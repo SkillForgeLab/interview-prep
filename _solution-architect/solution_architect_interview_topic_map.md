@@ -1,5 +1,7 @@
 # Senior Solution Architect Interview: Learn from Basics
 
+> /Users/sreedhar/Documents/Codex/2026-10-13/plan/outputs/solution_architect_interview_topic_map.md
+
 **Interview target:** A role for a candidate with 20+ years of experience.  
 **Starting point:** No prior topic knowledge is assumed.  
 **Target role:** Sr Solutions Architect I, American Express Global Commercial Services (GCS).  

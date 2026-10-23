@@ -2,7 +2,7 @@
 
 **Interview companion for Sreedhar | Technical and coding round**
 
-Use this beside `interview-study-guide.md`. The examples use Java 8 syntax unless a newer release is named. Read one section, run or trace its example, then explain it aloud without looking. For a coding exercise, first write a clear loop; use a stream when it makes the transformation easier to read.
+Use this beside `interview-study-guide-full.md`. The examples use Java 8 syntax unless a newer release is named. Read one section, run or trace its example, then explain it aloud without looking. For a coding exercise, first write a clear loop; use a stream when it makes the transformation easier to read.
 
 ## 1. The three ideas in one minute
 

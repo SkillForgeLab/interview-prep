@@ -1,3 +1,9 @@
+> solution_architect_interview_topic_map
+`/Users/sreedhar/Documents/Codex/2026-10-13/plan/outputs/solution_architect_interview_topic_map.md`
+
+
+
+
 A cache stampede (also known as the dogpiling effect or thundering herd problem) is a cascading system failure that occurs when a heavily requested, high-traffic cache key expires.
 Instead of a single worker smoothly updating the data, thousands of concurrent requests experience a cache miss at the exact same millisecond, bypassing the cache and slamming the primary database simultaneously to recompute the same identical data. This sudden flood of redundant work spikes CPU usage, exhausts database connection pools, and can trigger total system outages.
 
