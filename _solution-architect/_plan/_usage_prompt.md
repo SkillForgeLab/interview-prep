@@ -22,14 +22,14 @@ American Express role information. Identify any gaps that should be fixed before
 ## 2. Prompt for creating the guide.
 
 Using `solution_architect_interview_topic_map_v3.md` in the project sources as the authoritative syllabus, create a
-complete learning guide for **`F01 — Business framing, requirements, and quality attributes`**.
+complete learning guide for **`F02 — Architecture method, views, and decision records`**.
 
 **My learning requirements:**
 
 1. Assume I have zero prior knowledge of every subject.
 2. Teach from absolute basics to the depth needed to support senior Solution Architect interview preparation.
 3. Follow the learning and teaching rules in the topic map.
-4. Cover every checklist item assigned to `F01 (C014-C018)`. Do not skip or combine items in a way that loses required
+4. Cover every checklist item assigned to `F02 (C019-C022)`. Do not skip or combine items in a way that loses required
    detail.
 5. Break the guide into small, logically ordered lessons. Explain prerequisites before dependent concepts.
 6. For each concept, explain its purpose, terminology, how it works, and a practical example.
