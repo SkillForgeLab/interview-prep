@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>M03 · Essential distributed-systems mental model — beginner-first guide</title>
+<style>
+:root{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#202c39;background:#f4f7fa;line-height:1.67;--ink:#202c39;--muted:#586b7e;--blue:#184c75;--teal:#067b7c;--line:#dce5ec}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0}a{color:#075c91;text-underline-offset:3px}a:hover{color:#093e62}
+.layout{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:100vh}.sidebar{border-right:1px solid var(--line);background:#fff;padding:22px 14px 22px 20px;height:100vh;position:sticky;top:0;overflow:auto}
+.brand{display:flex;align-items:center;gap:12px;margin:0 7px 13px}.brand-square{background:#184c75;color:#fff;font-weight:800;letter-spacing:.02em;width:43px;height:43px;border-radius:12px;display:grid;place-items:center}.brand h2{font-size:14px;margin:0;line-height:1.4;color:#183c5d}.brand p{font-size:11px;margin:0;color:var(--muted)}
+.progress{padding:12px 14px;margin:8px 6px 15px;background:#f1f7f8;border:1px solid #d7e9e9;border-radius:12px;font-size:12px}.progress b{font-size:16px}.track{height:7px;border-radius:50px;background:#d2e2e5;margin-top:8px;overflow:hidden}.fill{height:100%;width:0;background:var(--teal);transition:width .2s}.nav-group{font-size:10px;color:#718191;letter-spacing:.12em;text-transform:uppercase;margin:19px 10px 7px;font-weight:800}.nav-item{display:flex;align-items:center;justify-content:space-between;gap:9px;text-decoration:none;color:#31475b;font-size:12px;font-weight:600;padding:9px 11px;border-radius:9px;margin-bottom:3px}.nav-item:hover{background:#f0f5f8;color:#164d73}.nav-item.active{background:#e8f2f6;color:#114e72;box-shadow:inset 3px 0 #1d8290}.nav-label{line-height:1.35}.nav-dot{width:10px;height:10px;flex:0 0 10px;border:1.5px solid #b0c3cf;border-radius:50%}.nav-dot.done{background:#067b7c;border-color:#067b7c}.sidebar-tip{font-size:11px;color:#718191;margin:18px 10px}
+.main{min-width:0}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:12px 30px;position:sticky;top:0;z-index:10;background:rgba(248,250,252,.97);border-bottom:1px solid var(--line)}.toolbar strong{font-size:12px;font-weight:700;color:#274960}.actions{display:flex;gap:7px;flex-wrap:wrap}button{border-radius:9px;border:1px solid #c9d8e2;padding:8px 12px;cursor:pointer;background:#fff;color:#21445f;font-weight:650;font-size:12px}button:hover{background:#f0f6f9}button.primary{background:#184c75;border-color:#184c75;color:white}button.primary:hover{background:#0e3858}
+.paper{max-width:940px;margin:28px auto 70px;padding:0 26px}.panel{background:white;border:1px solid #dde6ee;border-radius:15px;box-shadow:0 7px 30px rgba(41,71,99,.045);padding:36px 44px;margin-bottom:22px}.panel[hidden]{display:none}.panel h1{font-size:30px;line-height:1.2;color:#123e5c;letter-spacing:-.027em;margin:0 0 19px}.panel h2{font-size:25px;line-height:1.26;color:#123e5c;letter-spacing:-.02em;margin:0 0 24px}.panel h3{font-size:18px;color:#17516f;margin:29px 0 10px;line-height:1.36}.panel h4{font-size:15px;margin:20px 0 8px}.panel p,.panel li{font-size:14px}.panel p{margin:11px 0}.panel li{margin-bottom:4px}.panel ul,.panel ol{padding-left:24px}.panel ul{margin:10px 0 14px}.panel blockquote{margin:20px 0;border-left:4px solid #098183;background:#f0f8f7;padding:11px 19px;border-radius:0 9px 9px 0}.panel blockquote p{margin:0;font-size:14px}.panel pre{overflow:auto;border:1px solid #d6e5eb;color:#1b3851;background:#f6f9fb;padding:17px 18px;border-radius:11px;font-size:12px;line-height:1.42;white-space:pre;tab-size:4}.panel code{font: .93em ui-monospace,SFMono-Regular,Consolas,Monaco,monospace;background:#edf3f6;border-radius:4px;padding:2px 4px}.panel pre code{background:none;padding:0;font-size:inherit}.panel strong{color:#203f56}.panel hr{border:0;border-top:1px solid var(--line);margin:29px 0}.panel table{border-collapse:collapse;width:100%;font-size:12px;line-height:1.5;margin:18px 0;display:block;overflow-x:auto}.panel th,.panel td{padding:9px 11px;border:1px solid #dce5ec;vertical-align:top;min-width:84px}.panel th{background:#eff5f8;color:#244b65;text-align:left}.panel tr:nth-child(even) td{background:#fbfdfe}.panel input[type=checkbox]{accent-color:#0a7375}
+.lesson-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-5px 0 17px}.kicker{letter-spacing:.13em;font-size:11px;font-weight:800;color:#087e80}.complete-label{font-size:12px;font-weight:650;color:#496474;display:flex;align-items:center;gap:7px;cursor:pointer}.lesson-notes{margin-top:30px;border-top:1px solid #dae6ee;padding-top:18px}.lesson-notes label{display:block;font-weight:750;font-size:13px;margin-bottom:8px}.lesson-notes textarea{font:inherit;width:100%;border:1px solid #cbdae4;border-radius:9px;padding:12px;resize:vertical;font-size:13px;line-height:1.5;min-height:90px;color:var(--ink)}.lesson-notes textarea:focus{outline:2px solid #70b7b9}.subtle{display:block;font-size:11px;color:#6a7c8b;margin-top:4px}.notice{max-width:940px;margin:0 auto;color:#537087;font-size:12px;padding:14px 27px 0}.footer-nav{display:flex;justify-content:space-between;gap:10px;max-width:940px;margin:0 auto 50px;padding:0 27px}.footer-nav button{min-width:110px}
+@media(max-width:850px){.layout{display:block}.sidebar{height:auto;position:relative;border-right:0;border-bottom:1px solid var(--line);max-height:220px;padding:13px;overflow:auto}.brand{margin:0 4px 6px}.nav-group{margin-top:13px}.sidebar-tip{display:none}.nav-item{display:inline-flex;width:46%;vertical-align:top;margin-right:1%}.progress{max-width:280px}.toolbar{padding:10px 14px}.paper{padding:0 12px;margin-top:15px}.panel{padding:25px 18px}.panel h1{font-size:26px}.panel h2{font-size:22px}}
+@media print{@page{size:A4;margin:14mm 13mm}*{print-color-adjust:exact;-webkit-print-color-adjust:exact}html,body{background:white!important;color:#111!important}.layout{display:block}.sidebar,.toolbar,.footer-nav,.notice,.lesson-notes,button{display:none!important}.paper{padding:0;margin:0;max-width:none}.panel,.panel[hidden]{display:block!important;box-shadow:none;border:0;border-radius:0;padding:0;margin:0 0 20px;break-inside:auto}.panel.lesson-panel{break-before:page}.panel:not(.lesson-panel) h2{break-before:page}h1,h2,h3{break-after:avoid}blockquote,pre,tr{break-inside:avoid}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:9pt}p,li{font-size:10pt!important}table{font-size:8pt!important;overflow:visible!important;display:table!important;width:100%}td,th{padding:4pt 5pt!important}.panel a{color:#222;text-decoration:none}.kicker,.complete-label{display:none}.panel h1{font-size:22pt}.panel h2{font-size:17pt}.panel h3{font-size:12pt}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar" aria-label="Guide contents">
+<div class="brand"><div class="brand-square">M03</div><div><h2>Distributed systems</h2><p>Beginner-first learning guide</p></div></div>
+<div class="progress"><span>Lessons practiced</span><div><b id="progress-number">0</b> / 12</div><div class="track" aria-label="Lesson practice progress"><div class="fill" id="fill"></div></div></div>
+<nav id="side-nav"><div class="nav-group">Foundations</div>
+<a class="nav-item" href="#overview" id="overview-nav" data-target="overview"><span class="nav-label">Introduction</span></a>
+<a class="nav-item" href="#how-to-use-this-guide" id="how-to-use-this-guide-nav" data-target="how-to-use-this-guide"><span class="nav-label">Start here</span></a>
+<div class="nav-group">Lessons</div>
+<a class="nav-item" href="#l29" id="l29-nav" data-target="l29"><span class="nav-label">L29 · One running program versus two programs communicating</span><span class="nav-dot" data-dot="L29"></span></a>
+<a class="nav-item" href="#l30" id="l30-nav" data-target="l30"><span class="nav-label">L30 · Modular monolith versus separate services</span><span class="nav-dot" data-dot="L30"></span></a>
+<a class="nav-item" href="#l31" id="l31-nav" data-target="l31"><span class="nav-label">L31 · Network call, latency, and a normal request timeline</span><span class="nav-dot" data-dot="L31"></span></a>
+<a class="nav-item" href="#l32" id="l32-nav" data-target="l32"><span class="nav-label">L32 · What failure looks like: crash, missing reply, delayed reply</span><span class="nav-dot" data-dot="L32"></span></a>
+<a class="nav-item" href="#l33" id="l33-nav" data-target="l33"><span class="nav-label">L33 · A timeout is not proof of failure</span><span class="nav-dot" data-dot="L33"></span></a>
+<a class="nav-item" href="#l34" id="l34-nav" data-target="l34"><span class="nav-label">L34 · Safe and unsafe retries; stable request identity</span><span class="nav-dot" data-dot="L34"></span></a>
+<a class="nav-item" href="#l35" id="l35-nav" data-target="l35"><span class="nav-label">L35 · Two requests at the same time: lost update</span><span class="nav-dot" data-dot="L35"></span></a>
+<a class="nav-item" href="#l36" id="l36-nav" data-target="l36"><span class="nav-label">L36 · One-database transactions versus actions across systems</span><span class="nav-dot" data-dot="L36"></span></a>
+<a class="nav-item" href="#l37" id="l37-nav" data-target="l37"><span class="nav-label">L37 · Synchronous versus asynchronous communication</span><span class="nav-dot" data-dot="L37"></span></a>
+<a class="nav-item" href="#l38" id="l38-nav" data-target="l38"><span class="nav-label">L38 · Clock uncertainty: timestamps do not always prove order</span><span class="nav-dot" data-dot="L38"></span></a>
+<a class="nav-item" href="#l39" id="l39-nav" data-target="l39"><span class="nav-label">L39 · Network partition: decide which operation may pause</span><span class="nav-dot" data-dot="L39"></span></a>
+<a class="nav-item" href="#l40" id="l40-nav" data-target="l40"><span class="nav-label">L40 · Put it together: one failure timeline and one decision</span><span class="nav-dot" data-dot="L40"></span></a>
+<div class="nav-group">Practice &amp; review</div>
+<a class="nav-item" href="#m03-capstone-workbook-do-only-after-l29-l40" id="m03-capstone-workbook-do-only-after-l29-l40-nav" data-target="m03-capstone-workbook-do-only-after-l29-l40"><span class="nav-label">M03 capstone workbook — do only after L29–L40</span></a>
+<a class="nav-item" href="#coach-s-answer-key-reveal-only-after-making-an-attempt" id="coach-s-answer-key-reveal-only-after-making-an-attempt-nav" data-target="coach-s-answer-key-reveal-only-after-making-an-attempt"><span class="nav-label">Coach&#x27;s answer key — reveal only after making an attempt</span></a>
+<a class="nav-item" href="#speaking-laboratory-understanding-first-polish-second" id="speaking-laboratory-understanding-first-polish-second-nav" data-target="speaking-laboratory-understanding-first-polish-second"><span class="nav-label">Speaking laboratory — understanding first, polish second</span></a>
+<a class="nav-item" href="#glossary-plain-language-in-lesson-order" id="glossary-plain-language-in-lesson-order-nav" data-target="glossary-plain-language-in-lesson-order"><span class="nav-label">Glossary — plain language, in lesson order</span></a>
+<a class="nav-item" href="#progress-notebook-and-completion-checklist" id="progress-notebook-and-completion-checklist-nav" data-target="progress-notebook-and-completion-checklist"><span class="nav-label">Progress notebook and completion checklist</span></a>
+<a class="nav-item" href="#verified-primary-sources-and-scope-notes" id="verified-primary-sources-and-scope-notes-nav" data-target="verified-primary-sources-and-scope-notes"><span class="nav-label">Verified primary sources and scope notes</span></a></nav>
+<p class="sidebar-tip">One lesson at a time. Mark a lesson after you can trace, explain, and transfer it.</p>
+</aside>
+<div class="main">
+<div class="toolbar"><strong id="breadcrumb">M03 · Introduction</strong><div class="actions"><button id="show-all" type="button">Show all</button><button id="print" type="button">Print / Save as PDF</button><button id="copy-note" type="button">Copy notes</button></div></div>
+<p class="notice">Offline single-file guide · All systems and numeric targets are hypothetical · Technical sources are linked in the References section</p>
+<main class="paper" id="guide"><section class="panel guide-panel preamble" id="overview" data-id="overview" data-lesson="" aria-labelledby="overview-nav"><h1 id="m03-the-essential-distributed-systems-mental-model">M03 — The essential distributed-systems mental model</h1>
+<p><strong>Beginner-first learning and speaking guide · 24 October 2026</strong><br/>
+<strong>Authoritative syllabus:</strong> <code>__sa_beginner_first_curriculum.md</code>, mission M03 (L29–L40).<br/>
+<strong>Scope:</strong> One complete study resource, <strong>not</strong> one lesson to deliver in a single tutoring turn.<br/>
+<strong>Practice context:</strong> A <strong>hypothetical</strong> commercial spending platform; no American Express internal architecture is assumed or claimed.</p>
+<blockquote>
+<p><strong>The mental model:</strong> A program can send a request to another program, but it cannot always tell whether the other program completed the work. Different machines can fail or be delayed independently. Safe design starts by distinguishing <strong>what happened</strong>, <strong>what we observed</strong>, and <strong>what remains unknown</strong>.</p>
+</blockquote>
+</section>
+<section class="panel guide-panel" id="how-to-use-this-guide" data-id="how-to-use-this-guide" data-lesson="" aria-labelledby="how-to-use-this-guide-nav"><h2 id="how-to-use-this-guide">How to use this guide</h2>
+<ol>
+<li>Start at <strong>L29</strong> only after the M01 request/network/database basics and M02 business journey are familiar. If these feel unclear, return to those prerequisites first. <strong>Do not begin with a diagnostic.</strong></li>
+<li>Work on <strong>one lesson per conversation/session</strong>. First read <em>Purpose</em>, <em>Example</em>, and <em>Trace</em>. Then answer the <strong>one immediate check</strong>. Do not read the answer key before attempting it.</li>
+<li>After the check, say a <strong>single sentence in your own words</strong>. Then do the <em>Small change</em> exercise. Only afterward try the 2–4 sentence interview version and its judgment prompt.</li>
+<li>If you cannot explain a step, use the sentence starter and replay the original example. Progress depends on understanding, not speed.</li>
+<li>Keep a short progress note. Review material already taught after roughly 1, 3, 7, and 21 days if useful; those are flexible review intervals, not a scientific prescription.</li>
+</ol>
+<p><strong>M03 exit gate:</strong> Trace a normal request, explain one failure, apply the idea to a nearby case, and explain it clearly for <strong>30–60 seconds</strong>. A full senior panel answer is <strong>not</strong> expected yet.</p>
+<p><strong>Tutor feedback pattern:</strong> <code>UNDERSTANDING: ... | SPECIFIC FIX: ... | SPEAKING: ... | TRY AGAIN: ... | NEXT: ...</code>. Correct technical meaning first; improve wording second. If the learner misses twice, teach differently before trying again.</p>
+<h3 id="five-prerequisite-facts-to-remember-not-to-test-cold">Five prerequisite facts to remember, not to test cold</h3>
+<p>A <strong>process</strong> is a running program. A <strong>client</strong> sends a <strong>request</strong> to a <strong>server</strong>, which may send back a <strong>response</strong>. A <strong>network</strong> carries information between machines and can delay or lose communication. A <strong>database transaction</strong> groups supported local operations so that they commit together or roll back. An <strong>API contract</strong> states how programs exchange requests and responses. These ideas are from M01; the business journey and requirement/assumption distinction come from M02.</p>
+<h3 id="running-case-first-learn-the-normal-path">Running case — first learn the normal path</h3>
+<p>An employee submits a purchase request. The platform checks an organization's spending policy. Some requests also need a remote risk check. A separate payment provider may later receive an instruction. Finance needs accurate status. All services, timings, policies, and amounts below are <strong>made-up training assumptions</strong>.</p>
+<pre><code class="language-text">Employee     Purchase application        Policy data       Risk service       Provider
+   |                  |                       |                  |              |
+   |-- submit -------&gt;|                       |                  |              |
+   |                  |-- read --------------&gt;|                  |              |
+   |                  |&lt;-- allowed -----------|                  |              |
+   |                  |-- check, if needed ---------------------&gt;|              |
+   |                  |&lt;-- risk result --------------------------|              |
+   |                  |-- record request state |                  |              |
+   |                  |-- send financial instruction, if authorized -----------&gt;|
+   |                  |&lt;-- provider reply, if delivered -----------------------|
+   |&lt;-- truthful status + request ID ---------|                  |              |
+</code></pre>
+<p>A <code>request_id</code> identifies a <strong>logical business request</strong>. A network <strong>attempt</strong> is one effort to send or execute work. One logical request can have several attempts. Do not assume that a timeout or a response labeled “accepted” proves that money moved or final settlement occurred. The provider contract and business policy must define these states; M05 treats them in depth.</p>
+<hr/>
+</section>
+<section class="panel lesson-panel" id="l29" data-id="l29" data-lesson="L29" aria-labelledby="l29-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L29</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L29" aria-label="Mark L29 practiced"> Practiced with understanding</label></div><h2 id="l29">L29 — One running program versus two programs communicating</h2>
+<p><strong>Purpose.</strong> Inside one running program, a function can call another function directly. With two programs on different machines, one program sends information across a network. The other program may be slow, unreachable, or fail independently.</p>
+<p><strong>Tiny example.</strong> Asking a colleague beside you is not the same as mailing a request to another office. You may send the letter but not know when it arrived. <strong>Limit of the analogy:</strong> Networks deliver digital messages under protocols; delivery, security, and retry behavior depend on the specific system.</p>
+<p><strong>Trace the normal path.</strong></p>
+<ol>
+<li>The purchase program receives <code>request_id = R-17</code>.</li>
+<li>In one process, it calls <code>check_policy(900, 1000)</code> as an ordinary function and receives <code>True</code>.</li>
+<li>In a two-program design, it instead sends a message to a policy service.</li>
+<li>That service evaluates the request and sends a reply over the network.</li>
+</ol>
+<pre><code class="language-text">ONE PROCESS                        TWO PROGRAMS
++----------------------+           +-------------+      network      +-------------+
+| Purchase program     |           | Purchase    |------------------&gt;| Policy      |
+|  -&gt; check_policy()   |           | program     |&lt;------------------| service     |
++----------------------+           +-------------+                   +-------------+
+Direct call inside process          Request and separate response
+</code></pre>
+<p><strong>Immediate check — answer before continuing.</strong> In the two-program picture, what carries the request between programs?</p>
+<p><strong>Speak.</strong> “When two programs run separately, they communicate by ___.” Then add: “This matters because ___.”</p>
+<p><strong>Small change, later.</strong> Suppose the policy service is running but its network link stops working. Can the purchase program still receive its answer?</p>
+<p><strong>Later interview form (read only after your own attempt).</strong> “A local function call stays inside a running process, whereas a remote service call crosses a communication boundary. That introduces independent failures, delays, and uncertain replies. I choose the boundary only when its business and operational benefits justify those costs.”</p>
+<p><strong>Review cue.</strong> Draw a line between <em>same process</em> and <em>remote process</em>, and describe what crosses the line.</p>
+<div class="lesson-notes"><label for="notes-l29">My own words / follow-up notes</label><textarea id="notes-l29" data-notes="l29" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l30" data-id="l30" data-lesson="L30" aria-labelledby="l30-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L30</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L30" aria-label="Mark L30 practiced"> Practiced with understanding</label></div><h2 id="l30">L30 — Modular monolith versus separate services</h2>
+<p><strong>Purpose.</strong> A <strong>modular monolith</strong> is one deployable application with clear internal modules. <strong>Separate services</strong> run and deploy independently and communicate through explicit interfaces. More services do not automatically make a system better.</p>
+<p><strong>Tiny example.</strong> One shop can have separate counters inside the same building. Two independent shops need delivery and coordination between them. <strong>Limit:</strong> Software modules can share one deployment and transaction; shops do not precisely model code or data ownership.</p>
+<p><strong>Trace the choice.</strong></p>
+<ol>
+<li>A purchase module accepts the request.</li>
+<li>A policy module checks a rule. In a modular monolith, this may be a local function call.</li>
+<li>A reporting module records a view. It can be internal or a separate service.</li>
+<li>With separately deployed services, their owners must specify calls, data authority, timeouts, and recovery paths.</li>
+</ol>
+<pre><code class="language-text">OPTION A: one deployable app          OPTION B: separately deployed
++-----------------------------+       +----------+   API   +----------+
+| Purchase | Policy | Report  |       | Purchase |--------&gt;| Policy   |
+|   modules, clear boundaries |       +----------+         +----------+
++-----------------------------+            |
+           |                               +------API------&gt; Reporting
+        Database                         (different release/failure boundaries)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Modular monolith</th>
+<th>Separate services</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Independent deployment needed?</td>
+<td>Usually no</td>
+<td>Possible</td>
+</tr>
+<tr>
+<td>Remote hops between these modules?</td>
+<td>Not needed</td>
+<td>Usually yes</td>
+</tr>
+<tr>
+<td>Operational coordination</td>
+<td>Often simpler</td>
+<td>More contracts and monitoring</td>
+</tr>
+<tr>
+<td>Can it still have distributed risks?</td>
+<td>Yes: remote DB/providers</td>
+<td>Yes: between services and providers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Immediate check.</strong> Can one modular monolith still depend on a remote database or payment provider?</p>
+<p><strong>Speak.</strong> “I would start with ___ when ___, because ___.”</p>
+<p><strong>Small change, later.</strong> Reporting now has its own team and must deploy independently every day. How might that change the boundary choice?</p>
+<p><strong>Later interview form.</strong> “I would first test whether clear modules in one application meet the team and release needs. Separate services offer independent deployment and scaling but add network failure modes, data ownership, and operational cost. I would split when a specific constraint justifies those costs.”</p>
+<p><strong>Review cue.</strong> Explain why “microservices everywhere” is not a design requirement.</p>
+<div class="lesson-notes"><label for="notes-l30">My own words / follow-up notes</label><textarea id="notes-l30" data-notes="l30" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l31" data-id="l31" data-lesson="L31" aria-labelledby="l31-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L31</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L31" aria-label="Mark L31 practiced"> Practiced with understanding</label></div><h2 id="l31">L31 — Network call, latency, and a normal request timeline</h2>
+<p><strong>Purpose.</strong> <strong>Latency</strong> is elapsed time between starting an operation and receiving the outcome being measured. A remote call spends time in the network, queues, and server work, so multiple calls can add delay.</p>
+<p><strong>Tiny example.</strong> Sending a form to another desk takes delivery time, processing time, and return time. <strong>Limit:</strong> Real networks can vary sharply, and queued requests can overtake each other.</p>
+<p><strong>Trace a normal call.</strong> These milliseconds are <strong>hypothetical teaching values</strong>, not measured service targets.</p>
+<ol>
+<li>At <code>t=0 ms</code>, the purchase service sends a policy request.</li>
+<li>Request travel takes 20 ms; policy processing takes 40 ms.</li>
+<li>Reply travel takes 20 ms.</li>
+<li>The caller receives the response at <code>t=80 ms</code>. Observed call latency is <strong>80 ms</strong>.</li>
+</ol>
+<pre><code class="language-text">Time        Purchase program                  Policy program
+0 ms        send -----------------------------&gt;
+20 ms                                            receive
+20–60 ms                                         work (40 ms)
+60 ms       &lt;-------------------------------   reply
+80 ms       receive result
+</code></pre>
+<p>If a risk call of 150 ms starts <strong>after</strong> the policy call, these two calls alone cost about <code>80 + 150 = 230 ms</code> on this hypothetical path. If independent work can safely run in parallel, elapsed time may be closer to the longer branch plus coordination overhead. Do not parallelize work that depends on a prior decision.</p>
+<p><strong>Immediate check.</strong> In the 80 ms example, how much time did policy processing itself take?</p>
+<p><strong>Speak.</strong> “A remote call's time includes ___, ___, and ___.”</p>
+<p><strong>Small change, later.</strong> The policy service starts queuing requests for 120 ms. What happens to total elapsed time if all else stays equal?</p>
+<p><strong>Later interview form.</strong> “I would draw the critical request path and measure elapsed time at each hop. Serial dependencies add to user-visible latency, while queueing and variable remote delays often affect slow requests most. I would allocate a provisional end-to-end budget and validate it with measurements.”</p>
+<p><strong>Review cue.</strong> Distinguish <strong>one hop’s elapsed time</strong> from <strong>total journey time</strong>. A sum of individual high-percentile timings is not itself a guaranteed journey percentile.</p>
+<div class="lesson-notes"><label for="notes-l31">My own words / follow-up notes</label><textarea id="notes-l31" data-notes="l31" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l32" data-id="l32" data-lesson="L32" aria-labelledby="l32-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L32</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L32" aria-label="Mark L32 practiced"> Practiced with understanding</label></div><h2 id="l32">L32 — What failure looks like: crash, missing reply, delayed reply</h2>
+<p><strong>Purpose.</strong> A <strong>crash</strong> stops a running process. A <strong>missing reply</strong> means the caller did not receive an answer. A <strong>delayed reply</strong> may arrive too late to be useful. These events look different from the caller’s point of view.</p>
+<p><strong>Tiny example.</strong> A courier might never reach the office, deliver a message but lose the receipt, or return the receipt tomorrow. <strong>Limit:</strong> The analogy does not provide evidence of exact digital execution or commitment.</p>
+<p><strong>Trace three separate cases.</strong> Teach them separately, then compare.</p>
+<pre><code class="language-text">A. Crash before work:       Caller ---&gt; Service X     (not executed in this case)
+B. Reply lost:              Caller ---&gt; Service [work done] --X--&gt; Caller
+C. Reply late:              Caller ---&gt; Service [slow work] -----&gt; Caller (too late)
+</code></pre>
+<ol>
+<li>In case A, <strong>given the stated trace</strong>, the service stopped before the work started. The work did not run.</li>
+<li>In case B, the work occurred, but the network hid the success reply.</li>
+<li>In case C, the server eventually answered, but the caller may have given up waiting.</li>
+<li>Without a trustworthy trace or durable evidence, the caller may not know which case happened.</li>
+</ol>
+<p><strong>Immediate check.</strong> In case B, did the action fail just because the reply was lost?</p>
+<p><strong>Speak.</strong> “The caller observed ___, but the actual work may have ___.”</p>
+<p><strong>Small change, later.</strong> The server crashed <em>after</em> writing to its database but before sending the reply. Which part of the work can survive the crash?</p>
+<p><strong>Later interview form.</strong> “I separate execution failure from communication failure. If a caller receives no answer, I do not infer that the server did no work. I inspect durable state and trace evidence before choosing a recovery action.”</p>
+<p><strong>Review cue.</strong> Re-create A, B, and C without looking.</p>
+<div class="lesson-notes"><label for="notes-l32">My own words / follow-up notes</label><textarea id="notes-l32" data-notes="l32" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l33" data-id="l33" data-lesson="L33" aria-labelledby="l33-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L33</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L33" aria-label="Mark L33 practiced"> Practiced with understanding</label></div><h2 id="l33">L33 — A timeout is not proof of failure</h2>
+<p><strong>Purpose.</strong> A <strong>timeout</strong> means the caller stopped waiting after a configured limit. It does <strong>not</strong> by itself prove whether the remote action happened.</p>
+<p><strong>Tiny example.</strong> A restaurant does not answer your call within 30 seconds. That does not tell you whether it already received the order you placed earlier. <strong>Limit:</strong> A phone-call analogy cannot establish the provider’s guarantees.</p>
+<p><strong>Trace the unknown state.</strong></p>
+<ol>
+<li>Purchase service sends instruction <code>R-17</code> at <code>t=0</code>.</li>
+<li>Provider executes the action at <code>t=200 ms</code> in this scenario.</li>
+<li>The provider’s response never reaches the purchase service.</li>
+<li>The purchase service’s <strong>500 ms deadline</strong> expires.</li>
+<li>The purchase service knows <strong>“no timely reply”</strong>, not <strong>“provider did nothing.”</strong></li>
+</ol>
+<pre><code class="language-text">Caller                 Provider
+  |---- R-17 -----------&gt;|
+  |                      | action completed
+  |&lt;----X reply lost ----|
+  |
+  +-- timeout (knowledge = UNKNOWN)
+</code></pre>
+<p><strong>Immediate check.</strong> After the timeout, what fact can the caller state with confidence?</p>
+<p><strong>Speak.</strong> “A timeout tells us ___; it does not tell us ___.”</p>
+<p><strong>Small change, later.</strong> A status-query API exists. What question can the caller ask without initiating another action?</p>
+<p><strong>Later interview form.</strong> “A timeout only tells me that the deadline passed without a usable response. The remote side may have committed the action. For a side-effecting operation I preserve an unknown state, inspect durable evidence, and avoid blindly resubmitting it.”</p>
+<p><strong>Review cue.</strong> Say the M03 pass phrase using different words: <strong>No reply is not proof of no action.</strong></p>
+<div class="lesson-notes"><label for="notes-l33">My own words / follow-up notes</label><textarea id="notes-l33" data-notes="l33" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l34" data-id="l34" data-lesson="L34" aria-labelledby="l34-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L34</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L34" aria-label="Mark L34 practiced"> Practiced with understanding</label></div><h2 id="l34">L34 — Safe and unsafe retries; stable request identity</h2>
+<p><strong>Purpose.</strong> A <strong>retry</strong> is another attempt after a first attempt has not yielded a usable result. A <strong>stable request identity</strong> lets the system recognize that the second attempt refers to the same logical operation. Retries are only safe when the operation and the receiver’s contract make them safe.</p>
+<p><strong>Tiny example.</strong> Refreshing a read-only page is different from pressing “pay” twice. <strong>Limit:</strong> Some “read” operations can have side effects and some writes offer explicit retry-safe contracts; check the actual contract rather than relying on labels.</p>
+<p><strong>Trace.</strong></p>
+<ol>
+<li>Client sends <code>request_id=R-17</code> and amount <code>900</code> minor units.</li>
+<li>Reply is lost. Client retries <strong>the same</strong> <code>R-17</code>.</li>
+<li>The receiving system checks a <strong>durable</strong>, atomically created identity record for this scope and the original input.</li>
+<li>It returns the known result or a truthful pending state rather than starting a second independent operation.</li>
+<li>If the same identity arrives with different parameters, the system rejects the mismatch.</li>
+</ol>
+<pre><code class="language-text">First attempt:  R-17 / 900 --&gt; [durable operation R-17] --&gt; external effect?
+Retry:          R-17 / 900 --&gt; [look up R-17] ---------&gt; same operation
+Different:      R-17 / 950 --&gt; [reject mismatch]
+</code></pre>
+<p>A unique ID <strong>by itself</strong> does not guarantee one external effect. It needs atomic deduplication, a defined scope and retention window, and the downstream provider’s actual guarantees. If the provider has neither reliable idempotency nor status queries, hold uncertain financial outcomes for reconciliation rather than blindly retrying. M05 develops this carefully.</p>
+<p><strong>Immediate check.</strong> On retry, should the client generate a new logical request ID for the same intended action?</p>
+<p><strong>Speak.</strong> “I reuse the same request identity because ___.”</p>
+<p><strong>Small change, later.</strong> Two identical requests reach two different application instances at once. Why does checking an in-memory list on each instance fail?</p>
+<p><strong>Later interview form.</strong> “I classify the operation before retrying it. For mutations, a stable business request ID must be backed by atomic durable deduplication and compatible provider semantics. On an uncertain financial outcome, I query or reconcile before sending another independent instruction.”</p>
+<p><strong>Review cue.</strong> Distinguish <strong>a logical operation</strong> from <strong>one network attempt</strong>.</p>
+<div class="lesson-notes"><label for="notes-l34">My own words / follow-up notes</label><textarea id="notes-l34" data-notes="l34" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l35" data-id="l35" data-lesson="L35" aria-labelledby="l35-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L35</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L35" aria-label="Mark L35 practiced"> Practiced with understanding</label></div><h2 id="l35">L35 — Two requests at the same time: lost update</h2>
+<p><strong>Purpose.</strong> <strong>Concurrency</strong> means multiple pieces of work overlap in time. A <strong>lost update</strong> happens when one writer saves an old calculation and overwrites another writer’s change.</p>
+<p><strong>Tiny example.</strong> Two people both read the same notebook balance, calculate separately, and each write a new balance. <strong>Limit:</strong> A real database has concurrency controls and exact behavior depends on its isolation and query form.</p>
+<p><strong>Trace.</strong> The training balance starts at <strong>100</strong>.</p>
+<ol>
+<li>Worker A reads <code>balance=100</code> and plans to subtract 10.</li>
+<li>Worker B also reads <code>balance=100</code> and plans to subtract 20.</li>
+<li>Worker A writes <code>90</code>.</li>
+<li>Worker B writes <code>80</code> from its stale read, hiding A’s subtraction.</li>
+<li>Expected total after both valid subtractions is <strong>70</strong>. Actual stored value is <strong>80</strong>.</li>
+</ol>
+<pre><code class="language-text">Time   Worker A                  Stored balance            Worker B
+ t0                              100
+ t1    read 100
+ t2                                                        read 100
+ t3    write 90  -------------&gt; 90
+ t4                              80 &lt;------------------ write 80
+ Final = 80; one update has been lost.
+</code></pre>
+<p>One fix is <strong>optimistic concurrency control</strong>: every record has a <code>version</code>. A writer updates only if the version is still the one it read.</p>
+<pre><code class="language-sql">UPDATE balances
+SET amount_minor = amount_minor - 10,
+    version = version + 1
+WHERE account_id = 'A' AND version = 4 AND amount_minor &gt;= 10;
+</code></pre>
+<p>The caller must check the number of affected rows. <strong>One</strong> means this guarded write succeeded; <strong>zero</strong> means a conflict, missing row, or rejected condition. It must decide whether to reread, report conflict, or safely retry the full business decision. This example assumes the database executes the statement atomically. A pessimistic alternative is a transaction with an appropriate row lock and carefully defined scope; locking is not universally better.</p>
+<p><strong>Immediate check.</strong> What number is left in the flawed trace, and what number should be left?</p>
+<p><strong>Speak.</strong> “A lost update occurs when ___.”</p>
+<p><strong>Small change, later.</strong> Worker B uses a version check after worker A succeeds. Does B overwrite A’s value, or does it detect a conflict?</p>
+<p><strong>Later interview form.</strong> “Concurrent read–modify–write operations can lose changes. I would choose an atomic database update or version guard, test a conflict under overlapping requests, and define what the caller sees when one update cannot proceed. I would not assume that a transaction label alone removes every race.”</p>
+<p><strong>Review cue.</strong> Try the included Python interleaving lab <strong>after</strong> you can explain this paper trace.</p>
+<div class="lesson-notes"><label for="notes-l35">My own words / follow-up notes</label><textarea id="notes-l35" data-notes="l35" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l36" data-id="l36" data-lesson="L36" aria-labelledby="l36-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L36</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L36" aria-label="Mark L36 practiced"> Practiced with understanding</label></div><h2 id="l36">L36 — One-database transactions versus actions across systems</h2>
+<p><strong>Purpose.</strong> A <strong>transaction</strong> commits a supported set of changes as one unit <strong>inside its transactional boundary</strong>. A local database commit does not automatically commit or roll back a separate provider’s action.</p>
+<p><strong>Tiny example.</strong> Updating two fields in one ledger can be one local step; sending a separate package needs another confirmation. <strong>Limit:</strong> Some specialized distributed transaction protocols exist, but they need explicit coordination and guarantees and are not assumed in this case.</p>
+<p><strong>Trace.</strong></p>
+<ol>
+<li>The application inserts <code>PurchaseRequest(R-17, 'PENDING')</code> into its database.</li>
+<li>The database commits that record.</li>
+<li>The application sends a financial instruction to a separate provider.</li>
+<li>The provider acts, but the reply is lost. The local database still records the request; external outcome is unknown until evidence resolves it.</li>
+</ol>
+<pre><code class="language-text">LOCAL DATABASE TRANSACTION                 REMOTE PROVIDER
+BEGIN -&gt; insert R-17 -&gt; COMMIT             &lt;--- send after commit
+    |                                          action may happen
+Local change is durable (assumed)          local COMMIT cannot undo it
+</code></pre>
+<p>A <strong>transactional outbox</strong> later helps atomically save a local change and the <em>intent to publish a message</em> in the <strong>same database</strong>. It does not magically give atomic execution with the provider, and consumers still need duplicate handling. <strong>Saga</strong> and compensation appear later in M05. A compensation is a new fallible business action, not a guaranteed database rollback.</p>
+<p><strong>Immediate check.</strong> If the local database commits, does that prove the external provider completed its action?</p>
+<p><strong>Speak.</strong> “A database transaction protects ___, but it does not automatically protect ___.”</p>
+<p><strong>Small change, later.</strong> The process crashes after the database commit but before the remote send. What local evidence might help a recovery worker know what is still pending?</p>
+<p><strong>Later interview form.</strong> “I mark the transactional boundary explicitly. Local commits do not make a remote payment or message send atomic. I persist intent durably, model pending/unknown states, and design recovery and reconciliation around the actual external contract.”</p>
+<p><strong>Review cue.</strong> On a diagram, circle only the steps inside one transaction.</p>
+<div class="lesson-notes"><label for="notes-l36">My own words / follow-up notes</label><textarea id="notes-l36" data-notes="l36" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l37" data-id="l37" data-lesson="L37" aria-labelledby="l37-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L37</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L37" aria-label="Mark L37 practiced"> Practiced with understanding</label></div><h2 id="l37">L37 — Synchronous versus asynchronous communication</h2>
+<p><strong>Purpose.</strong> In <strong>synchronous request–reply</strong>, the caller waits for a result before it can finish the dependent step. In <strong>asynchronous work</strong>, a caller can accept a request and let other work continue later. Neither model automatically guarantees reliability.</p>
+<p><strong>Tiny example.</strong> Waiting on the phone for an answer is synchronous; leaving a written request with a tracking number is asynchronous. <strong>Limit:</strong> A queue is not necessarily durable, and “accepted” need not mean “completed.”</p>
+<p><strong>Trace the same user journey two ways.</strong></p>
+<pre><code class="language-text">SYNCHRONOUS                      ASYNCHRONOUS
+Client -&gt; API -&gt; Risk            Client -&gt; API -&gt; store durable intent
+Client &lt;- API &lt;- Risk            Client &lt;- API : ACCEPTED / R-17
+                                 Worker -&gt; Risk (later)
+                                 Client -&gt; status lookup -&gt; pending/done
+</code></pre>
+<ol>
+<li>Sync: request arrives; API waits on a risk response; it then replies.</li>
+<li>Async: API validates the input and durably records an accepted work item.</li>
+<li>API returns a request ID with <strong>pending/accepted</strong> status, not a false final success.</li>
+<li>Worker performs the task later; the caller checks status or receives a documented notification.</li>
+<li>If the work queue or worker fails, the design must define retention, retry/replay safety, and monitoring.</li>
+</ol>
+<p><strong>Immediate check.</strong> In the asynchronous example, does the immediate “accepted” response mean risk checking is complete?</p>
+<p><strong>Speak.</strong> “I prefer asynchronous processing when ___, but I must still ___.”</p>
+<p><strong>Small change, later.</strong> The employee must receive a binding risk decision before buying. Can the system simply report “approved” immediately after queueing?</p>
+<p><strong>Later interview form.</strong> “I use synchronous work for decisions required before responding. Asynchronous processing can remove long work from the immediate request path, but I still need durable acceptance, observable pending states, replay behavior, and clear completion semantics.”</p>
+<p><strong>Review cue.</strong> Define <strong>accepted</strong>, <strong>in progress</strong>, and <strong>completed</strong> without making them synonyms.</p>
+<div class="lesson-notes"><label for="notes-l37">My own words / follow-up notes</label><textarea id="notes-l37" data-notes="l37" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l38" data-id="l38" data-lesson="L38" aria-labelledby="l38-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L38</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L38" aria-label="Mark L38 practiced"> Practiced with understanding</label></div><h2 id="l38">L38 — Clock uncertainty: timestamps do not always prove order</h2>
+<p><strong>Purpose.</strong> Different computers have <strong>clocks</strong> that can disagree. A timestamp from machine A is not always sufficient to prove that its event occurred before a timestamp on machine B.</p>
+<p><strong>Tiny example.</strong> Two wall clocks show different minutes even when people act in a clear order. <strong>Limit:</strong> Well-engineered systems may use clock synchronization and special protocols; this lesson does not deny those specific guarantees.</p>
+<p><strong>Trace.</strong></p>
+<ol>
+<li>Service A completes event <code>E1</code> at real elapsed moment <code>t=10</code>, but its clock reads <code>10:00:05</code>.</li>
+<li>Service A sends a message to service B. B receives it afterward.</li>
+<li>Service B records event <code>E2</code> at real moment <code>t=11</code>, but its clock reads <code>10:00:03</code>.</li>
+<li>Looking only at timestamps falsely suggests <code>E2</code> came first.</li>
+</ol>
+<pre><code class="language-text">Real order:      A:E1 --------message--------&gt; B:E2
+Recorded time:   10:00:05                     10:00:03
+                 (larger)                     (smaller)
+</code></pre>
+<p>The known <strong>causal order</strong> is <code>E1 -&gt; message sent -&gt; message received -&gt; E2</code>. <strong>Causality</strong> here means one event could influence a later event. Within one ordered record stream, a <strong>sequence number</strong> or database-generated version can often express local order more reliably than wall-clock comparison. A global order across unrelated streams needs an explicit protocol and scope.</p>
+<p><strong>Immediate check.</strong> Which occurred first in this trace: <code>E1</code> or <code>E2</code>?</p>
+<p><strong>Speak.</strong> “Timestamps on different machines may mislead us because ___.”</p>
+<p><strong>Small change, later.</strong> Both services append to a single authoritative sequence. What additional ordering evidence would that provide?</p>
+<p><strong>Later interview form.</strong> “I avoid deriving global order from independent wall clocks alone. For correctness, I prefer causal relationships and a documented version or sequence order within the business entity. Any stronger cross-system ordering promise must be backed by the actual protocol.”</p>
+<p><strong>Review cue.</strong> Explain why <code>10:00:03</code> does not necessarily precede <code>10:00:05</code> across computers.</p>
+<div class="lesson-notes"><label for="notes-l38">My own words / follow-up notes</label><textarea id="notes-l38" data-notes="l38" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l39" data-id="l39" data-lesson="L39" aria-labelledby="l39-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L39</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L39" aria-label="Mark L39 practiced"> Practiced with understanding</label></div><h2 id="l39">L39 — Network partition: decide which operation may pause</h2>
+<p><strong>Purpose.</strong> A <strong>network partition</strong> occurs when parts of a distributed system cannot reliably communicate. If two sides cannot coordinate, some operations may need to pause to preserve a hard business rule.</p>
+<p><strong>Tiny example.</strong> Two store branches lose contact with the shared inventory office. Both can continue showing a cached catalog, but both independently selling the last unique item could cause an oversell. <strong>Limit:</strong> Software can use authority and reconciliation mechanisms; the analogy does not dictate a universal answer.</p>
+<p><strong>Trace a concrete purchase policy operation.</strong> Assume: one authoritative policy record, a hard organization spending cap, and two application locations that can no longer reach the authoritative record.</p>
+<ol>
+<li>Before partition, one designated writer checks and updates the authoritative remaining limit.</li>
+<li>The network link to that writer fails for the second location.</li>
+<li>Both locations might have old policy copies. An old copy is not proof of current capacity.</li>
+<li><strong>Policy choice in this hypothetical case:</strong> pause <strong>new cap-consuming approvals</strong> at the disconnected location; continue read-only history with a clear <strong>possibly stale</strong> label.</li>
+<li>Resume approvals only after authority and any in-flight requests are resolved. Someone must own this operational policy.</li>
+</ol>
+<pre><code class="language-text">Location A ------X------ Location B
+  |                            |
+  | authorized cap writer      | cached cap (may be old)
+  | new approvals possible     | PAUSE cap-consuming approvals
+  | read history possible      | read history with freshness label
+</code></pre>
+<p>This is a <strong>per-operation</strong> choice. A report read and a cap-consuming approval need not make the same availability–consistency trade-off. Do <strong>not</strong> describe an entire product as simply “AP” or “CP” without defining guarantees and failure assumptions.</p>
+<p><strong>Immediate check.</strong> Under the stated hard-cap policy, which operation pauses at location B?</p>
+<p><strong>Speak.</strong> “During a partition, I would allow ___ but pause ___ because ___.”</p>
+<p><strong>Small change, later.</strong> The business explicitly accepts a bounded overspend risk and sets a small offline allowance. What must be defined before that controlled degradation is safe?</p>
+<p><strong>Later interview form.</strong> “I first identify the invariant for a specific operation. During a partition, I would preserve authoritative writes for cap-consuming approvals even if some requests become unavailable. Less sensitive reads can continue with labeled stale data, provided product owners approve the behavior and reconciliation is defined.”</p>
+<p><strong>Review cue.</strong> Explain the partition decision for <strong>one action</strong>, not the entire system.</p>
+<div class="lesson-notes"><label for="notes-l39">My own words / follow-up notes</label><textarea id="notes-l39" data-notes="l39" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel lesson-panel" id="l40" data-id="l40" data-lesson="L40" aria-labelledby="l40-nav"><div class="lesson-top"><span class="kicker">MICRO-LESSON L40</span><label class="complete-label"><input type="checkbox" class="complete" data-lesson="L40" aria-label="Mark L40 practiced"> Practiced with understanding</label></div><h2 id="l40">L40 — Put it together: one failure timeline and one decision</h2>
+<p><strong>Purpose.</strong> A <strong>failure timeline</strong> records the order of requests, durable writes, observations, and unknowns. A <strong>decision record</strong> compares two credible choices using business requirements, failure behavior, and ownership.</p>
+<p><strong>Tiny example.</strong> A team reviews a lost parcel: when it was sent, whether delivery was confirmed, and which follow-up would create risk. <strong>Limit:</strong> For software, exact durable records and provider contracts matter more than anecdotes.</p>
+<p><strong>Trace the integrated training case.</strong></p>
+<ol>
+<li>Employee submits <code>R-17</code>. Purchase service records its validated intent.</li>
+<li>Purchase service calls a risk service, which evaluates the request.</li>
+<li>The risk reply is lost. The purchase service times out.</li>
+<li>The system keeps risk decision <strong>unknown</strong>, not “risk passed”. It does not issue a payment instruction whose policy requires prior risk approval.</li>
+<li>It uses an authorized status query or controlled reconciliation. A responsible owner reviews any unresolved case.</li>
+</ol>
+<pre><code class="language-text">Time    Employee       Purchase service          Risk provider
+ t0     R-17 ---------&gt; intent recorded
+ t1                     risk R-17 ---------------&gt; receives
+ t2                                                evaluates
+ t3                     &lt;---------X--------------- reply lost
+ t4     pending &lt;------- timeout / UNKNOWN
+ t5                     status query ------------&gt; evidence?
+ t6     updated &lt;------- confirmed or still pending
+</code></pre>
+<p><strong>Immediate check.</strong> At <code>t4</code>, is the risk result <em>rejected</em>, <em>approved</em>, or <em>unknown</em> from the caller’s available evidence?</p>
+<p><strong>Speak.</strong> “First ___; then the response ___; so we know ___ but still need ___.”</p>
+<p><strong>Small change, later.</strong> The risk provider has <strong>no</strong> status-query API. Who must decide whether requests wait, decline, or use a narrowly defined alternate process? What evidence is required?</p>
+<p><strong>Later interview form.</strong> “I would first draw the normal request path and ownership of each step. Then I would trace failure timing, separate local observations from external outcomes, and show which invariants prevent unsafe continuation. My boundary and recovery choice would be documented with a measurable latency goal, an operating owner, and a reversal condition.”</p>
+<p><strong>Review cue.</strong> Narrate L40 for 30–60 seconds without reading the professional answer.</p>
+<hr/>
+<div class="lesson-notes"><label for="notes-l40">My own words / follow-up notes</label><textarea id="notes-l40" data-notes="l40" placeholder="Write one short explanation in your words…" rows="3"></textarea><span class="subtle">Notes stay in this browser if local storage is available. They are not sent anywhere.</span></div></section>
+<section class="panel guide-panel" id="m03-capstone-workbook-do-only-after-l29-l40" data-id="m03-capstone-workbook-do-only-after-l29-l40" data-lesson="" aria-labelledby="m03-capstone-workbook-do-only-after-l29-l40-nav"><h2 id="m03-capstone-workbook-do-only-after-l29-l40">M03 capstone workbook — do only after L29–L40</h2>
+<p><strong>This workbook is not Day 1 homework.</strong> It matches all five M03 “Do” tasks plus the dependency-failure exercise. Keep notes open for a first attempt. Work independently only after guided practice. All figures below are <strong>hypothetical</strong>; verify real requirements with their owners.</p>
+<h3 id="capstone-a-mark-the-purchase-policy-payment-call-chain">Capstone A — Mark the purchase → policy → payment call chain</h3>
+<p>Make a diagram including <strong>nodes</strong>, <strong>network hops</strong>, <strong>owner</strong>, <strong>timeout/deadline</strong>, and <strong>possibly unknown result</strong>. Fill this worksheet:</p>
+<table>
+<thead>
+<tr>
+<th>Boundary</th>
+<th>Owner (role, not assumed team name)</th>
+<th>Caller knows</th>
+<th>What may still be unknown</th>
+<th>Recovery path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Employee → Purchase</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Purchase → Policy store/owner</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Purchase → External risk, if required</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Purchase → Provider, only after authorization</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Acceptance check:</strong> Each arrow has a named timeout <strong>and</strong> a statement about what the timeout does <em>not</em> prove. Name the actual business owner who must approve the failure policy in a real system; do not invent one.</p>
+<h3 id="capstone-b-produce-three-failure-timelines">Capstone B — Produce three failure timelines</h3>
+<p>Draw each trace with columns <code>time | caller | receiver | durable fact | what caller observed | unknown | safe next step</code>.</p>
+<p><strong>B1. Crash before execution.</strong> The remote worker receives the request but crashes before it performs or durably records the action. In this <strong>known trace</strong>, no action happened. Explain what evidence would be needed before the caller could rely on that statement.</p>
+<p><strong>B2. Commit then reply lost.</strong> The provider commits the action. The reply is dropped. The caller times out. Explain why a blind second instruction is unsafe.</p>
+<p><strong>B3. Retry while first call still running.</strong> A second attempt of the same <code>request_id</code> arrives while the first attempt is in progress. Show how <strong>atomic</strong> record creation stops two distinct logical operations. Decide whether the caller sees pending or a known result.</p>
+<p><strong>For every trace, say aloud:</strong> “I observed ___; the actual state is ___ or unknown; my next safe action is ___.”</p>
+<h3 id="capstone-c-allocate-a-hypothetical-latency-budget">Capstone C — Allocate a hypothetical latency budget</h3>
+<p>Assume the business proposes a <strong>1,000 ms</strong> end-to-end deadline. This is an exercise, <strong>not</strong> an external service-level promise. One initial serial budget:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th style="text-align:right">Allocated elapsed time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ingress/validation</td>
+<td style="text-align:right">60 ms</td>
+</tr>
+<tr>
+<td>Policy lookup</td>
+<td style="text-align:right">100 ms</td>
+</tr>
+<tr>
+<td>Remote risk check</td>
+<td style="text-align:right">200 ms</td>
+</tr>
+<tr>
+<td>Remote provider step (only if in this synchronous path)</td>
+<td style="text-align:right">450 ms</td>
+</tr>
+<tr>
+<td>Response and network overhead</td>
+<td style="text-align:right">90 ms</td>
+</tr>
+<tr>
+<td>Safety reserve</td>
+<td style="text-align:right">100 ms</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td style="text-align:right"><strong>1,000 ms</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Draw a serial chain and mark which steps must finish before later ones. Then answer: if the provider uses <strong>650 ms</strong>, which budget is exceeded, and what should the caller truthfully return? What could change if the provider is moved out of the synchronous path? Explain why a budget is <strong>not proof</strong> of actual percentile latency. Do not claim 1,000 ms is an achievable target without measurements and business approval.</p>
+<h3 id="capstone-d-reproduce-and-prevent-a-lost-update">Capstone D — Reproduce and prevent a lost update</h3>
+<p>First predict the trace: balance 100, worker A subtracts 10, worker B subtracts 20, both read before either writes. Then run the optional companion <code>M03_lost_update_lab.py</code>. It is a <strong>deterministic teaching simulation</strong> using a local SQLite database, not a load test or real simultaneous production workload.</p>
+<p>Success evidence: the flawed trace ends at <strong>80</strong>, whereas the guarded version preserves <strong>70</strong> after detecting one version conflict and recomputing safely. Explain why comparing a version and updating it must be <strong>one atomic database action</strong>. Show a test where the stale write changes <strong>zero rows</strong>. Also describe an alternative transaction/lock-based design and the cost of holding locks.</p>
+<h3 id="capstone-e-network-partition-choose-by-operation">Capstone E — Network partition: choose by operation</h3>
+<p>Assume a single authoritative organization-spend limit and temporary loss of connectivity at one site. Create a decision table:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>During partition</th>
+<th>Safety / truth condition</th>
+<th>Decision owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Show purchase history</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Approve new cap-consuming purchase</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Record a new request as pending</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Show finalized provider result</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Then change <strong>one</strong> assumption: the business authorizes a bounded offline limit. State the bound, how to prevent two sites spending the <strong>same</strong> allowance, how to audit it, and who can approve the risk. Do not assume a magic global partition mode.</p>
+<h3 id="capstone-f-risk-provider-unavailable-during-approval">Capstone F — Risk provider unavailable during approval</h3>
+<p>Compare only these business-policy choices:</p>
+<table>
+<thead>
+<tr>
+<th>Choice</th>
+<th>Observable user result</th>
+<th>Main risk</th>
+<th>Required authorization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stop / decline</strong></td>
+<td>No approval; state accurately why</td>
+<td>Legitimate purchases blocked</td>
+<td>Business risk and user-experience owner</td>
+</tr>
+<tr>
+<td><strong>Wait / pending</strong></td>
+<td>Decision deferred; status query or follow-up</td>
+<td>Delay, backlog and abandoned cases</td>
+<td>Owners of deadline, queue and customer communication</td>
+</tr>
+<tr>
+<td><strong>Narrowly defined degrade</strong></td>
+<td>Only an explicitly permitted subset continues</td>
+<td>Unauthorized acceptance if policy is weak</td>
+<td>Risk/control owner, with documented scope and evidence</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prompt:</strong> For a purchase requiring risk approval, can the system silently treat the service timeout as “approved”? Explain using the invariant and authorized business policy. Treat “declined” vs “could not decide” as distinct statuses unless policy explicitly says otherwise.</p>
+<h3 id="final-artifact-service-boundary-adr">Final artifact — service boundary ADR</h3>
+<p><strong>Architecture Decision Record (ADR)</strong> — brief note explaining an architecture choice. Create one page:</p>
+<ul>
+<li><strong>Decision:</strong> Keep policy logic inside a modular application <strong>or</strong> deploy it as a separate policy service.</li>
+<li><strong>Context/known facts:</strong> Who changes policy, deployment needs, traffic, ownership, latency and failure tolerance. Mark missing items <strong>open</strong>, not facts.</li>
+<li><strong>Option A and B:</strong> At least one real benefit and cost for each.</li>
+<li><strong>Normal path:</strong> Show where the policy result comes from.</li>
+<li><strong>Failure path:</strong> What happens when policy/risk connectivity breaks? Which operation pauses?</li>
+<li><strong>Data authority:</strong> Who owns the policy record and version?</li>
+<li><strong>Recommendation:</strong> Conditional on stated assumptions. No default “microservices win.”</li>
+<li><strong>Validation:</strong> Concurrency/conflict test, timeout test, duplicate request test, observed latency, and an owner for repair.</li>
+<li><strong>Reversal signal:</strong> The measured condition that would justify changing the decision.</li>
+</ul>
+<p><strong>Complete M03 evidence set:</strong> Three failure timelines; concurrency reproduction and fix; estimated or measured latency diagram; one justified service-boundary ADR. Syllabus coverage tags are <strong>C036–C045 and C118–C123</strong>. The source syllabus supplies these as coverage IDs, not a separate item-by-item definition in this file; do not invent their wording.</p>
+<hr/>
+</section>
+<section class="panel guide-panel" id="coach-s-answer-key-reveal-only-after-making-an-attempt" data-id="coach-s-answer-key-reveal-only-after-making-an-attempt" data-lesson="" aria-labelledby="coach-s-answer-key-reveal-only-after-making-an-attempt-nav"><h2 id="coach-s-answer-key-reveal-only-after-making-an-attempt">Coach's answer key — reveal only after making an attempt</h2>
+<p>These are teaching answers to the <em>immediate checks</em>. They are not scripts to memorize. A learner can use different words if the technical meaning is correct.</p>
+<table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>Short model answer</th>
+<th>Most important correction if missed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L29</td>
+<td>The network carries the request between separate programs.</td>
+<td>A normal function call inside one process is not a remote network call.</td>
+</tr>
+<tr>
+<td>L30</td>
+<td>Yes. A modular monolith can depend on remote systems.</td>
+<td>“Monolith” does not mean “nothing is distributed.”</td>
+</tr>
+<tr>
+<td>L31</td>
+<td>40 ms was server processing.</td>
+<td>Do not confuse processing time with round-trip latency.</td>
+</tr>
+<tr>
+<td>L32</td>
+<td>No. The reply was lost after the work completed.</td>
+<td>Missing response does not prove missing execution.</td>
+</tr>
+<tr>
+<td>L33</td>
+<td>The caller knows it did not get a timely usable answer.</td>
+<td>Timeout does not prove the action failed.</td>
+</tr>
+<tr>
+<td>L34</td>
+<td>No. Reuse the same logical ID for the same intended action.</td>
+<td>A fresh ID can make a repeated request appear new.</td>
+</tr>
+<tr>
+<td>L35</td>
+<td>Flawed: 80. Correct combined subtraction: 70.</td>
+<td>Two workers used stale snapshots of the same original value.</td>
+</tr>
+<tr>
+<td>L36</td>
+<td>No. Local commit does not establish remote provider execution.</td>
+<td>Local atomicity stops at its stated boundary.</td>
+</tr>
+<tr>
+<td>L37</td>
+<td>No. It means work was accepted, if durable acceptance was actually established.</td>
+<td>Accepted/pending is not completed/approved.</td>
+</tr>
+<tr>
+<td>L38</td>
+<td><code>E1</code> occurred before <code>E2</code>; the message establishes causal order.</td>
+<td>Independent clock values may not be comparable.</td>
+</tr>
+<tr>
+<td>L39</td>
+<td>New cap-consuming approvals pause at disconnected B.</td>
+<td>Use a concrete operation and invariant, not a product-wide label.</td>
+</tr>
+<tr>
+<td>L40</td>
+<td>Unknown, until reliable evidence confirms a result.</td>
+<td>Do not infer approval or rejection from a missing reply.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-capstone-thinking-compare-only-after-an-attempt">Model capstone thinking — compare only after an attempt</h3>
+<p><strong>B1 — known crash-before-work:</strong> <code>receive → crash before execution/durable effect</code>. The outside caller cannot infer this from timeout alone; it needs trusted status, logs plus correct durability semantics, or equivalent evidence. A retry may be safe only under the receiver’s defined retry contract.</p>
+<p><strong>B2 — reply lost:</strong> <code>receive → commit → reply lost → caller timeout</code>. The provider action happened, while the caller still sees unknown. Reconcile/query or use a documented provider idempotency guarantee; do not blindly create another financial action.</p>
+<p><strong>B3 — concurrent retry:</strong> <code>same R-17 → two instances → shared database atomic unique identity claim → exactly one logical operation row; other request sees the same operation and its pending/result state</code>. This does <strong>not</strong> alone guarantee one effect at an external provider.</p>
+<p><strong>C — latency:</strong> The planned provider budget is 450 ms. If that step takes 650 ms and other steps consume their full budgets, total would be 1,200 ms, exceeding 1,000 ms by 200 ms. A configured deadline may fire sooner, so that exact total is not necessarily observed. The safe user result is a documented timeout/pending/unknown status that reflects evidence. Async processing changes what the immediate response means; it does not remove eventual work latency.</p>
+<p><strong>D — concurrency:</strong> Both read 100. A writes 90; B writes 80. A guarded <code>UPDATE ... WHERE version=original</code> rejects the stale second write with <code>rowcount == 0</code>. B must fetch the new 90, re-check the business condition, and apply its 20 deduction to reach 70. In a real spending system this must be coupled with the actual authorization and transactional invariants; this lab alone is not a financial safety design.</p>
+<p><strong>E — example per-operation decision:</strong> History can be read with a stale-data label; new cap-consuming approval pauses at B; a new request may be <strong>durably accepted as pending</strong> only if storage, status, and replay semantics permit it; a final provider result is shown only with trustworthy evidence. Any offline allowance requires disjoint authority and explicit reconciliation. The exact policy belongs to the business/control owner.</p>
+<p><strong>F — risk outage:</strong> If risk approval is mandatory, silently treating an unavailable risk service as “approved” violates the stated requirement. Stop/decline versus pending versus controlled degradation is an authorized business decision. Never mix a timeout with a genuine negative risk decision without documented policy.</p>
+<p><strong>ADR — credible recommendation under limited facts:</strong> Begin with a modular application containing a clean policy module if independent release/scale is not yet required. This is a <strong>conditional training choice</strong>, not a universal rule. Reconsider separate deployment if evidence shows a persistent ownership, release, isolation, or scaling need that outweighs network failure and transaction costs.</p>
+<hr/>
+</section>
+<section class="panel guide-panel" id="speaking-laboratory-understanding-first-polish-second" data-id="speaking-laboratory-understanding-first-polish-second" data-lesson="" aria-labelledby="speaking-laboratory-understanding-first-polish-second-nav"><h2 id="speaking-laboratory-understanding-first-polish-second">Speaking laboratory — understanding first, polish second</h2>
+<p>Practice each stage <strong>in order</strong> and only after tracing the example.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Goal</th>
+<th>M03 example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Point</td>
+<td>Identify what happened</td>
+<td>“The service sent a request and got no reply.”</td>
+</tr>
+<tr>
+<td>2. One sentence</td>
+<td>Define meaning</td>
+<td>“A timeout means the caller stopped waiting.”</td>
+</tr>
+<tr>
+<td>3. Two sentences</td>
+<td>Add the risk</td>
+<td>“The provider might still have acted. So no reply is not proof of failure.”</td>
+</tr>
+<tr>
+<td>4. Walkthrough</td>
+<td>Narrate order</td>
+<td>“First we sent the instruction. Then the provider may have processed it. We lost the response, so we must check.”</td>
+</tr>
+<tr>
+<td>5. Professional</td>
+<td>Answer concisely</td>
+<td>“I treat remote timeouts as uncertain outcomes. I preserve operation identity and use documented status/idempotency guarantees to resolve the result.”</td>
+</tr>
+<tr>
+<td>6. Judgment</td>
+<td>Apply business constraint</td>
+<td>“For financial effects I do not blindly retry; I keep it pending and reconcile if no reliable answer is available.”</td>
+</tr>
+</tbody>
+</table>
+<p><strong>If words are hard:</strong> Start with “A ___ is ___,” “This matters because ___,” and “One thing that can go wrong is ___.” When you struggle, select one: “A timeout means the action failed” <strong>or</strong> “A timeout means there was no answer in time.” Explain your choice after reviewing L33. The second sentence is technically correct.</p>
+<h3 id="two-guided-30-60-second-practice-prompts">Two guided 30–60-second practice prompts</h3>
+<p><strong>Prompt 1 (after L33–L34):</strong> “An external call timed out. How do you interpret that, and what is your next safe step?” Build the answer from: observation → uncertainty → stable identity → evidence-based recovery.</p>
+<p><strong>Prompt 2 (after L39–L40):</strong> “Your policy service becomes unreachable. Would you allow purchases?” Build from: business invariant → which operation → two policy choices → owner and trade-off. There is no safe one-word answer without a defined policy.</p>
+<h3 id="one-minute-misconception-repair">One-minute misconception repair</h3>
+<table>
+<thead>
+<tr>
+<th>Tempting sentence</th>
+<th>Better sentence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“The request timed out, so the provider rejected it.”</td>
+<td>“The request timed out, so the caller does not have a timely result.”</td>
+</tr>
+<tr>
+<td>“A second request with a unique ID is safe.”</td>
+<td>“Safe retry needs stable identity <strong>and</strong> atomic deduplication and provider semantics.”</td>
+</tr>
+<tr>
+<td>“Microservices are always better.”</td>
+<td>“I compare them with a modular monolith against real requirements.”</td>
+</tr>
+<tr>
+<td>“Database COMMIT covers every system.”</td>
+<td>“A commit covers the participating transaction boundary.”</td>
+</tr>
+<tr>
+<td>“The earlier timestamp happened first.”</td>
+<td>“Independent clocks do not prove cross-machine order without guarantees.”</td>
+</tr>
+<tr>
+<td>“During partition, the whole system must be either AP or CP.”</td>
+<td>“I state availability and consistency needs for a <strong>specific operation</strong>.”</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section>
+<section class="panel guide-panel" id="glossary-plain-language-in-lesson-order" data-id="glossary-plain-language-in-lesson-order" data-lesson="" aria-labelledby="glossary-plain-language-in-lesson-order-nav"><h2 id="glossary-plain-language-in-lesson-order">Glossary — plain language, in lesson order</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning in this guide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Program / process</td>
+<td>Saved instructions / a running program.</td>
+</tr>
+<tr>
+<td>Module</td>
+<td>A logical part of an application with one responsibility.</td>
+</tr>
+<tr>
+<td>Modular monolith</td>
+<td>One deployable program with clear internal modules.</td>
+</tr>
+<tr>
+<td>Service</td>
+<td>Software providing a defined capability through an interface; in M03, usually a separately running process.</td>
+</tr>
+<tr>
+<td>Remote call / network hop</td>
+<td>A request that crosses a communication link to another process or system.</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>Elapsed time for the measured operation.</td>
+</tr>
+<tr>
+<td>Deadline / timeout</td>
+<td>End of an allowed waiting period / the waiting limit being reached.</td>
+</tr>
+<tr>
+<td>Partial failure</td>
+<td>One part or request fails while others can still work.</td>
+</tr>
+<tr>
+<td>Retry / attempt</td>
+<td>Another try / one execution or network transmission effort.</td>
+</tr>
+<tr>
+<td>Logical request identity</td>
+<td>Stable name for the business action, reused across its attempts.</td>
+</tr>
+<tr>
+<td>Idempotency</td>
+<td>Contract/behavior that makes repeated equivalent requests safe from duplicate intended effects within defined scope.</td>
+</tr>
+<tr>
+<td>Atomic</td>
+<td>A change is treated as one indivisible operation within its guarantee.</td>
+</tr>
+<tr>
+<td>Concurrency</td>
+<td>Operations overlap in time.</td>
+</tr>
+<tr>
+<td>Lost update</td>
+<td>One writer overwrites another writer’s change based on an old read.</td>
+</tr>
+<tr>
+<td>Version check</td>
+<td>Comparing stored version with the version read before allowing a write.</td>
+</tr>
+<tr>
+<td>Transaction</td>
+<td>Group of database changes committed or rolled back under stated database guarantees.</td>
+</tr>
+<tr>
+<td>Synchronous</td>
+<td>Caller waits for the needed result in the current flow.</td>
+</tr>
+<tr>
+<td>Asynchronous</td>
+<td>Work continues separately; caller can receive an accepted/pending status first.</td>
+</tr>
+<tr>
+<td>Causal order</td>
+<td>A documented chain showing one event could influence another.</td>
+</tr>
+<tr>
+<td>Network partition</td>
+<td>Network communication between some parts is disrupted.</td>
+</tr>
+<tr>
+<td>Invariant</td>
+<td>A business or data rule that must remain true.</td>
+</tr>
+<tr>
+<td>Authority</td>
+<td>System or actor permitted to make the decisive change for a fact.</td>
+</tr>
+<tr>
+<td>Reconciliation</td>
+<td>Comparing independent records/evidence and safely resolving differences.</td>
+</tr>
+<tr>
+<td>ADR</td>
+<td>Architecture Decision Record: choice, context, alternatives, trade-offs, proof, and revisit condition.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section>
+<section class="panel guide-panel" id="progress-notebook-and-completion-checklist" data-id="progress-notebook-and-completion-checklist" data-lesson="" aria-labelledby="progress-notebook-and-completion-checklist-nav"><h2 id="progress-notebook-and-completion-checklist">Progress notebook and completion checklist</h2>
+<p>Use the following compact record after each session. The guide does not automatically assess technical mastery; completing a checkbox means <strong>you</strong> confirmed the evidence.</p>
+<pre><code class="language-text">Current lesson (L29–L40):
+Normal example I can trace:
+My own one-sentence explanation:
+Technical idea I understood:
+One technical gap:
+Speaking stage (point / one sentence / two sentences / walkthrough / professional / judgment):
+One corrected sentence I can say aloud:
+Next lesson or review date:
+</code></pre>
+<p><strong>M03 completion checklist (not an entry test):</strong></p>
+<ul>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I traced the normal purchase → policy → risk/provider flow and marked communication boundaries.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I distinguished a crash, a lost reply, a slow reply, and the caller’s actual knowledge.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I explained a timeout without assuming remote failure.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I explained stable identity and why retries require an actual contract.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I reproduced a lost update and showed a conflict-safe write.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I marked a local transaction’s boundary versus a remote effect.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I compared synchronous and asynchronous paths truthfully.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I explained one misleading cross-machine timestamp trace.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I made one per-operation partition decision with an invariant and owner.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I produced the <strong>three failure timelines</strong>, <strong>latency diagram</strong>, <strong>concurrency test</strong>, and <strong>boundary ADR</strong>.</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>I can explain one normal path, one failure, and one changed case in <strong>30–60 seconds</strong>.</li>
+</ul>
+<p><strong>What comes next:</strong> M04 covers source of truth, replication, stale reads, and sharding. M05 deepens operation IDs, durable idempotency, unknown financial outcomes, compensation, and reconciliation. M06 treats API contracts, events, duplicate delivery, and outbox processing in detail. Do not treat this M03 guide as a replacement for those missions.</p>
+<hr/>
+</section>
+<section class="panel guide-panel" id="verified-primary-sources-and-scope-notes" data-id="verified-primary-sources-and-scope-notes" data-lesson="" aria-labelledby="verified-primary-sources-and-scope-notes-nav"><h2 id="verified-primary-sources-and-scope-notes">Verified primary sources and scope notes</h2>
+<p>The <strong>lesson order, exit criteria, case framing, and capstone requirements</strong> come from the uploaded syllabus. The following are <strong>independent official sources</strong> for mechanisms explained here. They do <strong>not</strong> establish employer internals, actual performance targets, or a provider's payment guarantees.</p>
+<ol>
+<li><strong>Microsoft Learn, Microservices architecture style</strong> — benefits and costs of separate services, extra communication, and distributed consistency: https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/microservices (L29–L30, L31).</li>
+<li><strong>AWS Builder's Library, Timeouts, retries, and backoff with jitter</strong> — what timeouts do, why retrying mutations can be unsafe, and load amplification: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/ (L31–L34).</li>
+<li><strong>AWS Builder's Library, Making retries safe with idempotent APIs</strong> — client request IDs, atomic identity handling, changed input, and retention: https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/ (L34).</li>
+<li><strong>PostgreSQL documentation, Transaction isolation</strong> — isolation guarantees and concurrent transaction anomalies: https://www.postgresql.org/docs/current/transaction-iso.html (L35). <strong>PostgreSQL documentation, Explicit locking:</strong> https://www.postgresql.org/docs/current/explicit-locking.html (L35).</li>
+<li><strong>SQLite documentation, Transactions</strong> — <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code> and its specific database behavior: https://www.sqlite.org/lang_transaction.html (L35–L36 and the lab). Database guarantees are product-specific.</li>
+<li><strong>AWS Prescriptive Guidance, Transactional outbox pattern</strong> — dual-write risks and duplicate events: https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html (L36 preview, later M06).</li>
+<li><strong>Microsoft Learn, Asynchronous request-reply pattern</strong> — accepted/pending semantics, polling, and asynchronous costs: https://learn.microsoft.com/en-us/azure/architecture/patterns/asynchronous-request-reply (L37).</li>
+<li><strong>Google Cloud Spanner, TrueTime and external consistency</strong> — example of why cross-machine clocks need explicit ordering guarantees: https://docs.cloud.google.com/spanner/docs/true-time-external-consistency (L38). This is a documented <strong>Spanner-specific</strong> mechanism, not a claim about all databases.</li>
+<li><strong>AWS, CAP theorem</strong> — trade-offs under network partitions: https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/cap-theorem.html (L39). The guide applies the choice to a stated business operation.</li>
+</ol>
+<p><strong>Evidence discipline:</strong> All latency values and failure traces are illustrative. SQL/Python examples are educational and are <strong>not</strong> sufficient to operate a real payment system. Provider status query, idempotency semantics, retention, risk fallback, deadline, and business approval requirements remain <strong>open</strong> until verified in the actual project.</p>
+</section></main>
+<div class="footer-nav"><button id="prev" type="button">← Previous</button><button class="primary" id="next" type="button">Next section →</button></div>
+</div></div>
+<script>
+(function(){'use strict';
+const sections=[...document.querySelectorAll('.panel')], nav=[...document.querySelectorAll('.nav-item')];
+let active=0,showAll=false;
+function get(key){try{return localStorage.getItem(key)}catch(e){return null}}
+function put(key,val){try{localStorage.setItem(key,val)}catch(e){}}
+function refresh(){
+  let done=0;
+  document.querySelectorAll('.complete').forEach(x=>{
+    x.checked=get('m03.done.'+x.dataset.lesson)==='1';
+    document.querySelectorAll('[data-dot="'+x.dataset.lesson+'"]').forEach(dot=>dot.classList.toggle('done',x.checked));
+    if(x.checked)done++;
+  });
+  document.getElementById('progress-number').textContent=done;
+  document.getElementById('fill').style.width=(done/12*100)+'%';
+}
+function show(index, scroll=true){
+  active=Math.max(0,Math.min(sections.length-1,index)); showAll=false;
+  sections.forEach((s,i)=>s.hidden=i!==active);
+  nav.forEach((n,i)=>{n.classList.toggle('active',i===active);if(i===active)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current')});
+  document.getElementById('breadcrumb').textContent='M03 · '+nav[active].innerText.trim();
+  document.getElementById('prev').disabled=active===0;
+  document.getElementById('next').disabled=active===sections.length-1;
+  document.getElementById('show-all').textContent='Show all';
+  if(scroll) window.scrollTo({top:0,behavior:'instant'});
+  if(location.hash.slice(1)!==sections[active].id) history.replaceState(null,'','#'+sections[active].id);
+}
+nav.forEach((n,i)=>n.addEventListener('click',e=>{e.preventDefault();show(i)}));
+document.getElementById('prev').addEventListener('click',()=>show(active-1));
+document.getElementById('next').addEventListener('click',()=>show(active+1));
+document.getElementById('print').addEventListener('click',()=>window.print());
+document.getElementById('show-all').addEventListener('click',()=>{
+  showAll=!showAll;
+  sections.forEach((s,i)=>s.hidden=!showAll&&i!==active);
+  document.getElementById('show-all').textContent=showAll?'One section':'Show all';
+  if(showAll)document.getElementById('breadcrumb').textContent='M03 · All sections';
+  else show(active,false);
+});
+document.querySelectorAll('.complete').forEach(x=>x.addEventListener('change',()=>{put('m03.done.'+x.dataset.lesson,x.checked?'1':'0');refresh()}));
+document.querySelectorAll('[data-notes]').forEach(t=>{t.value=get('m03.notes.'+t.dataset.notes)||'';t.addEventListener('input',()=>put('m03.notes.'+t.dataset.notes,t.value))});
+document.getElementById('copy-note').addEventListener('click',()=>{
+  const entries=[...document.querySelectorAll('[data-notes]')].filter(t=>t.value.trim()).map(t=>t.dataset.notes.toUpperCase()+':\n'+t.value.trim());
+  const str=entries.length?entries.join('\n\n'):'No notes recorded yet.';
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(str).then(()=>{document.getElementById('copy-note').textContent='Copied notes';setTimeout(()=>document.getElementById('copy-note').textContent='Copy notes',1300)}).catch(()=>window.prompt('Copy notes:',str))}else window.prompt('Copy notes:',str);
+});
+refresh();
+const start=location.hash.slice(1), ix=sections.findIndex(s=>s.id===start);show(ix<0?0:ix,false);
+})();
+</script>
+</body></html>

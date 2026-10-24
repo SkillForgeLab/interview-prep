@@ -3,27 +3,36 @@
 Using `__sa_beginner_first_curriculum.md` in the project sources as the authoritative syllabus, create a
 complete learning guide for **`M03 — The essential distributed-systems mental model`**.
 
-**My learning requirements:**
-
-1. Assume I have zero prior knowledge of every subject.
-2. Teach from basics to the depth needed to support senior Solution Architect interview preparation.
-3. Follow the learning and teaching rules in the topic map.
-4. Break the guide into small, logically ordered lessons. Explain prerequisites before dependent concepts.
-5. For each concept, explain its purpose, terminology, how it works, and a practical example.
-6. Include simple ASCII diagrams and executable Python code when useful. Explain code line by line.
-7. Include guided exercises, common mistakes, failure cases, trade-offs, and senior-level architecture reasoning where
-   relevant.
-8. Include natural, technically accurate **Interview Phrasing** with plain-English explanations.
-9. Use official primary references for factual verification. Separate sourced facts from hypothetical assumptions.
-10. Provide practice questions and a senior decision challenge. Put exercise solutions in a separate answer-key section.
-11. Include a clear assessment rubric and completion criteria.
+Do not change the scope of the master topic map. 
+Do not assume I already understand technical terminology.
 
 **Deliverables:**
 
-- One downloadable Markdown file containing the complete learning guide, organized into short, progressive lessons.
-- A coverage matrix mapping every required checklist ID to its lesson and assessment.
-- A final completeness audit listing anything missing or not verified.
+One downloadable Markdown file containing the complete learning guide, organized into short, progressive lessons.
 
-Do not change the scope of the master topic map. Do not assume I already understand technical terminology.
+---
+### M01 — Make the system real: computer → program → network → database
 
-Generate the guide as a reference document. Do not start interactive teaching until I explicitly request it.
+### M02 — Start from the business, not the technology
+
+### M03 — The essential distributed-systems mental model
+
+### M04 — Decide what data is true, and when
+
+### M05 — Financial correctness: unknown outcomes are a first-class state
+
+### M06 — Make interfaces and events safe for other teams
+
+### M07 — Security is an architecture boundary, not a last slide
+
+### M08 — Capacity and reliability with numbers and ownership
+
+### M09 — Failover, diagnosis, and real operations
+
+### M10 — Prove that architecture survives code, test, and release
+
+### M11 — Act like an architect across an organization
+
+### M12 — Earn the interview: no more familiar examples
+
+
