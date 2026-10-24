@@ -1,7 +1,7 @@
 # F02 — Architecture method, views, and decision records
 
 **Complete learning and senior Solution Architect interview reference**  
-**Authoritative syllabus:** `solution_architect_interview_topic_map_v3.md`, revision v3, 2026-10-24.  
+**Authoritative syllabus:** `__interview_topic_map_v3.md`, revision v3, 2026-10-24.  
 **Scope:** F02 only — **C019, C020, C021 (Core)** and **C022 (Depth)**.  
 **Prepared and primary-reference links checked:** 2026-10-24.  
 **Status:** Reference guide and uncompleted assessment; no learner performance is assumed.

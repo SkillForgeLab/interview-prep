@@ -4,7 +4,7 @@
 **Status:** Reference document, not a live lesson or a completed assessment.  
 **Target:** Beginner foundations → senior Solution Architect interview reasoning.  
 **Scope:** F01 only: **C014, C015, C016, C017, C018**, all **Core**.  
-**Authority:** `solution_architect_interview_topic_map_v3.md`, section **F01** and its learning/assessment rules.
+**Authority:** `__interview_topic_map_v3.md`, section **F01** and its learning/assessment rules.
 
 > **Important ID correction — Source requirement:** The request names `B01 (C014–C018)`. In the authoritative map, **B01
 has C001–C004** (software/Python basics), whereas **F01 has C014–C018**. This guide follows **F01/C014–C018** without

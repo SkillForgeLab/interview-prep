@@ -1,6 +1,6 @@
 ## Prompt for creating the guide.
 
-Using `solution_architect_interview_topic_map_v3.md` in the project sources as the authoritative syllabus, create a
+Using `__interview_topic_map_v3.md` in the project sources as the authoritative syllabus, create a
 complete learning guide for **`T01 — Service boundaries and architecture styles`**.
 
 **My learning requirements:**

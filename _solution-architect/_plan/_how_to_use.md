@@ -13,7 +13,7 @@ American Express role information. Identify any gaps that should be fixed before
 
 ## Workflow
 
-1. Keep `solution_architect_interview_topic_map_v3.md` in your ChatGPT Project files.
+1. Keep `__interview_topic_map_v3.md` in your ChatGPT Project files.
    You do not need to reattach it in every chat within the same Project if it remains accessible.
 2. Create a separate chat for each topic card. For example, B01 — Software, Python, and Programming Basics.
 3. Generate a complete Markdown guide organized into small, progressive lessons.
