@@ -1,0 +1,58 @@
+My interview is Wednesday, October 28.
+Assumes 8-10 hours a day through Tuesday.
+
+| Day             | Main work                                                                                                                                                       | What you should be able to say aloud by the end                                                     |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| **Sat, Oct 24** | Distributed application basics: services, data ownership, communication, and why design choices involve tradeoffs. Draw one simple system.                      | “Here is how I would break down the problem, and here is why I would keep or separate these parts.” |
+| **Sun, Oct 25** | REST APIs and service integration. Then API strategy: consumers, contracts, versioning, ownership, and a staged implementation roadmap.                         | “Here is how the platforms connect, what the API promises, and how I would roll it out.”            |
+| **Mon, Oct 26** | Reliability, performance, and scalability. Practice tracing a slow or failed request. Connect design choices to business and data architecture.                 | “Here is the likely failure path, the evidence I would check, and the tradeoff in my proposed fix.” |
+| **Tue, Oct 27** | Platform alignment, design and code reviews, governance, collaboration, and mentoring. Cover the companion topics below and practice short spoken explanations. | “Here is how I would reach a decision with the teams, document it, and guide delivery.”             |
+| **Wed, Oct 28** | **30–40 minutes only:** review your system diagram, five key tradeoffs, and a few concise answers. Speak them aloud once; avoid new material.                   | Clear, calm explanations in your own words.                                                         |
+
+
+## Guide sequence
+
+We’ll work through these guides one at a time.
+For each one, the goal is to understand it, explain it plainly, and defend a choice when someone raises a reasonable
+alternative.
+
+| Guide                                                                  | Understand                                                                                        | Explain aloud                                                                               | Defend in a design discussion                                                                  |
+|------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| **Core 1 — Distributed application design**                            | Services, data ownership, communication, and failure between components.                          | How a request moves through a system.                                                       | Why a simpler application or separate services better fit the requirements.                    |
+| **Core 2 — REST integration and API strategy**                         | API contracts, consumers, versioning, security, and service-oriented architecture (SOA).          | How two platforms integrate and what each owns.                                             | API boundaries, rollout order, and compatibility choices.                                      |
+| **Core 3 — Reliability, performance, and scale**                       | Timeouts, retries, monitoring, bottlenecks, and capacity.                                         | How you investigate a slow or failed transaction.                                           | Which improvement to make first and what risk it introduces.                                   |
+| **Core 4 — Architecture alignment and roadmap**                        | Business, information, application, and technical architecture; platform blueprints and roadmaps. | How a design supports a business outcome across these domains.                              | A phased plan when the ideal design cannot be delivered at once.                               |
+| **Core 5 — Reviews, governance, and leadership**                       | Standards, design and code reviews, decision records, and team responsibilities.                  | How you reach and communicate an architecture decision.                                     | A decision when product speed, engineering effort, and standards pull in different directions. |
+| **Companion — Security and compliance**                                | Sensitive data, access control, auditability, and required review points.                         | Where controls enter a design.                                                              | Why a control belongs at a particular boundary.                                                |
+| **Companion — Agile delivery and the software development life cycle** | How architecture work fits planning, implementation, testing, release, and operation.             | How to deliver architecture in usable stages.                                               | When to make a decision now and when to leave room to learn.                                   |
+| **Companion — Mentoring and AI-assisted work**                         | Giving actionable feedback; using AI for analysis and drafts while checking its claims.           | How you help an engineer improve a design and validate an AI-generated diagram or document. | Which conclusions need evidence, human review, or a design change.                             |
+
+
+## FOR CURRENT POSITION
+
+The posting puts more weight on: 
+Platform alignment, API strategy and roadmap, design governance, and responsible AI use.
+
+## Revised plan
+
+| Day             | 2–3 hour focus                                                                                                                                                                   | Practice result                                                                                                   |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| **Sat, Oct 24** | Distributed application fundamentals and tradeoffs. Use your user-management or payments work as context once you confirm the component details.                                 | Explain a system’s responsibilities, data ownership, and failure points in plain English.                         |
+| **Sun, Oct 25** | REST and SOA integration; API contracts, ownership, and versioning; a staged API roadmap.                                                                                        | Walk through your stated Digital Servicing application-to-application API strategy without overstating your role. |
+| **Mon, Oct 26** | Reliability, performance, scalability, and integration diagnosis; design and code review standards.                                                                              | Explain how you would investigate an issue and defend the order of fixes.                                         |
+| **Tue, Oct 27** | Platform blueprints, business and data alignment, governance, mentoring, Agile delivery, compliance, and responsible AI use. Practice concise answers from confirmed experience. | Give a clear architecture decision and explain how you would guide teams through it.                              |
+| **Wed, Oct 28** | **30–40 minutes:** review your diagrams, key tradeoffs, and two real project stories aloud.                                                                                      | Arrive with familiar explanations; study no new topic.                                                            |
+
+## Guide sequence
+
+| Guide                                            | Understand                                                                               | Explain aloud                                                   | Defend                                                                     |
+|--------------------------------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------|
+| **Core 1: Distributed design**                   | Components, communication, data ownership, and failure.                                  | How a request crosses a system.                                 | Why to keep components together or separate them.                          |
+| **Core 2: API integration and strategy**         | REST contracts, SOA, consumers, versioning, and rollout.                                 | How platforms connect and who owns each contract.               | A phased API roadmap with business and data architects.                    |
+| **Core 3: Enterprise alignment**                 | Business, information, application, and technical architecture; blueprints and roadmaps. | How a design supports a business outcome.                       | A choice that balances a local need with platform direction.               |
+| **Core 4: Operational quality**                  | Performance, reliability, scalability, observability, and integration failures.          | How to trace and diagnose a problem.                            | The first improvement to make and its tradeoff.                            |
+| **Core 5: Governance and leadership**            | Design and code reviews, standards, decisions, collaboration, and mentoring.             | How you bring teams to a decision.                              | How you handle a justified exception to a standard.                        |
+| **Core 6: Responsible AI-assisted architecture** | Where AI helps analysis and documentation, and how to validate outputs.                  | A practical review workflow based on your personal AI projects. | How to control incorrect claims, sensitive data exposure, and design risk. |
+| **Companion: Agile and SDLC**                    | Design through delivery and operation.                                                   | How architecture decisions fit an iterative release.            | What must be decided now versus learned later.                             |
+| **Companion: Security and compliance**           | Access, sensitive data, auditability, and review points.                                 | Where controls belong in a design.                              | Why a proposed control is sufficient for the stated risk.                  |
+| **Companion: Senior technical assessment**       | One strong programming discipline and its design fundamentals.                           | How code choices affect architecture.                           | A focused code-review recommendation.                                      |
