@@ -2,28 +2,32 @@
 
 I am preparing for a Sr Solutions Architect I interview at American Express Global Commercial Services.
 The target role expects the depth of a candidate with 20+ years of experience.
-Treat me as a beginner in every topic.
 
-Review the topic map thoroughly.
+Recognizing a concept and being able to explain it are two different skills. 
+We need to develop both, starting from zero.
 
-Audit the topic cards against the detailed checklist, check the prerequisite order, and compare the scope with official
-American Express role information. Identify any gaps that should be fixed before creating the learning guides.
+Recognizing a term does not mean I can explain it. Treat me as a beginner in every topic.
+Teach each concept in small steps, then help me explain it aloud before moving to more difficult interview questions.
+Teach technical understanding and spoken explanation together.
+
+Build interview mastery system from scratch around these five principles:
+
+1. Learn by solving problems, not by reading long explanations.
+2. Master prerequisites first.
+3. Use distributed-system failures as the main learning engine.
+4. Practice senior-level decisions, including business trade-offs, security, recovery, and ownership.
+5. Prove interview readiness through unfamiliar problems, timed answers, code reviews, and repeated assessment.
+
+**Include:**
+Hands-on exercises, failure simulations, interview answer frameworks, scoring rubrics, spaced revision, official
+technical references, and cold mock interviews.
+
 
 ---
 
-## Workflow
-
-1. Keep `solution_architect_interview_topic_map_v3.md` in your ChatGPT Project files.
-   You do not need to reattach it in every chat within the same Project if it remains accessible.
-2. Create a separate chat for each topic card. For example, B01 — Software, Python, and Programming Basics.
-3. Generate a complete Markdown guide organized into small, progressive lessons.
-4. Validate the guide against the card's checklist items. For B01, these are C001–C004.
-5. Study interactively, one concept at a time. Do the exercises before reading the solutions.
-   This separates guide creation from learning, making both easier to manage.
-
 ## Learning Recommendation
 
-Use two separate activities for every card:
+Use two separate activities:
 
 | Activity	             | Output                                                               |  
 |----------------------|----------------------------------------------------------------------|
@@ -33,7 +37,3 @@ Use two separate activities for every card:
 The guide becomes your permanent reference.
 Interactive learning develops the ability to explain and apply the material.
 
-Start with B01. Once its guide is generated and its checklist is fully covered, use the same prompt for B02, B03, and
-subsequent cards, changing only the card ID and title.
-
-This process should produce consistent learning material across all 25 cards while preserving the v3 syllabus.

@@ -1,12 +1,22 @@
-# Senior Solutions Architect I Interview — Topic Map (Beginner to Senior)
+# Senior Solutions Architect I Interview — Distributed Systems First (Beginner to Senior)
 
 **Interview depth target:** Practice judgment associated with an architect who has 20+ years of experience; this is a
 preparation standard, not a verified minimum for the vacancy.  
 **Starting point:** No prior topic knowledge is assumed.  
 **Target role:** Sr Solutions Architect I, American Express Global Commercial Services (GCS).  
-**Revision:** v3 — 2026-10-24. Based on the user-provided v2 topic map; expands prerequisite and checklist coverage.
+**Revision:** v4 — 2026-10-24. Distributed-systems-first revision of v3; all original coverage is retained.  
+**Primary focus:** Distributed systems, correctness under failure, consistency, scaling, and senior system design.  
+**Coverage:** 35 cards (25 retained + 10 DS cards). Checklist C001–C141 (C001–C117 retained + C118–C141 added).  
+**Recommended effort split:** About **70%** distributed-system learning, design exercises, and fault analysis; **30%** foundations, business context, security, payments, leadership, and interview communication. This is a study priority, **not** a verified interview weighting.
 
 ## Learning rules
+
+- **Distributed systems are the spine of the course.** Organize APIs, databases, payments, reliability,
+  security, and cloud around decisions made by cooperating services under failure.
+- Begin with basic software, networking, databases, and business requirements; move quickly to distributed system models.
+- Do not equate distributed systems with microservices: a modular monolith may be the safer option for some workflows.
+- Require students to state the failure boundary, consistency requirement, request identity, and recovery mechanism
+  in every substantial design problem.
 
 - Start from basics. Build toward senior interview depth through examples and trade-offs.
 - Teach prerequisites before the concept that needs them.
@@ -17,7 +27,7 @@ preparation standard, not a verified minimum for the vacancy.
 - Use industry-standard designs and architecture, citing current primary references for claims about standards.
 - An API, or application programming interface, is a contract for how software communicates.
 
-The **syllabus describes the target role** as emphasizing APIs, integration, platform roadmaps, design reviews,
+The **v2 syllabus describes the target role** as emphasizing APIs, integration, platform roadmaps, design reviews,
 mentoring, and responsible AI-tool use; this wording is not a substitute for the verified job posting.
 The syllabus also covers payments, data, security, reliability, and delivery.
 
@@ -237,30 +247,96 @@ lot.”**
 
 ## Learning sequence and prerequisites
 
-Use these stages as an order. A stage is not a fixed number of weeks.
+Follow the order below. Stages are prerequisite groups, not fixed weeks. The **DS** cards are the dominant learning path.
 
-| Stage | Cards               | What you will learn                                                  |
-|-------|---------------------|----------------------------------------------------------------------|
-| 1     | **B01 → B02 → B03** | Software and Python foundations → web/networking → databases and SQL |
-| 2     | F01, F02, D01       | Business requirements, architecture views, commercial workflows      |
-| 3     | T01, T02            | Application boundaries and distributed-system correctness            |
-| 4     | T03, T04, T05       | APIs, integration, and data ownership                                |
-| 5     | D02, T06            | Payment states, reconciliation, and security                         |
-| 6     | T07, T08, T09       | Reliability, performance, and operations                             |
-| 7     | T10, T11            | Deployment and **advanced** Python implementation and review         |
-| 8     | E01, E02, L01       | Migration, governance, and leadership                                |
-| 9     | A01, L02            | AI-assisted design and interview communication                       |
-| 10    | X01, X02            | Senior interview mocks and focused review                            |
+| Stage | Cards, in learning order | Purpose |
+|---|---|---|
+| 1 | **B01 → B02 → B03** | Basic Python, networks, HTTP, databases, SQL, and transactions |
+| 2 | **F01 → F02 → T01** | Requirements, diagrams, architecture styles, and service boundaries |
+| 3 | **DS01 → DS02 → T02 → DS05** | Distributed failure models, time, concurrency, idempotency, and transactions |
+| 4 | **DS03 → DS04 → T05** | Replication, consistency, quorum decisions, partitioning, and data ownership |
+| 5 | **T03 → T04 → DS06** | API contracts, events, message delivery, replay, and recovery |
+| 6 | **DS07 → T07 → DS08** | Resilience patterns, recovery objectives, failover, and multi-region correctness |
+| 7 | **T08 → T09 → DS09** | Performance, observability, incident response, and failure testing |
+| 8 | **D01 → D02 → T06** | Apply the system to commercial payments, financial integrity, and security |
+| 9 | **T10 → T11 → E01** | Deployment, code review, and safe modernization |
+| 10 | **E02 → L01 → A01 → L02** | Governance, leadership, AI-assisted reviews, and interview communication |
+| 11 | **DS10 → X01 → X02** | End-to-end distributed design and two evidence-based senior mock assessments |
 
-- Finish B01 before B02 and B03; start writing and testing tiny Python functions in B01. B02 applies software ideas to
-  web requests; B03 introduces relational data and SQL.
-- Finish B02 before advanced API and distributed-system cards. Finish B03 before T05 and database-heavy exercises.
-- T11 is **advanced application/code-review depth**, not the first introduction to Python. Reuse B01–B03 skills
-  throughout the intervening cards.
-- Learn T02 before advanced integration or reliability exercises.
-- Learn D01, T02, and T05 before the payment-state exercise in D02.
-- Use small exercises throughout. Build them gradually.
-- Use cloud-neutral examples first. Explain vendor-specific choices when needed.
+**Prerequisite rules:**
+
+- Finish B01 before B02/B03. Finish B02 before T01/DS01; finish B03 before DS03/DS04/T05.
+- T02 still introduces practical reliability and correctness patterns; DS02 and DS05 deepen these through failure
+  timelines and implementable invariants. Complete T02 before DS05.
+- Study DS03 before DS04. T03 requires T02, T04 requires T02 and T03, and DS06 requires T04.
+- DS07 requires DS05 and DS06. T07 requires T02 and T04; DS08 requires DS03, DS07, and T07.
+- T08 and T09 retain their original prerequisites. Study DS09 after T09 and DS08.
+- D02 still requires D01, T02, and T05. T06 still requires T03 and T05.
+- T11 remains advanced code-reading and review. E01 retains its original prerequisites.
+- DS10 requires DS01–DS09 plus D02, T06, and T11. Do X01/X02 after DS10 and their original prerequisites.
+- Keep cloud-neutral examples first. Never infer American Express implementation details from public products.
+
+## Distributed-systems-first study contract
+
+**Recommended study allocation (planning assumption):** Spend roughly seven of every ten study sessions on the
+DS01–DS10 sequence or distributed-system deep dives within T01/T02/T04/T05/T07/T08/T09/T11. Spend the remaining
+three on prerequisites, payments/security context, architectural governance, and interview communication. Adjust
+only from demonstrated gaps or verified interview scope.
+
+For every distributed-system lesson, answer these questions:
+
+1. **Correctness:** What business or data invariant must never be broken?
+2. **Boundaries:** Which service, datastore, message stream, and team owns each state transition?
+3. **Failure:** What if a message is duplicated, delayed, lost, reordered, or its outcome is unknown?
+4. **Consistency:** Which reads/writes must be fresh? Where is staleness acceptable?
+5. **Scale:** Which partition, dependency, queue, or request path becomes the bottleneck?
+6. **Recovery:** How can a second engineer detect, reconcile, and repair the fault?
+7. **Decision:** What is the simpler alternative, what does it sacrifice, and what evidence supports the choice?
+
+**Technical progression:** request/response across machines → time and concurrency → replication/consistency →
+partitioning → idempotent workflows → event delivery → resilience → regional failure → observability → full system design.
+
+**Practice case (hypothetical):** The existing commercial spending platform remains the shared example. Model it
+as cooperating policy, purchase, payment, and reporting capabilities, but do not assume this is any real company's
+internal architecture. Use explicit assumptions and compare both a modular monolith and separated services.
+
+```text
+  Employee/Client
+       |
+       v
+  Purchase API ---> Policy/Limit decision
+       |                  |
+       v                  v
+  Durable request <--- State and audit record
+       |
+       +----> Payment adapter (may succeed before a timeout)
+       |
+       +----> Outbox / events ---> Reporting projection
+                                (may be delayed or replayed)
+
+  Review every arrow for: timeout, duplicate, ordering, access, owner, recovery.
+```
+
+**Evaluation and evidence:** At least 4/5 on every applicable rubric dimension in a senior decision test. Keep
+one invariant/failure timeline, one architecture decision record, and one executable or precisely testable scenario
+per DS card. Do not mark checklist items complete from reading alone; require explanation, application, and defense.
+
+**Verified external references for this track (checked 2026-10-24):**
+
+- [Microsoft — Saga distributed transactions](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga):
+  local transactions and compensations; compensations themselves can fail.
+- [Microsoft — Circuit breaker](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker):
+  stop repeated calls to a failing dependency.
+- [Microsoft — Sharding](https://learn.microsoft.com/en-us/azure/architecture/patterns/sharding):
+  partition-key choice and cross-shard complexity.
+- [Google Cloud — Spanner and external consistency](https://docs.cloud.google.com/spanner/docs/true-time-external-consistency):
+  example of a specifically documented, strong consistency model; not a universal database guarantee.
+- [AWS — Transactional outbox](https://docs.aws.amazon.com/pdfs/prescriptive-guidance/latest/cloud-design-patterns/cloud-design-patterns.pdf):
+  atomic local state/event intent and duplicate-tolerant consumers.
+
+**Source status:** The focus and timing are **Recommendations**. Exercises and system sizing are **Hypothetical
+practice assumptions**. Official links verify only the technical patterns they document. The precise role and
+interview format remain **unverified**, as described in the v3 evidence rules.
 
 ## Detailed category-by-category coverage checklist
 
@@ -348,6 +424,36 @@ applied in each card's context.
   T04)
 - [ ] **Depth:** Evaluate Command Query Responsibility Segregation (CQRS) or event sourcing when a concrete requirement
   justifies the extra complexity. (T02, T05)
+
+### 4A. Distributed systems — v4 additions and primary emphasis
+
+The items below are **new**. Their required lesson crosswalk appears in the DS01–DS10 cards. Original C001–C117
+requirements and all original 25 cards remain valid.
+
+- [ ] **C118 · Core:** Identify nodes, network boundaries, request paths, failure domains, and why a distributed operation can have an uncertain outcome. (DS01)
+- [ ] **C119 · Core:** Allocate an end-to-end latency budget across network hops and identify amplification through synchronous call chains. (DS01)
+- [ ] **C120 · Core:** Explain the availability-versus-linearizable-consistency decision during a network partition; avoid blanket CAP labels. (DS01)
+- [ ] **C121 · Core:** Explain clock uncertainty, causal ordering, and why wall-clock timestamps alone cannot establish safe distributed order. (DS02)
+- [ ] **C122 · Core:** Detect lost updates, concurrent retries, write races, and compare optimistic versus pessimistic concurrency controls. (DS02)
+- [ ] **C123 · Depth:** Explain leases, distributed locks, and fencing tokens when a stale owner could still act. (DS02)
+- [ ] **C124 · Core:** Compare leader/follower, synchronous/asynchronous replication, replica lag, and failure recovery. (DS03)
+- [ ] **C125 · Core:** Specify read and write guarantees, including strong/linearizable versus eventual consistency, and defend allowed staleness. (DS03)
+- [ ] **C126 · Core:** Analyze quorum reads/writes, partitions, and split-brain prevention against a stated datastore model. (DS03)
+- [ ] **C127 · Depth:** Describe leader election and consensus at conceptual level; do not claim universal guarantees for a vendor. (DS03)
+- [ ] **C128 · Core:** Pick a stable partition/shard key; detect hot partitions, skew, and reassignment risk. (DS04)
+- [ ] **C129 · Core:** Evaluate cross-partition transactions, fan-out queries, global identifiers, and online rebalancing. (DS04)
+- [ ] **C130 · Depth:** Design cache invalidation and stale-read policy for a replicated or partitioned read path. (DS04)
+- [ ] **C131 · Core:** Implement durable idempotency identity, request validation, concurrent deduplication, and safe retries. (DS05)
+- [ ] **C132 · Core:** Resolve uncertain external financial actions with state queries, reconciliation, and explicit escalation. (DS05)
+- [ ] **C133 · Core:** Trace message delivery, offsets/acknowledgments, broker partitions, backlog growth, and safe replay. (DS06)
+- [ ] **C134 · Core:** Specify event schema evolution, ordering scope, duplicate-tolerant consumers, and dead-letter recovery. (DS06)
+- [ ] **C135 · Core:** Design timeouts, propagated deadlines, retry budgets/backoff/jitter, and circuit breakers for a call chain. (DS07)
+- [ ] **C136 · Core:** Select queue limits, backpressure, bulkheads, load shedding, and fail-safe behavior during overload. (DS07)
+- [ ] **C137 · Core:** Compare active/passive and active/active regional recovery using stated RTO, RPO, and recovery tests. (DS08)
+- [ ] **C138 · Core:** Prevent conflicting writes and split brain during failover; define data authority and return-to-primary rules. (DS08)
+- [ ] **C139 · Core:** Correlate logs, traces, state transitions, consumer lag, and business signals to find distributed failures. (DS09)
+- [ ] **C140 · Core:** Test selected failures safely, including delayed replies, event duplicates, stalled consumers, and region loss. (DS09)
+- [ ] **C141 · Core:** Produce and defend an end-to-end distributed-system design under changing consistency, throughput, and outage constraints. (DS10)
 
 ### 5. API strategy and cross-platform integration
 
@@ -609,6 +715,8 @@ rubric; log follow-up weaknesses.
 
 ### F01 — Business framing, requirements, and quality attributes
 
+**Distributed-systems lens (v4):** Phrase business goals as latency, correctness, freshness, recovery, and security requirements for a distributed design.
+
 **Prerequisites:** Start with plain business examples.
 
 **Prepare:**
@@ -652,6 +760,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### F02 — Architecture method, views, and decision records
+
+**Distributed-systems lens (v4):** Always show data authority, synchronous/async paths, failover regions, and how faults propagate.
 
 **Prerequisites:** F01.
 
@@ -758,6 +868,8 @@ rubric; log follow-up weaknesses.
 
 ### T01 — Service boundaries and architecture styles
 
+**Distributed-systems lens (v4):** Use service boundaries to compare a modular monolith with separate services. Mark new network failure boundaries.
+
 **Prerequisites:** F02.
 
 **Prepare:**
@@ -798,6 +910,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### T02 — Distributed-system correctness and failure semantics
+
+**Distributed-systems lens (v4):** Use DS01/DS02 as models and DS05 as the deeper correctness test; retain all original C039–C045 lessons.
 
 **Prerequisites:** T01.
 
@@ -843,6 +957,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### T03 — API product and contract strategy
+
+**Distributed-systems lens (v4):** Treat API retry semantics, error states, and authorization as distributed contracts, not just endpoint syntax.
 
 **Prerequisites:** T02.
 
@@ -900,6 +1016,8 @@ rubric; log follow-up weaknesses.
 
 ### T04 — Cross-platform integration and event architecture
 
+**Distributed-systems lens (v4):** Use DS06 to test actual delivery, replay, and consumer correctness, not just event diagrams.
+
 **Prerequisites:** T02 and T03.
 
 **Prepare:**
@@ -945,6 +1063,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### T05 — Data architecture, ownership, and reporting
+
+**Distributed-systems lens (v4):** Apply DS03 and DS04 to distinguish source of truth, replication, partitioning, and projection freshness.
 
 **Prerequisites:** B03, T01, and T02.
 
@@ -995,6 +1115,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### D02 — Payment lifecycle, state, and reconciliation
+
+**Distributed-systems lens (v4):** Connect payment state correctness to DS05 uncertain outcomes and DS06 replay and reconciliation.
 
 **Prerequisites:** D01, T02, and T05.
 
@@ -1047,6 +1169,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### T06 — Security, privacy, and payment-data risk
+
+**Distributed-systems lens (v4):** Review security and identity across every inter-service trust boundary and during degraded operation.
 
 **Prerequisites:** T03, and T05.
 
@@ -1111,6 +1235,8 @@ rubric; log follow-up weaknesses.
 
 ### T07 — Reliability, SLOs, and disaster recovery
 
+**Distributed-systems lens (v4):** Use DS07/DS08 to prove graceful degradation and regional write authority.
+
 **Prerequisites:** T02 and T04.
 
 **Prepare:**
@@ -1157,6 +1283,8 @@ rubric; log follow-up weaknesses.
 
 ### T08 — Performance, capacity, and cost
 
+**Distributed-systems lens (v4):** Use DS04/DS07 to test shard hotspots, tail latency, and retry amplification.
+
 **Prerequisites:** T02, T05, and T07.
 
 **Prepare:**
@@ -1201,6 +1329,8 @@ rubric; log follow-up weaknesses.
 
 ### T09 — Observability, incidents, and operating a 24/7 service
 
+**Distributed-systems lens (v4):** Use DS09 to verify business outcomes across trace and event boundaries.
+
 **Prerequisites:** T07.
 
 **Prepare:**
@@ -1243,6 +1373,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### T10 — Cloud, hybrid infrastructure, and platform engineering
+
+**Distributed-systems lens (v4):** Evaluate fault domains, deployment blast radius, and data/compute placement for DS08.
 
 **Prerequisites:** T06, T07, and T08.
 
@@ -1291,6 +1423,8 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### T11 — SDLC, code review, and hands-on technical depth
+
+**Distributed-systems lens (v4):** Use DS05/DS06 failure timelines for Python handler tests and event-consumer review.
 
 **Prerequisites:** B01, B02, B03, T02, and T03. Begin with code-reading exercises before concurrency tests.
 
@@ -1345,7 +1479,325 @@ risks, propose the smallest safe change, and show tests and rollback evidence.
 control consideration, how to validate it, and a named accountable owner. Score the decision on the standard card
 rubric; log follow-up weaknesses.
 
+### DS01 — Distributed-system boundaries, latency, and partition trade-offs
+
+**Prerequisites:** B01, B02, F02, and T01. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C118 · Core:** Identify nodes, network boundaries, request paths, failure domains, and uncertain outcomes.
+- **C119 · Core:** Allocate an end-to-end latency budget across network hops and synchronous call chains.
+- **C120 · Core:** Reason about availability and linearizable consistency during a network partition; avoid blanket CAP labels.
+
+**Prepare:** Node, request hop, process crash, partial failure, communication delay, timeout, retry uncertainty,
+network partition, availability, and consistency. Compare one process versus multiple processes across machines.
+Explain that a timeout is lack of confirmation, not proof the operation failed.
+
+**Worked example:** Draw a purchase API calling a policy service and a payment adapter. Mark two independent network
+links; trace a delayed payment reply. Budget latency by step using clearly labeled hypothetical numbers.
+
+**Guided practice:** Record the result the customer sees, the actual state, and the unknown facts for three failure
+timelines. Compare a direct synchronous chain to a durable-workflow variant. Validate by injecting a delayed reply.
+
+**Failure and trade-off:** More independently deployable services add network and operational failure points. During a
+partition, specify which side can safely serve a write instead of calling an entire database simply “AP” or “CP.”
+
+**Interview phrasing:** “I would identify the business invariant and every failure boundary. A timeout creates
+uncertainty. I would choose the consistency and availability behavior for the affected operation, then verify it by
+simulating the failure.”
+
+**Senior decision test:** Purchase approval must finish quickly but a risk dependency becomes unreachable. Choose
+between waiting, safe denial, and conditional degradation; compare latency, business risk, and recovery ownership.
+
+**Pass evidence:** Explain each new Core item, draw a normal and failed request timeline, defend alternatives, name
+monitoring and an owner; score at least 4/5 per applicable dimension.
+
+### DS02 — Distributed time, ordering, races, and coordination
+
+**Prerequisites:** DS01. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C121 · Core:** Explain clock uncertainty, causal ordering, and why timestamps alone are insufficient for correctness.
+- **C122 · Core:** Diagnose lost updates and concurrent retry races; compare optimistic and pessimistic control.
+- **C123 · Depth:** Use leases, distributed locks, and fencing tokens when stale owners can still act.
+
+**Prepare:** Wall-clock time versus logical/causal order, concurrent execution, request versions, conditional writes,
+compare-and-swap, optimistic version checks, row locks, leases, and stale lock holders. Define the terms before use.
+
+**Worked example:** Two business administrators edit the same spending limit. Construct a two-column event timeline:
+both read version 4; one writes version 5; the other must detect a conflict rather than silently overwrite it.
+
+**Guided practice:** Design and test an update with expected-version checks, including simultaneous writers and a
+replayed request. For Depth, simulate a lease expiring while the previous worker is paused.
+
+**Failure and trade-off:** Locking can simplify one invariant but increases contention and risks unavailable lock
+management. Optimistic updates need explicit conflict handling; physical timestamps do not eliminate races.
+
+**Interview phrasing:** “I would protect concurrent changes with a database-supported conditional update. For
+cross-node ownership, I would not trust a lease alone if an expired worker can still mutate state.”
+
+**Senior decision test:** Two workers both think they own an expensive reconciliation task. Compare a database claim,
+lease plus fencing, and idempotent task execution. Define what the downstream state store enforces.
+
+**Pass evidence:** Core item explanations, tested race timeline, chosen control, failure case, owner, and 4/5 scores.
+
+### DS03 — Replication, consistency, quorum, and consensus
+
+**Prerequisites:** B03, DS02, and T02. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C124 · Core:** Compare replica layouts and sync/async updates, lag, and recovery behavior.
+- **C125 · Core:** Specify strong/linearizable or eventual read/write semantics and allowed staleness.
+- **C126 · Core:** Discuss quorum, network partitions, and split-brain prevention for a particular model.
+- **C127 · Depth:** Explain why leader election/consensus may be needed and what its guarantees cover.
+
+**Prepare:** Replicas, leaders, followers, acknowledgments, quorum, staleness, read-your-writes, linearizability,
+serializability, partitions, and failover. Be precise: a specific database's guarantees must come from its docs.
+
+**Worked example:** A policy update is written to a primary node while a reporting replica lags. Show a stale read,
+a leader failure, and which reads/writes the chosen consistency contract permits.
+
+**Guided practice:** Compare one leader with asynchronous replicas against a documented strongly consistent design.
+State allowed stale-data duration and behavior during a partition; write a verification test for both.
+
+**Failure and trade-off:** Replication aids survival but does not by itself guarantee correct concurrent writes.
+Stronger consistency may increase latency or reduce write availability under some failures.
+
+**Interview phrasing:** “I would write the required consistency contract first. Then I would select replication and
+failover behavior that satisfies it, including how stale reads and conflicting writers are handled.”
+
+**Senior decision test:** A spend-limit update must be enforced before another purchase, while finance reporting may
+lag. Choose the read authority and test both a partition and a replica delay.
+
+**Pass evidence:** State guarantees and counterexamples; compare two alternatives, failure tests, recovery owner,
+and scores of at least 4/5.
+
+### DS04 — Partitioning, hot keys, and distributed scale
+
+**Prerequisites:** B03 and DS03. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C128 · Core:** Select shard keys and detect skew and hot partitions.
+- **C129 · Core:** Evaluate cross-shard transactions, fan-out reads, IDs, and rebalance safety.
+- **C130 · Depth:** Address cache staleness and invalidation when the scenario needs cached reads.
+
+**Prepare:** Horizontal partitioning, routing, shard key, tenant ID, hotspots, skew, fan-out, rebalancing, and
+cross-partition operations. Distinguish data capacity from request rate and storage from ownership.
+
+**Worked example:** Compare shard-by-tenant and shard-by-transaction for a hypothetical commercial platform with one
+very large tenant. Trace a policy lookup and a tenant-level finance report under both designs.
+
+**Guided practice:** Sketch routing and a rebalance plan. Estimate a simple hypothetical traffic distribution.
+Write the normal and failure path if the shard map is stale during migration.
+
+**Failure and trade-off:** More partitions do not repair a bad partition key. Spreading one tenant across shards can
+improve load distribution but complicate organization-wide queries and atomic updates.
+
+**Interview phrasing:** “I would choose a partition key from access patterns and measured hotspots, not only table
+size. I would budget for cross-partition queries, migrations, and the consistency of routing metadata.”
+
+**Senior decision test:** One corporate customer causes 40% of peak traffic (hypothetical). Decide whether to isolate
+the tenant, subdivide it, or optimize the current path, and show a load test plus rollback plan.
+
+**Pass evidence:** Key choice, access-pattern matrix, hot-key test, alternate design, owner, 4/5 scores.
+
+### DS05 — Idempotency, workflow state, and distributed transactions
+
+**Prerequisites:** DS02 and T02. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C041 · Core (reapply):** Idempotency keys, deduplication, safe retries, and concurrency.
+- **C043 · Core (reapply):** Transaction boundaries, sagas, and compensation.
+- **C044 · Core (reapply):** Transactional outbox and change-data capture concepts.
+- **C131 · Core:** Durable request identity, parameter consistency, concurrent deduplication, and retry safety.
+- **C132 · Core:** Resolve external-action uncertainty through status checks, reconciliation, and escalation.
+
+**Prepare:** Idempotent operation, durable request record, uniqueness constraint, in-progress state, request
+fingerprint, external correlation ID, compensation, saga, outbox, and audit evidence.
+
+**Worked example:** A payment adapter executes an action, then the API loses the response. Trace the first request,
+timeout, retry, same-key/different-body request, and the source of truth for the final outcome.
+
+**Guided practice:** Write a small Python handler or pseudocode with durable idempotency state and atomic reservation.
+Test parallel requests, crash between local commit and event publish, and uncertain downstream state.
+
+**Failure and trade-off:** A unique key in volatile memory does not survive process restart. An outbox reduces
+local dual-write risk but requires consumer deduplication. Compensation is not the same as rolling back an external
+financial action and may itself fail.
+
+**Interview phrasing:** “I would assign a durable business request ID, enforce atomic claim and deduplication, and
+persist an uncertain state until reconciliation confirms the external outcome. I would not retry blindly.”
+
+**Senior decision test:** An external payment succeeded but the caller timed out and immediately retried. Compare
+status query, provider-supported idempotent retry, and manual intervention. Choose according to verified contract.
+
+**Pass evidence:** Correct failure timeline, request-state model, concurrent test, audit/reconcile plan, owner, 4/5.
+
+### DS06 — Event streams, delivery semantics, and replay
+
+**Prerequisites:** T04 and DS05. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C052 · Core (reapply):** Event contract, naming, schema versioning, and ordering scope.
+- **C053 · Core (reapply):** Poison messages, dead-letter paths, delayed and duplicate consumers.
+- **C133 · Core:** Trace broker partitions, consumer acknowledgment/offset behavior, retention, lag, and replay.
+- **C134 · Core:** Design safe consumers with ordering assumptions, schema evolution, and deduplication.
+
+**Prepare:** Command versus event, publisher, broker, topic, partition, offset, acknowledgment, at-least-once
+delivery, consumer group, backlog, replay, poison message, and dead-letter queue. Avoid unqualified “exactly once.”
+
+**Worked example:** A committed purchase generates an event. Reporting is offline and later replays records, including
+one duplicate and one old event arriving after a newer state transition.
+
+**Guided practice:** Define an event envelope with entity ID, event ID, version, occurrence time, schema version,
+and producer. Write consumer rules for ordering and idempotence. Simulate lag and recovery.
+
+**Failure and trade-off:** A broker acknowledgment is not necessarily proof the downstream business effect committed.
+Ordering often has a defined partition/key scope; replay can reconstruct or corrupt a projection depending on the
+consumer's state model.
+
+**Interview phrasing:** “I would define the event contract and ordering scope, then make consumers safe under replay.
+I would monitor consumer lag and keep a recovery path for poison or missing events.”
+
+**Senior decision test:** Reporting is down six hours while purchases continue. Compare synchronous blocking with
+event buffering and replay; prove no unaccounted events remain after recovery.
+
+**Pass evidence:** Contract, timeline, replay plan, duplicate handling, reconciliation owner, 4/5.
+
+### DS07 — Cascading failure, overload, and backpressure
+
+**Prerequisites:** DS05 and DS06. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C040 · Core (reapply):** Partial failure, timeouts, bounded retries, circuit breaking, and backpressure.
+- **C081 · Core (reapply):** Queueing, load shedding, and capacity controls.
+- **C135 · Core:** End-to-end deadlines, bounded backoff/jitter, retry budgets, and circuit breakers.
+- **C136 · Core:** Queue limits, bulkheads, backpressure, safe rejection, and overload recovery.
+
+**Prepare:** Timeout versus deadline, caller cancellation, retry amplification, exponential backoff, jitter,
+circuit breaker, bulkhead isolation, queue capacity, saturation, and load shedding.
+
+**Worked example:** A request passes through three services, each retrying three times. Trace the potential
+amplification and show how a propagated deadline and one controlled retry owner reduce work.
+
+**Guided practice:** Draw a queue growing while reporting slows. Choose limits, backpressure signal, user-visible
+response, and alerts. Exercise partial and total dependency outages.
+
+**Failure and trade-off:** Unlimited queues hide overload until latency becomes unacceptable. Aggressive retries can
+harm the dependency they are trying to reach. Reject or degrade work deliberately where data integrity permits.
+
+**Interview phrasing:** “I would allocate an end-to-end deadline, set bounded retries with jitter, isolate failing
+dependencies, and shed excess load safely rather than building an unbounded backlog.”
+
+**Senior decision test:** A downstream risk service becomes slow during a traffic spike. Preserve financial safety
+while comparing fail-closed behavior, cached risk results, and delayed processing under explicit assumptions.
+
+**Pass evidence:** Deadline/queue arithmetic, failure tests, safe state, alert owner, 4/5.
+
+### DS08 — Regional failure, failover, and split brain
+
+**Prerequisites:** DS03, DS07, and T07. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C077 · Core (reapply):** High availability and active/passive versus active/active.
+- **C078 · Core (reapply):** Recovery time, recovery point, backup, and restore evidence.
+- **C085 · Depth (reapply):** Multi-region consistency and fault-injection when justified.
+- **C137 · Core:** Match failover topology to assumed recovery targets and validate recovery.
+- **C138 · Core:** Define a single authority for risky writes, split-brain prevention, and failback.
+
+**Prepare:** Region, failure domain, recovery time objective (RTO), recovery point objective (RPO), active/passive,
+active/active, data replication lag, traffic routing, fencing, and failback.
+
+**Worked example:** The active purchase region stops responding while asynchronous replicas trail. Distinguish
+requests known to be committed from uncertain ones; decide whether the secondary may accept new financial writes.
+
+**Guided practice:** Write a failover runbook with triggers, writer ownership, customer-facing state, reconciliation,
+measured recovery, and return-to-primary validation. Run a tabletop exercise.
+
+**Failure and trade-off:** Active/active does not automatically solve conflicting financial writes. Recovery targets
+are assumptions until tested; failover can preserve availability while risking inconsistent authority.
+
+**Interview phrasing:** “I would derive failover from business RTO and RPO, define write authority during a partition,
+and prove the data and customer journey are correct before accepting normal traffic.”
+
+**Senior decision test:** The primary region is partitioned rather than fully down. Compare writable failover with
+safe read-only operation and deferred action; explain split-brain controls and reconciliation evidence.
+
+**Pass evidence:** Architecture, runbook, writer-fencing plan, drill measurements, owner, 4/5.
+
+### DS09 — Observability, debugging, and failure experiments
+
+**Prerequisites:** T09 and DS08. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C083 · Core (reapply):** Logs, metrics, traces, and customer-journey signals.
+- **C084 · Core (reapply):** Alerts, runbooks, incident ownership, and learning.
+- **C085 · Depth (reapply):** Fault injection or multi-region validation when justified.
+- **C139 · Core:** Correlate request IDs, distributed traces, state changes, lag, and business impact.
+- **C140 · Core:** Safely test delays, duplicates, stuck consumers, and region loss with rollback controls.
+
+**Prepare:** Trace/span, correlation ID, service-level indicator (SLI), consumer lag, cardinality, audit trail,
+incident timeline, rollback guardrail, and recovery verification.
+
+**Worked example:** Infrastructure shows green, but purchases remain pending. Follow one request ID from ingress
+through downstream timeout to outbox and reporting consumer; find the business-level failure.
+
+**Guided practice:** Build a minimal incident evidence pack: timeline, hypothesis, log/trace fields, dashboards,
+repro, mitigation, and regression test. Inject a duplicate event in a controlled test environment.
+
+**Failure and trade-off:** Server uptime is not customer success. Excess logs can expose sensitive data or increase
+cost; telemetry must follow least privilege and protect confidential financial information.
+
+**Interview phrasing:** “I would correlate technical traces with business state and measure end-to-end outcomes.
+The incident is resolved only when the business invariant and recovery path are verified.”
+
+**Senior decision test:** All service health checks pass, while one cohort of customers cannot complete purchases.
+Identify the missing signal, isolate the failure, and define a safe controlled test and owner.
+
+**Pass evidence:** Traceable incident timeline, actionable alert, failure-injection plan, owner, 4/5.
+
+### DS10 — Senior distributed-system design capstone
+
+**Prerequisites:** DS01–DS09, D02, T06, and T11. **Priority:** Primary.
+
+**Required checklist coverage (binding crosswalk):**
+
+- **C115 · Core (reapply):** Defend an unfamiliar, timed architecture with changing constraints.
+- **C141 · Core:** Build and defend end-to-end distributed-system design under consistency, scale, and outage constraints.
+
+**Prepare:** Tie requirements, invariants, data ownership, consistency, partitioning, idempotency, asynchronous
+integration, regional failover, SLOs, threat modeling, operations, and delivery sequencing into one argument.
+
+**Worked example:** Draft a cloud-neutral commercial purchase platform. Compare a modular monolith with independently
+deployed services. Label transaction authority, reporting freshness, recovery, and deployment boundaries.
+
+**Guided practice:** Complete two distinct 45–60 minute design exercises (not only the original running case).
+Change a constraint mid-design: region failure, 10x traffic, strict freshness, unavailable payment partner, or
+new audit obligation. Treat any numeric load or latency as a hypothetical assumption.
+
+**Failure and trade-off:** A diagram without invariants, failure handling, data authority, or ownership is not a
+senior design. Naming patterns without showing their costs and validation is insufficient.
+
+**Interview phrasing:** “I would first confirm the business invariant and measurable quality targets. Then I would
+show ownership, consistency, failure behavior, and recovery, compare viable designs, and propose measured delivery.”
+
+**Senior decision test:** Receive an unfamiliar problem; identify missing facts, two viable architectures, failure
+cases, test evidence, accountable teams, and phased adoption under timed follow-ups.
+
+**Pass evidence:** Score at least 4/5 on every applicable dimension for **two separate capstones**. Then complete
+X01 and X02 using the existing mock standards, without coaching during the timed mock.
+
 ### E01 — Modernization and incremental migration
+
+**Distributed-systems lens (v4):** Migration must preserve transaction invariants, idempotency, replay, and safe coexistence.
 
 **Prerequisites:** T03, T04, T05, T07, and T11.
 
@@ -1564,6 +2016,9 @@ rubric; log follow-up weaknesses.
 
 ### X01 — Integrated system-design mock
 
+**Distributed-systems lens (v4):** At least one unfamiliar mock must stress consistency under partition,
+duplicate requests, event recovery, capacity, and region failover. Keep the original two-prompt pass rule.
+
 **Prerequisites:** The technical and enterprise cards. Use mocks after teaching.
 
 **Prepare:**
@@ -1599,6 +2054,9 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ### X02 — Leadership, deep-dive, and gap-closure mock
+
+**Distributed-systems lens (v4):** Make the technical deep dive a distributed-system decision or failure-oriented
+Python handler/event-consumer review. Retain leadership questions and two consecutive passing mocks.
 
 **Prerequisites:** L01, A01, L02, and X01.
 
@@ -1636,6 +2094,10 @@ control consideration, how to validate it, and a named accountable owner. Score 
 rubric; log follow-up weaknesses.
 
 ## Compact preparation portfolio
+
+**V4 DS emphasis:** Add a failure timeline, data consistency contract, retry/idempotency test, partition-key
+analysis, event replay plan, multi-region runbook, and distributed trace to the original portfolio. These are
+primary preparation artifacts, not optional notes.
 
 As the sessions finish, maintain these compact artifacts. They are more valuable for review than full transcripts:
 
@@ -1678,3 +2140,24 @@ facts; use your own experience to demonstrate judgment.
 evidence, relevant Depth items are visibly labeled, all exercises have a reviewed outcome, the senior decision test
 passes, and factual claims cite primary sources. A checked box in this source map means the **map has been revised**,
 not that the learner has mastered the topic.
+
+## v4 change-control and distributed-system completion gate
+
+**Changes against v3 (2026-10-24):**
+
+- [x] Preserve all 25 v3 cards and all C001–C117 identifiers/checklist wording.
+- [x] Add DS01–DS10 (10 new cards; **35 total**) and C118–C141 (24 new checklist items; **141 total**).
+- [x] Reorder the learning pathway so distributed-systems concepts are the spine, while preserving prerequisites.
+- [x] Specify a recommended **70% distributed systems / 30% supporting areas** study allocation; not a role claim.
+- [x] Require failure timelines, consistency semantics, data authority, trade-offs, validation, and recovery evidence.
+- [x] Keep payment examples hypothetical and continue to require source verification for company/standards facts.
+- [x] Keep existing 4/5 per-dimension senior pass bar and two separate/consecutive mocks for X01/X02.
+
+**Additional acceptance conditions for DS01–DS10:** Each C118–C141 Core item must have its own short lesson,
+worked example, guided exercise, failure/trade-off analysis, and senior interview phrasing under the existing
+six-step production contract. Depth items remain visible, not falsely marked as mastered. Review the senior
+assessment evidence and revisit weak cases before proceeding. Preserve the original C001–C117 checklist crosswalk.
+
+**Scope warning:** This is an interview preparation plan chosen to prioritize distributed systems. It is **not**
+evidence that the target company weights distributed systems at 70%, uses any listed technology, or runs a
+particular interview format. Rebalance only after finding the verified job requisition or interview instructions.
