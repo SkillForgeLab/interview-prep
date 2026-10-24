@@ -17,7 +17,7 @@ preparation standard, not a verified minimum for the vacancy.
 - Use industry-standard designs and architecture, citing current primary references for claims about standards.
 - An API, or application programming interface, is a contract for how software communicates.
 
-The **v2 syllabus describes the target role** as emphasizing APIs, integration, platform roadmaps, design reviews,
+The **syllabus describes the target role** as emphasizing APIs, integration, platform roadmaps, design reviews,
 mentoring, and responsible AI-tool use; this wording is not a substitute for the verified job posting.
 The syllabus also covers payments, data, security, reliability, and delivery.
 
