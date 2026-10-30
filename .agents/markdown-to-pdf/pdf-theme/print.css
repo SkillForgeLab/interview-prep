@@ -1,0 +1,241 @@
+:root {
+    color-scheme: light;
+    --pdf-heading: #183328;
+    --pdf-accent: #116845;
+    --pdf-sage: #e8f4ec;
+    --pdf-code: #f1f7f3;
+    --pdf-border: #d3e3d9;
+    --pdf-ink: #202d26;
+    --pdf-muted: #526b5e;
+    --pdf-paper: #ffffff;
+    --pdf-body-size: 10pt;
+    --pdf-small-size: 8pt;
+    --pdf-code-size: 8pt;
+    --pdf-h1-size: 23pt;
+    --pdf-h2-size: 16pt;
+    --pdf-h3-size: 12pt;
+    --pdf-h4-size: 10.5pt;
+}
+
+@page {
+    size: A4;
+    margin: 18mm 17mm 20mm;
+    @bottom-right {
+        content: "Page " counter(page);
+        font: 8pt "Palatino", "Palatino Linotype", system-ui, sans-serif;
+        color: #526b5e;
+    }
+}
+
+html {
+    font-family: "Palatino", "Palatino Linotype", system-ui, sans-serif;
+    color: var(--pdf-ink);
+    background: var(--pdf-paper);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
+
+body {
+    margin: 0;
+    font: var(--pdf-body-size)/1.45 "Palatino", "Palatino Linotype", system-ui, sans-serif;
+    color: var(--pdf-ink);
+    background: var(--pdf-paper);
+}
+/* Lines 44–85 were not visible in the provided photographs. */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+li {
+    margin-bottom: 3pt;
+}
+
+a {
+    color: var(--pdf-accent);
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+}
+
+code, pre {
+    font-family: monospace;
+    font-size: var(--pdf-code-size);
+    color: var(--pdf-ink);
+}
+
+:not(pre) > code {
+    background: var(--pdf-code);
+    padding: 0.5pt 2pt;
+    overflow-wrap: anywhere;
+}
+
+pre {
+    box-sizing: border-box;
+    max-width: 100%;
+    margin: 8pt 0 10pt;
+    padding: 8pt 9pt;
+    border: 0.6pt solid var(--pdf-border);
+    border-left: 2.4pt solid var(--pdf-accent);
+    border-radius: 3pt;
+    background: var(--pdf-code);
+    line-height: 1.35;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    break-inside: auto;
+}
+
+pre code {
+    padding: 0;
+    background: transparent;
+    font-size: inherit;
+    white-space: inherit;
+}
+
+div.sourceCode {
+    margin: 0;
+    background: transparent;
+}
+
+/* Do not allow converter-provided syntax palettes to override the print theme. */
+pre code span {
+    color: inherit;
+    background: transparent;
+}
+
+/* Mark text diagrams explicitly: wrapping would change their meaning. */
+pre.diagram, pre.diagram code {
+    white-space: pre;
+    overflow-wrap: normal;
+}
+
+blockquote, .callout {
+    margin: 9pt 0;
+    padding: 7pt 10pt;
+    border-left: 2.4pt solid var(--pdf-accent);
+    background: var(--pdf-sage);
+    color: var(--pdf-ink);
+    break-inside: auto;
+}
+
+hr {
+    border: 0;
+    border-top: 0.6pt solid var(--pdf-border);
+    margin: 12pt 0;
+}
+
+table {
+    display: table;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+    margin: 8pt 0 12pt;
+    font-size: var(--pdf-small-size);
+}
+
+th, td {
+    border: 0.5pt solid var(--pdf-border);
+    padding: 5pt;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+}
+
+th {
+    background: var(--pdf-sage);
+    color: var(--pdf-heading);
+    font-weight: 700;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    break-inside: auto;
+}
+
+img, svg {
+    max-width: 100%;
+    height: auto;
+}
+
+figure {
+    margin: 10pt 0;
+}
+
+figcaption, .source-label {
+    color: var(--pdf-muted);
+    font-size: var(--pdf-small-size);
+}
+
+nav#TOC, nav[role="doc-toc"] {
+    margin: 12pt 0 18pt;
+}
+
+.pdf-cover {
+    break-after: page;
+    page-break-after: always;
+}
+
+.pdf-cover h1 {
+    margin-bottom: 18pt;
+}
+
+.pdf-cover nav ul, .pdf-cover nav ol {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.pdf-cover nav li {
+    margin: 0 0 5pt;
+    break-inside: avoid;
+}
+
+.pdf-cover nav a {
+    color: var(--pdf-heading);
+    font-size: var(--pdf-body-size);
+    line-height: 1.35;
+    text-decoration: none;
+}
+
+.pdf-cover nav a::after {
+    content: leader(".") target-counter(attr(href), page);
+    color: var(--pdf-muted);
+}

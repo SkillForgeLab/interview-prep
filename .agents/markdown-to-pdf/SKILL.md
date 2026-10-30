@@ -12,9 +12,9 @@ Use this skill for Markdown-to-PDF work in this repository so the user does not 
 
 The shared theme is the source of truth:
 
-- Follow `../markdown-authoring/SKILL.md` for readable source Markdown: avoid wide tables and cluttered lists, and prefer standalone bold labels followed by blockquoted explanations for definitions, Q&A, and similar labeled entries.
-- Read `pdf-theme/README.md`.
-- Use `pdf-theme/print.css` and `pdf-theme/guide.html` for learning guides.
+- Follow [../markdown-authoring/SKILL.md](../markdown-authoring/SKILL.md) for readable source Markdown: avoid wide tables and cluttered lists, and prefer standalone bold labels followed by blockquoted explanations for definitions, Q&A, and similar labeled entries.
+- Read [pdf-theme/README.md](pdf-theme/README.md).
+- Use [pdf-theme/print.css](pdf-theme/print.css) and [pdf-theme/guide.html](pdf-theme/guide.html) for learning guides.
 - Follow `AGENTS.md` and any more specific instructions for the document type.
 - The standard is Forest / Sage v1, portrait A4, the shared typography, spacing, palette, cover/index treatment, and page numbering. Do not invent a per-document theme.
 - Study-pack exports use the shared A4 stylesheet; existing Letter-size PDFs remain unchanged unless regeneration is requested.

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="$if(lang)$$lang$$else$en$endif$">
+<head>
+  <meta charset="utf-8">
+  <title>$pagetitle$</title>
+  $for(css)$
+  <link href="$css$" rel="stylesheet">
+  $endfor$
+  $for(header-includes)$
+  $header-includes$
+  $endfor$
+</head>
+<body>
+<section aria-label="Cover and index" class="pdf-cover">
+  <h1>$title$</h1>
+  <nav aria-label="Index" id="TOC" role="doc-toc">
+    <h2>Index</h2>
+    $table-of-contents$
+  </nav>
+</section>
+<main>
+  $body$
+</main>
+</body>
+</html>
