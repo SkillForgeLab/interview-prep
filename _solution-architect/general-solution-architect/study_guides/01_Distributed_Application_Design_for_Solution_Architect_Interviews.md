@@ -6,9 +6,6 @@ This guide explains how to divide an application into components, define their r
 communicate, and reason about the failures that occur between them. It starts with a simple mental model and builds
 toward the tradeoffs an architect should be able to defend.
 
-The examples are illustrative, not claims about the learner's work or any particular company's systems. Replace them
-with a real project when practicing personal experience answers.
-
 ## Learning outcomes
 
 After studying this guide, you should be able to:
@@ -20,14 +17,16 @@ After studying this guide, you should be able to:
 - Identify common cross-component failure modes and explain proportionate controls.
 - Present a design decision with its rationale, tradeoffs, assumptions, and validation plan.
 
-No specialized prerequisite is needed. The key idea is that an application is a set of responsibilities that work
-together to deliver a business outcome.
+The key idea is that an application is a set of responsibilities that work together to deliver a business outcome.
 
 ## 1. Start with the system, not the service count
 
 A **distributed application** uses multiple components that communicate across process or network boundaries to
-complete a capability. A component might be a function, module, application process, managed platform service, or
-external system. Not every component is a microservice, and not every useful architecture needs many components.
+complete a capability.
+
+A component might be a function, module, application process, managed platform service, or external system.
+
+Not every component is a microservice, and not every useful architecture needs many components.
 
 Consider a customer placing an order:
 
@@ -52,8 +51,8 @@ the boxes need named responsibilities, and the arrows need a meaning.
 
 **Data owner:**
 
-> The data owner is the component accountable for creating, validating, and changing a business fact. Other components
-> should use an agreed interface rather than silently changing that owner's data.
+> The data owner is the component accountable for creating, validating, and changing a business fact.
+> Other components should use an agreed interface rather than silently changing that owner's data.
 
 For example, the Order component can own order status, while a Payment component owns payment authorization and
 settlement status. An order may refer to a payment identifier, but that does not make the Order component authoritative
@@ -61,12 +60,38 @@ for payment records.
 
 ## 2. Separate logical design from deployment
 
-A logical component is a responsibility boundary in the design. A deployment unit is something built, released, and
-operated independently. The two concepts are related, but they are not the same.
+A **logical component** is a responsibility boundary in the design.
 
-A single application can have clear internal modules, each with a defined interface and owner. This is often called a
-**modular monolith**: one deployable application with deliberate internal boundaries. A **microservice** is a separately
-deployable service, usually aligned to a cohesive business capability and operated as an independent process.
+A **deployment unit** is something built, released, and operated independently.
+
+The two concepts are related, but they are not the same.
+
+A **monolith** is a single deployable application without clear internal boundaries. It can be a single module or a
+large codebase with many responsibilities. It is not inherently bad, but it can make ownership, scaling, and independent
+delivery harder.
+
+A **modular monolith** is a single application with clear internal modules, each with a defined interface and owner:
+one deployable application with deliberate internal boundaries.
+
+> Here, an **owner** is the component that is the authoritative source for a particular kind of data and is responsible
+> for changing it and enforcing its rules.
+>
+> **“Owner”** means a software component, not necessarily a person or a separately deployed service. A module inside a
+> modular monolith can own data just as a microservice can.
+>
+> **Examples:**
+> **Shopping cart:** The Cart component owns cart contents and quantities. A Checkout component can read the cart and
+> request changes through the Cart interface, but shouldn’t directly edit cart records.
+>
+> **Customer profile:** The Customer component owns a customer’s name and contact details. An Order component can store
+> the customer ID and use the profile, but the Customer component remains responsible for updating the details.
+
+
+A **microservice** is a separately deployable service, usually aligned to a cohesive business capability and operated as
+an independent process.
+
+A distributed application can be a mix of monoliths, modular monoliths, and microservices. The choice depends on the
+business needs, team structure, and operational constraints.
 
 ```text
 Modular monolith                         Distributed services
@@ -92,7 +117,7 @@ They can also support independent scaling and delivery when those capabilities a
 
 **Modular monolith:**
 
-> Useful when the application needs clear domain boundaries, but independent deployment is not yet worth the
+> Useful when the application needs clear domain boundaries, ownership but independent deployment is not yet worth the
 > operational cost. Modules still share a process and often a release, so discipline is needed to prevent unwanted
 > coupling.
 
@@ -106,32 +131,50 @@ is expected to grow. First establish which constraint requires independent deplo
 
 **Decision test:**
 
-> Split a component when the benefit of independent change, scaling, ownership, or fault isolation is greater than the
-> cost of operating and coordinating across a network boundary.
+> Split a component when
+>
+> the **benefit** of `independent change`, `scaling`, `ownership`, or `fault isolation`
+>
+> **is greater than** the **cost of** `operating and coordinating across a network boundary`.
 
-Useful evidence includes different change rates, distinct business capabilities, separate team ownership, materially
-different scaling needs, or a need to contain specific failures. “The code is large” or “microservices are modern” is
-not enough by itself.
+Useful evidence includes `different change rates`, `materially different scaling needs`, `distinct business 
+capabilities`, `separate team ownership`, or a `need to contain specific failures`.
+
+"The code is large" or "microservices are modern" is not enough by itself.
+
+**Need to contain specific failures**: Design a boundary so a failure in one capability has limited impact on the
+rest of the system.
+
+> Example scenarios that might justify a separate service:
+> - **Payment provider outage:** Payment processing can fail or become delayed without bringing down browsing or cart
+    management. Customers might not be able to complete checkout, but they can still use the rest of the site.
+>
+>
+> - **Recommendation service failure:** Recommendations can time-out or go offline without preventing customers from
+    searching for or buying products.
 
 ## 3. Draw boundaries around capabilities and data
 
 A **business capability** is something the organization must be able to do, such as accept an order, authorize a
-payment, or fulfill a shipment. A service boundary should normally group work and data that change together, and
-separate work that has different ownership or reasons to change.
+payment, or fulfill a shipment.
+
+A service boundary should normally **group** `work and data that change together`, and **separate** `work that has 
+different ownership or reasons to change`.
 
 For a simple ordering example:
 
 ```text
 Checkout / Order                    Payment                    Fulfillment
 -----------------                   -------                    -----------
-Accept order                        Authorize payment           Allocate stock
-Track order status                  Capture/refund               Prepare shipment
-Own order data                      Own payment data             Own fulfillment data
+Accept order                        Authorize payment          Allocate stock
+Track order status                  Capture/refund             Prepare shipment
+Own order data                      Own payment data           Own fulfillment data
 ```
 
-These are candidate boundaries, not a required three-service design. An early system might implement them as modules
-in one deployable application. The same responsibilities can later be separated if there is evidence that independent
-deployment is valuable.
+These are candidate boundaries, not a required three-service design.
+
+An early system might implement them as modules in one deployable application. The same responsibilities can later be
+separated if there is evidence that independent deployment is valuable.
 
 **Data ownership rule of thumb:**
 
@@ -139,9 +182,10 @@ deployment is valuable.
 > authoritative source. Define how it is refreshed and how stale it may be.
 
 Avoid casual shared-database writes across services. If several services directly change the same tables, their
-deployments and data model are coupled even if their code is in separate repositories. During a migration, shared
-storage may be a deliberate temporary state; record the risks, ownership, and exit plan rather than treating it as a
-clean target.
+deployments and data model are coupled even if their code is in separate repositories.
+
+During a migration, shared storage may be a deliberate temporary state; record the risks, ownership, and exit plan
+rather than treating it as a clean target.
 
 Before splitting a capability, check:
 
@@ -180,6 +224,20 @@ This is useful when work can finish later, the receiver may be temporarily unava
 It adds message storage, delivery behavior, monitoring, and recovery responsibilities. A broker does not remove
 dependencies; it changes when and how they are experienced.
 
+The diagram compares the point at which the sender continues. The synchronous path waits for the receiver's response;
+the asynchronous path hands work to a broker and continues before the receiver finishes.
+
+```mermaid
+flowchart LR
+    Caller -->|request| Decision{Need result now?}
+    Decision -->|yes| Sync[Wait for response]
+    Sync -->|response or timeout| ContinueNow[Continue or report outcome]
+    Decision -->|no| Broker[Publish work to broker]
+    Broker -->|accepted| ContinueLater[Continue with pending status]
+    Broker -->|deliver later| Receiver[Receiver processes work]
+    Receiver -->|result or event| Status[Update observable status]
+```
+
 **Synchronous request:**
 
 > Use it when the caller usually needs a result now. Design the contract, timeout, retry policy, and caller behavior.
@@ -204,17 +262,24 @@ answered after the caller times out. A timeout does not necessarily mean the rec
 Suppose Checkout sends a payment authorization request. Payment processes it, but the response is delayed. Checkout
 times out. If Checkout retries without a stable operation identifier, the customer could be authorized twice.
 
-```text
-Checkout -- authorize(id=order-73) --> Payment
-Checkout <-- timeout (outcome unknown) --
-Checkout -- retry same id=order-73 --> Payment
+The sequence shows why a timeout means “outcome unknown,” not necessarily “the operation failed.”
+
+```mermaid
+sequenceDiagram
+    participant C as Checkout
+    participant P as Payment
+    C->>P: Authorize(key=order-73)
+    Note over C, P: Payment may complete while the response is delayed
+    C->>C: Timeout, outcome is unknown
+    C->>P: Retry authorize(key=order-73)
+    P-->>C: Return the existing outcome without repeating the effect
 ```
 
 The same business operation identifier lets Payment recognize the retry and return the known outcome rather than
 performing the operation again. This behavior is **idempotency**: repeating a request with the same key has the same
 business effect as performing it once.
 
-Important controls, chosen according to risk:
+**Important controls, chosen according to risk:**
 
 - **Timeout:** Bound how long a caller waits. Set it with the end-to-end latency objective and downstream behavior in
   mind.
@@ -245,10 +310,20 @@ this as an intuition rather than a production availability prediction.
 When one business action updates data owned by multiple components, the system must define what “complete” means.
 The components may not share one database transaction.
 
-Consider order acceptance and inventory reservation:
+Consider order acceptance and inventory reservation. The diagram shows one possible compensation if the reservation
+cannot be completed; an actual workflow must choose actions that match its business rules.
 
 ```text
-Order accepted -> Inventory reservation requested -> Reservation confirmed
+Order service             Inventory service
+     |                            |
+     | reserve(order-73)          |
+     |--------------------------->|
+     |                            | reserve stock
+     |<---------------------------|
+     | reservation confirmed     |
+     |                            |
+     | if reservation fails:     |
+     | cancel order / review      |
 ```
 
 For a short period, the Order component may show “pending inventory” while Inventory is still processing the request.
@@ -278,22 +353,15 @@ the choices.
 known before fulfillment starts. Shipment preparation can happen later. Temporary delays are acceptable if the customer
 can see a truthful status. The example does not assume any particular provider, traffic volume, or regulatory regime.
 
-```text
-Customer
-   |
-   v
-Checkout / Order component ---- synchronous ----> Payment component
-   |                                                |
-   | owns order and status                          | owns payment status
-   v                                                v
-Order database                                  Payment database
-   |
-   | publish OrderReadyForFulfillment
-   v
-Message broker ---- asynchronous ----> Fulfillment component
-                                          |
-                                          v
-                                    Fulfillment database
+```mermaid
+flowchart LR
+    Customer --> Checkout[Checkout / Order component]
+    Checkout -->|synchronous authorization| Payment[Payment component]
+    Checkout -->|owns order and status| OrderDB[(Order database)]
+    Payment -->|owns payment status| PaymentDB[(Payment database)]
+    Checkout -->|publish OrderReadyForFulfillment| Broker[Message broker]
+    Broker -->|asynchronous delivery| Fulfillment[Fulfillment component]
+    Fulfillment -->|owns fulfillment status| FulfillmentDB[(Fulfillment database)]
 ```
 
 ### Request flow
