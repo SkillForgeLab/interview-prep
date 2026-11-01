@@ -1,0 +1,783 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="A first-principles guide to foundations and the Strategy design pattern, with runnable Java 25-compatible code and offline exercises."><title>Lessons 0 + 1 · Foundations &amp; Strategy · Java 25</title><style>
+:root{color-scheme:light;--ink:#20312f;--muted:#52615c;--accent:#006b60;--line:#d8e1da;--paper:#fff;--wash:#f3f5ef;--soft:#eaf4ef;--gold:#ad6c1b}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:var(--wash);color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.62}a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:#003d36}button,input,select{font:inherit}button,a,input,select,summary,pre{outline-offset:5px}button{cursor:pointer}.js-only{display:none}.js .js-only{display:inline-flex}
+.skip{position:absolute;left:20px;top:-100px;background:white;padding:10px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,900px);gap:38px;padding:36px 30px 60px}.sidebar{position:sticky;top:32px;align-self:start;max-height:calc(100vh - 60px);overflow:auto;font-size:13px}.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.08em;margin-bottom:26px}.brand b{background:var(--accent);color:white;padding:7px 9px;border-radius:6px;font-size:15px}.sidebar .eyebrow{font-size:10px;margin:25px 0 8px}.sidebar a{display:block;color:var(--muted);text-decoration:none;padding:5px 0;line-height:1.5}.sidebar a:hover{color:var(--accent)}.sidebar .nav-head{font-weight:700;color:var(--ink);margin-top:8px}.print-button{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:10px 14px;margin-top:20px;font-size:13px;font-weight:700}.nav-note{font-size:11px;color:var(--muted);max-width:180px}
+main{min-width:0}.sheet{background:var(--paper);border:1px solid var(--line);border-radius:10px;margin:0 0 24px;padding:40px 44px;box-shadow:0 3px 12px #17291e04;scroll-margin-top:24px}.sheet>.eyebrow:first-child{margin-top:0}h1,h2,h3,h4{line-height:1.2;letter-spacing:-.025em;color:var(--ink)}h2{font-size:32px;margin:10px 0 24px}h3{font-size:19px;margin:27px 0 10px}p{margin:12px 0}.eyebrow{font-weight:700;font-size:11px;letter-spacing:.14em;color:var(--accent);line-height:1.5}.accent{color:var(--accent)}.small,.source-note{font-size:13px;color:var(--muted)}.lede{font-size:20px;line-height:1.65;max-width:650px}.deck{font-size:22px;font-weight:700;margin-top:25px}.cover{padding:52px 48px;background:linear-gradient(145deg,#fff 60%,#eff6ec)}.cover h1{font-size:54px;line-height:1.08;letter-spacing:-.055em;margin:30px 0 0}.tags{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.tags span{border:1px solid #cadad0;border-radius:4px;padding:4px 9px;color:var(--accent);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.035em}.cover-rule{width:68px;height:4px;background:var(--accent);margin:36px 0}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px}.cover-cols h3{margin:9px 0;font-size:21px}.cover-cols p{font-size:15px}.cover-note{font-family:Georgia,serif;font-size:22px;line-height:1.5;margin:30px 0 0}.method{border-top:1px solid var(--line);margin-top:28px;padding-top:21px}.method strong{font-size:14px}.method ol{display:grid;grid-template-columns:repeat(3,1fr);gap:5px 20px;padding-left:20px;margin:12px 0 0;font-size:12px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:20px 0;line-height:1.5}caption{text-align:left;font-size:12px;color:var(--muted);padding-bottom:8px}th{text-align:left;background:var(--soft);color:#1f4c42;font-size:12px;border-top:1px solid var(--line);font-weight:700}th,td{padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line)}td:first-child{font-weight:500}tbody tr:nth-child(even){background:#fafbf8}table code{font-size:.9em}.numbers{font-variant-numeric:tabular-nums}.numbers th,.numbers td{padding:9px 8px}
+code{font-family:"DejaVu Sans Mono",Consolas,"Liberation Mono",monospace;font-size:.88em;background:#f0f3ef;border-radius:3px;padding:2px 4px;overflow-wrap:anywhere}.codebox{border:1px solid #d8e3db;border-radius:6px;margin:18px 0;overflow:hidden;background:#f6f8f4}.codebar{padding:8px 13px;background:#eaf0e9;border-bottom:1px solid #d8e3db;font-size:11px;font-weight:700;letter-spacing:.015em;color:#3f5f50;display:flex;align-items:center;justify-content:space-between;gap:10px}.codebar button{background:white;border:1px solid #bbcdbf;border-radius:4px;color:#285543;font-size:11px;padding:3px 9px}.codebox pre{padding:15px;margin:0;overflow:auto;font-size:12px;line-height:1.55;tab-size:4;white-space:pre-wrap;overflow-wrap:anywhere}.codebox code{padding:0;border-radius:0;font-size:inherit;line-height:inherit;background:none;overflow-wrap:inherit}.small-code pre{font-size:11.6px;line-height:1.5}
+.callout,.pause{border-left:3px solid var(--accent);padding:15px 18px;margin:23px 0;background:#edf6f0;border-radius:0 6px 6px 0;font-size:14px}.callout strong,.pause strong{color:#155747}.callout p,.pause p{margin:6px 0 0}.callout.note{background:#fbf6e9;border-left-color:var(--gold)}.callout.note strong{color:#795017}.pause{background:#f8f9f4;border-left-color:#94a982}.requirement{font-family:Georgia,serif;font-size:22px;line-height:1.5;border-left:3px solid #cad8ca;padding:4px 0 4px 18px;margin:23px 0}
+ol,ul{padding-left:24px}li{padding-left:4px;margin:7px 0}li::marker{color:var(--accent);font-weight:700}.downloads{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.download{display:inline-flex;gap:12px;align-items:center;text-decoration:none;border:1px solid #bfd3c5;background:#f1f8f2;border-radius:5px;padding:7px 10px;font-size:12px;font-weight:700}.download span{font-size:16px}.dependency-card{border:1px solid var(--line);border-radius:6px;background:#fafcf9;padding:18px;margin:24px 0}.dependency-card .eyebrow{margin:0 0 16px}.dep-line{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}.dep-line span,.dep-line strong{padding:10px 9px;border:1px solid #c8d9cc;border-radius:5px;background:white;text-align:center}.dep-line strong{background:var(--soft);color:var(--accent)}.dep-line b{color:var(--accent)}.dependency-card p:last-child{font-size:12px;color:var(--muted);margin-bottom:0}
+.js .practice{display:block}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.practice{background:#f6f9f2;border:1px solid var(--line);padding:22px;border-radius:8px}.practice label{font-size:13px;font-weight:700}.practice input[type=number],.practice select{display:block;width:100%;margin-top:6px;padding:9px;background:white;color:var(--ink);border:1px solid #adbdad;border-radius:4px}.check{display:flex;align-items:center;gap:8px}.check input{width:18px;height:18px;accent-color:var(--accent)}.result{margin-top:20px;padding-top:15px;border-top:1px solid var(--line)}.result>span{font-size:12px;text-transform:uppercase;letter-spacing:.08em}.result>strong{display:block;font-size:36px;line-height:1.4;letter-spacing:-.04em;color:var(--accent)}.result p{font-size:13px;margin:5px 0}.solution summary{font-weight:700;font-size:15px;color:var(--accent);cursor:pointer;padding:10px 0}.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.review-grid article{border-top:1px solid var(--line);padding-top:14px}.review-grid article>span{font-size:12px;font-weight:700;color:var(--accent)}.review-grid h3{margin:8px 0}.review-grid p{font-size:14px}.closing{font-family:Georgia,serif;font-size:27px;line-height:1.5;margin-top:32px}.part{font-size:15px;font-weight:400;letter-spacing:0;color:var(--muted);white-space:nowrap}.source-page h2{font-size:26px}.references{font-size:13px;padding-left:24px}.references li{margin:17px 0}.references p{margin:3px 0;color:var(--muted)}.print-help{padding-top:12px;border-top:1px solid var(--line)}.print-help p{font-size:13px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#203e35;color:white;padding:8px 16px;border-radius:5px;font-size:13px;z-index:20}.toast:empty{display:none}.endnote{text-align:center;font-size:12px;color:var(--muted);padding:20px}
+@media(max-width:1000px){.layout{grid-template-columns:180px minmax(0,1fr);gap:20px;padding:24px 18px}.sheet{padding:30px}.cover h1{font-size:46px}.dep-line{font-size:11px}}
+@media(max-width:760px){.layout{display:block;padding:14px}.sidebar{position:static;max-height:none;margin-bottom:16px;padding:10px 12px}.sidebar nav{display:none}.brand{margin:0;display:inline-flex}.sidebar .print-button{margin:0 0 0 16px}.nav-note{display:none}.sheet{padding:25px 21px;border-radius:7px}.cover{padding:32px 24px}.cover h1{font-size:43px}h2{font-size:28px}.lede{font-size:18px}.two-col,.review-grid{grid-template-columns:1fr;gap:10px}.method ol{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.codebox pre{font-size:11px;padding:12px}table{font-size:12px}th,td{padding:8px 6px}.numbers{font-size:10px}.numbers th,.numbers td{padding:6px 4px}.dep-line{flex-wrap:wrap;justify-content:center;font-size:11px}.references a{overflow-wrap:anywhere}.source-page h2{font-size:23px}.tags{gap:6px}}
+@page{size:A4 portrait;margin:12mm 14mm 14mm;@bottom-left{content:"DP · Foundations & Strategy · Java 25";font-family:Arial,sans-serif;font-size:8pt;color:#657468}@bottom-right{content:counter(page);font-family:Arial,sans-serif;font-size:8pt;color:#657468}}
+@media print{html{scroll-behavior:auto}body{background:white;font-size:10pt;line-height:1.42;color:#182e25}.layout{display:block;max-width:none;margin:0;padding:0}.sidebar,.no-print,.js-only,.js .js-only,.downloads,.skip,.toast,.endnote{display:none!important}.sheet{padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:white;break-before:page;page-break-before:always}.sheet:first-child{break-before:auto;page-break-before:auto}.sheet h2{font-size:22pt;margin:6pt 0 13pt}.eyebrow{font-size:8pt;letter-spacing:.12em}h3{font-size:12.5pt;margin:13pt 0 6pt}p{margin:7pt 0}h2,h3,h4,.codebar{break-after:avoid}p,li{orphans:3;widows:3}a{color:inherit;text-decoration:none}.cover{padding-top:12mm}.cover h1{font-size:42pt;margin-top:20pt}.deck{font-size:18pt}.lede{font-size:15pt}.tags span{font-size:8pt}.cover-rule{margin:25pt 0;height:3pt}.cover-cols h3{font-size:16pt}.cover-cols p{font-size:11pt}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20pt}.method{margin-top:23pt;padding-top:16pt}.method ol{font-size:9pt;gap:3pt 18pt}.cover-note{font-size:17pt;margin-top:23pt}.small,.source-note{font-size:9pt}.codebox{margin:10pt 0;border-radius:3pt;break-inside:avoid}.codebar{font-size:8pt;padding:5pt 9pt}.codebox pre,.small-code pre{font-size:8.3pt;line-height:1.42;padding:8pt;white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere}.codebox code{font-size:inherit}.callout,.pause{padding:8pt 10pt;font-size:9.5pt;margin:12pt 0;break-inside:avoid}.requirement{font-size:15pt;margin:12pt 0}table{font-size:9.3pt;margin:11pt 0}th{font-size:9pt}th,td{padding:5.5pt 7pt}tr{break-inside:avoid}thead{display:table-header-group}caption{font-size:8.5pt}.numbers{font-size:9pt}.numbers th,.numbers td{padding:6pt}ul,ol{padding-left:19pt}li{margin:5pt 0}.dependency-card{padding:8pt;margin:11pt 0;break-inside:avoid}.dep-line{font-size:9pt}.dependency-card .eyebrow{margin-bottom:8pt}.questions{columns:2;column-gap:25pt}.questions li{break-inside:avoid}#exercise .questions li{margin:3pt 0}#exercise th,#exercise td{padding:4pt 6pt}#exercise .callout{margin:9pt 0}.dependency-card p:last-child{font-size:9pt}.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:15pt}.review-grid p{font-size:10pt}.review-grid article{break-inside:avoid}.closing{font-size:21pt}.solution>summary{display:none}.solution>:not(summary){display:block}.source-page h2{font-size:21pt}.source-page .codebox{break-inside:avoid}.source-page .codebox pre{font-size:9pt;line-height:1.45}.part{font-size:11pt}.references{font-size:9pt}.references li{margin:12pt 0}.references a{font-weight:700}.references a::after{content:"\A" attr(href);white-space:pre-wrap;overflow-wrap:anywhere;font-weight:400;font-size:7.6pt;color:#466653}.print-help{margin-top:16pt}.print-help p{font-size:9pt}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body><a class="skip" href="#start">Skip to the guide</a><div class="layout"><aside class="sidebar" aria-label="Guide navigation"><div class="brand"><b>DP</b><span>ENGINEERING LAB</span></div><nav><a class="nav-head" href="#start">Lessons 0 + 1</a><a href="#setup">Setup &amp; source files</a>
+<p class="eyebrow">LESSON 0 · FOUNDATIONS</p><a href="#simplest">01 &nbsp; Start simple</a><a href="#pressure">02 &nbsp; Add pressure</a><a href="#diagnose">03 &nbsp; Find what varies</a>
+<p class="eyebrow">LESSON 1 · STRATEGY</p><a href="#contract">01 &nbsp; Define the capability</a><a href="#algorithms">02 &nbsp; Move the algorithms</a><a href="#compose">03 &nbsp; Compose checkout</a><a href="#selection">04 &nbsp; Select at the boundary</a><a href="#test">05 &nbsp; Prove behavior</a><a href="#practice">06 &nbsp; Practice &amp; extend</a><a href="#tradeoffs">07 &nbsp; Weigh the cost</a>
+<p class="eyebrow">APPLY &amp; RECALL</p><a href="#exercise">Discount exercise</a><a href="#answer">Reference answer</a><a href="#review">Review checklist</a>
+<p class="eyebrow">APPENDIX</p><a href="#source-simple">SimpleShipping.java</a><a href="#source-strategy">StrategyLab.java</a><a href="#source-discount">DiscountLab.java</a><a href="#references">Sources &amp; printing</a></nav><button id="print" class="print-button js-only" type="button">Print / Save as PDF</button><p class="nav-note">Light theme. All content and code are embedded. Read and practice offline.</p></aside><main><section class="sheet cover" id="start"><p class="eyebrow">DP / HANDS-ON DESIGN / LESSONS 0 + 1</p><h1>Design for change.<br><span class="accent">Derive the pattern.</span></h1>
+<p class="deck">Foundations &amp; Strategy in Java 25</p>
+<p class="lede">Start with a shipping calculation. Add real pressure. Identify what varies.
+Build a boundary only when the problem earns it.</p>
+<div class="tags"><span>First principles</span><span>Plain Java</span><span>Offline guide</span><span>Print ready</span></div>
+<div class="cover-rule"></div>
+<div class="two-col cover-cols">
+<div><p class="eyebrow">LESSON 0</p><h3>Learn to see the pressure</h3><p>Cohesion, coupling, dependencies, abstraction, and composition through one evolving checkout.</p></div>
+<div><p class="eyebrow">LESSON 1</p><h3>Contain the variation</h3><p>Derive Strategy, wire it explicitly, test behavior, and decide when the extra structure pays for itself.</p></div>
+</div>
+<div class="method"><strong>The learning loop</strong><ol><li>Build the simplest thing</li><li>Change the requirement</li><li>Observe the pain</li><li>Diagnose the cause</li><li>Refactor</li><li>Test behavior</li><li>Name the pattern</li><li>Examine the cost</li><li>Know when to stop</li></ol></div>
+<p class="cover-note">A pattern is a way to control dependencies and change. Class names are the vocabulary you earn at the end.</p>
+</section>
+<section class="sheet " id="setup"><p class="eyebrow">BEFORE YOU CODE</p><h2>A small, explicit lab</h2>
+<p>You need basic Java methods, classes, constructors, and conditionals. This guide explains the additional syntax when it first appears. The runnable files use only the standard library.</p>
+<h3>Keep the domain small</h3>
+<table><thead><tr><th>Decision for this lab</th><th>Why it is explicit</th></tr></thead><tbody>
+<tr><td>One currency; money is a <code>long</code> number of cents.</td><td><code>10_000L</code> means $100.00. No fractional cents enter shipping calculations.</td></tr>
+<tr><td>Weight is a positive <code>int</code> in whole kilograms.</td><td>Fractional weights and carrier rounding are outside this lesson.</td></tr>
+<tr><td>Subtotal is nonnegative and excludes shipping.</td><td>The workflow is simply subtotal plus shipping.</td></tr>
+<tr><td>Remote destination is a <code>boolean</code>.</td><td>We retain the original variation without building an address model.</td></tr>
+<tr><td>No tax, currency conversion, carrier API, or persistence.</td><td>These would introduce independent design problems.</td></tr>
+</tbody></table>
+<p>The <code>L</code> suffix makes a number a <code>long</code>; underscores improve readability. Multiplication by a <code>long</code> constant also makes the rate calculation use <code>long</code> arithmetic. The largest positive <code>int</code> weight is safe at these rates.</p>
+<h3>Download and run</h3>
+<p>Use a JDK 25 installation and confirm both tools report version 25. Save each file under its exact name. Each runs independently; no Maven or Gradle setup is needed.</p>
+<div class="codebox"><div class="codebar"><span>Terminal · from the folder containing the three files</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>java --version
+javac --version
+javac --release 25 SimpleShipping.java StrategyLab.java DiscountLab.java
+java SimpleShipping
+java StrategyLab
+java DiscountLab</code></pre></div><div class="downloads"><a class="download" download="SimpleShipping.java" href="data:text/plain;base64,cHVibGljIGNsYXNzIFNpbXBsZVNoaXBwaW5nIHsKICAgIHN0YXRpYyBsb25nIGZpcnN0U2hpcHBpbmdDZW50cyhpbnQgd2VpZ2h0S2cpIHsKICAgICAgICBpZiAod2VpZ2h0S2cgPD0gMCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJXZWlnaHQgbXVzdCBiZSBwb3NpdGl2ZSIpOwogICAgICAgIH0KICAgICAgICByZXR1cm4gd2VpZ2h0S2cgKiAyMDBMOwogICAgfQoKICAgIHN0YXRpYyBsb25nIHNoaXBwaW5nQ2VudHMoaW50IHdlaWdodEtnLCBTdHJpbmcgbWV0aG9kKSB7CiAgICAgICAgaWYgKHdlaWdodEtnIDw9IDApIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiV2VpZ2h0IG11c3QgYmUgcG9zaXRpdmUiKTsKICAgICAgICB9CiAgICAgICAgaWYgKCJzdGFuZGFyZCIuZXF1YWxzKG1ldGhvZCkpIHsKICAgICAgICAgICAgcmV0dXJuIHdlaWdodEtnICogMjAwTDsKICAgICAgICB9CiAgICAgICAgaWYgKCJleHByZXNzIi5lcXVhbHMobWV0aG9kKSkgewogICAgICAgICAgICByZXR1cm4gd2VpZ2h0S2cgKiA0MDBMICsgMV8wMDBMOwogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJVbmtub3duIG1ldGhvZDogIiArIG1ldGhvZCk7CiAgICB9CgogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIGlmIChmaXJzdFNoaXBwaW5nQ2VudHMoMTApICE9IDJfMDAwTAogICAgICAgICAgICAgICAgfHwgc2hpcHBpbmdDZW50cygxMCwgInN0YW5kYXJkIikgIT0gMl8wMDBMCiAgICAgICAgICAgICAgICB8fCBzaGlwcGluZ0NlbnRzKDEwLCAiZXhwcmVzcyIpICE9IDVfMDAwTCkgewogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIlNoaXBwaW5nIGNoZWNrIGZhaWxlZCIpOwogICAgICAgIH0KICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIlN0YW5kYXJkOiAyMDAwIGNlbnRzIik7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJFeHByZXNzOiA1MDAwIGNlbnRzIik7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJTaW1wbGUgc2hpcHBpbmcgY2hlY2tzIHBhc3NlZC4iKTsKICAgIH0KfQo=">SimpleShipping.java <span aria-hidden="true">↓</span></a><a class="download" download="StrategyLab.java" href="data:text/plain;base64,aW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwoKcHVibGljIGNsYXNzIFN0cmF0ZWd5TGFiIHsKICAgIC8vIFBhcnQgQTogZGF0YSBhbmQgdGhlIGJlaGF2aW9yIHRvIHByZXNlcnZlLgogICAgcmVjb3JkIE9yZGVyKGludCB3ZWlnaHRLZywgbG9uZyBzdWJ0b3RhbENlbnRzLCBib29sZWFuIHJlbW90ZSkgewogICAgICAgIE9yZGVyIHsKICAgICAgICAgICAgaWYgKHdlaWdodEtnIDw9IDAgfHwgc3VidG90YWxDZW50cyA8IDApIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIkludmFsaWQgb3JkZXIiKTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgbG9uZyBzaGlwcGluZ0JlZm9yZShPcmRlciBvcmRlciwgU3RyaW5nIG1ldGhvZCkgewogICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwob3JkZXIsICJvcmRlciIpOwogICAgICAgIGlmICgic3RhbmRhcmQiLmVxdWFscyhtZXRob2QpKSB7CiAgICAgICAgICAgIGxvbmcgcHJpY2UgPSBvcmRlci53ZWlnaHRLZygpICogMjAwTDsKICAgICAgICAgICAgaWYgKG9yZGVyLnN1YnRvdGFsQ2VudHMoKSA+IDEwXzAwMEwpIHsKICAgICAgICAgICAgICAgIHByaWNlIC09IDUwMEw7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIE1hdGgubWF4KDBMLCBwcmljZSk7CiAgICAgICAgfQogICAgICAgIGlmICgiZXhwcmVzcyIuZXF1YWxzKG1ldGhvZCkpIHsKICAgICAgICAgICAgbG9uZyBwcmljZSA9IG9yZGVyLndlaWdodEtnKCkgKiA0MDBMICsgMV8wMDBMOwogICAgICAgICAgICBpZiAob3JkZXIucmVtb3RlKCkpIHsKICAgICAgICAgICAgICAgIHByaWNlICs9IDFfNTAwTDsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gcHJpY2U7CiAgICAgICAgfQogICAgICAgIGlmICgib3Zlcm5pZ2h0Ii5lcXVhbHMobWV0aG9kKSkgewogICAgICAgICAgICBsb25nIHByaWNlID0gb3JkZXIud2VpZ2h0S2coKSAqIDcwMEwgKyAyXzUwMEw7CiAgICAgICAgICAgIGlmIChvcmRlci5yZW1vdGUoKSkgewogICAgICAgICAgICAgICAgcHJpY2UgKz0gM18wMDBMOwogICAgICAgICAgICB9CiAgICAgICAgICAgIHJldHVybiBwcmljZTsKICAgICAgICB9CiAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiVW5rbm93biBtZXRob2Q6ICIgKyBtZXRob2QpOwogICAgfQoKICAgIC8vIFBhcnQgQjogY2FwYWJpbGl0eSBhbmQgaW5kZXBlbmRlbnQgaW1wbGVtZW50YXRpb25zLgogICAgQEZ1bmN0aW9uYWxJbnRlcmZhY2UKICAgIGludGVyZmFjZSBTaGlwcGluZ1BvbGljeSB7CiAgICAgICAgbG9uZyBjYWxjdWxhdGVDZW50cyhPcmRlciBvcmRlcik7CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIFN0YW5kYXJkU2hpcHBpbmcgaW1wbGVtZW50cyBTaGlwcGluZ1BvbGljeSB7CiAgICAgICAgQE92ZXJyaWRlCiAgICAgICAgcHVibGljIGxvbmcgY2FsY3VsYXRlQ2VudHMoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgbG9uZyBwcmljZSA9IG9yZGVyLndlaWdodEtnKCkgKiAyMDBMOwogICAgICAgICAgICBpZiAob3JkZXIuc3VidG90YWxDZW50cygpID4gMTBfMDAwTCkgewogICAgICAgICAgICAgICAgcHJpY2UgLT0gNTAwTDsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gTWF0aC5tYXgoMEwsIHByaWNlKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIEV4cHJlc3NTaGlwcGluZyBpbXBsZW1lbnRzIFNoaXBwaW5nUG9saWN5IHsKICAgICAgICBAT3ZlcnJpZGUKICAgICAgICBwdWJsaWMgbG9uZyBjYWxjdWxhdGVDZW50cyhPcmRlciBvcmRlcikgewogICAgICAgICAgICBsb25nIHByaWNlID0gb3JkZXIud2VpZ2h0S2coKSAqIDQwMEwgKyAxXzAwMEw7CiAgICAgICAgICAgIHJldHVybiBwcmljZSArIChvcmRlci5yZW1vdGUoKSA/IDFfNTAwTCA6IDBMKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIE92ZXJuaWdodFNoaXBwaW5nIGltcGxlbWVudHMgU2hpcHBpbmdQb2xpY3kgewogICAgICAgIEBPdmVycmlkZQogICAgICAgIHB1YmxpYyBsb25nIGNhbGN1bGF0ZUNlbnRzKE9yZGVyIG9yZGVyKSB7CiAgICAgICAgICAgIGxvbmcgcHJpY2UgPSBvcmRlci53ZWlnaHRLZygpICogNzAwTCArIDJfNTAwTDsKICAgICAgICAgICAgcmV0dXJuIHByaWNlICsgKG9yZGVyLnJlbW90ZSgpID8gM18wMDBMIDogMEwpOwogICAgICAgIH0KICAgIH0KCiAgICAvLyBQYXJ0IEM6IHN0YWJsZSB3b3JrZmxvdyBhbmQgc2VsZWN0aW9uIGF0IHRoZSBib3VuZGFyeS4KICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBDaGVja291dFNlcnZpY2UgewogICAgICAgIHByaXZhdGUgZmluYWwgU2hpcHBpbmdQb2xpY3kgc2hpcHBpbmdQb2xpY3k7CgogICAgICAgIENoZWNrb3V0U2VydmljZShTaGlwcGluZ1BvbGljeSBzaGlwcGluZ1BvbGljeSkgewogICAgICAgICAgICB0aGlzLnNoaXBwaW5nUG9saWN5ID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChzaGlwcGluZ1BvbGljeSk7CiAgICAgICAgfQoKICAgICAgICBsb25nIHRvdGFsQ2VudHMoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChvcmRlciwgIm9yZGVyIik7CiAgICAgICAgICAgIGxvbmcgc2hpcHBpbmcgPSBzaGlwcGluZ1BvbGljeS5jYWxjdWxhdGVDZW50cyhvcmRlcik7CiAgICAgICAgICAgIGlmIChzaGlwcGluZyA8IDApIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oIk5lZ2F0aXZlIHNoaXBwaW5nIik7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIE1hdGguYWRkRXhhY3Qob3JkZXIuc3VidG90YWxDZW50cygpLCBzaGlwcGluZyk7CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyBTaGlwcGluZ1BvbGljeSBzZWxlY3RQb2xpY3koU3RyaW5nIG1ldGhvZCkgewogICAgICAgIGlmIChtZXRob2QgPT0gbnVsbCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJNZXRob2QgaXMgcmVxdWlyZWQiKTsKICAgICAgICB9CiAgICAgICAgcmV0dXJuIHN3aXRjaCAobWV0aG9kKSB7CiAgICAgICAgICAgIGNhc2UgInN0YW5kYXJkIiAtPiBuZXcgU3RhbmRhcmRTaGlwcGluZygpOwogICAgICAgICAgICBjYXNlICJleHByZXNzIiAtPiBuZXcgRXhwcmVzc1NoaXBwaW5nKCk7CiAgICAgICAgICAgIGNhc2UgIm92ZXJuaWdodCIgLT4gbmV3IE92ZXJuaWdodFNoaXBwaW5nKCk7CiAgICAgICAgICAgIGRlZmF1bHQgLT4gdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigKICAgICAgICAgICAgICAgICAgICAiVW5rbm93biBtZXRob2Q6ICIgKyBtZXRob2QpOwogICAgICAgIH07CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIERyb25lU2hpcHBpbmcgaW1wbGVtZW50cyBTaGlwcGluZ1BvbGljeSB7CiAgICAgICAgQE92ZXJyaWRlCiAgICAgICAgcHVibGljIGxvbmcgY2FsY3VsYXRlQ2VudHMoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgcmV0dXJuIDJfMDAwTCArIG9yZGVyLndlaWdodEtnKCkgKiA1MDBMOwogICAgICAgIH0KICAgIH0KCiAgICAvLyBQYXJ0IEQ6IHNtYWxsLCBhbHdheXMtb24gY2hlY2tzOyBubyB0ZXN0IGxpYnJhcnkgcmVxdWlyZWQuCiAgICBzdGF0aWMgdm9pZCBlcXVhbChsb25nIGV4cGVjdGVkLCBsb25nIGFjdHVhbCwgU3RyaW5nIGxhYmVsKSB7CiAgICAgICAgaWYgKGV4cGVjdGVkICE9IGFjdHVhbCkgewogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IobGFiZWwgKyAiOiBleHBlY3RlZCAiICsgZXhwZWN0ZWQKICAgICAgICAgICAgICAgICAgICArICIsIGdvdCAiICsgYWN0dWFsKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIHZvaWQgZXhwZWN0VGhyb3dzKENsYXNzPD8gZXh0ZW5kcyBUaHJvd2FibGU+IHR5cGUsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUnVubmFibGUgYWN0aW9uKSB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgYWN0aW9uLnJ1bigpOwogICAgICAgIH0gY2F0Y2ggKFRocm93YWJsZSBmYWlsdXJlKSB7CiAgICAgICAgICAgIGlmICh0eXBlLmlzSW5zdGFuY2UoZmFpbHVyZSkpIHsKICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgfQogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIlVuZXhwZWN0ZWQgZXhjZXB0aW9uIiwgZmFpbHVyZSk7CiAgICAgICAgfQogICAgICAgIHRocm93IG5ldyBBc3NlcnRpb25FcnJvcigiRXhwZWN0ZWQgIiArIHR5cGUuZ2V0U2ltcGxlTmFtZSgpKTsKICAgIH0KCiAgICBzdGF0aWMgdm9pZCBydW5DaGVja3MoKSB7CiAgICAgICAgT3JkZXJbXSBvcmRlcnMgPSB7CiAgICAgICAgICAgIG5ldyBPcmRlcigxMCwgMTBfMDAwTCwgZmFsc2UpLAogICAgICAgICAgICBuZXcgT3JkZXIoMTAsIDEwXzAwMUwsIGZhbHNlKSwKICAgICAgICAgICAgbmV3IE9yZGVyKDEwLCAxMF8wMDFMLCB0cnVlKSwKICAgICAgICAgICAgbmV3IE9yZGVyKDEsIDEwXzAwMUwsIGZhbHNlKQogICAgICAgIH07CiAgICAgICAgU3RyaW5nW10gbWV0aG9kcyA9IHsic3RhbmRhcmQiLCAiZXhwcmVzcyIsICJvdmVybmlnaHQifTsKICAgICAgICBsb25nW11bXSBleHBlY3RlZCA9IHsKICAgICAgICAgICAgezJfMDAwTCwgNV8wMDBMLCA5XzUwMEx9LAogICAgICAgICAgICB7MV81MDBMLCA1XzAwMEwsIDlfNTAwTH0sCiAgICAgICAgICAgIHsxXzUwMEwsIDZfNTAwTCwgMTJfNTAwTH0sCiAgICAgICAgICAgIHswTCwgMV80MDBMLCAzXzIwMEx9CiAgICAgICAgfTsKICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IG9yZGVycy5sZW5ndGg7IGkrKykgewogICAgICAgICAgICBmb3IgKGludCBqID0gMDsgaiA8IG1ldGhvZHMubGVuZ3RoOyBqKyspIHsKICAgICAgICAgICAgICAgIGVxdWFsKGV4cGVjdGVkW2ldW2pdLCBzaGlwcGluZ0JlZm9yZShvcmRlcnNbaV0sIG1ldGhvZHNbal0pLAogICAgICAgICAgICAgICAgICAgICAgICAiYmVmb3JlIC8gIiArIGkgKyAiIC8gIiArIG1ldGhvZHNbal0pOwogICAgICAgICAgICAgICAgZXF1YWwoZXhwZWN0ZWRbaV1bal0sIHNlbGVjdFBvbGljeShtZXRob2RzW2pdKQogICAgICAgICAgICAgICAgICAgICAgICAuY2FsY3VsYXRlQ2VudHMob3JkZXJzW2ldKSwKICAgICAgICAgICAgICAgICAgICAgICAgImFmdGVyIC8gIiArIGkgKyAiIC8gIiArIG1ldGhvZHNbal0pOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIFNoaXBwaW5nUG9saWN5IGZpeGVkU2hpcHBpbmcgPSBvcmRlciAtPiAxXzAwMEw7CiAgICAgICAgZXF1YWwoMTFfMDAwTCwgbmV3IENoZWNrb3V0U2VydmljZShmaXhlZFNoaXBwaW5nKQogICAgICAgICAgICAgICAgLnRvdGFsQ2VudHMob3JkZXJzWzBdKSwgImNoZWNrb3V0IHdpdGggZml4ZWQgc2hpcHBpbmciKTsKICAgICAgICBlcXVhbCgxNl81MDFMLCBuZXcgQ2hlY2tvdXRTZXJ2aWNlKHNlbGVjdFBvbGljeSgiZXhwcmVzcyIpKQogICAgICAgICAgICAgICAgLnRvdGFsQ2VudHMob3JkZXJzWzJdKSwgInNlbGVjdGVkIHBvbGljeSBpbnRlZ3JhdGlvbiIpOwogICAgICAgIGVxdWFsKDE3XzAwMEwsIG5ldyBDaGVja291dFNlcnZpY2UobmV3IERyb25lU2hpcHBpbmcoKSkKICAgICAgICAgICAgICAgIC50b3RhbENlbnRzKG9yZGVyc1swXSksICJleHRlbnNpb24gd2l0aG91dCBjaGVja291dCBlZGl0cyIpOwogICAgICAgIGV4cGVjdFRocm93cyhJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBzZWxlY3RQb2xpY3koInVua25vd24iKSk7CiAgICAgICAgZXhwZWN0VGhyb3dzKElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IHNlbGVjdFBvbGljeShudWxsKSk7CiAgICAgICAgZXhwZWN0VGhyb3dzKElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBPcmRlcigwLCAxMDBMLCBmYWxzZSkpOwogICAgICAgIGV4cGVjdFRocm93cyhJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBuZXcgT3JkZXIoMSwgLTFMLCBmYWxzZSkpOwogICAgICAgIGV4cGVjdFRocm93cyhOdWxsUG9pbnRlckV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2UobnVsbCkpOwogICAgICAgIGV4cGVjdFRocm93cyhOdWxsUG9pbnRlckV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2UoZml4ZWRTaGlwcGluZykudG90YWxDZW50cyhudWxsKSk7CiAgICAgICAgZXhwZWN0VGhyb3dzKElsbGVnYWxTdGF0ZUV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2Uob3JkZXIgLT4gLTFMKQogICAgICAgICAgICAgICAgICAgICAgICAudG90YWxDZW50cyhvcmRlcnNbMF0pKTsKICAgICAgICBleHBlY3RUaHJvd3MoQXJpdGhtZXRpY0V4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2UoZml4ZWRTaGlwcGluZykKICAgICAgICAgICAgICAgICAgICAgICAgLnRvdGFsQ2VudHMobmV3IE9yZGVyKDEsIExvbmcuTUFYX1ZBTFVFLCBmYWxzZSkpKTsKICAgIH0KCiAgICAvLyBQYXJ0IEU6IGNvbXBvc2UgYW5kIHJ1biB0aGUgYXBwbGljYXRpb24uCiAgICBwdWJsaWMgc3RhdGljIHZvaWQgbWFpbihTdHJpbmdbXSBhcmdzKSB7CiAgICAgICAgcnVuQ2hlY2tzKCk7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJBbGwgc2hpcHBpbmcgY2hlY2tzIHBhc3NlZC4iKTsKICAgICAgICBPcmRlciBvcmRlciA9IG5ldyBPcmRlcigxMCwgMTBfMDAwTCwgZmFsc2UpOwogICAgICAgIGZvciAoU3RyaW5nIG1ldGhvZCA6IG5ldyBTdHJpbmdbXXsic3RhbmRhcmQiLCAiZXhwcmVzcyIsICJvdmVybmlnaHQifSkgewogICAgICAgICAgICBDaGVja291dFNlcnZpY2UgY2hlY2tvdXQgPSBuZXcgQ2hlY2tvdXRTZXJ2aWNlKHNlbGVjdFBvbGljeShtZXRob2QpKTsKICAgICAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKG1ldGhvZCArICIgdG90YWw6ICIgKyBjaGVja291dC50b3RhbENlbnRzKG9yZGVyKQogICAgICAgICAgICAgICAgICAgICsgIiBjZW50cyIpOwogICAgICAgIH0KICAgIH0KfQo=">StrategyLab.java <span aria-hidden="true">↓</span></a><a class="download" download="DiscountLab.java" href="data:text/plain;base64,aW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwoKcHVibGljIGNsYXNzIERpc2NvdW50TGFiIHsKICAgIEBGdW5jdGlvbmFsSW50ZXJmYWNlCiAgICBpbnRlcmZhY2UgRGlzY291bnRQb2xpY3kgewogICAgICAgIGxvbmcgZGlzY291bnRDZW50cyhsb25nIGFtb3VudENlbnRzKTsKICAgIH0KCiAgICAvLyBXaG9sZSBwZXJjZW50YWdlcywgd2l0aCBmcmFjdGlvbmFsIGNlbnRzIHJvdW5kZWQgZG93bi4KICAgIHN0YXRpYyBsb25nIHBlcmNlbnRPZihsb25nIGFtb3VudENlbnRzLCBpbnQgcGVyY2VudCkgewogICAgICAgIGlmIChhbW91bnRDZW50cyA8IDAgfHwgcGVyY2VudCA8IDAgfHwgcGVyY2VudCA+IDEwMCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJJbnZhbGlkIGRpc2NvdW50IGlucHV0Iik7CiAgICAgICAgfQogICAgICAgIHJldHVybiBNYXRoLm11bHRpcGx5RXhhY3QoYW1vdW50Q2VudHMsIHBlcmNlbnQpIC8gMTAwTDsKICAgIH0KCiAgICBzdGF0aWMgbG9uZyBkaXNjb3VudEJlZm9yZShTdHJpbmcgdHlwZSwgbG9uZyBhbW91bnRDZW50cykgewogICAgICAgIGlmICgicmVndWxhciIuZXF1YWxzKHR5cGUpKSB7CiAgICAgICAgICAgIHJldHVybiBwZXJjZW50T2YoYW1vdW50Q2VudHMsIDUpOwogICAgICAgIH0KICAgICAgICBpZiAoInByZW1pdW0iLmVxdWFscyh0eXBlKSkgewogICAgICAgICAgICByZXR1cm4gcGVyY2VudE9mKGFtb3VudENlbnRzLCAxMCk7CiAgICAgICAgfQogICAgICAgIGlmICgiZW1wbG95ZWUiLmVxdWFscyh0eXBlKSkgewogICAgICAgICAgICByZXR1cm4gcGVyY2VudE9mKGFtb3VudENlbnRzLCAzMCk7CiAgICAgICAgfQogICAgICAgIHJldHVybiBwZXJjZW50T2YoYW1vdW50Q2VudHMsIDApOwogICAgfQoKICAgIHN0YXRpYyBEaXNjb3VudFBvbGljeSBzZWxlY3REaXNjb3VudChTdHJpbmcgdHlwZSkgewogICAgICAgIGlmICgicmVndWxhciIuZXF1YWxzKHR5cGUpKSB7CiAgICAgICAgICAgIHJldHVybiBhbW91bnQgLT4gcGVyY2VudE9mKGFtb3VudCwgNSk7CiAgICAgICAgfQogICAgICAgIGlmICgicHJlbWl1bSIuZXF1YWxzKHR5cGUpKSB7CiAgICAgICAgICAgIHJldHVybiBhbW91bnQgLT4gcGVyY2VudE9mKGFtb3VudCwgMTApOwogICAgICAgIH0KICAgICAgICBpZiAoImVtcGxveWVlIi5lcXVhbHModHlwZSkpIHsKICAgICAgICAgICAgcmV0dXJuIGFtb3VudCAtPiBwZXJjZW50T2YoYW1vdW50LCAzMCk7CiAgICAgICAgfQogICAgICAgIHJldHVybiBhbW91bnQgLT4gcGVyY2VudE9mKGFtb3VudCwgMCk7CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIENoZWNrb3V0IHsKICAgICAgICBwcml2YXRlIGZpbmFsIERpc2NvdW50UG9saWN5IGRpc2NvdW50UG9saWN5OwoKICAgICAgICBDaGVja291dChEaXNjb3VudFBvbGljeSBkaXNjb3VudFBvbGljeSkgewogICAgICAgICAgICB0aGlzLmRpc2NvdW50UG9saWN5ID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChkaXNjb3VudFBvbGljeSk7CiAgICAgICAgfQoKICAgICAgICBsb25nIHRvdGFsQ2VudHMobG9uZyBhbW91bnRDZW50cykgewogICAgICAgICAgICBpZiAoYW1vdW50Q2VudHMgPCAwKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJOZWdhdGl2ZSBhbW91bnQiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICBsb25nIGRpc2NvdW50ID0gZGlzY291bnRQb2xpY3kuZGlzY291bnRDZW50cyhhbW91bnRDZW50cyk7CiAgICAgICAgICAgIGlmIChkaXNjb3VudCA8IDAgfHwgZGlzY291bnQgPiBhbW91bnRDZW50cykgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiSW52YWxpZCBkaXNjb3VudCIpOwogICAgICAgICAgICB9CiAgICAgICAgICAgIHJldHVybiBhbW91bnRDZW50cyAtIGRpc2NvdW50OwogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgdm9pZCBlcXVhbChsb25nIGV4cGVjdGVkLCBsb25nIGFjdHVhbCkgewogICAgICAgIGlmIChleHBlY3RlZCAhPSBhY3R1YWwpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKCJFeHBlY3RlZCAiICsgZXhwZWN0ZWQgKyAiLCBnb3QgIiArIGFjdHVhbCk7CiAgICAgICAgfQogICAgfQoKICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBtYWluKFN0cmluZ1tdIGFyZ3MpIHsKICAgICAgICBTdHJpbmdbXSB0eXBlcyA9IHsicmVndWxhciIsICJwcmVtaXVtIiwgImVtcGxveWVlIiwgImd1ZXN0IiwgbnVsbH07CiAgICAgICAgbG9uZ1tdIGRpc2NvdW50cyA9IHs1MDBMLCAxXzAwMEwsIDNfMDAwTCwgMEwsIDBMfTsKICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IHR5cGVzLmxlbmd0aDsgaSsrKSB7CiAgICAgICAgICAgIERpc2NvdW50UG9saWN5IHBvbGljeSA9IHNlbGVjdERpc2NvdW50KHR5cGVzW2ldKTsKICAgICAgICAgICAgZXF1YWwoZGlzY291bnRzW2ldLCBkaXNjb3VudEJlZm9yZSh0eXBlc1tpXSwgMTBfMDAwTCkpOwogICAgICAgICAgICBlcXVhbChkaXNjb3VudHNbaV0sIHBvbGljeS5kaXNjb3VudENlbnRzKDEwXzAwMEwpKTsKICAgICAgICAgICAgZXF1YWwoMTBfMDAwTCAtIGRpc2NvdW50c1tpXSwgbmV3IENoZWNrb3V0KHBvbGljeSkKICAgICAgICAgICAgICAgICAgICAudG90YWxDZW50cygxMF8wMDBMKSk7CiAgICAgICAgfQogICAgICAgIGVxdWFsKDBMLCBzZWxlY3REaXNjb3VudCgicmVndWxhciIpLmRpc2NvdW50Q2VudHMoMEwpKTsKICAgICAgICBlcXVhbCg0OUwsIHNlbGVjdERpc2NvdW50KCJyZWd1bGFyIikuZGlzY291bnRDZW50cyg5OTlMKSk7CiAgICAgICAgZXF1YWwoOV8wMDBMLCBuZXcgQ2hlY2tvdXQoYW1vdW50IC0+IDFfMDAwTCkudG90YWxDZW50cygxMF8wMDBMKSk7CiAgICAgICAgRGlzY291bnRQb2xpY3kgc3R1ZGVudCA9IGFtb3VudCAtPiBwZXJjZW50T2YoYW1vdW50LCAxNSk7CiAgICAgICAgZXF1YWwoOF81MDBMLCBuZXcgQ2hlY2tvdXQoc3R1ZGVudCkudG90YWxDZW50cygxMF8wMDBMKSk7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJBbGwgZGlzY291bnQgY2hlY2tzIHBhc3NlZC4iKTsKICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIlN0dWRlbnQgdG90YWw6IDg1MDAgY2VudHMiKTsKICAgIH0KfQo=">DiscountLab.java <span aria-hidden="true">↓</span></a></div>
+<p class="source-note">The <code>--release 25</code> option checks against Java 25 language rules and APIs. You can also run one file directly, for example <code>java StrategyLab.java</code>. <a href="#ref-javac">[1]</a> <a href="#ref-java">[2]</a></p>
+<aside class="callout note"><strong>Validation, stated precisely</strong><p>All three complete files compiled with warnings treated as errors and passed their checks on the available OpenJDK 17 runtime. Java 25 language and API compatibility was checked against Oracle documentation. <strong>Execution on JDK 25 was not available here.</strong> The examples use no preview features.</p></aside>
+<p class="small">Short code panels in the lessons are excerpts. The appendix contains every line of each complete file, in order. Downloads are embedded in this HTML, so they work offline in a normal browser.</p>
+</section>
+<section class="sheet " id="simplest"><p class="eyebrow">LESSON 0 / 01</p><h2>One requirement. One algorithm.</h2>
+<p class="requirement">“Calculate shipping price at $2 per kilogram.”</p>
+<p>Start with a method. It takes what the calculation needs and returns the result. There is no reason yet for a shipping interface, registry, or class hierarchy.</p>
+<div class="codebox"><div class="codebar"><span>SimpleShipping.java · first implementation</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static long firstShippingCents(int weightKg) {
+    if (weightKg &lt;= 0) {
+        throw new IllegalArgumentException(&quot;Weight must be positive&quot;);
+    }
+    return weightKg * 200L;
+}</code></pre></div>
+<p>At 10 kg, the result is <code>2_000</code> cents. The validation is a domain rule; it does not imply a design pattern.</p>
+<h3>The first change is still simple</h3>
+<p class="requirement">“Support standard and express shipping.”</p>
+<div class="codebox"><div class="codebar"><span>SimpleShipping.java · second implementation</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static long shippingCents(int weightKg, String method) {
+    if (weightKg &lt;= 0) {
+        throw new IllegalArgumentException(&quot;Weight must be positive&quot;);
+    }
+    if (&quot;standard&quot;.equals(method)) {
+        return weightKg * 200L;
+    }
+    if (&quot;express&quot;.equals(method)) {
+        return weightKg * 400L + 1_000L;
+    }
+    throw new IllegalArgumentException(&quot;Unknown method: &quot; + method);
+}</code></pre></div>
+<p><code>"standard".equals(method)</code> compares string contents and safely returns false for <code>null</code>. Unknown or missing method names reach the explicit error. A string is enough for the teaching example; request parsing can validate it at the application boundary.</p>
+<aside class="callout insight"><strong>Do not refactor on sight</strong><p>An <code>if</code> is not evidence of bad design. Two short, stable branches may be the easiest code to understand and maintain.</p></aside>
+<div class="pause"><strong>Try it</strong><p>Run <code>SimpleShipping</code>. Predict both prices for 3 kg, then change the input and check: standard is 600 cents; express is 2,200 cents.</p></div>
+</section>
+<section class="sheet " id="pressure"><p class="eyebrow">LESSON 0 / 02</p><h2>Let the requirements create pressure</h2>
+<p class="requirement">“Standard has a discount. Express and overnight have different remote-area surcharges. More shipping methods are coming.”</p>
+<table><thead><tr><th>Method</th><th>Rule, in cents</th></tr></thead><tbody>
+<tr><td>Standard</td><td><code>weightKg × 200</code>; subtract 500 if subtotal is <strong>strictly greater</strong> than 10,000; minimum price 0.</td></tr>
+<tr><td>Express</td><td><code>weightKg × 400 + 1,000</code>; add 1,500 for remote delivery.</td></tr>
+<tr><td>Overnight</td><td><code>weightKg × 700 + 2,500</code>; add 3,000 for remote delivery.</td></tr>
+</tbody></table>
+<aside class="callout note"><strong>Make the behavior correction before refactoring</strong><p>The original discount can make shipping negative: 1 kg gives 200 − 500 = −300 cents. This guide adds a zero minimum to the baseline <em>before</em> moving code. The later refactor preserves that baseline, including its discounts and remote surcharges.</p></aside>
+<p>The expanded method now owns several independently changing policies:</p>
+<div class="codebox small-code"><div class="codebar"><span>StrategyLab.java · baseline before refactoring</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static long shippingBefore(Order order, String method) {
+    Objects.requireNonNull(order, &quot;order&quot;);
+    if (&quot;standard&quot;.equals(method)) {
+        long price = order.weightKg() * 200L;
+        if (order.subtotalCents() &gt; 10_000L) {
+            price -= 500L;
+        }
+        return Math.max(0L, price);
+    }
+    if (&quot;express&quot;.equals(method)) {
+        long price = order.weightKg() * 400L + 1_000L;
+        if (order.remote()) {
+            price += 1_500L;
+        }
+        return price;
+    }
+    if (&quot;overnight&quot;.equals(method)) {
+        long price = order.weightKg() * 700L + 2_500L;
+        if (order.remote()) {
+            price += 3_000L;
+        }
+        return price;
+    }
+    throw new IllegalArgumentException(&quot;Unknown method: &quot; + method);
+}</code></pre></div>
+<p class="small">International delivery, store pickup, same-day delivery, and partner delivery would add further policies. Three are enough to expose the pressure; there is no magic number of branches that requires a pattern.</p>
+</section>
+<section class="sheet " id="diagnose"><p class="eyebrow">LESSON 0 / 03</p><h2>Find the axis of change</h2>
+<p>The problem is not simply that the method is getting long. Standard discounts, express fees, and overnight surcharges can change for different business reasons, yet every change enters the same method.</p>
+<p>Sharing a method does not automatically make algorithms depend on each other. Here it creates a common editing and reasoning surface: a maintainer must navigate unrelated rules, and the caller remains tied to the combined selector and calculator.</p>
+<h3>Ask two questions before introducing a type</h3>
+<table><thead><tr><th>What remains stable?</th><th>What varies independently?</th></tr></thead><tbody>
+<tr><td>Checkout asks for a shipping price and adds it to the subtotal.</td><td>Each shipping method calculates its price differently and can evolve separately.</td></tr>
+</tbody></table>
+<p>The <strong>axis of change</strong> is the shipping calculation. The boundary should let checkout ask for that capability without knowing each formula.</p>
+<h3>Five ideas, grounded in this example</h3>
+<table><thead><tr><th>Concept</th><th>Meaning here</th><th>Design question</th></tr></thead><tbody>
+<tr><td><strong>Cohesion</strong></td><td>A module's code serves one related purpose.</td><td>Do standard discount rules belong with standard pricing?</td></tr>
+<tr><td><strong>Coupling</strong></td><td>How much one part relies on another's details.</td><td>Must checkout change when express pricing changes?</td></tr>
+<tr><td><strong>Dependency</strong></td><td>A type, value, or behavior needed by another part.</td><td>What does checkout actually need to know?</td></tr>
+<tr><td><strong>Abstraction</strong></td><td>A contract that exposes useful behavior and hides details.</td><td>Can “calculate shipping” be described without a formula?</td></tr>
+<tr><td><strong>Composition</strong></td><td>An object uses another object to do part of its work.</td><td>Can we give checkout a calculator instead of putting every rule inside it?</td></tr>
+</tbody></table>
+<aside class="callout insight"><strong>The design decision</strong><p>Separate the stable checkout workflow from the varying shipping calculation. Keep selecting a policy as a separate responsibility.</p></aside>
+<div class="pause"><strong>Pause before moving on</strong><p>Explain the pressure without using the words “interface” or “Strategy.” If the problem statement already dictates a class diagram, step back.</p></div>
+</section>
+<section class="sheet " id="contract"><p class="eyebrow">LESSON 1 / 01</p><h2>Describe the capability first</h2>
+<p>Checkout needs something that can calculate shipping. Start with the input data, then describe only that capability.</p>
+<div class="codebox"><div class="codebar"><span>StrategyLab.java · immutable input data</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>record Order(int weightKg, long subtotalCents, boolean remote) {
+    Order {
+        if (weightKg &lt;= 0 || subtotalCents &lt; 0) {
+            throw new IllegalArgumentException(&quot;Invalid order&quot;);
+        }
+    }
+}</code></pre></div>
+<p>A Java <code>record</code> declares a data carrier. Java generates the constructor and accessors such as <code>weightKg()</code>; its component fields are final. The compact constructor checks the inputs. With only primitive components, this particular record has no mutable nested state. <a href="#ref-records">[3]</a></p>
+<div class="codebox"><div class="codebar"><span>StrategyLab.java · the dependency boundary</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>@FunctionalInterface
+interface ShippingPolicy {
+    long calculateCents(Order order);
+}</code></pre></div>
+<p>The contract names an operation, not an implementation. Checkout will know <code>ShippingPolicy</code>, not <code>ExpressShipping</code>.</p>
+<h3>The signature is only part of the contract</h3>
+<table><thead><tr><th>Contract element</th><th>Agreement</th></tr></thead><tbody>
+<tr><td>Input</td><td>A non-null, valid <code>Order</code>.</td></tr>
+<tr><td>Output</td><td>A nonnegative shipping amount in the same currency's cents.</td></tr>
+<tr><td>Behavior in this lab</td><td>Return a quote; do not change the order or perform I/O.</td></tr>
+<tr><td>Caller responsibility</td><td>Supply a valid order and handle a failed calculation if a future implementation can fail.</td></tr>
+</tbody></table>
+<p><code>@FunctionalInterface</code> asks the compiler to verify that the interface is functional. Here there is one abstract method, so a lambda can supply it too. The annotation is useful but is not required for lambda compatibility. <a href="#ref-functional">[4]</a></p>
+<aside class="callout insight"><strong>A useful boundary has a narrow purpose</strong><p>Do not add tracking, label printing, payment, or persistence to <code>ShippingPolicy</code>. Checkout asked for a shipping price.</p></aside>
+<p class="small">In a larger codebase, keep this contract with the application/domain code that needs it, so callers do not have to import an implementation module. Our single-file lab nests types only to keep setup small.</p>
+</section>
+<section class="sheet " id="algorithms"><p class="eyebrow">LESSON 1 / 02</p><h2>Move each algorithm intact</h2>
+<p>Give each policy one place to change. Preserve the rules while moving them; a structural refactor should not silently alter prices.</p>
+<div class="codebox"><div class="codebar"><span>StrategyLab.java · the three implementations</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static final class StandardShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        long price = order.weightKg() * 200L;
+        if (order.subtotalCents() &gt; 10_000L) {
+            price -= 500L;
+        }
+        return Math.max(0L, price);
+    }
+}
+
+static final class ExpressShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        long price = order.weightKg() * 400L + 1_000L;
+        return price + (order.remote() ? 1_500L : 0L);
+    }
+}
+
+static final class OvernightShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        long price = order.weightKg() * 700L + 2_500L;
+        return price + (order.remote() ? 3_000L : 0L);
+    }
+}</code></pre></div>
+<p><code>implements ShippingPolicy</code> establishes the contract. <code>@Override</code> lets the compiler check that each method implements the expected operation. The implementations are <code>public</code> because an interface's abstract methods are public.</p>
+<p><code>static</code> means these nested classes do not need a <code>StrategyLab</code> instance. In an application you can place the types in separate files. <code>final</code> prevents subclassing; variation is provided through the shared interface.</p>
+<aside class="callout insight"><strong>Keep the right conditionals</strong><p>The subtotal check belongs inside standard pricing. The remote-area check belongs inside the relevant delivery policy. Strategy does not require eliminating those decisions.</p></aside>
+<div class="pause"><strong>Predict the edit</strong><p>If the remote express surcharge changes from $15 to $18, which calculation changes? Which regression checks should change? Checkout should have no pricing edit.</p></div>
+</section>
+<section class="sheet " id="compose"><p class="eyebrow">LESSON 1 / 03</p><h2>Give checkout the capability</h2>
+<p>The checkout service receives a policy through its constructor, stores it, and delegates the calculation. This is object composition.</p>
+<div class="codebox"><div class="codebar"><span>StrategyLab.java · stable workflow</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static final class CheckoutService {
+    private final ShippingPolicy shippingPolicy;
+
+    CheckoutService(ShippingPolicy shippingPolicy) {
+        this.shippingPolicy = Objects.requireNonNull(shippingPolicy);
+    }
+
+    long totalCents(Order order) {
+        Objects.requireNonNull(order, &quot;order&quot;);
+        long shipping = shippingPolicy.calculateCents(order);
+        if (shipping &lt; 0) {
+            throw new IllegalStateException(&quot;Negative shipping&quot;);
+        }
+        return Math.addExact(order.subtotalCents(), shipping);
+    }
+}</code></pre></div>
+<p>The constructor rejects a missing policy. Checkout rejects negative shipping and uses <code>Math.addExact</code> to throw <code>ArithmeticException</code> if the total overflows a <code>long</code>. <a href="#ref-math">[5]</a></p>
+<div class="dependency-card"><p class="eyebrow">THE DEPENDENCY BOUNDARY</p><div class="dep-line"><span>CheckoutService</span><b aria-label="depends on">→</b><strong>ShippingPolicy</strong><b aria-label="implemented by">←</b><span>Shipping implementations</span></div><p>Arrows mean “depends on the contract.” The runtime object is still a concrete policy.</p></div>
+<h3>Trace one call</h3>
+<div class="codebox"><div class="codebar"><span>Inside StrategyLab · composition example</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>ShippingPolicy policy = new ExpressShipping();
+CheckoutService checkout = new CheckoutService(policy);
+long total = checkout.totalCents(new Order(10, 10_000L, false));
+// 10_000 + (10 * 400 + 1_000) = 15_000 cents</code></pre></div>
+<p>Checkout invokes the interface method. Java dispatches that call to the actual <code>ExpressShipping</code> object; checkout then adds its 5,000-cent result to the subtotal.</p>
+<aside class="callout insight"><strong>Now name the design: Strategy</strong><p><strong>Strategy puts interchangeable algorithms behind a common contract so a context can use the selected algorithm.</strong> Here the context is <code>CheckoutService</code>, the strategy contract is <code>ShippingPolicy</code>, and the concrete strategies calculate shipping.</p></aside>
+<p>Supplying the constructor parameter is manual <strong>dependency injection</strong>. Depending on this contract illustrates <strong>dependency inversion</strong>. No framework is needed. The <code>final</code> field fixes a policy per instance; Strategy does not require changing it later.</p>
+</section>
+<section class="sheet " id="selection"><p class="eyebrow">LESSON 1 / 04</p><h2>Someone still has to choose</h2>
+<p class="requirement">“The request says express. Which object should be used?”</p>
+<p>Strategy separates calculation from selection. A small selector near the application entry point translates an external method name into an implementation.</p>
+<div class="codebox"><div class="codebar"><span>StrategyLab.java · selection boundary</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static ShippingPolicy selectPolicy(String method) {
+    if (method == null) {
+        throw new IllegalArgumentException(&quot;Method is required&quot;);
+    }
+    return switch (method) {
+        case &quot;standard&quot; -&gt; new StandardShipping();
+        case &quot;express&quot; -&gt; new ExpressShipping();
+        case &quot;overnight&quot; -&gt; new OvernightShipping();
+        default -&gt; throw new IllegalArgumentException(
+                &quot;Unknown method: &quot; + method);
+    };
+}</code></pre></div>
+<p>This Java switch expression returns an object. Arrow cases do not fall through; <code>default</code> rejects unsupported names. The null check makes the failure explicit. Names are case-sensitive in this lab. <a href="#ref-expressions">[6]</a></p>
+<div class="codebox"><div class="codebar"><span>Inside StrategyLab · application wiring</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>String requestedMethod = &quot;express&quot;; // From a validated request.
+ShippingPolicy policy = selectPolicy(requestedMethod);
+CheckoutService checkout = new CheckoutService(policy);
+long total = checkout.totalCents(new Order(10, 10_000L, false));</code></pre></div>
+<table><thead><tr><th>Responsibility</th><th>Owner</th><th>What it knows</th></tr></thead><tbody>
+<tr><td>Selection</td><td><code>selectPolicy</code></td><td>Supported names and concrete types.</td></tr>
+<tr><td>Calculation</td><td>Each shipping implementation</td><td>Its business rules and required order data.</td></tr>
+<tr><td>Workflow</td><td><code>CheckoutService</code></td><td>The contract and how to combine subtotal with shipping.</td></tr>
+</tbody></table>
+<aside class="callout insight"><strong>Moving a decision is a real design change</strong><p>There is still a conditional, but it chooses an algorithm instead of containing every algorithm. Keep this wiring centralized; repeating this switch in every caller would recreate a maintenance problem.</p></aside>
+<p class="small">This helper is a simple factory-style selector. It does not, by itself, demonstrate the GoF Factory Method pattern, which has a different construction structure. We will derive creation patterns when creation itself becomes the pressure.</p>
+</section>
+<section class="sheet " id="test"><p class="eyebrow">LESSON 1 / 05</p><h2>Prove the behavior survived</h2>
+<p>Test the prices before moving the code. Run the same independently specified expectations against the old method and new policies. Comparing old and new only to each other can preserve the same bug twice.</p>
+<table class="numbers"><caption>Shipping amounts in cents. These expectations appear in the executable checks.</caption><thead><tr><th>Weight</th><th>Subtotal</th><th>Remote</th><th>Standard</th><th>Express</th><th>Overnight</th></tr></thead><tbody>
+<tr><td>10 kg</td><td>10,000</td><td>No</td><td>2,000</td><td>5,000</td><td>9,500</td></tr>
+<tr><td>10 kg</td><td>10,001</td><td>No</td><td>1,500</td><td>5,000</td><td>9,500</td></tr>
+<tr><td>10 kg</td><td>10,001</td><td>Yes</td><td>1,500</td><td>6,500</td><td>12,500</td></tr>
+<tr><td>1 kg</td><td>10,001</td><td>No</td><td>0</td><td>1,400</td><td>3,200</td></tr>
+</tbody></table>
+<h3>Test the workflow with a substitute</h3>
+<div class="codebox"><div class="codebar"><span>Inside StrategyLab · fixed-result test double</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>ShippingPolicy fixedShipping = order -&gt; 1_000L;
+CheckoutService checkout = new CheckoutService(fixedShipping);
+equal(11_000L, checkout.totalCents(new Order(10, 10_000L, false)),
+        &quot;checkout with fixed shipping&quot;);</code></pre></div>
+<p>The lambda means “for any supplied order, return 1,000 cents.” It satisfies <code>ShippingPolicy</code>. This isolates checkout's addition from every real pricing rule. The contract is a substitution point.</p>
+<h3>Check three levels</h3>
+<ol><li><strong>Policy checks:</strong> rate, discount threshold, remote surcharge, and zero minimum.</li><li><strong>Workflow checks:</strong> a fixed policy result is included; invalid results and overflow are rejected.</li><li><strong>Wiring checks:</strong> a selected express policy produces the expected total; unsupported names fail.</li></ol>
+<div class="codebox"><div class="codebar"><span>Expected output · java StrategyLab</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>All shipping checks passed.
+standard total: 12000 cents
+express total: 15000 cents
+overnight total: 19500 cents</code></pre></div>
+<p>The appendix includes the checks and their helpers. They explicitly throw <code>AssertionError</code>, so they always run. Java's <code>assert</code> keyword would require enabling assertions; we avoid that setup trap here.</p>
+<aside class="callout insight"><strong>Regression testing still matters</strong><p>Separating policies reduces the scope of an edit. It does not prove integration is correct or remove the need to rerun relevant existing checks.</p></aside>
+</section>
+<section class="sheet " id="practice"><p class="eyebrow">LESSON 1 / 06</p><h2>Change the policy, trace the result</h2>
+<p>Use the same checkout operation with different policies. Predict the shipping amount first, then change the inputs. This browser exercise mirrors the Java rules; it does not execute Java.</p>
+<form id="practice-form" class="practice no-print js-only" onsubmit="return false">
+<div class="form-grid"><label>Shipping method<select id="method"><option value="standard">Standard</option><option value="express">Express</option><option value="overnight">Overnight</option></select></label>
+<label>Weight (whole kg)<input id="weight" type="number" min="1" max="1000" step="1" value="10" required></label>
+<label>Subtotal (cents)<input id="subtotal" type="number" min="0" max="100000000" step="1" value="10000" required></label>
+<label class="check"><input id="remote" type="checkbox"> Remote destination</label></div>
+<div class="result" aria-live="polite"><span>Checkout total</span><strong id="result-total">$120.00</strong><p id="result-trace">10,000 + 2,000 = 12,000 cents</p><p id="result-rule">Standard: 10 × 200; no discount at exactly 10,000 cents.</p></div>
+<p class="small">Practice controls limit weights and amounts for convenient browser input. The Java record accepts the wider positive-int/nonnegative-long domain described earlier.</p>
+</form>
+<h3>Work these cases on paper</h3>
+<table><thead><tr><th>Change</th><th>Expected result</th><th>What it demonstrates</th></tr></thead><tbody>
+<tr><td>10 kg, $100.00, standard.</td><td>$20.00 shipping; $120.00 total.</td><td>The discount threshold is strict.</td></tr>
+<tr><td>Raise the subtotal by one cent.</td><td>$15.00 shipping; $115.01 total.</td><td>A rule can create a discontinuity. That is an explicit business rule, not an interface effect.</td></tr>
+<tr><td>Select express and remote for 10 kg, $100.01.</td><td>$65.00 shipping; $165.01 total.</td><td>Same workflow, different calculation.</td></tr>
+<tr><td>Use standard for 1 kg, $100.01.</td><td>$0 shipping; $100.01 total.</td><td>The minimum prevents negative shipping.</td></tr>
+</tbody></table>
+<h3>Add drone delivery</h3>
+<div class="codebox"><div class="codebar"><span>StrategyLab.java · another implementation</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static final class DroneShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        return 2_000L + order.weightKg() * 500L;
+    }
+}</code></pre></div>
+<p>Give <code>new DroneShipping()</code> directly to a new checkout. At 10 kg and a $100.00 subtotal, shipping is $70.00 and the total is $170.00. Existing pricing classes and checkout need no edit.</p>
+<p>To accept the external name <code>"drone"</code>, you must also add a selector case and a wiring check. The downloaded lab deliberately tests direct injection; its selector still exposes only the original three names.</p>
+</section>
+<section class="sheet " id="tradeoffs"><p class="eyebrow">LESSON 1 / 07</p><h2>What changed, and what did it cost?</h2>
+<table><thead><tr><th>Design concern</th><th>Before</th><th>After</th></tr></thead><tbody>
+<tr><td>Change express pricing</td><td>Edit a combined method.</td><td>Edit the express policy and its expectations.</td></tr>
+<tr><td>Add another algorithm</td><td>Add another calculation branch.</td><td>Add an implementation; update selection if publicly exposed.</td></tr>
+<tr><td>Test checkout alone</td><td>It is tied to real pricing if it calls the combined function.</td><td>Supply a fixed-result substitute.</td></tr>
+<tr><td>Find all behavior</td><td>One place, more branches.</td><td>More types and a wiring step to navigate.</td></tr>
+<tr><td>Change the contract</td><td>Change the original caller/function agreement.</td><td>Potentially update checkout and every implementation.</td></tr>
+</tbody></table>
+<h3>Use the boundary when it contains real change</h3>
+<p>Strategy is useful when several algorithms vary independently, callers should not know their details, and substitution or separate testing is valuable. The cost is additional types or functions, indirection, wiring, and debugging navigation.</p>
+<p>Keep a conditional when there are only a few short, stable rules. Keep a single parameterized function when only a rate varies. A family of one-line classes can be more ceremony than insight.</p>
+<div class="codebox"><div class="codebar"><span>Inside StrategyLab · Strategy can be a function</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>ShippingPolicy fixedFee = order -&gt; 750L;
+CheckoutService checkout = new CheckoutService(fixedFee);</code></pre></div>
+<p>A lambda is useful for short behavior without extra state. A named class is useful when an algorithm has substantial logic, collaborators, or a domain name worth navigating to. Both can implement the same design.</p>
+<h3>Common wrong turns</h3>
+<ul><li><strong>Checkout chooses its own concrete policy.</strong> That makes selection a checkout responsibility again.</li><li><strong>Checkout checks <code>instanceof ExpressShipping</code>.</strong> That leaks concrete-policy knowledge back into the workflow.</li><li><strong>A new class means no other edits.</strong> Selection, configuration, and tests can still change.</li><li><strong>The interface guarantees identical semantics.</strong> Implementations must honor the same units, validity rules, and behavioral contract.</li><li><strong>More interfaces means better design.</strong> Every abstraction has to earn its cost.</li></ul>
+<aside class="callout insight"><strong>The principle to retain</strong><p>Use the simplest design that contains the change you have evidence to expect. Separate independently changing policies; keep local decisions close to the rules they express.</p></aside>
+</section>
+<section class="sheet " id="exercise"><p class="eyebrow">YOUR LAB / DISCOUNTS</p><h2>Derive the boundary yourself</h2>
+<p>Start with the same pressure in a different part of checkout. The original example returns a <strong>discount amount</strong>, not the final total.</p>
+<div class="codebox"><div class="codebar"><span>DiscountLab.java · starting implementation</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static long discountBefore(String type, long amountCents) {
+    if (&quot;regular&quot;.equals(type)) {
+        return percentOf(amountCents, 5);
+    }
+    if (&quot;premium&quot;.equals(type)) {
+        return percentOf(amountCents, 10);
+    }
+    if (&quot;employee&quot;.equals(type)) {
+        return percentOf(amountCents, 30);
+    }
+    return percentOf(amountCents, 0);
+}</code></pre></div>
+<p><code>percentOf(amountCents, percent)</code> calculates a whole percentage in cents and rounds a fractional cent down. For nonnegative integers, division by 100 discards the remainder. The complete helper rejects negative input and uses checked multiplication. <a href="#ref-expressions">[6]</a> <a href="#ref-math">[5]</a></p>
+<h3>Write the design before the classes</h3>
+<ol class="questions"><li>What varies independently?</li><li>What remains stable?</li><li>What capability does checkout need?</li><li>Where should that contract live?</li><li>Who should choose the implementation?</li><li>Can student discount be added without modifying checkout?</li><li>Can the rules and workflow be tested independently?</li></ol>
+<h3>Acceptance checks</h3>
+<table><thead><tr><th>Input</th><th>Discount</th><th>Total due</th></tr></thead><tbody>
+<tr><td>10,000 cents, regular</td><td>500</td><td>9,500</td></tr>
+<tr><td>10,000 cents, premium</td><td>1,000</td><td>9,000</td></tr>
+<tr><td>10,000 cents, employee</td><td>3,000</td><td>7,000</td></tr>
+<tr><td>10,000 cents, unknown or null type</td><td>0</td><td>10,000</td></tr>
+<tr><td>999 cents, regular</td><td>49</td><td>950</td></tr>
+<tr><td>0 cents, regular</td><td>0</td><td>0</td></tr>
+</tbody></table>
+<aside class="callout note"><strong>Preserve the fallback intentionally</strong><p>Shipping rejects unknown names. The original discount example gives unknown customer types zero discount. These are different business contracts. Do not change the latter during the refactor just to make the examples look uniform.</p></aside>
+<p><strong>Extension:</strong> add a 15% student discount. At 10,000 cents, the total must be 8,500. Use a fixed 1,000-cent discount to test the checkout arithmetic without a real discount policy.</p>
+</section>
+<section class="sheet " id="answer"><p class="eyebrow">YOUR LAB / REVIEW AFTER YOUR ATTEMPT</p><h2>One possible answer</h2>
+<details class="solution" open><summary>Design reasoning and solution outline</summary>
+<p><strong>Variation:</strong> the discount rule. <strong>Stable work:</strong> calculate the amount due. <strong>Capability:</strong> return the discount in cents for an amount. Put that contract with the caller's application/domain code; select the implementation at the entry point.</p>
+<div class="codebox"><div class="codebar"><span>Inside DiscountLab · contract and wiring</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>@FunctionalInterface
+interface DiscountPolicy {
+    long discountCents(long amountCents);
+}
+
+DiscountPolicy premium = amount -&gt; percentOf(amount, 10);
+Checkout checkout = new Checkout(premium);
+long due = checkout.totalCents(10_000L); // 9_000 cents</code></pre></div>
+<p>The reference solution uses lambdas because these policies differ only by a percentage. Separate <code>RegularDiscount</code>, <code>PremiumDiscount</code>, and <code>EmployeeDiscount</code> classes would also be valid practice, especially if their rules later diverge.</p>
+<div class="codebox"><div class="codebar"><span>DiscountLab.java · the stable caller</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static final class Checkout {
+    private final DiscountPolicy discountPolicy;
+
+    Checkout(DiscountPolicy discountPolicy) {
+        this.discountPolicy = Objects.requireNonNull(discountPolicy);
+    }
+
+    long totalCents(long amountCents) {
+        if (amountCents &lt; 0) {
+            throw new IllegalArgumentException(&quot;Negative amount&quot;);
+        }
+        long discount = discountPolicy.discountCents(amountCents);
+        if (discount &lt; 0 || discount &gt; amountCents) {
+            throw new IllegalStateException(&quot;Invalid discount&quot;);
+        }
+        return amountCents - discount;
+    }
+}</code></pre></div>
+<p>The selector retains a zero-discount fallback. The helper returns <code>Math.multiplyExact(amountCents, percent) / 100L</code>. If the multiplication overflows, the lab throws rather than returning a corrupted price. A broader monetary model would need its own representation and rounding decisions.</p>
+<p><strong>Student:</strong> supply <code>amount -&gt; percentOf(amount, 15)</code>. No checkout edit is needed. Add a selection branch if requests must choose <code>"student"</code> by name.</p>
+<p>The complete <a href="#source-discount">DiscountLab.java appendix</a> includes the initial implementation, selector, helper, checkout, and runnable checks.</p>
+</details>
+<aside class="callout insight"><strong>What to learn next</strong><p>If object creation and selection spread across callers, investigate creation patterns next. If logging, insurance, and weekend surcharges must wrap multiple policies, investigate Decorator. Derive each from a new pressure in this same system.</p></aside>
+</section>
+<section class="sheet " id="review"><p class="eyebrow">RECALL / WITHOUT LOOKING AT THE CODE</p><h2>Can you explain the design?</h2>
+<div class="review-grid"><article><span>01</span><h3>State the pressure</h3><p>Several shipping policies change independently while checkout's workflow remains stable.</p></article>
+<article><span>02</span><h3>Name the boundary</h3><p>A shipping policy takes a valid order and returns a nonnegative shipping amount in cents.</p></article>
+<article><span>03</span><h3>Locate the decisions</h3><p>Entry-point wiring chooses the policy. Each policy owns its own pricing decisions. Checkout composes the result.</p></article>
+<article><span>04</span><h3>Show substitution</h3><p>A real algorithm and a fixed-result test double can both satisfy the contract.</p></article>
+<article><span>05</span><h3>State the cost</h3><p>More structure and navigation. An interface change can affect every implementation.</p></article>
+<article><span>06</span><h3>Know when to stop</h3><p>A short, stable conditional can be the better design. Extract the boundary when the observed change justifies it.</p></article></div>
+<h3>A refactoring checklist you can reuse</h3>
+<ol><li>Write down inputs, outputs, and error behavior.</li><li>Identify independent reasons for change.</li><li>Keep the stable workflow visible.</li><li>Describe the smallest useful capability.</li><li>Move one algorithm at a time without changing its rules.</li><li>Choose implementations at a clear boundary.</li><li>Check policy behavior, substitution, and wiring.</li><li>Compare the maintenance benefit with the added indirection.</li></ol>
+<p class="closing">The point is not to recognize a class diagram.<br>It is to explain why a boundary belongs there.</p>
+</section>
+<section class="sheet source-page" id="source-simple"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>SimpleShipping.java <span class="part">1 / 1</span></h2><p>Complete file. Copy the panels in order into <code>SimpleShipping.java</code>, with a newline between panels, or use the embedded download. All types are nested in the public class so each file runs independently.</p><div class="downloads"><a class="download" download="SimpleShipping.java" href="data:text/plain;base64,cHVibGljIGNsYXNzIFNpbXBsZVNoaXBwaW5nIHsKICAgIHN0YXRpYyBsb25nIGZpcnN0U2hpcHBpbmdDZW50cyhpbnQgd2VpZ2h0S2cpIHsKICAgICAgICBpZiAod2VpZ2h0S2cgPD0gMCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJXZWlnaHQgbXVzdCBiZSBwb3NpdGl2ZSIpOwogICAgICAgIH0KICAgICAgICByZXR1cm4gd2VpZ2h0S2cgKiAyMDBMOwogICAgfQoKICAgIHN0YXRpYyBsb25nIHNoaXBwaW5nQ2VudHMoaW50IHdlaWdodEtnLCBTdHJpbmcgbWV0aG9kKSB7CiAgICAgICAgaWYgKHdlaWdodEtnIDw9IDApIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiV2VpZ2h0IG11c3QgYmUgcG9zaXRpdmUiKTsKICAgICAgICB9CiAgICAgICAgaWYgKCJzdGFuZGFyZCIuZXF1YWxzKG1ldGhvZCkpIHsKICAgICAgICAgICAgcmV0dXJuIHdlaWdodEtnICogMjAwTDsKICAgICAgICB9CiAgICAgICAgaWYgKCJleHByZXNzIi5lcXVhbHMobWV0aG9kKSkgewogICAgICAgICAgICByZXR1cm4gd2VpZ2h0S2cgKiA0MDBMICsgMV8wMDBMOwogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJVbmtub3duIG1ldGhvZDogIiArIG1ldGhvZCk7CiAgICB9CgogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIGlmIChmaXJzdFNoaXBwaW5nQ2VudHMoMTApICE9IDJfMDAwTAogICAgICAgICAgICAgICAgfHwgc2hpcHBpbmdDZW50cygxMCwgInN0YW5kYXJkIikgIT0gMl8wMDBMCiAgICAgICAgICAgICAgICB8fCBzaGlwcGluZ0NlbnRzKDEwLCAiZXhwcmVzcyIpICE9IDVfMDAwTCkgewogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIlNoaXBwaW5nIGNoZWNrIGZhaWxlZCIpOwogICAgICAgIH0KICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIlN0YW5kYXJkOiAyMDAwIGNlbnRzIik7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJFeHByZXNzOiA1MDAwIGNlbnRzIik7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJTaW1wbGUgc2hpcHBpbmcgY2hlY2tzIHBhc3NlZC4iKTsKICAgIH0KfQo=">SimpleShipping.java <span aria-hidden="true">↓</span></a></div><div class="codebox small-code"><div class="codebar"><span>SimpleShipping.java · complete source · 1/1</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>public class SimpleShipping {
+    static long firstShippingCents(int weightKg) {
+        if (weightKg &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Weight must be positive&quot;);
+        }
+        return weightKg * 200L;
+    }
+
+    static long shippingCents(int weightKg, String method) {
+        if (weightKg &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Weight must be positive&quot;);
+        }
+        if (&quot;standard&quot;.equals(method)) {
+            return weightKg * 200L;
+        }
+        if (&quot;express&quot;.equals(method)) {
+            return weightKg * 400L + 1_000L;
+        }
+        throw new IllegalArgumentException(&quot;Unknown method: &quot; + method);
+    }
+
+    public static void main(String[] args) {
+        if (firstShippingCents(10) != 2_000L
+                || shippingCents(10, &quot;standard&quot;) != 2_000L
+                || shippingCents(10, &quot;express&quot;) != 5_000L) {
+            throw new AssertionError(&quot;Shipping check failed&quot;);
+        }
+        System.out.println(&quot;Standard: 2000 cents&quot;);
+        System.out.println(&quot;Express: 5000 cents&quot;);
+        System.out.println(&quot;Simple shipping checks passed.&quot;);
+    }
+}</code></pre></div></section>
+<section class="sheet source-page" id="source-strategy"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>StrategyLab.java <span class="part">1 / 5</span></h2><p>Complete file. Copy the panels in order into <code>StrategyLab.java</code>, with a newline between panels, or use the embedded download. All types are nested in the public class so each file runs independently.</p><div class="downloads"><a class="download" download="StrategyLab.java" href="data:text/plain;base64,aW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwoKcHVibGljIGNsYXNzIFN0cmF0ZWd5TGFiIHsKICAgIC8vIFBhcnQgQTogZGF0YSBhbmQgdGhlIGJlaGF2aW9yIHRvIHByZXNlcnZlLgogICAgcmVjb3JkIE9yZGVyKGludCB3ZWlnaHRLZywgbG9uZyBzdWJ0b3RhbENlbnRzLCBib29sZWFuIHJlbW90ZSkgewogICAgICAgIE9yZGVyIHsKICAgICAgICAgICAgaWYgKHdlaWdodEtnIDw9IDAgfHwgc3VidG90YWxDZW50cyA8IDApIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIkludmFsaWQgb3JkZXIiKTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgbG9uZyBzaGlwcGluZ0JlZm9yZShPcmRlciBvcmRlciwgU3RyaW5nIG1ldGhvZCkgewogICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwob3JkZXIsICJvcmRlciIpOwogICAgICAgIGlmICgic3RhbmRhcmQiLmVxdWFscyhtZXRob2QpKSB7CiAgICAgICAgICAgIGxvbmcgcHJpY2UgPSBvcmRlci53ZWlnaHRLZygpICogMjAwTDsKICAgICAgICAgICAgaWYgKG9yZGVyLnN1YnRvdGFsQ2VudHMoKSA+IDEwXzAwMEwpIHsKICAgICAgICAgICAgICAgIHByaWNlIC09IDUwMEw7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIE1hdGgubWF4KDBMLCBwcmljZSk7CiAgICAgICAgfQogICAgICAgIGlmICgiZXhwcmVzcyIuZXF1YWxzKG1ldGhvZCkpIHsKICAgICAgICAgICAgbG9uZyBwcmljZSA9IG9yZGVyLndlaWdodEtnKCkgKiA0MDBMICsgMV8wMDBMOwogICAgICAgICAgICBpZiAob3JkZXIucmVtb3RlKCkpIHsKICAgICAgICAgICAgICAgIHByaWNlICs9IDFfNTAwTDsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gcHJpY2U7CiAgICAgICAgfQogICAgICAgIGlmICgib3Zlcm5pZ2h0Ii5lcXVhbHMobWV0aG9kKSkgewogICAgICAgICAgICBsb25nIHByaWNlID0gb3JkZXIud2VpZ2h0S2coKSAqIDcwMEwgKyAyXzUwMEw7CiAgICAgICAgICAgIGlmIChvcmRlci5yZW1vdGUoKSkgewogICAgICAgICAgICAgICAgcHJpY2UgKz0gM18wMDBMOwogICAgICAgICAgICB9CiAgICAgICAgICAgIHJldHVybiBwcmljZTsKICAgICAgICB9CiAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiVW5rbm93biBtZXRob2Q6ICIgKyBtZXRob2QpOwogICAgfQoKICAgIC8vIFBhcnQgQjogY2FwYWJpbGl0eSBhbmQgaW5kZXBlbmRlbnQgaW1wbGVtZW50YXRpb25zLgogICAgQEZ1bmN0aW9uYWxJbnRlcmZhY2UKICAgIGludGVyZmFjZSBTaGlwcGluZ1BvbGljeSB7CiAgICAgICAgbG9uZyBjYWxjdWxhdGVDZW50cyhPcmRlciBvcmRlcik7CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIFN0YW5kYXJkU2hpcHBpbmcgaW1wbGVtZW50cyBTaGlwcGluZ1BvbGljeSB7CiAgICAgICAgQE92ZXJyaWRlCiAgICAgICAgcHVibGljIGxvbmcgY2FsY3VsYXRlQ2VudHMoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgbG9uZyBwcmljZSA9IG9yZGVyLndlaWdodEtnKCkgKiAyMDBMOwogICAgICAgICAgICBpZiAob3JkZXIuc3VidG90YWxDZW50cygpID4gMTBfMDAwTCkgewogICAgICAgICAgICAgICAgcHJpY2UgLT0gNTAwTDsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gTWF0aC5tYXgoMEwsIHByaWNlKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIEV4cHJlc3NTaGlwcGluZyBpbXBsZW1lbnRzIFNoaXBwaW5nUG9saWN5IHsKICAgICAgICBAT3ZlcnJpZGUKICAgICAgICBwdWJsaWMgbG9uZyBjYWxjdWxhdGVDZW50cyhPcmRlciBvcmRlcikgewogICAgICAgICAgICBsb25nIHByaWNlID0gb3JkZXIud2VpZ2h0S2coKSAqIDQwMEwgKyAxXzAwMEw7CiAgICAgICAgICAgIHJldHVybiBwcmljZSArIChvcmRlci5yZW1vdGUoKSA/IDFfNTAwTCA6IDBMKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIE92ZXJuaWdodFNoaXBwaW5nIGltcGxlbWVudHMgU2hpcHBpbmdQb2xpY3kgewogICAgICAgIEBPdmVycmlkZQogICAgICAgIHB1YmxpYyBsb25nIGNhbGN1bGF0ZUNlbnRzKE9yZGVyIG9yZGVyKSB7CiAgICAgICAgICAgIGxvbmcgcHJpY2UgPSBvcmRlci53ZWlnaHRLZygpICogNzAwTCArIDJfNTAwTDsKICAgICAgICAgICAgcmV0dXJuIHByaWNlICsgKG9yZGVyLnJlbW90ZSgpID8gM18wMDBMIDogMEwpOwogICAgICAgIH0KICAgIH0KCiAgICAvLyBQYXJ0IEM6IHN0YWJsZSB3b3JrZmxvdyBhbmQgc2VsZWN0aW9uIGF0IHRoZSBib3VuZGFyeS4KICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBDaGVja291dFNlcnZpY2UgewogICAgICAgIHByaXZhdGUgZmluYWwgU2hpcHBpbmdQb2xpY3kgc2hpcHBpbmdQb2xpY3k7CgogICAgICAgIENoZWNrb3V0U2VydmljZShTaGlwcGluZ1BvbGljeSBzaGlwcGluZ1BvbGljeSkgewogICAgICAgICAgICB0aGlzLnNoaXBwaW5nUG9saWN5ID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChzaGlwcGluZ1BvbGljeSk7CiAgICAgICAgfQoKICAgICAgICBsb25nIHRvdGFsQ2VudHMoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChvcmRlciwgIm9yZGVyIik7CiAgICAgICAgICAgIGxvbmcgc2hpcHBpbmcgPSBzaGlwcGluZ1BvbGljeS5jYWxjdWxhdGVDZW50cyhvcmRlcik7CiAgICAgICAgICAgIGlmIChzaGlwcGluZyA8IDApIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oIk5lZ2F0aXZlIHNoaXBwaW5nIik7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIE1hdGguYWRkRXhhY3Qob3JkZXIuc3VidG90YWxDZW50cygpLCBzaGlwcGluZyk7CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyBTaGlwcGluZ1BvbGljeSBzZWxlY3RQb2xpY3koU3RyaW5nIG1ldGhvZCkgewogICAgICAgIGlmIChtZXRob2QgPT0gbnVsbCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJNZXRob2QgaXMgcmVxdWlyZWQiKTsKICAgICAgICB9CiAgICAgICAgcmV0dXJuIHN3aXRjaCAobWV0aG9kKSB7CiAgICAgICAgICAgIGNhc2UgInN0YW5kYXJkIiAtPiBuZXcgU3RhbmRhcmRTaGlwcGluZygpOwogICAgICAgICAgICBjYXNlICJleHByZXNzIiAtPiBuZXcgRXhwcmVzc1NoaXBwaW5nKCk7CiAgICAgICAgICAgIGNhc2UgIm92ZXJuaWdodCIgLT4gbmV3IE92ZXJuaWdodFNoaXBwaW5nKCk7CiAgICAgICAgICAgIGRlZmF1bHQgLT4gdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigKICAgICAgICAgICAgICAgICAgICAiVW5rbm93biBtZXRob2Q6ICIgKyBtZXRob2QpOwogICAgICAgIH07CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIERyb25lU2hpcHBpbmcgaW1wbGVtZW50cyBTaGlwcGluZ1BvbGljeSB7CiAgICAgICAgQE92ZXJyaWRlCiAgICAgICAgcHVibGljIGxvbmcgY2FsY3VsYXRlQ2VudHMoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgcmV0dXJuIDJfMDAwTCArIG9yZGVyLndlaWdodEtnKCkgKiA1MDBMOwogICAgICAgIH0KICAgIH0KCiAgICAvLyBQYXJ0IEQ6IHNtYWxsLCBhbHdheXMtb24gY2hlY2tzOyBubyB0ZXN0IGxpYnJhcnkgcmVxdWlyZWQuCiAgICBzdGF0aWMgdm9pZCBlcXVhbChsb25nIGV4cGVjdGVkLCBsb25nIGFjdHVhbCwgU3RyaW5nIGxhYmVsKSB7CiAgICAgICAgaWYgKGV4cGVjdGVkICE9IGFjdHVhbCkgewogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IobGFiZWwgKyAiOiBleHBlY3RlZCAiICsgZXhwZWN0ZWQKICAgICAgICAgICAgICAgICAgICArICIsIGdvdCAiICsgYWN0dWFsKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIHZvaWQgZXhwZWN0VGhyb3dzKENsYXNzPD8gZXh0ZW5kcyBUaHJvd2FibGU+IHR5cGUsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUnVubmFibGUgYWN0aW9uKSB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgYWN0aW9uLnJ1bigpOwogICAgICAgIH0gY2F0Y2ggKFRocm93YWJsZSBmYWlsdXJlKSB7CiAgICAgICAgICAgIGlmICh0eXBlLmlzSW5zdGFuY2UoZmFpbHVyZSkpIHsKICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgfQogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIlVuZXhwZWN0ZWQgZXhjZXB0aW9uIiwgZmFpbHVyZSk7CiAgICAgICAgfQogICAgICAgIHRocm93IG5ldyBBc3NlcnRpb25FcnJvcigiRXhwZWN0ZWQgIiArIHR5cGUuZ2V0U2ltcGxlTmFtZSgpKTsKICAgIH0KCiAgICBzdGF0aWMgdm9pZCBydW5DaGVja3MoKSB7CiAgICAgICAgT3JkZXJbXSBvcmRlcnMgPSB7CiAgICAgICAgICAgIG5ldyBPcmRlcigxMCwgMTBfMDAwTCwgZmFsc2UpLAogICAgICAgICAgICBuZXcgT3JkZXIoMTAsIDEwXzAwMUwsIGZhbHNlKSwKICAgICAgICAgICAgbmV3IE9yZGVyKDEwLCAxMF8wMDFMLCB0cnVlKSwKICAgICAgICAgICAgbmV3IE9yZGVyKDEsIDEwXzAwMUwsIGZhbHNlKQogICAgICAgIH07CiAgICAgICAgU3RyaW5nW10gbWV0aG9kcyA9IHsic3RhbmRhcmQiLCAiZXhwcmVzcyIsICJvdmVybmlnaHQifTsKICAgICAgICBsb25nW11bXSBleHBlY3RlZCA9IHsKICAgICAgICAgICAgezJfMDAwTCwgNV8wMDBMLCA5XzUwMEx9LAogICAgICAgICAgICB7MV81MDBMLCA1XzAwMEwsIDlfNTAwTH0sCiAgICAgICAgICAgIHsxXzUwMEwsIDZfNTAwTCwgMTJfNTAwTH0sCiAgICAgICAgICAgIHswTCwgMV80MDBMLCAzXzIwMEx9CiAgICAgICAgfTsKICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IG9yZGVycy5sZW5ndGg7IGkrKykgewogICAgICAgICAgICBmb3IgKGludCBqID0gMDsgaiA8IG1ldGhvZHMubGVuZ3RoOyBqKyspIHsKICAgICAgICAgICAgICAgIGVxdWFsKGV4cGVjdGVkW2ldW2pdLCBzaGlwcGluZ0JlZm9yZShvcmRlcnNbaV0sIG1ldGhvZHNbal0pLAogICAgICAgICAgICAgICAgICAgICAgICAiYmVmb3JlIC8gIiArIGkgKyAiIC8gIiArIG1ldGhvZHNbal0pOwogICAgICAgICAgICAgICAgZXF1YWwoZXhwZWN0ZWRbaV1bal0sIHNlbGVjdFBvbGljeShtZXRob2RzW2pdKQogICAgICAgICAgICAgICAgICAgICAgICAuY2FsY3VsYXRlQ2VudHMob3JkZXJzW2ldKSwKICAgICAgICAgICAgICAgICAgICAgICAgImFmdGVyIC8gIiArIGkgKyAiIC8gIiArIG1ldGhvZHNbal0pOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIFNoaXBwaW5nUG9saWN5IGZpeGVkU2hpcHBpbmcgPSBvcmRlciAtPiAxXzAwMEw7CiAgICAgICAgZXF1YWwoMTFfMDAwTCwgbmV3IENoZWNrb3V0U2VydmljZShmaXhlZFNoaXBwaW5nKQogICAgICAgICAgICAgICAgLnRvdGFsQ2VudHMob3JkZXJzWzBdKSwgImNoZWNrb3V0IHdpdGggZml4ZWQgc2hpcHBpbmciKTsKICAgICAgICBlcXVhbCgxNl81MDFMLCBuZXcgQ2hlY2tvdXRTZXJ2aWNlKHNlbGVjdFBvbGljeSgiZXhwcmVzcyIpKQogICAgICAgICAgICAgICAgLnRvdGFsQ2VudHMob3JkZXJzWzJdKSwgInNlbGVjdGVkIHBvbGljeSBpbnRlZ3JhdGlvbiIpOwogICAgICAgIGVxdWFsKDE3XzAwMEwsIG5ldyBDaGVja291dFNlcnZpY2UobmV3IERyb25lU2hpcHBpbmcoKSkKICAgICAgICAgICAgICAgIC50b3RhbENlbnRzKG9yZGVyc1swXSksICJleHRlbnNpb24gd2l0aG91dCBjaGVja291dCBlZGl0cyIpOwogICAgICAgIGV4cGVjdFRocm93cyhJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBzZWxlY3RQb2xpY3koInVua25vd24iKSk7CiAgICAgICAgZXhwZWN0VGhyb3dzKElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IHNlbGVjdFBvbGljeShudWxsKSk7CiAgICAgICAgZXhwZWN0VGhyb3dzKElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBPcmRlcigwLCAxMDBMLCBmYWxzZSkpOwogICAgICAgIGV4cGVjdFRocm93cyhJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBuZXcgT3JkZXIoMSwgLTFMLCBmYWxzZSkpOwogICAgICAgIGV4cGVjdFRocm93cyhOdWxsUG9pbnRlckV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2UobnVsbCkpOwogICAgICAgIGV4cGVjdFRocm93cyhOdWxsUG9pbnRlckV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2UoZml4ZWRTaGlwcGluZykudG90YWxDZW50cyhudWxsKSk7CiAgICAgICAgZXhwZWN0VGhyb3dzKElsbGVnYWxTdGF0ZUV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2Uob3JkZXIgLT4gLTFMKQogICAgICAgICAgICAgICAgICAgICAgICAudG90YWxDZW50cyhvcmRlcnNbMF0pKTsKICAgICAgICBleHBlY3RUaHJvd3MoQXJpdGhtZXRpY0V4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IG5ldyBDaGVja291dFNlcnZpY2UoZml4ZWRTaGlwcGluZykKICAgICAgICAgICAgICAgICAgICAgICAgLnRvdGFsQ2VudHMobmV3IE9yZGVyKDEsIExvbmcuTUFYX1ZBTFVFLCBmYWxzZSkpKTsKICAgIH0KCiAgICAvLyBQYXJ0IEU6IGNvbXBvc2UgYW5kIHJ1biB0aGUgYXBwbGljYXRpb24uCiAgICBwdWJsaWMgc3RhdGljIHZvaWQgbWFpbihTdHJpbmdbXSBhcmdzKSB7CiAgICAgICAgcnVuQ2hlY2tzKCk7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJBbGwgc2hpcHBpbmcgY2hlY2tzIHBhc3NlZC4iKTsKICAgICAgICBPcmRlciBvcmRlciA9IG5ldyBPcmRlcigxMCwgMTBfMDAwTCwgZmFsc2UpOwogICAgICAgIGZvciAoU3RyaW5nIG1ldGhvZCA6IG5ldyBTdHJpbmdbXXsic3RhbmRhcmQiLCAiZXhwcmVzcyIsICJvdmVybmlnaHQifSkgewogICAgICAgICAgICBDaGVja291dFNlcnZpY2UgY2hlY2tvdXQgPSBuZXcgQ2hlY2tvdXRTZXJ2aWNlKHNlbGVjdFBvbGljeShtZXRob2QpKTsKICAgICAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKG1ldGhvZCArICIgdG90YWw6ICIgKyBjaGVja291dC50b3RhbENlbnRzKG9yZGVyKQogICAgICAgICAgICAgICAgICAgICsgIiBjZW50cyIpOwogICAgICAgIH0KICAgIH0KfQo=">StrategyLab.java <span aria-hidden="true">↓</span></a></div><div class="codebox small-code"><div class="codebar"><span>StrategyLab.java · complete source · 1/5</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>import java.util.Objects;
+
+public class StrategyLab {
+    // Part A: data and the behavior to preserve.
+    record Order(int weightKg, long subtotalCents, boolean remote) {
+        Order {
+            if (weightKg &lt;= 0 || subtotalCents &lt; 0) {
+                throw new IllegalArgumentException(&quot;Invalid order&quot;);
+            }
+        }
+    }
+
+    static long shippingBefore(Order order, String method) {
+        Objects.requireNonNull(order, &quot;order&quot;);
+        if (&quot;standard&quot;.equals(method)) {
+            long price = order.weightKg() * 200L;
+            if (order.subtotalCents() &gt; 10_000L) {
+                price -= 500L;
+            }
+            return Math.max(0L, price);
+        }
+        if (&quot;express&quot;.equals(method)) {
+            long price = order.weightKg() * 400L + 1_000L;
+            if (order.remote()) {
+                price += 1_500L;
+            }
+            return price;
+        }
+        if (&quot;overnight&quot;.equals(method)) {
+            long price = order.weightKg() * 700L + 2_500L;
+            if (order.remote()) {
+                price += 3_000L;
+            }
+            return price;
+        }
+        throw new IllegalArgumentException(&quot;Unknown method: &quot; + method);
+    }
+
+    // Part B: capability and independent implementations.
+    @FunctionalInterface
+    interface ShippingPolicy {
+        long calculateCents(Order order);
+    }</code></pre></div></section>
+<section class="sheet source-page" id="source-strategy-2"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>StrategyLab.java <span class="part">2 / 5</span></h2><p class="small">Continuation of the same file. Append immediately after the previous panel; keep the class open until its final closing brace.</p><div class="codebox small-code"><div class="codebar"><span>StrategyLab.java · complete source · 2/5</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static final class StandardShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        long price = order.weightKg() * 200L;
+        if (order.subtotalCents() &gt; 10_000L) {
+            price -= 500L;
+        }
+        return Math.max(0L, price);
+    }
+}
+
+static final class ExpressShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        long price = order.weightKg() * 400L + 1_000L;
+        return price + (order.remote() ? 1_500L : 0L);
+    }
+}
+
+static final class OvernightShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        long price = order.weightKg() * 700L + 2_500L;
+        return price + (order.remote() ? 3_000L : 0L);
+    }
+}
+
+// Part C: stable workflow and selection at the boundary.
+static final class CheckoutService {
+    private final ShippingPolicy shippingPolicy;
+
+    CheckoutService(ShippingPolicy shippingPolicy) {
+        this.shippingPolicy = Objects.requireNonNull(shippingPolicy);
+    }</code></pre></div></section>
+<section class="sheet source-page" id="source-strategy-3"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>StrategyLab.java <span class="part">3 / 5</span></h2><p class="small">Continuation of the same file. Append immediately after the previous panel; keep the class open until its final closing brace.</p><div class="codebox small-code"><div class="codebar"><span>StrategyLab.java · complete source · 3/5</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>long totalCents(Order order) {
+        Objects.requireNonNull(order, &quot;order&quot;);
+        long shipping = shippingPolicy.calculateCents(order);
+        if (shipping &lt; 0) {
+            throw new IllegalStateException(&quot;Negative shipping&quot;);
+        }
+        return Math.addExact(order.subtotalCents(), shipping);
+    }
+}
+
+static ShippingPolicy selectPolicy(String method) {
+    if (method == null) {
+        throw new IllegalArgumentException(&quot;Method is required&quot;);
+    }
+    return switch (method) {
+        case &quot;standard&quot; -&gt; new StandardShipping();
+        case &quot;express&quot; -&gt; new ExpressShipping();
+        case &quot;overnight&quot; -&gt; new OvernightShipping();
+        default -&gt; throw new IllegalArgumentException(
+                &quot;Unknown method: &quot; + method);
+    };
+}
+
+static final class DroneShipping implements ShippingPolicy {
+    @Override
+    public long calculateCents(Order order) {
+        return 2_000L + order.weightKg() * 500L;
+    }
+}
+
+// Part D: small, always-on checks; no test library required.
+static void equal(long expected, long actual, String label) {
+    if (expected != actual) {
+        throw new AssertionError(label + &quot;: expected &quot; + expected
+                + &quot;, got &quot; + actual);
+    }
+}</code></pre></div></section>
+<section class="sheet source-page" id="source-strategy-4"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>StrategyLab.java <span class="part">4 / 5</span></h2><p class="small">Continuation of the same file. Append immediately after the previous panel; keep the class open until its final closing brace.</p><div class="codebox small-code"><div class="codebar"><span>StrategyLab.java · complete source · 4/5</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static void expectThrows(Class&lt;? extends Throwable&gt; type,
+                         Runnable action) {
+    try {
+        action.run();
+    } catch (Throwable failure) {
+        if (type.isInstance(failure)) {
+            return;
+        }
+        throw new AssertionError(&quot;Unexpected exception&quot;, failure);
+    }
+    throw new AssertionError(&quot;Expected &quot; + type.getSimpleName());
+}
+
+static void runChecks() {
+    Order[] orders = {
+        new Order(10, 10_000L, false),
+        new Order(10, 10_001L, false),
+        new Order(10, 10_001L, true),
+        new Order(1, 10_001L, false)
+    };
+    String[] methods = {&quot;standard&quot;, &quot;express&quot;, &quot;overnight&quot;};
+    long[][] expected = {
+        {2_000L, 5_000L, 9_500L},
+        {1_500L, 5_000L, 9_500L},
+        {1_500L, 6_500L, 12_500L},
+        {0L, 1_400L, 3_200L}
+    };
+    for (int i = 0; i &lt; orders.length; i++) {
+        for (int j = 0; j &lt; methods.length; j++) {
+            equal(expected[i][j], shippingBefore(orders[i], methods[j]),
+                    &quot;before / &quot; + i + &quot; / &quot; + methods[j]);
+            equal(expected[i][j], selectPolicy(methods[j])
+                    .calculateCents(orders[i]),
+                    &quot;after / &quot; + i + &quot; / &quot; + methods[j]);
+        }
+    }
+    ShippingPolicy fixedShipping = order -&gt; 1_000L;
+    equal(11_000L, new CheckoutService(fixedShipping)
+            .totalCents(orders[0]), &quot;checkout with fixed shipping&quot;);
+    equal(16_501L, new CheckoutService(selectPolicy(&quot;express&quot;))
+            .totalCents(orders[2]), &quot;selected policy integration&quot;);
+    equal(17_000L, new CheckoutService(new DroneShipping())
+            .totalCents(orders[0]), &quot;extension without checkout edits&quot;);</code></pre></div></section>
+<section class="sheet source-page" id="source-strategy-5"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>StrategyLab.java <span class="part">5 / 5</span></h2><p class="small">Continuation of the same file. Append immediately after the previous panel; keep the class open until its final closing brace.</p><div class="codebox small-code"><div class="codebar"><span>StrategyLab.java · complete source · 5/5</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>expectThrows(IllegalArgumentException.class,
+                () -&gt; selectPolicy(&quot;unknown&quot;));
+        expectThrows(IllegalArgumentException.class,
+                () -&gt; selectPolicy(null));
+        expectThrows(IllegalArgumentException.class,
+                () -&gt; new Order(0, 100L, false));
+        expectThrows(IllegalArgumentException.class,
+                () -&gt; new Order(1, -1L, false));
+        expectThrows(NullPointerException.class,
+                () -&gt; new CheckoutService(null));
+        expectThrows(NullPointerException.class,
+                () -&gt; new CheckoutService(fixedShipping).totalCents(null));
+        expectThrows(IllegalStateException.class,
+                () -&gt; new CheckoutService(order -&gt; -1L)
+                        .totalCents(orders[0]));
+        expectThrows(ArithmeticException.class,
+                () -&gt; new CheckoutService(fixedShipping)
+                        .totalCents(new Order(1, Long.MAX_VALUE, false)));
+    }
+
+    // Part E: compose and run the application.
+    public static void main(String[] args) {
+        runChecks();
+        System.out.println(&quot;All shipping checks passed.&quot;);
+        Order order = new Order(10, 10_000L, false);
+        for (String method : new String[]{&quot;standard&quot;, &quot;express&quot;, &quot;overnight&quot;}) {
+            CheckoutService checkout = new CheckoutService(selectPolicy(method));
+            System.out.println(method + &quot; total: &quot; + checkout.totalCents(order)
+                    + &quot; cents&quot;);
+        }
+    }
+}</code></pre></div></section>
+<section class="sheet source-page" id="source-discount"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>DiscountLab.java <span class="part">1 / 2</span></h2><p>Complete file. Copy the panels in order into <code>DiscountLab.java</code>, with a newline between panels, or use the embedded download. All types are nested in the public class so each file runs independently.</p><div class="downloads"><a class="download" download="DiscountLab.java" href="data:text/plain;base64,aW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwoKcHVibGljIGNsYXNzIERpc2NvdW50TGFiIHsKICAgIEBGdW5jdGlvbmFsSW50ZXJmYWNlCiAgICBpbnRlcmZhY2UgRGlzY291bnRQb2xpY3kgewogICAgICAgIGxvbmcgZGlzY291bnRDZW50cyhsb25nIGFtb3VudENlbnRzKTsKICAgIH0KCiAgICAvLyBXaG9sZSBwZXJjZW50YWdlcywgd2l0aCBmcmFjdGlvbmFsIGNlbnRzIHJvdW5kZWQgZG93bi4KICAgIHN0YXRpYyBsb25nIHBlcmNlbnRPZihsb25nIGFtb3VudENlbnRzLCBpbnQgcGVyY2VudCkgewogICAgICAgIGlmIChhbW91bnRDZW50cyA8IDAgfHwgcGVyY2VudCA8IDAgfHwgcGVyY2VudCA+IDEwMCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJJbnZhbGlkIGRpc2NvdW50IGlucHV0Iik7CiAgICAgICAgfQogICAgICAgIHJldHVybiBNYXRoLm11bHRpcGx5RXhhY3QoYW1vdW50Q2VudHMsIHBlcmNlbnQpIC8gMTAwTDsKICAgIH0KCiAgICBzdGF0aWMgbG9uZyBkaXNjb3VudEJlZm9yZShTdHJpbmcgdHlwZSwgbG9uZyBhbW91bnRDZW50cykgewogICAgICAgIGlmICgicmVndWxhciIuZXF1YWxzKHR5cGUpKSB7CiAgICAgICAgICAgIHJldHVybiBwZXJjZW50T2YoYW1vdW50Q2VudHMsIDUpOwogICAgICAgIH0KICAgICAgICBpZiAoInByZW1pdW0iLmVxdWFscyh0eXBlKSkgewogICAgICAgICAgICByZXR1cm4gcGVyY2VudE9mKGFtb3VudENlbnRzLCAxMCk7CiAgICAgICAgfQogICAgICAgIGlmICgiZW1wbG95ZWUiLmVxdWFscyh0eXBlKSkgewogICAgICAgICAgICByZXR1cm4gcGVyY2VudE9mKGFtb3VudENlbnRzLCAzMCk7CiAgICAgICAgfQogICAgICAgIHJldHVybiBwZXJjZW50T2YoYW1vdW50Q2VudHMsIDApOwogICAgfQoKICAgIHN0YXRpYyBEaXNjb3VudFBvbGljeSBzZWxlY3REaXNjb3VudChTdHJpbmcgdHlwZSkgewogICAgICAgIGlmICgicmVndWxhciIuZXF1YWxzKHR5cGUpKSB7CiAgICAgICAgICAgIHJldHVybiBhbW91bnQgLT4gcGVyY2VudE9mKGFtb3VudCwgNSk7CiAgICAgICAgfQogICAgICAgIGlmICgicHJlbWl1bSIuZXF1YWxzKHR5cGUpKSB7CiAgICAgICAgICAgIHJldHVybiBhbW91bnQgLT4gcGVyY2VudE9mKGFtb3VudCwgMTApOwogICAgICAgIH0KICAgICAgICBpZiAoImVtcGxveWVlIi5lcXVhbHModHlwZSkpIHsKICAgICAgICAgICAgcmV0dXJuIGFtb3VudCAtPiBwZXJjZW50T2YoYW1vdW50LCAzMCk7CiAgICAgICAgfQogICAgICAgIHJldHVybiBhbW91bnQgLT4gcGVyY2VudE9mKGFtb3VudCwgMCk7CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIENoZWNrb3V0IHsKICAgICAgICBwcml2YXRlIGZpbmFsIERpc2NvdW50UG9saWN5IGRpc2NvdW50UG9saWN5OwoKICAgICAgICBDaGVja291dChEaXNjb3VudFBvbGljeSBkaXNjb3VudFBvbGljeSkgewogICAgICAgICAgICB0aGlzLmRpc2NvdW50UG9saWN5ID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChkaXNjb3VudFBvbGljeSk7CiAgICAgICAgfQoKICAgICAgICBsb25nIHRvdGFsQ2VudHMobG9uZyBhbW91bnRDZW50cykgewogICAgICAgICAgICBpZiAoYW1vdW50Q2VudHMgPCAwKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJOZWdhdGl2ZSBhbW91bnQiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICBsb25nIGRpc2NvdW50ID0gZGlzY291bnRQb2xpY3kuZGlzY291bnRDZW50cyhhbW91bnRDZW50cyk7CiAgICAgICAgICAgIGlmIChkaXNjb3VudCA8IDAgfHwgZGlzY291bnQgPiBhbW91bnRDZW50cykgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiSW52YWxpZCBkaXNjb3VudCIpOwogICAgICAgICAgICB9CiAgICAgICAgICAgIHJldHVybiBhbW91bnRDZW50cyAtIGRpc2NvdW50OwogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgdm9pZCBlcXVhbChsb25nIGV4cGVjdGVkLCBsb25nIGFjdHVhbCkgewogICAgICAgIGlmIChleHBlY3RlZCAhPSBhY3R1YWwpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKCJFeHBlY3RlZCAiICsgZXhwZWN0ZWQgKyAiLCBnb3QgIiArIGFjdHVhbCk7CiAgICAgICAgfQogICAgfQoKICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBtYWluKFN0cmluZ1tdIGFyZ3MpIHsKICAgICAgICBTdHJpbmdbXSB0eXBlcyA9IHsicmVndWxhciIsICJwcmVtaXVtIiwgImVtcGxveWVlIiwgImd1ZXN0IiwgbnVsbH07CiAgICAgICAgbG9uZ1tdIGRpc2NvdW50cyA9IHs1MDBMLCAxXzAwMEwsIDNfMDAwTCwgMEwsIDBMfTsKICAgICAgICBmb3IgKGludCBpID0gMDsgaSA8IHR5cGVzLmxlbmd0aDsgaSsrKSB7CiAgICAgICAgICAgIERpc2NvdW50UG9saWN5IHBvbGljeSA9IHNlbGVjdERpc2NvdW50KHR5cGVzW2ldKTsKICAgICAgICAgICAgZXF1YWwoZGlzY291bnRzW2ldLCBkaXNjb3VudEJlZm9yZSh0eXBlc1tpXSwgMTBfMDAwTCkpOwogICAgICAgICAgICBlcXVhbChkaXNjb3VudHNbaV0sIHBvbGljeS5kaXNjb3VudENlbnRzKDEwXzAwMEwpKTsKICAgICAgICAgICAgZXF1YWwoMTBfMDAwTCAtIGRpc2NvdW50c1tpXSwgbmV3IENoZWNrb3V0KHBvbGljeSkKICAgICAgICAgICAgICAgICAgICAudG90YWxDZW50cygxMF8wMDBMKSk7CiAgICAgICAgfQogICAgICAgIGVxdWFsKDBMLCBzZWxlY3REaXNjb3VudCgicmVndWxhciIpLmRpc2NvdW50Q2VudHMoMEwpKTsKICAgICAgICBlcXVhbCg0OUwsIHNlbGVjdERpc2NvdW50KCJyZWd1bGFyIikuZGlzY291bnRDZW50cyg5OTlMKSk7CiAgICAgICAgZXF1YWwoOV8wMDBMLCBuZXcgQ2hlY2tvdXQoYW1vdW50IC0+IDFfMDAwTCkudG90YWxDZW50cygxMF8wMDBMKSk7CiAgICAgICAgRGlzY291bnRQb2xpY3kgc3R1ZGVudCA9IGFtb3VudCAtPiBwZXJjZW50T2YoYW1vdW50LCAxNSk7CiAgICAgICAgZXF1YWwoOF81MDBMLCBuZXcgQ2hlY2tvdXQoc3R1ZGVudCkudG90YWxDZW50cygxMF8wMDBMKSk7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJBbGwgZGlzY291bnQgY2hlY2tzIHBhc3NlZC4iKTsKICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIlN0dWRlbnQgdG90YWw6IDg1MDAgY2VudHMiKTsKICAgIH0KfQo=">DiscountLab.java <span aria-hidden="true">↓</span></a></div><div class="codebox small-code"><div class="codebar"><span>DiscountLab.java · complete source · 1/2</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>import java.util.Objects;
+
+public class DiscountLab {
+    @FunctionalInterface
+    interface DiscountPolicy {
+        long discountCents(long amountCents);
+    }
+
+    // Whole percentages, with fractional cents rounded down.
+    static long percentOf(long amountCents, int percent) {
+        if (amountCents &lt; 0 || percent &lt; 0 || percent &gt; 100) {
+            throw new IllegalArgumentException(&quot;Invalid discount input&quot;);
+        }
+        return Math.multiplyExact(amountCents, percent) / 100L;
+    }
+
+    static long discountBefore(String type, long amountCents) {
+        if (&quot;regular&quot;.equals(type)) {
+            return percentOf(amountCents, 5);
+        }
+        if (&quot;premium&quot;.equals(type)) {
+            return percentOf(amountCents, 10);
+        }
+        if (&quot;employee&quot;.equals(type)) {
+            return percentOf(amountCents, 30);
+        }
+        return percentOf(amountCents, 0);
+    }
+
+    static DiscountPolicy selectDiscount(String type) {
+        if (&quot;regular&quot;.equals(type)) {
+            return amount -&gt; percentOf(amount, 5);
+        }
+        if (&quot;premium&quot;.equals(type)) {
+            return amount -&gt; percentOf(amount, 10);
+        }
+        if (&quot;employee&quot;.equals(type)) {
+            return amount -&gt; percentOf(amount, 30);
+        }
+        return amount -&gt; percentOf(amount, 0);
+    }</code></pre></div></section>
+<section class="sheet source-page" id="source-discount-2"><p class="eyebrow">APPENDIX / RUNNABLE SOURCE</p><h2>DiscountLab.java <span class="part">2 / 2</span></h2><p class="small">Continuation of the same file. Append immediately after the previous panel; keep the class open until its final closing brace.</p><div class="codebox small-code"><div class="codebar"><span>DiscountLab.java · complete source · 2/2</span><button class="copy js-only" type="button">Copy</button></div><pre tabindex="0"><code>static final class Checkout {
+        private final DiscountPolicy discountPolicy;
+
+        Checkout(DiscountPolicy discountPolicy) {
+            this.discountPolicy = Objects.requireNonNull(discountPolicy);
+        }
+
+        long totalCents(long amountCents) {
+            if (amountCents &lt; 0) {
+                throw new IllegalArgumentException(&quot;Negative amount&quot;);
+            }
+            long discount = discountPolicy.discountCents(amountCents);
+            if (discount &lt; 0 || discount &gt; amountCents) {
+                throw new IllegalStateException(&quot;Invalid discount&quot;);
+            }
+            return amountCents - discount;
+        }
+    }
+
+    static void equal(long expected, long actual) {
+        if (expected != actual) {
+            throw new AssertionError(&quot;Expected &quot; + expected + &quot;, got &quot; + actual);
+        }
+    }
+
+    public static void main(String[] args) {
+        String[] types = {&quot;regular&quot;, &quot;premium&quot;, &quot;employee&quot;, &quot;guest&quot;, null};
+        long[] discounts = {500L, 1_000L, 3_000L, 0L, 0L};
+        for (int i = 0; i &lt; types.length; i++) {
+            DiscountPolicy policy = selectDiscount(types[i]);
+            equal(discounts[i], discountBefore(types[i], 10_000L));
+            equal(discounts[i], policy.discountCents(10_000L));
+            equal(10_000L - discounts[i], new Checkout(policy)
+                    .totalCents(10_000L));
+        }
+        equal(0L, selectDiscount(&quot;regular&quot;).discountCents(0L));
+        equal(49L, selectDiscount(&quot;regular&quot;).discountCents(999L));
+        equal(9_000L, new Checkout(amount -&gt; 1_000L).totalCents(10_000L));
+        DiscountPolicy student = amount -&gt; percentOf(amount, 15);
+        equal(8_500L, new Checkout(student).totalCents(10_000L));
+        System.out.println(&quot;All discount checks passed.&quot;);
+        System.out.println(&quot;Student total: 8500 cents&quot;);
+    }
+}</code></pre></div></section>
+<section class="sheet " id="references"><p class="eyebrow">REFERENCES / OFFICIAL SOURCES</p><h2>Language details you can verify</h2>
+<p>The learning sequence is adapted from the supplied Lesson 0 and Strategy conversation. The examples and exercises are teaching code. The references below verify Java behavior, syntax, and commands; they do not prescribe the business rules.</p>
+<ol class="references">
+<li id="ref-javac"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Oracle JDK 25: javac</a><p>Compilation and the <code>--release</code> option.</p></li>
+<li id="ref-java"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/java.html">Oracle JDK 25: java</a><p>Launching class files, source-file mode, and assertion options.</p></li>
+<li id="ref-records"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle Java 25 Language Guide: Record Classes</a><p>Generated accessors, final component fields, and compact constructors.</p></li>
+<li id="ref-functional"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/FunctionalInterface.html">Java SE 25 API: FunctionalInterface</a><p>Functional interfaces and lambda implementations.</p></li>
+<li id="ref-math"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Math.html">Java SE 25 API: Math</a><p><code>addExact</code> and <code>multiplyExact</code> detect overflow.</p></li>
+<li id="ref-expressions"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-15.html">Java SE 25 Language Specification: Expressions</a><p>Integer division (§15.17.2), method invocation (§15.12), lambdas (§15.27), and switch expressions (§15.28).</p></li>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-9.html#jls-9.4">Java SE 25 Language Specification: Interfaces</a><p>Interface method declarations and access.</p></li>
+<li><a href="https://www.pearson.com/en-us/subject-catalog/p/design-patterns-elements-of-reusable-object-oriented-software/P200000009480/9780201633610">Pearson: Design Patterns, by Gamma, Helm, Johnson, and Vlissides</a><p>The original Gang of Four catalog, for further reading.</p></li>
+</ol>
+<div class="print-help"><h3>Save this guide as a PDF</h3><p>Open the HTML in a browser, then choose <strong>Print / Save as PDF</strong>. Use A4 paper, portrait orientation, and 100% scale. The guide supplies print margins and removes navigation and controls. Turn browser headers and footers off if they repeat the URL. Background graphics are optional; text and borders remain readable without them.</p><p>All lesson content, answers, and source panels print. The interactive practice is replaced by the permanent worked-case table. Download links remain useful in HTML; PDF readers may not support embedded source downloads.</p></div>
+<p class="small">Prepared 1 September 2026. Java 25 compatibility checked against official documentation; execution checks performed with OpenJDK 17.0.20. No external fonts, scripts, images, or stylesheets are required to read this file.</p>
+</section><footer class="endnote">DP · Learn the pressure. Derive the boundary. Earn the pattern.</footer></main></div><div class="toast" id="toast" role="status" aria-live="polite"></div><script>
+document.documentElement.classList.add('js');
+const toast = document.getElementById('toast');
+let toastTimer;
+function announce(text) {
+  toast.textContent = text;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.textContent = ''; }, 2600);
+}
+document.querySelectorAll('.copy').forEach(button => {
+  button.addEventListener('click', async () => {
+    const block = button.closest('.codebox').querySelector('pre');
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(block.textContent);
+      announce('Code copied.');
+    } catch (_) {
+      const range = document.createRange();
+      range.selectNodeContents(block);
+      const selection = window.getSelection();
+      selection.removeAllRanges(); selection.addRange(range);
+      announce('Code selected. Use Ctrl+C or Command+C to copy.');
+    }
+  });
+});
+let detailsState = [];
+function openForPrint() {
+  detailsState = [...document.querySelectorAll('details')].map(el => [el, el.open]);
+  detailsState.forEach(([el]) => { el.open = true; });
+}
+window.addEventListener('beforeprint', openForPrint);
+window.addEventListener('afterprint', () => detailsState.forEach(([el, open]) => {el.open = open;}));
+document.getElementById('print').addEventListener('click', () => window.print());
+const form = document.getElementById('practice-form');
+function updatePractice() {
+  const weight = Number(document.getElementById('weight').value);
+  const subtotal = Number(document.getElementById('subtotal').value);
+  const method = document.getElementById('method').value;
+  const remote = document.getElementById('remote').checked;
+  if (!form.checkValidity() || !Number.isInteger(weight) || !Number.isInteger(subtotal)) {
+    document.getElementById('result-total').textContent = 'Check inputs';
+    document.getElementById('result-trace').textContent = 'Use whole values within the displayed input limits.';
+    document.getElementById('result-rule').textContent = '';
+    return;
+  }
+  let shipping, rule;
+  if (method === 'standard') {
+    shipping = Math.max(0, weight * 200 - (subtotal > 10000 ? 500 : 0));
+    rule = `Standard: ${weight} × 200` + (subtotal > 10000 ? ' − 500, with a minimum of zero.' : '; no discount at or below 10,000 cents.');
+  } else if (method === 'express') {
+    shipping = weight * 400 + 1000 + (remote ? 1500 : 0);
+    rule = `Express: ${weight} × 400 + 1,000` + (remote ? ' + 1,500 for remote delivery.' : '; no remote surcharge.');
+  } else {
+    shipping = weight * 700 + 2500 + (remote ? 3000 : 0);
+    rule = `Overnight: ${weight} × 700 + 2,500` + (remote ? ' + 3,000 for remote delivery.' : '; no remote surcharge.');
+  }
+  const total = subtotal + shipping;
+  document.getElementById('result-total').textContent = '$' + (total / 100).toFixed(2);
+  document.getElementById('result-trace').textContent = `${subtotal.toLocaleString('en-US')} + ${shipping.toLocaleString('en-US')} = ${total.toLocaleString('en-US')} cents`;
+  document.getElementById('result-rule').textContent = rule;
+}
+form.addEventListener('input', updatePractice);
+form.addEventListener('change', updatePractice);
+updatePractice();
+</script></body></html>

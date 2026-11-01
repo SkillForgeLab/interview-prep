@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 15: Ports and Adapters from first principles, with Java 25-compatible examples, runnable tests, and a printable offline guide."><title>Lesson 15 · Ports & Adapters / Hexagonal Architecture</title><style>
+:root{color-scheme:light;--ink:#182d38;--muted:#516570;--blue:#185a88;--teal:#126b63;--line:#d9e2e6;--paper:#fff;--wash:#f4f7f8;--soft:#edf5f6;--gold:#916120}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:#f7f8f7;color:var(--ink);font:17px/1.7 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:var(--teal)}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #c77822;outline-offset:4px}.skip{position:absolute;top:-80px;left:20px;padding:10px;background:white;z-index:10}.skip:focus{top:10px}.layout{max-width:1430px;margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:44px;padding:0 48px 80px}.rail{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:38px 6px 30px 0;font-size:13px;scrollbar-width:thin}.rail-brand{font-size:12px;letter-spacing:.14em;font-weight:750;color:var(--teal);text-transform:uppercase;padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:22px}.rail nav a{display:block;text-decoration:none;color:var(--muted);line-height:1.45;padding:5px 9px;border-left:2px solid transparent}.rail nav a:hover,.rail nav a.active{color:var(--blue);border-left-color:var(--blue);background:#edf3f7}.rail h3{font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin:23px 0 8px;color:var(--ink)}.rail .section-no{font-variant-numeric:tabular-nums;font-size:11px;color:#71838b;display:inline-block;width:22px}.rail-footer{border-top:1px solid var(--line);margin-top:25px;padding-top:18px;font-size:12px}.main{min-width:0;max-width:1000px;background:var(--paper);padding:0 45px 45px}.hero{padding:59px 0 36px;border-bottom:2px solid var(--ink)}.eyebrow{font-size:11px;line-height:1.6;text-transform:uppercase;letter-spacing:.14em;font-weight:750;color:var(--teal);margin:0 0 16px}.hero h1{font:normal clamp(40px,4vw,58px)/1.08 Georgia,"Times New Roman",serif;letter-spacing:-.035em;margin:20px 0 25px;max-width:730px}.hero h1 span{display:block;color:var(--teal);font-size:.67em;letter-spacing:-.02em;margin-top:13px}.lead{font-size:19px;line-height:1.7;max-width:720px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.meta span{border:1px solid var(--line);border-radius:4px;font-size:11px;padding:5px 9px;color:var(--muted);font-weight:650}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:23px 0}.button,button{appearance:none;border:1px solid var(--blue);border-radius:4px;padding:9px 14px;background:var(--blue);color:#fff;font:650 12px/1.5 system-ui,sans-serif;text-decoration:none;cursor:pointer}.button:hover,button:hover{background:#124367;color:white}.button.secondary{color:var(--blue);background:white}.button.secondary:hover{background:#eff5f8}.lesson-section{padding:34px 0 14px;border-bottom:1px solid var(--line);scroll-margin-top:25px}.lesson-section>h2{font:normal 30px/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.025em;margin:3px 0 20px;display:flex;gap:15px;align-items:baseline}.num{font:650 14px/1.4 system-ui,sans-serif;color:var(--teal);min-width:26px}.lesson-section h3{font-size:18px;margin:26px 0 10px;line-height:1.35}.lesson-section p{margin:13px 0 17px}.lesson-section li{margin:7px 0}.chapter-label{margin:10px 0 24px;padding:11px 0;border-top:3px solid var(--teal);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:750;color:var(--teal)}.chapter-start{padding-top:45px}.callout{border:1px solid #cee2df;border-left:4px solid var(--teal);padding:16px 19px;margin:23px 0;background:#f4faf8;font-size:15px;break-inside:avoid}.callout>strong{display:block;margin-bottom:5px;color:#155950}.callout.important{background:#fffbf1;border-color:#e9dbb7;border-left-color:#a47326}.callout.important>strong{color:#7b551c}.small,.source-note{font-size:13px;color:var(--muted);line-height:1.65}.cite{font-size:11px;font-weight:700;white-space:nowrap;vertical-align:super;text-decoration:none;margin-left:2px}code{font-family:ui-monospace,"DejaVu Sans Mono",Consolas,monospace;font-size:.85em;overflow-wrap:anywhere}p code,td code,li code{background:#f0f4f6;padding:.1em .28em;border-radius:3px}figure{margin:23px 0}.codeblock{border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#f6f8fa}.codeblock figcaption{padding:9px 14px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.045em;font-weight:700;color:var(--muted);background:#edf2f5;display:flex;justify-content:space-between;align-items:center;gap:8px}.copy{font-size:10px;color:var(--blue);background:white;border:1px solid #c8d6df;padding:3px 9px;white-space:nowrap}.copy:hover{color:white}.codeblock pre{margin:0;padding:16px 18px;font:12px/1.7 ui-monospace,"DejaVu Sans Mono",Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;color:#183f59}.codeblock pre code{font:inherit}.table-wrap{margin:21px 0;width:100%}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.6;table-layout:fixed}th{background:#eaf1f3;color:#234855;text-align:left;font-size:11px;letter-spacing:.025em;font-weight:750}th,td{padding:12px;border:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}td:first-child{font-weight:650}tbody tr:nth-child(even){background:#fafcfc}.architecture{padding:23px;border:1px solid var(--line);background:#fafcfc}.architecture figcaption{font-size:12px;font-weight:700;margin-bottom:20px;color:var(--muted)}.map-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center;font-size:12px}.map-row.three{grid-template-columns:repeat(3,minmax(0,1fr))}.map-row span{display:block;background:white;border:1px solid #ccdce3;padding:11px 6px;overflow-wrap:anywhere}.map-core{border:2px solid var(--teal);background:#edf8f4;text-align:center;padding:18px}.map-core strong{display:block;color:var(--teal);font-size:22px;line-height:1.4}.map-core .eyebrow{font-size:9px}.map-core div{margin-top:12px;font-size:14px}.map-core div span{padding:0 12px}.map-arrow{text-align:center;color:var(--teal);font-weight:600;line-height:1.2;padding:10px}.map-arrow small{font-size:10px;padding-left:5px;color:var(--muted);font-weight:400}.outside span{background:#f0f3f6}.steps{list-style:decimal;padding-left:26px}.steps li{padding:5px 0 5px 8px}.checklist{border:1px solid var(--line);margin:19px 0}.checklist label{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;font-size:14px;border-bottom:1px solid var(--line);cursor:pointer}.checklist label:last-child{border-bottom:0}.checklist input{margin-top:6px;accent-color:var(--teal);min-width:16px;min-height:16px}.checklist label:has(input:checked){background:#edf8f2}.checklist input:checked+span{color:#32564a}.references{padding-left:24px;font-size:13px}.references li{margin:19px 0;break-inside:avoid;padding-left:5px}.references p{margin:3px 0;color:var(--muted);font-size:12px}.print-url{display:none}.doc-footer{padding-top:35px;color:var(--muted);font-size:12px}.mobile-contents{display:none}.print-guide{border-left:2px solid var(--line);padding-left:13px;font-size:12px;color:var(--muted);margin:25px 0}.toast{position:fixed;right:24px;bottom:24px;background:#174b42;color:#fff;padding:12px 18px;border-radius:5px;font-size:13px;z-index:10;box-shadow:0 4px 20px #0002}.toast:empty{display:none}
+@media(max-width:1100px){.layout{grid-template-columns:220px minmax(0,1fr);padding:0 23px;gap:24px}.main{padding:0 26px 40px}.rail{font-size:12px}.hero h1{font-size:43px}.lead{font-size:17px}}
+@media(max-width:800px){.layout{display:block;padding:0 15px 30px}.rail{display:none}.main{padding:0 22px 35px;max-width:none}.hero{padding-top:32px}.hero h1{font-size:40px}.mobile-contents{display:block;margin:24px 0}.mobile-contents summary{color:var(--blue);cursor:pointer;font-weight:650;font-size:14px}.mobile-contents nav{columns:2;column-gap:24px;font-size:12px}.mobile-contents a{display:block;padding:5px 0;break-inside:avoid}body{font-size:16px}.lesson-section>h2{font-size:27px}.map-row{grid-template-columns:repeat(2,minmax(0,1fr))}.codeblock pre{font-size:11px;padding:13px}th,td{padding:9px;font-size:12px}.architecture{padding:14px}}
+@media(max-width:440px){.layout{padding:0 8px}.main{padding:0 14px 28px}.hero h1{font-size:35px}.map-row.three{grid-template-columns:1fr}.mobile-contents nav{columns:1}.lesson-section>h2{font-size:25px}.callout{padding:13px;font-size:14px}table{font-size:11px}th,td{padding:7px;font-size:11px}.button{font-size:11px;padding:8px 10px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A4;margin:15mm 14mm 16mm;@bottom-left{content:"DP / LESSON 15";font:8pt sans-serif;color:#63747c}@bottom-right{content:counter(page);font:8pt sans-serif;color:#63747c}}
+@media print{html{scroll-behavior:auto;scroll-padding-top:0}body{background:white;font:10pt/1.55 Arial,Helvetica,sans-serif;color:#162b35}.layout{display:block;max-width:none;margin:0;padding:0}.main{max-width:none;padding:0;background:white}.rail,.screen-only,.copy,.toast,.skip,.mobile-contents{display:none!important}.hero{padding:0 0 17px}.hero h1{font-size:34pt;margin:13px 0 19px;max-width:none}.hero h1 span{font-size:22pt}.lead{font-size:12pt;line-height:1.55}.meta{margin:17px 0}.meta span{font-size:8pt;padding:3px 7px}.eyebrow{font-size:8pt;margin-bottom:10px}.lesson-section{padding:18px 0 9px;scroll-margin-top:0}.lesson-section>h2{display:block;font-size:20pt;margin:4px 0 12px;break-before:auto;break-inside:avoid;break-after:avoid}.lesson-section>h2 .num{display:inline-block;margin-right:10px}.num{font-size:10pt;min-width:20px}.lesson-section h3{font-size:12pt;margin:17px 0 7px;break-after:avoid}.lesson-section p{margin:8px 0 11px;orphans:3;widows:3}.chapter-label{font-size:8pt;margin:6px 0 15px;padding-top:7px;break-after:avoid}.chapter-start{break-before:auto;padding-top:18px}#section-1,#appendix-a,#appendix-b,#sources{break-before:page;padding-top:0}.chapter-start .chapter-label{margin-top:0}.callout{padding:10px 12px;margin:14px 0;font-size:9pt;border-left-width:3px;break-inside:avoid}.small,.source-note{font-size:8.5pt}.codeblock{margin:13px 0;break-inside:avoid;overflow:visible;border-radius:0}.codeblock figcaption{font-size:7.5pt;padding:5px 9px;display:block;break-after:avoid}.codeblock pre{font-size:8pt;line-height:1.5;padding:10px 11px;white-space:pre-wrap;overflow-wrap:anywhere;orphans:3;widows:3}.long-code{break-inside:auto}.long-code pre{break-inside:auto;box-decoration-break:clone;line-height:1.38}.table-wrap{margin:13px 0;overflow:visible}table{font-size:8.5pt;line-height:1.5;table-layout:fixed}th{font-size:8pt}th,td{padding:7px}thead{display:table-header-group}tr{break-inside:avoid}a{color:inherit;text-decoration:underline}p code,td code{background:transparent;padding:0}.cite{font-size:7pt}.architecture{padding:15px;margin:16px 0;break-inside:avoid}.architecture figcaption{font-size:8.5pt;margin-bottom:13px}.map-row{font-size:9pt}.map-row span{padding:8px 5px}.map-core strong{font-size:16pt}.map-core div{font-size:10pt}.map-arrow{padding:7px}.map-arrow small{font-size:8pt}.checklist label{font-size:9.5pt;padding:8px 11px;break-inside:avoid}.checklist input{min-width:11px;min-height:11px;margin-top:4px}.references{font-size:9pt}.references p{font-size:8.5pt}.references li{margin:12px 0}.print-url{display:block;font:7.5pt/1.45 Arial,sans-serif;color:#40545e;overflow-wrap:anywhere}.doc-footer{font-size:8pt;padding-top:20px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<a href="#main" class="skip">Skip to the guide</a>
+<div class="layout"><aside class="rail"><div class="rail-brand">DP / Design patterns<br>Lesson 15</div><nav aria-label="Lesson contents"><h3>A · Derive the boundary</h3><a href="#section-1"><span class="section-no">01</span>Start with a realistic bad design</a><a href="#section-2"><span class="section-no">02</span>What happens when inputs change?</a><a href="#section-3"><span class="section-no">03</span>What happens when outputs change?</a><a href="#section-4"><span class="section-no">04</span>The architecture we are aiming for</a><h3>B · Build the core</h3><a href="#section-5"><span class="section-no">05</span>First, model the use case</a><a href="#section-6"><span class="section-no">06</span>Implement the application service</a><a href="#section-7"><span class="section-no">07</span>Those dependencies are output ports</a><a href="#section-8"><span class="section-no">08</span>Keep domain rules independent</a><h3>C · Add adapters</h3><a href="#section-9"><span class="section-no">09</span>Build the first driving adapter: REST</a><a href="#section-10"><span class="section-no">10</span>Why the controller is an adapter</a><a href="#section-11"><span class="section-no">11</span>Add a CLI adapter</a><a href="#section-12"><span class="section-no">12</span>Add a message consumer</a><a href="#section-13"><span class="section-no">13</span>Implement the persistence adapter</a><a href="#section-14"><span class="section-no">14</span>Implement the payment-provider boundary</a><a href="#section-15"><span class="section-no">15</span>Implement the Kafka output adapter</a><a href="#section-16"><span class="section-no">16</span>See the complete architecture</a><h3>D · Wire and verify</h3><a href="#section-17"><span class="section-no">17</span>Give responsibilities a place in the codebase</a><a href="#section-18"><span class="section-no">18</span>Separate compile-time dependencies from calls</a><a href="#section-19"><span class="section-no">19</span>Runtime flow can go outward</a><a href="#section-20"><span class="section-no">20</span>Assemble the object graph at the composition root</a><a href="#section-21"><span class="section-no">21</span>Use lightweight adapters in tests</a><a href="#section-22"><span class="section-no">22</span>Test the use case without the framework</a><a href="#section-23"><span class="section-no">23</span>Test each adapter at its own boundary</a><h3>E · Sharpen the boundaries</h3><a href="#section-24"><span class="section-no">24</span>Driving and driven are roles</a><a href="#section-25"><span class="section-no">25</span>Time is an external dependency too</a><a href="#section-26"><span class="section-no">26</span>Do not create a port for everything</a><a href="#section-27"><span class="section-no">27</span>Make ports speak application language</a><a href="#section-28"><span class="section-no">28</span>Keep vendor models outside the port</a><a href="#section-29"><span class="section-no">29</span>Folders do not enforce architecture</a><a href="#section-30"><span class="section-no">30</span>Choose framework separation deliberately</a><a href="#section-31"><span class="section-no">31</span>Relate this to layered architecture</a><a href="#section-32"><span class="section-no">32</span>Relate Hexagonal, Clean, and Onion</a><h3>F · Apply the reasoning</h3><a href="#section-33"><span class="section-no">33</span>Connect the patterns already learned</a><a href="#section-34"><span class="section-no">34</span>Use the first-principles design process</a><h3>Practice & reference</h3><a href="#exercise">RegisterCustomer exercise</a><a href="#next">Next: the Outbox problem</a><a href="#appendix-a">A · Runnable Java + tests</a><a href="#appendix-b">B · JDBC adapter + schema</a><a href="#sources">Sources & validation</a></nav><div class="rail-footer">Java 25-compatible code<br>Light theme · Offline document<br><a href="#top">Back to top</a></div></aside>
+<main class="main" id="main"><header class="hero" id="top"><p class="eyebrow">Lesson 15 · Architecture from first principles</p><h1>Ports &amp; Adapters<span>Hexagonal Architecture</span></h1><p class="lead">Derive an application boundary from one practical problem: paying an order should not tie your business rules to HTTP, SQL, a payment provider, or a message broker.</p><div class="meta"><span>34 sections + exercise</span><span>Java 25-compatible</span><span>Complete offline demo</span><span>Print-ready A4</span></div><p>Start with coupled checkout code. Identify what must stay stable, give those interactions contracts, translate technology at the edges, then wire and test the result.</p><div class="actions screen-only" id="hero-actions"><a class="button secondary" download="Lesson15.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEudGltZS5DbG9jazsKaW1wb3J0IGphdmEudGltZS5JbnN0YW50OwppbXBvcnQgamF2YS50aW1lLlpvbmVPZmZzZXQ7CmltcG9ydCBqYXZhLnV0aWwuQXJyYXlMaXN0OwppbXBvcnQgamF2YS51dGlsLkN1cnJlbmN5OwppbXBvcnQgamF2YS51dGlsLkhhc2hNYXA7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKaW1wb3J0IGphdmEudXRpbC5NYXA7CmltcG9ydCBqYXZhLnV0aWwuT2JqZWN0czsKaW1wb3J0IGphdmEudXRpbC5PcHRpb25hbDsKCi8vIExlc3NvbiAxNTogc2luZ2xlLWZpbGUgdGVhY2hpbmcgdmVyc2lvbi4gTm8gcHJldmlldyBmZWF0dXJlcyBvciBsaWJyYXJpZXMuCi8vIERvbWFpbiwgYXBwbGljYXRpb24sIGFuZCBhZGFwdGVycyBzaGFyZSBhIGZpbGUgb25seSB0byBzaW1wbGlmeSBydW5uaW5nIGl0LgpwdWJsaWMgZmluYWwgY2xhc3MgTGVzc29uMTUgewogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIGlmIChhcmdzLmxlbmd0aCA9PSAxICYmIGFyZ3NbMF0uZXF1YWxzKCJ0ZXN0IikpIHsKICAgICAgICAgICAgTGVzc29uMTVUZXN0cy5ydW4oKTsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KICAgICAgICB2YXIgb3JkZXJzID0gbmV3IEluTWVtb3J5T3JkZXJSZXBvc2l0b3J5KCk7CiAgICAgICAgb3JkZXJzLnNhdmUoT3JkZXIuY3JlYXRlZCgiTy0xIiwgIkMtMSIsCiAgICAgICAgICAgICAgICBuZXcgTW9uZXkoNTAwMCwgQ3VycmVuY3kuZ2V0SW5zdGFuY2UoIlVTRCIpKSkpOwogICAgICAgIHZhciBwYXltZW50cyA9IG5ldyBGYWtlUGF5bWVudEdhdGV3YXkoKTsKICAgICAgICB2YXIgZXZlbnRzID0gbmV3IFJlY29yZGluZ0V2ZW50UHVibGlzaGVyKCk7CiAgICAgICAgUGF5T3JkZXJVc2VDYXNlIHBheU9yZGVyID0gbmV3IFBheU9yZGVyU2VydmljZSgKICAgICAgICAgICAgICAgIG9yZGVycywgcGF5bWVudHMsIGV2ZW50cywgQ2xvY2suc3lzdGVtVVRDKCkpOwogICAgICAgIG5ldyBQYXlPcmRlckNsaShwYXlPcmRlcikuZXhlY3V0ZSgiTy0xIik7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJTdGF0dXM6ICIKICAgICAgICAgICAgICAgICsgb3JkZXJzLmZpbmRCeUlkKCJPLTEiKS5vckVsc2VUaHJvdygpLnN0YXR1cygpKTsKICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIkV2ZW50czogIiArIGV2ZW50cy5ldmVudHMoKS5zaXplKCkpOwogICAgfQp9CgovLyBET01BSU46IGRhdGEgYW5kIGludmFyaWFudHMsIHdpdGggbm8gcGVyc2lzdGVuY2Ugb3IgcHJvdG9jb2wgY29kZS4KcmVjb3JkIE1vbmV5KGxvbmcgbWlub3JVbml0cywgQ3VycmVuY3kgY3VycmVuY3kpIHsKICAgIE1vbmV5IHsKICAgICAgICBpZiAobWlub3JVbml0cyA8PSAwKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIkFtb3VudCBtdXN0IGJlIHBvc2l0aXZlIik7CiAgICAgICAgfQogICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwoY3VycmVuY3ksICJjdXJyZW5jeSIpOwogICAgfQp9CgplbnVtIE9yZGVyU3RhdHVzIHsgQ1JFQVRFRCwgUEFJRCB9CgpyZWNvcmQgT3JkZXIoU3RyaW5nIGlkLCBTdHJpbmcgY3VzdG9tZXJJZCwgTW9uZXkgdG90YWwsCiAgICAgICAgICAgICBPcmRlclN0YXR1cyBzdGF0dXMsIFN0cmluZyBwYXltZW50SWQpIHsKICAgIE9yZGVyIHsKICAgICAgICByZXF1aXJlVGV4dChpZCwgImlkIik7CiAgICAgICAgcmVxdWlyZVRleHQoY3VzdG9tZXJJZCwgImN1c3RvbWVySWQiKTsKICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHRvdGFsLCAidG90YWwiKTsKICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHN0YXR1cywgInN0YXR1cyIpOwogICAgICAgIGlmIChzdGF0dXMgPT0gT3JkZXJTdGF0dXMuQ1JFQVRFRCAmJiBwYXltZW50SWQgIT0gbnVsbCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJDcmVhdGVkIG9yZGVyIGhhcyBubyBwYXltZW50Iik7CiAgICAgICAgfQogICAgICAgIGlmIChzdGF0dXMgPT0gT3JkZXJTdGF0dXMuUEFJRCkgewogICAgICAgICAgICByZXF1aXJlVGV4dChwYXltZW50SWQsICJwYXltZW50SWQiKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIE9yZGVyIGNyZWF0ZWQoU3RyaW5nIGlkLCBTdHJpbmcgY3VzdG9tZXJJZCwgTW9uZXkgdG90YWwpIHsKICAgICAgICByZXR1cm4gbmV3IE9yZGVyKGlkLCBjdXN0b21lcklkLCB0b3RhbCwgT3JkZXJTdGF0dXMuQ1JFQVRFRCwgbnVsbCk7CiAgICB9CgogICAgdm9pZCByZXF1aXJlUGF5YWJsZSgpIHsKICAgICAgICBpZiAoc3RhdHVzICE9IE9yZGVyU3RhdHVzLkNSRUFURUQpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiT25seSBjcmVhdGVkIG9yZGVycyBjYW4gYmUgcGFpZCIpOwogICAgICAgIH0KICAgIH0KCiAgICBPcmRlciBtYXJrUGFpZChTdHJpbmcgcGF5bWVudElkKSB7CiAgICAgICAgcmVxdWlyZVBheWFibGUoKTsKICAgICAgICByZXR1cm4gbmV3IE9yZGVyKGlkLCBjdXN0b21lcklkLCB0b3RhbCwgT3JkZXJTdGF0dXMuUEFJRCwgcGF5bWVudElkKTsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyB2b2lkIHJlcXVpcmVUZXh0KFN0cmluZyB2YWx1ZSwgU3RyaW5nIG5hbWUpIHsKICAgICAgICBpZiAodmFsdWUgPT0gbnVsbCB8fCB2YWx1ZS5pc0JsYW5rKCkpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbihuYW1lICsgIiBtdXN0IG5vdCBiZSBibGFuayIpOwogICAgICAgIH0KICAgIH0KfQoKcmVjb3JkIE9yZGVyUGFpZChTdHJpbmcgb3JkZXJJZCwgU3RyaW5nIHBheW1lbnRJZCwgSW5zdGFudCBvY2N1cnJlZEF0KSB7fQoKLy8gQVBQTElDQVRJT046IHRoZSBpbnB1dCBjb250cmFjdCBhbmQgdGhlIG91dHB1dCBjb250cmFjdHMgaXQgbmVlZHMuCnJlY29yZCBQYXlPcmRlckNvbW1hbmQoU3RyaW5nIG9yZGVySWQpIHsKICAgIFBheU9yZGVyQ29tbWFuZCB7CiAgICAgICAgaWYgKG9yZGVySWQgPT0gbnVsbCB8fCBvcmRlcklkLmlzQmxhbmsoKSkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJvcmRlcklkIG11c3Qgbm90IGJlIGJsYW5rIik7CiAgICAgICAgfQogICAgfQp9CgpyZWNvcmQgUGF5bWVudFJlc3VsdChTdHJpbmcgcGF5bWVudElkKSB7fQpyZWNvcmQgUGF5bWVudFJlcXVlc3QoU3RyaW5nIGlkZW1wb3RlbmN5S2V5LCBTdHJpbmcgY3VzdG9tZXJJZCwgTW9uZXkgYW1vdW50KSB7fQpyZWNvcmQgUGF5bWVudFJlY2VpcHQoU3RyaW5nIHBheW1lbnRJZCkgewogICAgUGF5bWVudFJlY2VpcHQgewogICAgICAgIGlmIChwYXltZW50SWQgPT0gbnVsbCB8fCBwYXltZW50SWQuaXNCbGFuaygpKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oInBheW1lbnRJZCBtdXN0IG5vdCBiZSBibGFuayIpOwogICAgICAgIH0KICAgIH0KfQoKaW50ZXJmYWNlIFBheU9yZGVyVXNlQ2FzZSB7CiAgICBQYXltZW50UmVzdWx0IGhhbmRsZShQYXlPcmRlckNvbW1hbmQgY29tbWFuZCk7Cn0KCmludGVyZmFjZSBPcmRlclJlcG9zaXRvcnkgewogICAgT3B0aW9uYWw8T3JkZXI+IGZpbmRCeUlkKFN0cmluZyBvcmRlcklkKTsKICAgIHZvaWQgc2F2ZShPcmRlciBvcmRlcik7Cn0KCmludGVyZmFjZSBQYXltZW50R2F0ZXdheSB7CiAgICAvLyBTYW1lIGtleSArIHNhbWUgcmVxdWVzdCBtdXN0IHJldXNlIGEgc3VjY2Vzc2Z1bCBsb2dpY2FsIGNoYXJnZS4KICAgIC8vIERlY2xpbmUgb3IgdW5jZXJ0YWluIG91dGNvbWU6IHRocm93OyBuZXZlciByZXR1cm4gYSBzdWNjZXNzIHJlY2VpcHQuCiAgICBQYXltZW50UmVjZWlwdCBjaGFyZ2UoUGF5bWVudFJlcXVlc3QgcmVxdWVzdCk7Cn0KCmludGVyZmFjZSBFdmVudFB1Ymxpc2hlciB7CiAgICAvLyBOYXJyb3cgZXZlbnQgY29udHJhY3QgZm9yIHRoaXMgbGVzc29uOyBub3QgdGllZCB0byBhIGJyb2tlciBtb2RlbC4KICAgIHZvaWQgcHVibGlzaChPcmRlclBhaWQgZXZlbnQpOwp9CgpmaW5hbCBjbGFzcyBQYXlPcmRlclNlcnZpY2UgaW1wbGVtZW50cyBQYXlPcmRlclVzZUNhc2UgewogICAgcHJpdmF0ZSBmaW5hbCBPcmRlclJlcG9zaXRvcnkgb3JkZXJzOwogICAgcHJpdmF0ZSBmaW5hbCBQYXltZW50R2F0ZXdheSBwYXltZW50czsKICAgIHByaXZhdGUgZmluYWwgRXZlbnRQdWJsaXNoZXIgZXZlbnRzOwogICAgcHJpdmF0ZSBmaW5hbCBDbG9jayBjbG9jazsKCiAgICBQYXlPcmRlclNlcnZpY2UoT3JkZXJSZXBvc2l0b3J5IG9yZGVycywgUGF5bWVudEdhdGV3YXkgcGF5bWVudHMsCiAgICAgICAgICAgICAgICAgICAgRXZlbnRQdWJsaXNoZXIgZXZlbnRzLCBDbG9jayBjbG9jaykgewogICAgICAgIHRoaXMub3JkZXJzID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChvcmRlcnMpOwogICAgICAgIHRoaXMucGF5bWVudHMgPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHBheW1lbnRzKTsKICAgICAgICB0aGlzLmV2ZW50cyA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwoZXZlbnRzKTsKICAgICAgICB0aGlzLmNsb2NrID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChjbG9jayk7CiAgICB9CgogICAgQE92ZXJyaWRlCiAgICBwdWJsaWMgUGF5bWVudFJlc3VsdCBoYW5kbGUoUGF5T3JkZXJDb21tYW5kIGNvbW1hbmQpIHsKICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKGNvbW1hbmQpOwogICAgICAgIE9yZGVyIG9yZGVyID0gb3JkZXJzLmZpbmRCeUlkKGNvbW1hbmQub3JkZXJJZCgpKQogICAgICAgICAgICAgICAgLm9yRWxzZVRocm93KCgpIC0+IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIk9yZGVyIG5vdCBmb3VuZCIpKTsKICAgICAgICBvcmRlci5yZXF1aXJlUGF5YWJsZSgpOyAvLyBDaGVjayBCRUZPUkUgYW55IGV4dGVybmFsIGNoYXJnZS4KICAgICAgICBQYXltZW50UmVjZWlwdCByZWNlaXB0ID0gcGF5bWVudHMuY2hhcmdlKG5ldyBQYXltZW50UmVxdWVzdCgKICAgICAgICAgICAgICAgICJwYXktb3JkZXI6IiArIG9yZGVyLmlkKCksIG9yZGVyLmN1c3RvbWVySWQoKSwgb3JkZXIudG90YWwoKSkpOwogICAgICAgIE9yZGVyIHBhaWQgPSBvcmRlci5tYXJrUGFpZChyZWNlaXB0LnBheW1lbnRJZCgpKTsKICAgICAgICBvcmRlcnMuc2F2ZShwYWlkKTsKICAgICAgICBldmVudHMucHVibGlzaChuZXcgT3JkZXJQYWlkKHBhaWQuaWQoKSwgcmVjZWlwdC5wYXltZW50SWQoKSwKICAgICAgICAgICAgICAgIEluc3RhbnQubm93KGNsb2NrKSkpOwogICAgICAgIHJldHVybiBuZXcgUGF5bWVudFJlc3VsdChyZWNlaXB0LnBheW1lbnRJZCgpKTsKICAgIH0KfQoKLy8gRFJJVklORyBBREFQVEVSUzogaW5pdGlhdGUgYSB1c2UgY2FzZS4KZmluYWwgY2xhc3MgUGF5T3JkZXJDbGkgewogICAgcHJpdmF0ZSBmaW5hbCBQYXlPcmRlclVzZUNhc2UgcGF5T3JkZXI7CgogICAgUGF5T3JkZXJDbGkoUGF5T3JkZXJVc2VDYXNlIHBheU9yZGVyKSB7CiAgICAgICAgdGhpcy5wYXlPcmRlciA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwocGF5T3JkZXIpOwogICAgfQoKICAgIHZvaWQgZXhlY3V0ZShTdHJpbmcgb3JkZXJJZCkgewogICAgICAgIHZhciByZXN1bHQgPSBwYXlPcmRlci5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZChvcmRlcklkKSk7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJQYXltZW50OiAiICsgcmVzdWx0LnBheW1lbnRJZCgpKTsKICAgIH0KfQoKcmVjb3JkIFBheU9yZGVyTWVzc2FnZShTdHJpbmcgb3JkZXJJZCkge30KCmZpbmFsIGNsYXNzIFBheU9yZGVyQ29uc3VtZXIgewogICAgcHJpdmF0ZSBmaW5hbCBQYXlPcmRlclVzZUNhc2UgcGF5T3JkZXI7CgogICAgUGF5T3JkZXJDb25zdW1lcihQYXlPcmRlclVzZUNhc2UgcGF5T3JkZXIpIHsKICAgICAgICB0aGlzLnBheU9yZGVyID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChwYXlPcmRlcik7CiAgICB9CgogICAgdm9pZCBvbk1lc3NhZ2UoUGF5T3JkZXJNZXNzYWdlIG1lc3NhZ2UpIHsKICAgICAgICBwYXlPcmRlci5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZChtZXNzYWdlLm9yZGVySWQoKSkpOwogICAgfQp9CgovLyBEUklWRU4gVEVTVCBBREFQVEVSUzogc2luZ2xlLXRocmVhZGVkLCBpbi1tZW1vcnkgdGVhY2hpbmcgc3Vic3RpdHV0ZXMuCmZpbmFsIGNsYXNzIEluTWVtb3J5T3JkZXJSZXBvc2l0b3J5IGltcGxlbWVudHMgT3JkZXJSZXBvc2l0b3J5IHsKICAgIHByaXZhdGUgZmluYWwgTWFwPFN0cmluZywgT3JkZXI+IGRhdGEgPSBuZXcgSGFzaE1hcDw+KCk7CiAgICBwcml2YXRlIGludCB3cml0ZXM7CgogICAgcHVibGljIE9wdGlvbmFsPE9yZGVyPiBmaW5kQnlJZChTdHJpbmcgb3JkZXJJZCkgewogICAgICAgIHJldHVybiBPcHRpb25hbC5vZk51bGxhYmxlKGRhdGEuZ2V0KG9yZGVySWQpKTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzYXZlKE9yZGVyIG9yZGVyKSB7CiAgICAgICAgZGF0YS5wdXQob3JkZXIuaWQoKSwgb3JkZXIpOyAvLyBJbW11dGFibGUgT3JkZXI6IG5vIGFsaWFzaW5nIG11dGF0aW9uLgogICAgICAgIHdyaXRlcysrOwogICAgfQoKICAgIGludCB3cml0ZXMoKSB7IHJldHVybiB3cml0ZXM7IH0KfQoKZmluYWwgY2xhc3MgRmFrZVBheW1lbnRHYXRld2F5IGltcGxlbWVudHMgUGF5bWVudEdhdGV3YXkgewogICAgcHJpdmF0ZSBmaW5hbCBNYXA8U3RyaW5nLCBQYXltZW50UmVxdWVzdD4gcmVxdWVzdHMgPSBuZXcgSGFzaE1hcDw+KCk7CiAgICBwcml2YXRlIGZpbmFsIE1hcDxTdHJpbmcsIFBheW1lbnRSZWNlaXB0PiByZWNlaXB0cyA9IG5ldyBIYXNoTWFwPD4oKTsKICAgIHByaXZhdGUgaW50IGNoYXJnZXM7CgogICAgcHVibGljIFBheW1lbnRSZWNlaXB0IGNoYXJnZShQYXltZW50UmVxdWVzdCByZXF1ZXN0KSB7CiAgICAgICAgU3RyaW5nIGtleSA9IHJlcXVlc3QuaWRlbXBvdGVuY3lLZXkoKTsKICAgICAgICBpZiAocmVjZWlwdHMuY29udGFpbnNLZXkoa2V5KSkgewogICAgICAgICAgICBpZiAoIXJlcXVlc3RzLmdldChrZXkpLmVxdWFscyhyZXF1ZXN0KSkgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiS2V5IHJldXNlZCBmb3IgY2hhbmdlZCByZXF1ZXN0Iik7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIHJlY2VpcHRzLmdldChrZXkpOwogICAgICAgIH0KICAgICAgICB2YXIgcmVjZWlwdCA9IG5ldyBQYXltZW50UmVjZWlwdCgiUEFZLSIgKyArK2NoYXJnZXMpOwogICAgICAgIHJlcXVlc3RzLnB1dChrZXksIHJlcXVlc3QpOwogICAgICAgIHJlY2VpcHRzLnB1dChrZXksIHJlY2VpcHQpOwogICAgICAgIHJldHVybiByZWNlaXB0OwogICAgfQoKICAgIGludCBjaGFyZ2VzKCkgeyByZXR1cm4gY2hhcmdlczsgfQp9CgpmaW5hbCBjbGFzcyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlciBpbXBsZW1lbnRzIEV2ZW50UHVibGlzaGVyIHsKICAgIHByaXZhdGUgZmluYWwgTGlzdDxPcmRlclBhaWQ+IHJlY29yZGVkID0gbmV3IEFycmF5TGlzdDw+KCk7CgogICAgcHVibGljIHZvaWQgcHVibGlzaChPcmRlclBhaWQgZXZlbnQpIHsgcmVjb3JkZWQuYWRkKGV2ZW50KTsgfQogICAgTGlzdDxPcmRlclBhaWQ+IGV2ZW50cygpIHsgcmV0dXJuIExpc3QuY29weU9mKHJlY29yZGVkKTsgfQp9CgovLyBURVNUUzogdXNlIHJlYWwgZG9tYWluIHZhbHVlczsgcmVwbGFjZSBvbmx5IGJvdW5kYXJ5IGRlcGVuZGVuY2llcy4KZmluYWwgY2xhc3MgTGVzc29uMTVUZXN0cyB7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBJbnN0YW50IE5PVyA9IEluc3RhbnQucGFyc2UoIjIwMjYtMDgtMjhUMTI6MDA6MDBaIik7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBDbG9jayBDTE9DSyA9IENsb2NrLmZpeGVkKE5PVywgWm9uZU9mZnNldC5VVEMpOwoKICAgIHN0YXRpYyB2b2lkIHJ1bigpIHsKICAgICAgICBwYXlzT3JkZXIoKTsKICAgICAgICByZWZ1c2VzU2Vjb25kQ2hhcmdlKCk7CiAgICAgICAgbWlzc2luZ09yZGVySGFzTm9FZmZlY3RzKCk7CiAgICAgICAgcGF5bWVudEZhaWx1cmVEb2VzTm90U2F2ZU9yUHVibGlzaCgpOwogICAgICAgIGltbXV0YWJsZU9yZGVyUmVxdWlyZXNTYXZlKCk7CiAgICAgICAgZ2F0ZXdheVJldXNlc1JlY2VpcHQoKTsKICAgICAgICBwdWJsaXNoRmFpbHVyZUxlYXZlc1BhaWRPcmRlcigpOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiNyBjaGVja3MgcGFzc2VkIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgSW5NZW1vcnlPcmRlclJlcG9zaXRvcnkgc2VlZGVkKCkgewogICAgICAgIHZhciBvcmRlcnMgPSBuZXcgSW5NZW1vcnlPcmRlclJlcG9zaXRvcnkoKTsKICAgICAgICBvcmRlcnMuc2F2ZShPcmRlci5jcmVhdGVkKCJPLTEiLCAiQy0xIiwKICAgICAgICAgICAgICAgIG5ldyBNb25leSg1MDAwLCBDdXJyZW5jeS5nZXRJbnN0YW5jZSgiVVNEIikpKSk7CiAgICAgICAgcmV0dXJuIG9yZGVyczsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyB2b2lkIHBheXNPcmRlcigpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgdmFyIHBheW1lbnRzID0gbmV3IEZha2VQYXltZW50R2F0ZXdheSgpOwogICAgICAgIHZhciBldmVudHMgPSBuZXcgUmVjb3JkaW5nRXZlbnRQdWJsaXNoZXIoKTsKICAgICAgICB2YXIgYXBwID0gbmV3IFBheU9yZGVyU2VydmljZShvcmRlcnMsIHBheW1lbnRzLCBldmVudHMsIENMT0NLKTsKICAgICAgICB2YXIgcmVzdWx0ID0gYXBwLmhhbmRsZShuZXcgUGF5T3JkZXJDb21tYW5kKCJPLTEiKSk7CiAgICAgICAgY2hlY2socmVzdWx0LnBheW1lbnRJZCgpLmVxdWFscygiUEFZLTEiKSwgInJlY2VpcHQiKTsKICAgICAgICBjaGVjayhvcmRlcnMuZmluZEJ5SWQoIk8tMSIpLm9yRWxzZVRocm93KCkuc3RhdHVzKCkKICAgICAgICAgICAgICAgID09IE9yZGVyU3RhdHVzLlBBSUQsICJzYXZlZCBzdGF0ZSIpOwogICAgICAgIGNoZWNrKG9yZGVycy53cml0ZXMoKSA9PSAyLCAic2VlZCBwbHVzIGV4cGxpY2l0IHNhdmUiKTsKICAgICAgICBjaGVjayhwYXltZW50cy5jaGFyZ2VzKCkgPT0gMSwgIm9uZSBjaGFyZ2UiKTsKICAgICAgICBjaGVjayhldmVudHMuZXZlbnRzKCkuZXF1YWxzKExpc3Qub2YoCiAgICAgICAgICAgICAgICBuZXcgT3JkZXJQYWlkKCJPLTEiLCAiUEFZLTEiLCBOT1cpKSksICJldmVudCBwYXlsb2FkIGFuZCB0aW1lIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCByZWZ1c2VzU2Vjb25kQ2hhcmdlKCkgewogICAgICAgIHZhciBvcmRlcnMgPSBzZWVkZWQoKTsKICAgICAgICB2YXIgcGF5bWVudHMgPSBuZXcgRmFrZVBheW1lbnRHYXRld2F5KCk7CiAgICAgICAgdmFyIGV2ZW50cyA9IG5ldyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlcigpOwogICAgICAgIHZhciBhcHAgPSBuZXcgUGF5T3JkZXJTZXJ2aWNlKG9yZGVycywgcGF5bWVudHMsIGV2ZW50cywgQ0xPQ0spOwogICAgICAgIGFwcC5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZCgiTy0xIikpOwogICAgICAgIGV4cGVjdChJbGxlZ2FsU3RhdGVFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBhcHAuaGFuZGxlKG5ldyBQYXlPcmRlckNvbW1hbmQoIk8tMSIpKSk7CiAgICAgICAgY2hlY2socGF5bWVudHMuY2hhcmdlcygpID09IDEgJiYgZXZlbnRzLmV2ZW50cygpLnNpemUoKSA9PSAxLAogICAgICAgICAgICAgICAgInBhaWQgb3JkZXIgcmVqZWN0ZWQgYmVmb3JlIGNoYXJnZSBvciBldmVudCIpOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHZvaWQgbWlzc2luZ09yZGVySGFzTm9FZmZlY3RzKCkgewogICAgICAgIHZhciBvcmRlcnMgPSBuZXcgSW5NZW1vcnlPcmRlclJlcG9zaXRvcnkoKTsKICAgICAgICB2YXIgcGF5bWVudHMgPSBuZXcgRmFrZVBheW1lbnRHYXRld2F5KCk7CiAgICAgICAgdmFyIGV2ZW50cyA9IG5ldyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlcigpOwogICAgICAgIHZhciBhcHAgPSBuZXcgUGF5T3JkZXJTZXJ2aWNlKG9yZGVycywgcGF5bWVudHMsIGV2ZW50cywgQ0xPQ0spOwogICAgICAgIGV4cGVjdChJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBhcHAuaGFuZGxlKG5ldyBQYXlPcmRlckNvbW1hbmQoIm1pc3NpbmciKSkpOwogICAgICAgIGNoZWNrKHBheW1lbnRzLmNoYXJnZXMoKSA9PSAwICYmIG9yZGVycy53cml0ZXMoKSA9PSAwCiAgICAgICAgICAgICAgICAmJiBldmVudHMuZXZlbnRzKCkuaXNFbXB0eSgpLCAibWlzc2luZyBvcmRlciBoYXMgbm8gZWZmZWN0cyIpOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHZvaWQgcGF5bWVudEZhaWx1cmVEb2VzTm90U2F2ZU9yUHVibGlzaCgpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgUGF5bWVudEdhdGV3YXkgZmFpbGluZyA9IHJlcXVlc3QgLT4gewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbFN0YXRlRXhjZXB0aW9uKCJQYXltZW50IGZhaWxlZCIpOwogICAgICAgIH07CiAgICAgICAgdmFyIGV2ZW50cyA9IG5ldyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlcigpOwogICAgICAgIHZhciBhcHAgPSBuZXcgUGF5T3JkZXJTZXJ2aWNlKG9yZGVycywgZmFpbGluZywgZXZlbnRzLCBDTE9DSyk7CiAgICAgICAgZXhwZWN0KElsbGVnYWxTdGF0ZUV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IGFwcC5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZCgiTy0xIikpKTsKICAgICAgICBjaGVjayhvcmRlcnMud3JpdGVzKCkgPT0gMSAmJiBldmVudHMuZXZlbnRzKCkuaXNFbXB0eSgpLAogICAgICAgICAgICAgICAgIm5vIHNhdmUgb3IgZXZlbnQgYWZ0ZXIgcGF5bWVudCBmYWlsdXJlIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBpbW11dGFibGVPcmRlclJlcXVpcmVzU2F2ZSgpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgT3JkZXIgbG9hZGVkID0gb3JkZXJzLmZpbmRCeUlkKCJPLTEiKS5vckVsc2VUaHJvdygpOwogICAgICAgIGxvYWRlZC5tYXJrUGFpZCgiUEFZLXVuc2F2ZWQiKTsKICAgICAgICBjaGVjayhvcmRlcnMuZmluZEJ5SWQoIk8tMSIpLm9yRWxzZVRocm93KCkuc3RhdHVzKCkKICAgICAgICAgICAgICAgID09IE9yZGVyU3RhdHVzLkNSRUFURUQsICJ1bnNhdmVkIHZhbHVlIG11c3Qgbm90IGNoYW5nZSByZXBvc2l0b3J5Iik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBnYXRld2F5UmV1c2VzUmVjZWlwdCgpIHsKICAgICAgICB2YXIgZ2F0ZXdheSA9IG5ldyBGYWtlUGF5bWVudEdhdGV3YXkoKTsKICAgICAgICB2YXIgYW1vdW50ID0gbmV3IE1vbmV5KDUwMDAsIEN1cnJlbmN5LmdldEluc3RhbmNlKCJVU0QiKSk7CiAgICAgICAgdmFyIHJlcXVlc3QgPSBuZXcgUGF5bWVudFJlcXVlc3QoImtleS0xIiwgIkMtMSIsIGFtb3VudCk7CiAgICAgICAgY2hlY2soZ2F0ZXdheS5jaGFyZ2UocmVxdWVzdCkuZXF1YWxzKGdhdGV3YXkuY2hhcmdlKHJlcXVlc3QpKSwKICAgICAgICAgICAgICAgICJzYW1lIGxvZ2ljYWwgY2hhcmdlIHJldHVybnMgc2FtZSByZWNlaXB0Iik7CiAgICAgICAgY2hlY2soZ2F0ZXdheS5jaGFyZ2VzKCkgPT0gMSwgIm9uZSBsb2dpY2FsIGNoYXJnZSIpOwogICAgICAgIGV4cGVjdChJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsICgpIC0+IGdhdGV3YXkuY2hhcmdlKAogICAgICAgICAgICAgICAgbmV3IFBheW1lbnRSZXF1ZXN0KCJrZXktMSIsICJDLTIiLCBhbW91bnQpKSk7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBwdWJsaXNoRmFpbHVyZUxlYXZlc1BhaWRPcmRlcigpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgRXZlbnRQdWJsaXNoZXIgZmFpbGluZyA9IGV2ZW50IC0+IHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiQnJva2VyIHVuYXZhaWxhYmxlIik7CiAgICAgICAgfTsKICAgICAgICB2YXIgYXBwID0gbmV3IFBheU9yZGVyU2VydmljZShvcmRlcnMsIG5ldyBGYWtlUGF5bWVudEdhdGV3YXkoKSwKICAgICAgICAgICAgICAgIGZhaWxpbmcsIENMT0NLKTsKICAgICAgICBleHBlY3QoSWxsZWdhbFN0YXRlRXhjZXB0aW9uLmNsYXNzLAogICAgICAgICAgICAgICAgKCkgLT4gYXBwLmhhbmRsZShuZXcgUGF5T3JkZXJDb21tYW5kKCJPLTEiKSkpOwogICAgICAgIGNoZWNrKG9yZGVycy5maW5kQnlJZCgiTy0xIikub3JFbHNlVGhyb3coKS5zdGF0dXMoKQogICAgICAgICAgICAgICAgPT0gT3JkZXJTdGF0dXMuUEFJRCwgImRlbW9uc3RyYXRlcyB0aGUgdW5yZXNvbHZlZCBkdWFsIHdyaXRlIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBjaGVjayhib29sZWFuIGNvbmRpdGlvbiwgU3RyaW5nIG1lc3NhZ2UpIHsKICAgICAgICBpZiAoIWNvbmRpdGlvbikgeyB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IobWVzc2FnZSk7IH0KICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyB2b2lkIGV4cGVjdChDbGFzczw/IGV4dGVuZHMgUnVudGltZUV4Y2VwdGlvbj4gdHlwZSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFJ1bm5hYmxlIGFjdGlvbikgewogICAgICAgIHRyeSB7CiAgICAgICAgICAgIGFjdGlvbi5ydW4oKTsKICAgICAgICB9IGNhdGNoIChSdW50aW1lRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgaWYgKHR5cGUuaXNJbnN0YW5jZShmYWlsdXJlKSkgeyByZXR1cm47IH0KICAgICAgICAgICAgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKCJVbmV4cGVjdGVkIGV4Y2VwdGlvbiIsIGZhaWx1cmUpOwogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIkV4cGVjdGVkICIgKyB0eXBlLmdldFNpbXBsZU5hbWUoKSk7CiAgICB9Cn0K">Download runnable Java</a><a class="button secondary" download="JdbcOrderRepository.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmEudXRpbC5DdXJyZW5jeTsKaW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwppbXBvcnQgamF2YS51dGlsLk9wdGlvbmFsOwppbXBvcnQgamF2YXguc3FsLkRhdGFTb3VyY2U7CgovLyBDb21waWxlIGFsb25nc2lkZSBMZXNzb24xNS5qYXZhLiBSdW50aW1lIHJlcXVpcmVzIGEgY29uZmlndXJlZCBEYXRhU291cmNlCi8vIGFuZCBhIEpEQkMgZHJpdmVyLiBFYWNoIG9wZXJhdGlvbiB1c2VzIGl0cyBvd24gYXV0by1jb21taXQgY29ubmVjdGlvbi4KcHVibGljIGZpbmFsIGNsYXNzIEpkYmNPcmRlclJlcG9zaXRvcnkgaW1wbGVtZW50cyBPcmRlclJlcG9zaXRvcnkgewogICAgcHJpdmF0ZSBmaW5hbCBEYXRhU291cmNlIGRhdGFTb3VyY2U7CgogICAgcHVibGljIEpkYmNPcmRlclJlcG9zaXRvcnkoRGF0YVNvdXJjZSBkYXRhU291cmNlKSB7CiAgICAgICAgdGhpcy5kYXRhU291cmNlID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChkYXRhU291cmNlKTsKICAgIH0KCiAgICBAT3ZlcnJpZGUKICAgIHB1YmxpYyBPcHRpb25hbDxPcmRlcj4gZmluZEJ5SWQoU3RyaW5nIG9yZGVySWQpIHsKICAgICAgICBTdHJpbmcgc3FsID0gIiIiCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQsIGN1c3RvbWVyX2lkLCB0b3RhbF9taW5vciwgY3VycmVuY3ksIHN0YXR1cywgcGF5bWVudF9pZAogICAgICAgICAgICAgICAgRlJPTSBvcmRlcnMgV0hFUkUgaWQgPSA/CiAgICAgICAgICAgICAgICAiIiI7CiAgICAgICAgdHJ5ICh2YXIgY29ubmVjdGlvbiA9IGRhdGFTb3VyY2UuZ2V0Q29ubmVjdGlvbigpKSB7CiAgICAgICAgICAgIHJlcXVpcmVBdXRvQ29tbWl0KGNvbm5lY3Rpb24uZ2V0QXV0b0NvbW1pdCgpKTsKICAgICAgICAgICAgdHJ5ICh2YXIgc3RhdGVtZW50ID0gY29ubmVjdGlvbi5wcmVwYXJlU3RhdGVtZW50KHNxbCkpIHsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoMSwgb3JkZXJJZCk7CiAgICAgICAgICAgICAgICB0cnkgKHZhciByb3dzID0gc3RhdGVtZW50LmV4ZWN1dGVRdWVyeSgpKSB7CiAgICAgICAgICAgICAgICAgICAgaWYgKCFyb3dzLm5leHQoKSkgeyByZXR1cm4gT3B0aW9uYWwuZW1wdHkoKTsgfQogICAgICAgICAgICAgICAgICAgIHJldHVybiBPcHRpb25hbC5vZihuZXcgT3JkZXIoCiAgICAgICAgICAgICAgICAgICAgICAgICAgICByb3dzLmdldFN0cmluZygiaWQiKSwgcm93cy5nZXRTdHJpbmcoImN1c3RvbWVyX2lkIiksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBuZXcgTW9uZXkocm93cy5nZXRMb25nKCJ0b3RhbF9taW5vciIpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDdXJyZW5jeS5nZXRJbnN0YW5jZShyb3dzLmdldFN0cmluZygiY3VycmVuY3kiKSkpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgT3JkZXJTdGF0dXMudmFsdWVPZihyb3dzLmdldFN0cmluZygic3RhdHVzIikpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgcm93cy5nZXRTdHJpbmcoInBheW1lbnRfaWQiKSkpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiQ291bGQgbm90IGxvYWQgb3JkZXIiLCBmYWlsdXJlKTsKICAgICAgICB9CiAgICB9CgogICAgQE92ZXJyaWRlCiAgICBwdWJsaWMgdm9pZCBzYXZlKE9yZGVyIG9yZGVyKSB7CiAgICAgICAgU3RyaW5nIHNxbCA9ICIiIgogICAgICAgICAgICAgICAgSU5TRVJUIElOVE8gb3JkZXJzCiAgICAgICAgICAgICAgICAgICAgKGlkLCBjdXN0b21lcl9pZCwgdG90YWxfbWlub3IsIGN1cnJlbmN5LCBzdGF0dXMsIHBheW1lbnRfaWQpCiAgICAgICAgICAgICAgICBWQUxVRVMgKD8sID8sID8sID8sID8sID8pCiAgICAgICAgICAgICAgICBPTiBDT05GTElDVCAoaWQpIERPIFVQREFURSBTRVQKICAgICAgICAgICAgICAgICAgICBjdXN0b21lcl9pZCA9IEVYQ0xVREVELmN1c3RvbWVyX2lkLAogICAgICAgICAgICAgICAgICAgIHRvdGFsX21pbm9yID0gRVhDTFVERUQudG90YWxfbWlub3IsCiAgICAgICAgICAgICAgICAgICAgY3VycmVuY3kgPSBFWENMVURFRC5jdXJyZW5jeSwKICAgICAgICAgICAgICAgICAgICBzdGF0dXMgPSBFWENMVURFRC5zdGF0dXMsCiAgICAgICAgICAgICAgICAgICAgcGF5bWVudF9pZCA9IEVYQ0xVREVELnBheW1lbnRfaWQKICAgICAgICAgICAgICAgICIiIjsKICAgICAgICB0cnkgKHZhciBjb25uZWN0aW9uID0gZGF0YVNvdXJjZS5nZXRDb25uZWN0aW9uKCkpIHsKICAgICAgICAgICAgcmVxdWlyZUF1dG9Db21taXQoY29ubmVjdGlvbi5nZXRBdXRvQ29tbWl0KCkpOwogICAgICAgICAgICB0cnkgKHZhciBzdGF0ZW1lbnQgPSBjb25uZWN0aW9uLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICAgICAgc3RhdGVtZW50LnNldFN0cmluZygxLCBvcmRlci5pZCgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoMiwgb3JkZXIuY3VzdG9tZXJJZCgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRMb25nKDMsIG9yZGVyLnRvdGFsKCkubWlub3JVbml0cygpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoNCwgb3JkZXIudG90YWwoKS5jdXJyZW5jeSgpLmdldEN1cnJlbmN5Q29kZSgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoNSwgb3JkZXIuc3RhdHVzKCkubmFtZSgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoNiwgb3JkZXIucGF5bWVudElkKCkpOwogICAgICAgICAgICAgICAgaWYgKHN0YXRlbWVudC5leGVjdXRlVXBkYXRlKCkgIT0gMSkgewogICAgICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oIkV4cGVjdGVkIG9uZSBzYXZlZCBvcmRlciIpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiQ291bGQgbm90IHNhdmUgb3JkZXIiLCBmYWlsdXJlKTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCByZXF1aXJlQXV0b0NvbW1pdChib29sZWFuIGF1dG9Db21taXQpIHsKICAgICAgICBpZiAoIWF1dG9Db21taXQpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiRGVtbyByZXF1aXJlcyBhdXRvLWNvbW1pdCBjb25uZWN0aW9ucyIpOwogICAgICAgIH0KICAgIH0KfQo=">Download JDBC adapter</a></div><p class="print-guide">To make a PDF: use your browser’s Print / Save as PDF, choose A4 and 100% scale, and turn off the browser’s default headers and footers. Navigation and copy controls are hidden in print; all lesson content and complete source remain.</p><div class="callout"><strong>The idea to carry through the lesson</strong><div>Let the application express its operation and the capabilities it needs. Let adapters translate between those contracts and external technologies.</div></div><p class="source-note">Cockburn’s original pattern emphasizes running and testing the application independently of its usual UI and database. <a class="cite" href="#source-1" aria-label="Source 1">[1]</a> This guide preserves the supplied lesson’s sequence and makes its runnable and conceptual examples explicit.</p><details class="mobile-contents"><summary>Contents · jump to a section</summary><nav aria-label="Compact lesson contents"><h3>A · Derive the boundary</h3><a href="#section-1"><span class="section-no">01</span>Start with a realistic bad design</a><a href="#section-2"><span class="section-no">02</span>What happens when inputs change?</a><a href="#section-3"><span class="section-no">03</span>What happens when outputs change?</a><a href="#section-4"><span class="section-no">04</span>The architecture we are aiming for</a><h3>B · Build the core</h3><a href="#section-5"><span class="section-no">05</span>First, model the use case</a><a href="#section-6"><span class="section-no">06</span>Implement the application service</a><a href="#section-7"><span class="section-no">07</span>Those dependencies are output ports</a><a href="#section-8"><span class="section-no">08</span>Keep domain rules independent</a><h3>C · Add adapters</h3><a href="#section-9"><span class="section-no">09</span>Build the first driving adapter: REST</a><a href="#section-10"><span class="section-no">10</span>Why the controller is an adapter</a><a href="#section-11"><span class="section-no">11</span>Add a CLI adapter</a><a href="#section-12"><span class="section-no">12</span>Add a message consumer</a><a href="#section-13"><span class="section-no">13</span>Implement the persistence adapter</a><a href="#section-14"><span class="section-no">14</span>Implement the payment-provider boundary</a><a href="#section-15"><span class="section-no">15</span>Implement the Kafka output adapter</a><a href="#section-16"><span class="section-no">16</span>See the complete architecture</a><h3>D · Wire and verify</h3><a href="#section-17"><span class="section-no">17</span>Give responsibilities a place in the codebase</a><a href="#section-18"><span class="section-no">18</span>Separate compile-time dependencies from calls</a><a href="#section-19"><span class="section-no">19</span>Runtime flow can go outward</a><a href="#section-20"><span class="section-no">20</span>Assemble the object graph at the composition root</a><a href="#section-21"><span class="section-no">21</span>Use lightweight adapters in tests</a><a href="#section-22"><span class="section-no">22</span>Test the use case without the framework</a><a href="#section-23"><span class="section-no">23</span>Test each adapter at its own boundary</a><h3>E · Sharpen the boundaries</h3><a href="#section-24"><span class="section-no">24</span>Driving and driven are roles</a><a href="#section-25"><span class="section-no">25</span>Time is an external dependency too</a><a href="#section-26"><span class="section-no">26</span>Do not create a port for everything</a><a href="#section-27"><span class="section-no">27</span>Make ports speak application language</a><a href="#section-28"><span class="section-no">28</span>Keep vendor models outside the port</a><a href="#section-29"><span class="section-no">29</span>Folders do not enforce architecture</a><a href="#section-30"><span class="section-no">30</span>Choose framework separation deliberately</a><a href="#section-31"><span class="section-no">31</span>Relate this to layered architecture</a><a href="#section-32"><span class="section-no">32</span>Relate Hexagonal, Clean, and Onion</a><h3>F · Apply the reasoning</h3><a href="#section-33"><span class="section-no">33</span>Connect the patterns already learned</a><a href="#section-34"><span class="section-no">34</span>Use the first-principles design process</a><h3>Practice & reference</h3><a href="#exercise">RegisterCustomer exercise</a><a href="#next">Next: the Outbox problem</a><a href="#appendix-a">A · Runnable Java + tests</a><a href="#appendix-b">B · JDBC adapter + schema</a><a href="#sources">Sources & validation</a></nav></details></header>
+<section id="section-1" class="lesson-section chapter-start"><p class="chapter-label">A · Derive the boundary</p><h2><span class="num">01</span><span>Start with a realistic bad design</span></h2>
+<p>You need checkout. An HTTP endpoint loads a database row, charges a payment provider, changes the order, and publishes a message. One method now owns both the business operation and the details of every external system.</p>
+<figure class="codeblock"><figcaption>The starting problem · deliberately coupled design</figcaption><pre><code>// Design sketch, not vendor SDK code.
+// All of these responsibilities live in one controller:
+// 1. Parse an HTTP request.
+// 2. Read an order with SQL.
+// 3. Charge a payment provider.
+// 4. Set the database status to PAID.
+// 5. Publish a Kafka message.
+// 6. Construct an HTTP response.</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">What it knows</th><th scope="col">Why that creates pressure</th></tr></thead><tbody><tr><td>HTTP and JSON</td><td>The workflow is tied to one entry mechanism.</td></tr><tr><td>SQL and table columns</td><td>Schema changes can reach the business operation.</td></tr><tr><td>Payment SDK and broker API</td><td>Vendor behavior and transport failures mix with policy.</td></tr><tr><td>Order rules and workflow</td><td>Rules become hard to test without the surrounding infrastructure.</td></tr></tbody></table></div><aside class="callout note"><strong>First question</strong><div>Which parts describe paying an order, and which parts only describe the technology used to do it?</div></aside></section><section id="section-2" class="lesson-section"><h2><span class="num">02</span><span>What happens when inputs change?</span></h2>
+<p>Today a REST request starts checkout. Tomorrow a CLI, scheduled job, message consumer, or test must start the same operation. If the workflow lives in a controller, each caller must duplicate it or go through HTTP.</p>
+<p>Name the operation independently: <strong>PayOrder</strong>. REST is one way to request it. Move the operation into a callable application boundary so each entry mechanism can translate into the same request.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Incoming mechanism</th><th scope="col">Translation it should own</th></tr></thead><tbody><tr><td>REST</td><td>Path, body, authentication context → application command</td></tr><tr><td>CLI</td><td>Arguments → application command</td></tr><tr><td>Message consumer</td><td>Message schema → application command</td></tr><tr><td>Test</td><td>Test inputs → application command</td></tr></tbody></table></div></section><section id="section-3" class="lesson-section"><h2><span class="num">03</span><span>What happens when outputs change?</span></h2>
+<p>The use case needs to load an order, take payment, and announce success. PostgreSQL, a payment provider, and Kafka are possible implementations of those needs.</p>
+<p>Ask what the application needs before asking which SDK method to call. A stable contract limits how far an infrastructure change spreads. It cannot make vendors with different business capabilities interchangeable for free.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Side of the boundary</th><th scope="col">Who starts the interaction?</th><th scope="col">Example</th></tr></thead><tbody><tr><td>Driving / primary</td><td>An external caller starts an application operation.</td><td>HTTP endpoint calls PayOrder.</td></tr><tr><td>Driven / secondary</td><td>The application asks for an external capability.</td><td>PayOrder asks a gateway to charge.</td></tr></tbody></table></div><p class="source-note">This vocabulary follows Cockburn’s original description. <a class="cite" href="#source-1" aria-label="Source 1">[1]</a></p></section><section id="section-4" class="lesson-section"><h2><span class="num">04</span><span>The architecture we are aiming for</span></h2>
+<figure class="architecture"><figcaption>Inside and outside · runtime collaboration</figcaption>
+<div class="map-row"><span>REST</span><span>CLI</span><span>Message consumer</span><span>Test</span></div>
+<div class="map-arrow">↓ <small>driving adapters translate</small></div>
+<div class="map-core"><span class="eyebrow">Application boundary</span><strong>PayOrderUseCase</strong><div>PayOrderService <span aria-hidden="true">↓</span> Order rules</div></div>
+<div class="map-arrow">↓ <small>application calls output contracts</small></div>
+<div class="map-row three"><span>OrderRepository</span><span>PaymentGateway</span><span>EventPublisher</span></div>
+<div class="map-arrow">↓ <small>driven adapters supply implementations</small></div>
+<div class="map-row three outside"><span>JDBC / PostgreSQL</span><span>Payment provider</span><span>Kafka</span></div>
+</figure>
+<p><strong>Source dependency rule:</strong> adapters refer to core contracts; core code does not name concrete adapters. The arrows above describe calls at runtime. Sections 18–19 separate that flow from source-code dependencies.</p>
+<p>The useful distinction is <em>inside versus outside</em>. Six sides have no special architectural meaning.</p></section><section id="section-5" class="lesson-section chapter-start"><p class="chapter-label">B · Build the core</p><h2><span class="num">05</span><span>First, model the use case</span></h2>
+<p>The application exposes a capability: pay an order. A command carries the requested input; the input port describes the callable operation.</p>
+<figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>record PayOrderCommand(String orderId) {
+    PayOrderCommand {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException(&quot;orderId must not be blank&quot;);
+        }
+    }
+}
+
+record PaymentResult(String paymentId) {}
+
+interface PayOrderUseCase {
+    PaymentResult handle(PayOrderCommand command);
+}</code></pre></figure>
+<p>Nothing here mentions HTTP, JSON, Spring, or Kafka. A port is the contract of a meaningful interaction. In Java, an interface is a convenient way to express it; a separate interface for every input method is not a requirement of the pattern.</p>
+<p class="small">The runnable version uses package-private types in one file. In a package-separated application, expose the types that adapters must access as public types in their own files.</p></section><section id="section-6" class="lesson-section"><h2><span class="num">06</span><span>Implement the application service</span></h2>
+<p>The application service coordinates the use case. It loads the order, asks the domain whether payment is allowed, calls a payment capability, saves the new state, and publishes a fact.</p>
+<figure class="codeblock long-code"><figcaption>Java · exact service from the runnable demo</figcaption><pre><code>final class PayOrderService implements PayOrderUseCase {
+    private final OrderRepository orders;
+    private final PaymentGateway payments;
+    private final EventPublisher events;
+    private final Clock clock;
+
+    PayOrderService(OrderRepository orders, PaymentGateway payments,
+                    EventPublisher events, Clock clock) {
+        this.orders = Objects.requireNonNull(orders);
+        this.payments = Objects.requireNonNull(payments);
+        this.events = Objects.requireNonNull(events);
+        this.clock = Objects.requireNonNull(clock);
+    }
+
+    @Override
+    public PaymentResult handle(PayOrderCommand command) {
+        Objects.requireNonNull(command);
+        Order order = orders.findById(command.orderId())
+                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Order not found&quot;));
+        order.requirePayable(); // Check BEFORE any external charge.
+        PaymentReceipt receipt = payments.charge(new PaymentRequest(
+                &quot;pay-order:&quot; + order.id(), order.customerId(), order.total()));
+        Order paid = order.markPaid(receipt.paymentId());
+        orders.save(paid);
+        events.publish(new OrderPaid(paid.id(), receipt.paymentId(),
+                Instant.now(clock)));
+        return new PaymentResult(receipt.paymentId());
+    }
+}</code></pre></figure><aside class="callout important"><strong>Why this order matters</strong><div><code>requirePayable()</code> runs before the external charge. The original lesson checked state only while marking the order paid; that could charge an already-paid order before throwing.</div></aside>
+<p>Here, an order supports one payment and its amount does not change. That lets the demo derive a stable logical payment key from the order ID. Production retry and concurrency rules need a persisted payment-attempt model and reconciliation.</p>
+<p>The four constructor dependencies are explicit. The three custom ports describe capabilities; <code>java.time.Clock</code> supplies the timestamp. We return to time in section 25.</p><aside class="callout important"><strong>Scope of this implementation</strong><div>This is a synchronous teaching workflow. A stored paid order is rejected on a repeat call; the whole use case is <strong>not</strong> idempotent. A gateway key does not make saving state and publishing an event atomic.</div></aside></section><section id="section-7" class="lesson-section"><h2><span class="num">07</span><span>Those dependencies are output ports</span></h2>
+<p>Define the operations in application language. The repository says what is persisted, the gateway says what payment result is required, and the event port says what fact leaves the application.</p>
+<figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>interface OrderRepository {
+    Optional&lt;Order&gt; findById(String orderId);
+    void save(Order order);
+}
+
+interface PaymentGateway {
+    // Same key + same request must reuse a successful logical charge.
+    // Decline or uncertain outcome: throw; never return a success receipt.
+    PaymentReceipt charge(PaymentRequest request);
+}
+
+interface EventPublisher {
+    // Narrow event contract for this lesson; not tied to a broker model.
+    void publish(OrderPaid event);
+}</code></pre></figure><figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>record PaymentRequest(
+        String idempotencyKey, String customerId, Money amount) {}
+
+record PaymentReceipt(String paymentId) {
+    PaymentReceipt {
+        if (paymentId == null || paymentId.isBlank()) {
+            throw new IllegalArgumentException(&quot;paymentId must not be blank&quot;);
+        }
+    }
+}
+
+record OrderPaid(
+        String orderId, String paymentId, Instant occurredAt) {}</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">Contract</th><th scope="col">Meaning in this lesson</th></tr></thead><tbody><tr><td>findById</td><td>Return an order or Optional.empty(); absence is explicit.</td></tr><tr><td>save</td><td>Store the supplied immutable order by ID; insert or replace in the demo.</td></tr><tr><td>charge</td><td>Return a confirmed success receipt; failures must not masquerade as success.</td></tr><tr><td>publish</td><td>Hand off an OrderPaid fact; this alone promises no cross-system transaction.</td></tr></tbody></table></div>
+<p>The contracts belong near the application that needs them. This guide narrows <code>EventPublisher</code> to <code>OrderPaid</code>; a larger system can introduce a shared event abstraction when several event types require it.</p></section><section id="section-8" class="lesson-section"><h2><span class="num">08</span><span>Keep domain rules independent</span></h2>
+<p>An order owns the rule that only a created order can be paid. The application invokes the rule; it does not reproduce it in every controller or consumer.</p>
+<figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>enum OrderStatus { CREATED, PAID }
+
+// Methods inside the complete Order record in Appendix A:
+void requirePayable() {
+    if (status != OrderStatus.CREATED) {
+        throw new IllegalStateException(&quot;Only created orders can be paid&quot;);
+    }
+}
+
+Order markPaid(String paymentId) {
+    requirePayable();
+    return new Order(id, customerId, total, OrderStatus.PAID, paymentId);
+}</code></pre></figure>
+<p>The demo uses an immutable <code>Order</code> record. <code>markPaid</code> returns a new value, so the repository changes only when <code>save</code> is called. A mutable entity is also valid; then test repositories must avoid accidentally persisting changes by sharing mutable references.</p>
+<figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>record Money(long minorUnits, Currency currency) {
+    Money {
+        if (minorUnits &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Amount must be positive&quot;);
+        }
+        Objects.requireNonNull(currency, &quot;currency&quot;);
+    }
+}</code></pre></figure>
+<p>Use minor units with a currency, rather than a bare number named “cents” for every currency. This teaching domain accepts only positive payments. Java records provide data carriers; they do not make arbitrary referenced objects deeply immutable. <a class="cite" href="#source-3" aria-label="Source 3">[3]</a></p>
+<p>All components of this small order model are immutable. Domain code uses Java types and business concepts, with no framework or vendor imports.</p></section><section id="section-9" class="lesson-section chapter-start"><p class="chapter-label">C · Add adapters</p><h2><span class="num">09</span><span>Build the first driving adapter: REST</span></h2>
+<p>The HTTP adapter translates a request into the input port and translates the result back to the protocol.</p>
+<figure class="codeblock"><figcaption>Spring MVC integration excerpt · separate CheckoutController.java</figcaption><pre><code>import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public final class CheckoutController {
+    private final PayOrderUseCase payOrder;
+
+    public CheckoutController(PayOrderUseCase payOrder) {
+        this.payOrder = payOrder;
+    }
+
+    @PostMapping(&quot;/orders/{orderId}/payment&quot;)
+    public PaymentResponse pay(@PathVariable(&quot;orderId&quot;) String orderId) {
+        var result = payOrder.handle(new PayOrderCommand(orderId));
+        return new PaymentResponse(result.paymentId());
+    }
+
+    public record PaymentResponse(String paymentId) {}
+}</code></pre></figure>
+<p><code>@PostMapping</code> maps the HTTP operation; the explicit path-variable name avoids depending on compiler parameter-name metadata. <a class="cite" href="#source-7" aria-label="Source 7">[7]</a> Authentication, authorization, transport validation, and HTTP error mapping also belong at an appropriate inbound boundary.</p>
+<p class="small">This excerpt requires Spring MVC and the application types. The embedded offline demo does not start a web server. Use a Java 25-compatible framework line; the verified Spring Boot system requirements include Java 25. <a class="cite" href="#source-8" aria-label="Source 8">[8]</a></p></section><section id="section-10" class="lesson-section"><h2><span class="num">10</span><span>Why the controller is an adapter</span></h2>
+<p><code>PayOrderUseCase</code> expresses the application’s operation. <code>CheckoutController</code> connects HTTP to that operation.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Concept</th><th scope="col">Question it answers</th><th scope="col">In this service</th></tr></thead><tbody><tr><td>Port</td><td>What interaction does the application support?</td><td>PayOrderUseCase</td></tr><tr><td>Adapter</td><td>How does this technology participate?</td><td>CheckoutController</td></tr><tr><td>Application service</td><td>How is the use case coordinated?</td><td>PayOrderService</td></tr><tr><td>Domain</td><td>Which business states and transitions are valid?</td><td>Order</td></tr></tbody></table></div>
+<p>The controller can change its route, response DTO, or HTTP error format without changing the payment workflow. Keeping these roles distinct makes the boundary visible in code.</p></section><section id="section-11" class="lesson-section"><h2><span class="num">11</span><span>Add a CLI adapter</span></h2>
+<p>A second entry point should reuse the same application operation. Only its translation changes.</p>
+<figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>final class PayOrderCli {
+    private final PayOrderUseCase payOrder;
+
+    PayOrderCli(PayOrderUseCase payOrder) {
+        this.payOrder = Objects.requireNonNull(payOrder);
+    }
+
+    void execute(String orderId) {
+        var result = payOrder.handle(new PayOrderCommand(orderId));
+        System.out.println(&quot;Payment: &quot; + result.paymentId());
+    }
+}</code></pre></figure>
+<p>The CLI owns argument handling and console output. The service does not know whether its caller is a terminal, controller, or test. The main method in section 20 invokes this adapter.</p></section><section id="section-12" class="lesson-section"><h2><span class="num">12</span><span>Add a message consumer</span></h2>
+<p>A message-driven request can reach the same input port. This class shows the translation after a transport listener has deserialized a message.</p>
+<figure class="codeblock"><figcaption>Java · transport-neutral consumer translation</figcaption><pre><code>record PayOrderMessage(String orderId) {}
+
+final class PayOrderConsumer {
+    private final PayOrderUseCase payOrder;
+
+    PayOrderConsumer(PayOrderUseCase payOrder) {
+        this.payOrder = Objects.requireNonNull(payOrder);
+    }
+
+    void onMessage(PayOrderMessage message) {
+        payOrder.handle(new PayOrderCommand(message.orderId()));
+    }
+}</code></pre></figure>
+<p>A real Kafka listener wraps this translation with deserialization, acknowledgments, retry policy, and failed-message handling. Those policies must agree with the use case’s duplicate-request behavior. This demo rejects a repeated payment after the order is paid; a consumer cannot blindly retry every failure forever.</p>
+<p>Kafka is driving in this role. The same technology is driven when the application publishes to it.</p></section><section id="section-13" class="lesson-section"><h2><span class="num">13</span><span>Implement the persistence adapter</span></h2>
+<p>The core owns <code>OrderRepository</code>. A JDBC class implements it and maps database rows into domain values. SQL, connection handling, and mapping stay in that class.</p>
+<figure class="codeblock long-code"><figcaption>Java · findById from complete JDBC adapter</figcaption><pre><code>@Override
+    public Optional&lt;Order&gt; findById(String orderId) {
+        String sql = &quot;&quot;&quot;
+                SELECT id, customer_id, total_minor, currency, status, payment_id
+                FROM orders WHERE id = ?
+                &quot;&quot;&quot;;
+        try (var connection = dataSource.getConnection()) {
+            requireAutoCommit(connection.getAutoCommit());
+            try (var statement = connection.prepareStatement(sql)) {
+                statement.setString(1, orderId);
+                try (var rows = statement.executeQuery()) {
+                    if (!rows.next()) { return Optional.empty(); }
+                    return Optional.of(new Order(
+                            rows.getString(&quot;id&quot;), rows.getString(&quot;customer_id&quot;),
+                            new Money(rows.getLong(&quot;total_minor&quot;),
+                                    Currency.getInstance(rows.getString(&quot;currency&quot;))),
+                            OrderStatus.valueOf(rows.getString(&quot;status&quot;)),
+                            rows.getString(&quot;payment_id&quot;)));
+                }
+            }
+        } catch (SQLException failure) {
+            throw new IllegalStateException(&quot;Could not load order&quot;, failure);
+        }
+    }</code></pre></figure>
+<p>The complete class, imports, save implementation, and schema are in <a href="#appendix-b">Appendix B</a>. It uses <code>DataSource</code>, prepared statements, and try-with-resources. <a class="cite" href="#source-5" aria-label="Source 5">[5]</a> <a class="cite" href="#source-6" aria-label="Source 6">[6]</a></p>
+<p>The repository returns <code>Optional.empty()</code> for a missing order and translates SQL failures into an application-visible runtime failure. A production design should define more precise failure types where callers need distinct recovery decisions.</p>
+<aside class="callout important"><strong>Transaction boundary is still missing</strong><div>This example explicitly requires an auto-commit connection for each operation. A read and a later write are separate transactions; there is no version check or protection against lost updates. Replacing the adapter does not solve concurrency.</div></aside></section><section id="section-14" class="lesson-section"><h2><span class="num">14</span><span>Implement the payment-provider boundary</span></h2>
+<p>The adapter converts the application’s <code>PaymentRequest</code> into the provider’s request and converts the provider’s result into <code>PaymentReceipt</code>. Provider models stay outside the port.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Application concept</th><th scope="col">Stripe integration responsibility</th></tr></thead><tbody><tr><td>Money</td><td>Map minor units and currency into the supported payment amount.</td></tr><tr><td>Application customer ID</td><td>Resolve the provider customer and payment-method references.</td></tr><tr><td>Logical payment key</td><td>Apply the provider request-idempotency mechanism.</td></tr><tr><td>Confirmed successful payment</td><td>Return PaymentReceipt only when the payment has succeeded.</td></tr><tr><td>Decline, pending state, required customer action</td><td>Represent these outcomes explicitly; do not mark the order paid.</td></tr></tbody></table></div>
+<p>Stripe’s PaymentIntent has a lifecycle; initiating a request is not always equivalent to completing payment. A production design that allows pending payments or customer authentication needs richer outcomes and a completion flow, often driven by webhooks. <a class="cite" href="#source-9" aria-label="Source 9">[9]</a></p>
+<p>The original lesson’s <code>stripe.createCharge(...)</code> was a conceptual placeholder, not a complete SDK integration. This guide keeps that boundary explanation without inventing a vendor API. The runnable version uses a fully implemented fake.</p>
+<p>Stripe documents request idempotency, including checks for changed parameters. Provider-specific retention and error behavior must be part of the real adapter’s contract. <a class="cite" href="#source-10" aria-label="Source 10">[10]</a></p></section><section id="section-15" class="lesson-section"><h2><span class="num">15</span><span>Implement the Kafka output adapter</span></h2>
+<p>Publishing is a different role from consuming. Here the application calls an output port, and a Kafka adapter creates the broker record.</p>
+<figure class="codeblock long-code"><figcaption>Kafka integration excerpt · client library and encoder required</figcaption><pre><code>import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
+public final class KafkaEventPublisher implements EventPublisher {
+    private final Producer&lt;String, String&gt; producer;
+    private final Function&lt;OrderPaid, String&gt; encode;
+
+    public KafkaEventPublisher(Producer&lt;String, String&gt; producer,
+                               Function&lt;OrderPaid, String&gt; encode) {
+        this.producer = producer;
+        this.encode = encode;
+    }
+
+    @Override
+    public void publish(OrderPaid event) {
+        var record = new ProducerRecord&lt;&gt;(
+                &quot;order-paid&quot;, event.orderId(), encode.apply(event));
+        try {
+            producer.send(record).get();
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(&quot;Publish interrupted&quot;, failure);
+        } catch (ExecutionException failure) {
+            throw new IllegalStateException(&quot;Publish failed&quot;, failure.getCause());
+        }
+    }
+}</code></pre></figure>
+<p><code>send</code> returns a future; ignoring it can hide asynchronous delivery failure. This teaching adapter waits for completion according to producer configuration. <a class="cite" href="#source-11" aria-label="Source 11">[11]</a> It does not prove a consumer processed the message, and an interrupted wait does not prove the message was never sent.</p>
+<p>The injected encoder owns the message schema and serialization. The composition root owns producer configuration and shutdown. A production publisher also needs bounded waiting and a deliberate failure policy. Waiting for Kafka still cannot atomically commit the database and the broker.</p></section><section id="section-16" class="lesson-section"><h2><span class="num">16</span><span>See the complete architecture</span></h2>
+<p>Read the architecture by responsibility and ownership. Every concrete technology is attached at a boundary.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Role</th><th scope="col">Core contract or policy</th><th scope="col">Outside implementation</th></tr></thead><tbody><tr><td>Incoming payment request</td><td>PayOrderUseCase</td><td>REST controller, CLI, message consumer</td></tr><tr><td>Use-case orchestration</td><td>PayOrderService</td><td>No transport required</td></tr><tr><td>Valid state transitions</td><td>Order</td><td>No storage required</td></tr><tr><td>Order persistence</td><td>OrderRepository</td><td>JDBC or in-memory repository</td></tr><tr><td>Taking payment</td><td>PaymentGateway</td><td>Provider adapter or fake</td></tr><tr><td>Announcing payment</td><td>EventPublisher</td><td>Kafka or recording publisher</td></tr><tr><td>Current time</td><td>java.time.Clock</td><td>System clock or fixed clock</td></tr></tbody></table></div>
+<p>The domain is the set of business concepts and rules. The application coordinates those rules with external capabilities. Both sit inside the boundary; ports describe how that boundary can be crossed.</p></section><section id="section-17" class="lesson-section chapter-start"><p class="chapter-label">D · Wire and verify</p><h2><span class="num">17</span><span>Give responsibilities a place in the codebase</span></h2>
+<p>A practical package layout follows those responsibilities. These paths describe the package-separated version; the downloadable teaching file deliberately keeps the types together.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Package below com.example.orders</th><th scope="col">Representative types</th></tr></thead><tbody><tr><td><code>domain</code></td><td>Order, OrderStatus, Money, OrderPaid</td></tr><tr><td><code>application</code></td><td>PayOrderCommand, PaymentResult, PayOrderUseCase, PayOrderService</td></tr><tr><td><code>application.port.out</code></td><td>OrderRepository, PaymentGateway, EventPublisher, payment request/receipt</td></tr><tr><td><code>adapter.in.web</code></td><td>CheckoutController</td></tr><tr><td><code>adapter.in.cli</code></td><td>PayOrderCli</td></tr><tr><td><code>adapter.in.messaging</code></td><td>PayOrderConsumer and wire-message DTO</td></tr><tr><td><code>adapter.out.persistence</code></td><td>JdbcOrderRepository</td></tr><tr><td><code>adapter.out.payment</code></td><td>Payment provider adapter</td></tr><tr><td><code>adapter.out.messaging</code></td><td>KafkaEventPublisher and encoder</td></tr><tr><td><code>config</code></td><td>ApplicationConfiguration or main composition root</td></tr></tbody></table></div>
+<p>Package names help people navigate. Separate build modules or dependency checks can enforce boundaries more strongly. A folder name by itself cannot prevent an import in the wrong direction.</p></section><section id="section-18" class="lesson-section"><h2><span class="num">18</span><span>Separate compile-time dependencies from calls</span></h2>
+<p>When compiling the core, the compiler should need the domain, application contracts, and permitted standard-library types. It should not need a controller, JDBC repository, or payment SDK.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Source code</th><th scope="col">May name / depend on</th><th scope="col">Must not require in this design</th></tr></thead><tbody><tr><td>Domain</td><td>Domain types and Java standard types</td><td>Spring, SQL, Kafka, payment SDK</td></tr><tr><td>Application</td><td>Domain and output contracts</td><td>Concrete driven adapters</td></tr><tr><td>Driving adapters</td><td>Application input contract and transport types</td><td>Duplicated workflow or business rules</td></tr><tr><td>Driven adapters</td><td>Core output contract and external technology</td><td>Core code depending back on the adapter</td></tr><tr><td>Composition root</td><td>Core contracts and concrete implementations</td><td>Business rules hidden in wiring</td></tr></tbody></table></div><p>Microsoft’s architecture guidance distinguishes core dependencies from concrete implementations assembled at runtime. <a class="cite" href="#source-2" aria-label="Source 2">[2]</a></p></section><section id="section-19" class="lesson-section"><h2><span class="num">19</span><span>Runtime flow can go outward</span></h2>
+<p>At runtime, a service must eventually call an actual repository. That does not require its source code to name the JDBC class.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">View</th><th scope="col">Relationship</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td>Runtime call</td><td><code>PayOrderService → JdbcOrderRepository</code></td><td>The injected object receives the call.</td></tr><tr><td>Service source</td><td><code>PayOrderService → OrderRepository</code></td><td>The service names the interface.</td></tr><tr><td>Adapter source</td><td><code>JdbcOrderRepository → OrderRepository</code></td><td>The adapter implements that interface.</td></tr></tbody></table></div>
+<p><strong>Dependency inversion</strong> makes the implementation depend on the core contract. <strong>Dependency injection</strong> supplies the chosen implementation to an object. Constructor injection alone does not invert a dependency: a constructor that asks for <code>JdbcOrderRepository</code> still depends directly on JDBC infrastructure.</p></section><section id="section-20" class="lesson-section"><h2><span class="num">20</span><span>Assemble the object graph at the composition root</span></h2>
+<p>Some code must choose concrete implementations. Put that choice in the startup wiring, where the full object graph is assembled.</p>
+<figure class="codeblock"><figcaption>Plain Java · inside Lesson15.main</figcaption><pre><code>var orders = new InMemoryOrderRepository();
+orders.save(Order.created(&quot;O-1&quot;, &quot;C-1&quot;,
+        new Money(5000, Currency.getInstance(&quot;USD&quot;))));
+var payments = new FakePaymentGateway();
+var events = new RecordingEventPublisher();
+
+PayOrderUseCase payOrder = new PayOrderService(
+        orders, payments, events, Clock.systemUTC());
+new PayOrderCli(payOrder).execute(&quot;O-1&quot;);</code></pre></figure>
+<p>Production startup can substitute JDBC, a provider adapter, and Kafka at the same constructor. Their configuration, clients, credentials, and lifecycle stay in infrastructure and wiring.</p>
+<figure class="codeblock"><figcaption>Spring wiring excerpt · output-adapter beans configured separately</figcaption><pre><code>import java.time.Clock;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration(proxyBeanMethods = false)
+public class ApplicationConfiguration {
+    @Bean
+    Clock clock() { return Clock.systemUTC(); }
+
+    @Bean
+    PayOrderUseCase payOrderUseCase(OrderRepository orders,
+                                  PaymentGateway payments,
+                                  EventPublisher events,
+                                  Clock clock) {
+        return new PayOrderService(orders, payments, events, clock);
+    }
+}</code></pre></figure><p>Spring can construct and supply the beans. The service itself needs no annotation. <code>@Bean</code> is container configuration, not the architecture. <a class="cite" href="#source-12" aria-label="Source 12">[12]</a></p></section><section id="section-21" class="lesson-section"><h2><span class="num">21</span><span>Use lightweight adapters in tests</span></h2>
+<p>Keep real domain values and replace external boundaries. The in-memory repository stores immutable order values; the recording publisher captures emitted facts.</p>
+<figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>final class InMemoryOrderRepository implements OrderRepository {
+    private final Map&lt;String, Order&gt; data = new HashMap&lt;&gt;();
+    private int writes;
+
+    public Optional&lt;Order&gt; findById(String orderId) {
+        return Optional.ofNullable(data.get(orderId));
+    }
+
+    public void save(Order order) {
+        data.put(order.id(), order); // Immutable Order: no aliasing mutation.
+        writes++;
+    }
+
+    int writes() { return writes; }
+}</code></pre></figure><figure class="codeblock"><figcaption>Java · teaching excerpt</figcaption><pre><code>final class RecordingEventPublisher implements EventPublisher {
+    private final List&lt;OrderPaid&gt; recorded = new ArrayList&lt;&gt;();
+
+    public void publish(OrderPaid event) { recorded.add(event); }
+    List&lt;OrderPaid&gt; events() { return List.copyOf(recorded); }
+}</code></pre></figure>
+<p>The complete <code>FakePaymentGateway</code> in Appendix A records successful requests by logical key. Repeating the same request returns the same receipt; changing the request under the same key fails. This models the contract we want to test, not every behavior of a payment provider.</p>
+<p>These fakes are intentionally single-threaded. They do not stand in for database isolation, broker delivery, or a provider sandbox.</p></section><section id="section-22" class="lesson-section"><h2><span class="num">22</span><span>Test the use case without the framework</span></h2>
+<p>The core test provides an order, a gateway, an event recorder, and a fixed clock. It asserts the result, persisted state, charge count, and complete event payload.</p>
+<figure class="codeblock"><figcaption>Java · complete test method; helpers appear in Appendix A</figcaption><pre><code>private static void paysOrder() {
+        var orders = seeded();
+        var payments = new FakePaymentGateway();
+        var events = new RecordingEventPublisher();
+        var app = new PayOrderService(orders, payments, events, CLOCK);
+        var result = app.handle(new PayOrderCommand(&quot;O-1&quot;));
+        check(result.paymentId().equals(&quot;PAY-1&quot;), &quot;receipt&quot;);
+        check(orders.findById(&quot;O-1&quot;).orElseThrow().status()
+                == OrderStatus.PAID, &quot;saved state&quot;);
+        check(orders.writes() == 2, &quot;seed plus explicit save&quot;);
+        check(payments.charges() == 1, &quot;one charge&quot;);
+        check(events.events().equals(List.of(
+                new OrderPaid(&quot;O-1&quot;, &quot;PAY-1&quot;, NOW))), &quot;event payload and time&quot;);
+    }</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">Check included in the demo</th><th scope="col">What it protects or reveals</th></tr></thead><tbody><tr><td>Successful payment</td><td>One charge, explicit save, expected event and timestamp.</td></tr><tr><td>Second payment request</td><td>A paid order is rejected before another charge.</td></tr><tr><td>Missing order</td><td>No payment, write, or event occurs.</td></tr><tr><td>Payment failure</td><td>No save or event follows a failed payment call.</td></tr><tr><td>Unsaved immutable result</td><td>An in-memory repository cannot hide a missing save.</td></tr><tr><td>Gateway key reuse</td><td>Same request reuses the receipt; changed parameters fail.</td></tr><tr><td>Publisher failure</td><td>The order stays paid, exposing the unresolved dual write.</td></tr></tbody></table></div>
+<p>The demo uses small checks that throw <code>AssertionError</code>; it needs no JUnit library and no <code>-ea</code> option. This keeps the architectural test runnable with only a JDK.</p></section><section id="section-23" class="lesson-section"><h2><span class="num">23</span><span>Test each adapter at its own boundary</span></h2>
+<p>Passing a use-case test does not verify SQL, HTTP mapping, serialization, or external API semantics. Those belong in separate tests.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Test boundary</th><th scope="col">Evidence to collect</th></tr></thead><tbody><tr><td>REST adapter</td><td>Request mapping, command construction, validation, authorization and error responses.</td></tr><tr><td>JDBC adapter</td><td>Round-trip mapping, missing rows, constraints, upserts, connection cleanup and real transaction behavior.</td></tr><tr><td>Payment adapter</td><td>Request translation, successful and pending outcomes, declines, timeouts and idempotency behavior.</td></tr><tr><td>Kafka adapter</td><td>Topic, key, schema, producer failures and acknowledgement policy.</td></tr><tr><td>Composition</td><td>The real object graph starts with the intended implementations.</td></tr></tbody></table></div>
+<p>Use a real test database where database semantics are the subject of the test, and provider test facilities or a protocol stub for external integrations. Keep this evidence separate from the fast application tests.</p></section><section id="section-24" class="lesson-section chapter-start"><p class="chapter-label">E · Sharpen the boundaries</p><h2><span class="num">24</span><span>Driving and driven are roles</span></h2>
+<p>Ask who starts the application interaction. The technology name alone does not answer that question.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Adapter</th><th scope="col">Role</th><th scope="col">Why</th></tr></thead><tbody><tr><td>REST controller</td><td>Driving</td><td>It requests PayOrder.</td></tr><tr><td>CLI / scheduled trigger</td><td>Driving</td><td>It initiates an application operation.</td></tr><tr><td>Kafka consumer</td><td>Driving</td><td>An incoming message requests work.</td></tr><tr><td>JDBC repository</td><td>Driven</td><td>The use case asks it to load or save.</td></tr><tr><td>Payment adapter</td><td>Driven</td><td>The use case asks it to take payment.</td></tr><tr><td>Kafka publisher</td><td>Driven</td><td>The use case asks it to publish a fact.</td></tr><tr><td>Test calling the input port</td><td>Driving</td><td>It initiates a scenario.</td></tr><tr><td>Recording fake</td><td>Driven</td><td>It responds to the application.</td></tr></tbody></table></div></section><section id="section-25" class="lesson-section"><h2><span class="num">25</span><span>Time is an external dependency too</span></h2>
+<p>A direct call to <code>Instant.now()</code> uses the system clock. Injecting the source of time lets a test choose an exact instant.</p>
+<figure class="codeblock"><figcaption>Java · statements inside a method</figcaption><pre><code>import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+
+Clock production = Clock.systemUTC();
+Clock test = Clock.fixed(
+        Instant.parse(&quot;2026-08-28T12:00:00Z&quot;), ZoneOffset.UTC);
+
+Instant observed = Instant.now(test);</code></pre></figure>
+<p>Java already provides the <code>Clock</code> abstraction and system/fixed implementations. Its documentation explicitly supports substituting clocks for testing. <a class="cite" href="#source-4" aria-label="Source 4">[4]</a></p>
+<p>You can treat it as the boundary to time without defining a custom <code>Clock</code> interface with the same name. A custom port becomes useful if the application needs a different business concept, such as a trading calendar or a business-day cutoff.</p></section><section id="section-26" class="lesson-section"><h2><span class="num">26</span><span>Do not create a port for everything</span></h2>
+<p>A port should isolate a meaningful interaction or a source of variation. Adding an interface around every class or standard collection increases indirection without necessarily creating a useful boundary.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Candidate</th><th scope="col">Decision question</th></tr></thead><tbody><tr><td>PaymentGateway / OrderRepository</td><td>Is this an external capability the application must control? Usually yes.</td></tr><tr><td>Clock or randomness</td><td>Does nondeterminism affect a rule or test? Then make it controllable.</td></tr><tr><td>String formatting / basic arithmetic</td><td>Is there actual policy or external variation? Often a plain function is enough.</td></tr><tr><td>UUID generator</td><td>Does identity assignment require deterministic tests or a specific policy? Decide from that need.</td></tr><tr><td>JSON / logging</td><td>Keep transport encoding outside; add a core abstraction only for a meaningful application need.</td></tr></tbody></table></div>
+<p>“Interface for every class” and “never abstract this utility” are both poor defaults. Start with the dependency that needs a boundary.</p></section><section id="section-27" class="lesson-section"><h2><span class="num">27</span><span>Make ports speak application language</span></h2>
+<p>A technology-shaped interface can preserve the very coupling it was meant to remove.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Leaky contract</th><th scope="col">Application-shaped contract</th><th scope="col">What changes</th></tr></thead><tbody><tr><td><code>ResultSet executeSql(String query)</code></td><td><code>Optional&lt;Order&gt; findById(String id)</code></td><td>The core asks for an order rather than building SQL.</td></tr><tr><td><code>HttpResponse post(String path, JsonNode body)</code></td><td><code>PaymentReceipt charge(PaymentRequest request)</code></td><td>The core asks for a payment rather than describing HTTP.</td></tr><tr><td><code>send(ProducerRecord record)</code></td><td><code>publish(OrderPaid event)</code></td><td>The core announces a fact rather than constructing broker records.</td></tr></tbody></table></div>
+<p>A port should also define the semantics that matter: absence, failures, ordering, duplicate handling, and what successful return means. A domain-sounding method name is only the beginning of a useful contract.</p></section><section id="section-28" class="lesson-section"><h2><span class="num">28</span><span>Keep vendor models outside the port</span></h2>
+<p>If <code>PaymentGateway</code> accepts a provider request class and returns a provider charge class, the application still needs the provider SDK to compile.</p>
+<figure class="codeblock"><figcaption>Contract comparison · vendor names are conceptual examples</figcaption><pre><code>// Vendor-shaped: still couples the core to the SDK.
+// StripeCharge charge(StripeChargeRequest request);
+
+// Application-shaped: adapter owns the conversion.
+interface PaymentGateway {
+    PaymentReceipt charge(PaymentRequest request);
+}</code></pre></figure>
+<p>Translation is work, but it is localized work. Put SDK objects, provider error codes, broker envelopes, ORM proxies, and transport serialization inside adapters. Expose only the business meaning that the application actually needs.</p></section><section id="section-29" class="lesson-section"><h2><span class="num">29</span><span>Folders do not enforce architecture</span></h2>
+<p>A <code>domain</code> directory can still import a payment SDK. An <code>application</code> directory can still construct <code>JdbcOrderRepository</code>. Naming does not change the dependency graph.</p>
+<ul><li>Inspect imports across the boundary.</li><li>Look for service locators, globals, and concrete adapter construction in core classes.</li><li>Compile a separated core module without infrastructure libraries.</li><li>Run its use-case tests with in-memory or recording adapters.</li></ul>
+<p>Our single-file demo demonstrates responsibilities and substitutions. It does not demonstrate build-module enforcement; split it using section 17 when that enforcement is needed.</p></section><section id="section-30" class="lesson-section"><h2><span class="num">30</span><span>Choose framework separation deliberately</span></h2>
+<p>A framework-free core is a design choice with benefits and costs. It helps when rules are substantial, several entry points share behavior, or external integrations change independently. Mapping separate persistence and domain models also takes effort.</p>
+<p>A small CRUD application may reasonably keep persistence annotations on an entity. That choice accepts a framework dependency; it does not make the code automatically bad. Evaluate the cost of mapping against the isolation your application needs.</p>
+<aside class="callout note"><strong>Keep the goal concrete</strong><div>Ask whether the separation improves testability, rule clarity, independent change, or replacement of external systems. Architectural purity is not a substitute for those outcomes.</div></aside></section><section id="section-31" class="lesson-section"><h2><span class="num">31</span><span>Relate this to layered architecture</span></h2>
+<p>Controller, service, repository, and database can remain useful layers. The key question is what the service depends on.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Organization</th><th scope="col">Dependency question</th></tr></thead><tbody><tr><td>Service directly names a JDBC implementation</td><td>Business orchestration is coupled to that persistence mechanism.</td></tr><tr><td>Service names a core-owned repository contract</td><td>Infrastructure supplies an implementation at runtime.</td></tr><tr><td>Several driving and driven adapters surround a core</td><td>Different protocols can share the same operation and capabilities.</td></tr></tbody></table></div>
+<p>A layered implementation can also follow ports and adapters. These descriptions emphasize different aspects: layering groups responsibilities; ports and adapters emphasizes the application boundary and the direction of dependencies across it.</p></section><section id="section-32" class="lesson-section"><h2><span class="num">32</span><span>Relate Hexagonal, Clean, and Onion</span></h2>
+<p>These names describe related architectural approaches, not one identical specification. Their common ground is protecting business/application policy from direct dependencies on infrastructure mechanisms.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Name</th><th scope="col">Useful emphasis</th></tr></thead><tbody><tr><td>Ports & Adapters / Hexagonal</td><td>Purposeful boundary interactions and replaceable adapters.</td></tr><tr><td>Clean Architecture</td><td>A dependency rule that points toward inner policy.</td></tr><tr><td>Onion Architecture</td><td>An inner model surrounded by services and outer infrastructure.</td></tr></tbody></table></div>
+<p>Microsoft discusses these approaches together around an application core and inward dependencies. <a class="cite" href="#source-2" aria-label="Source 2">[2]</a> For this lesson, evaluate the concrete boundary rather than arguing about which folder layout earns a label.</p></section><section id="section-33" class="lesson-section chapter-start"><p class="chapter-label">F · Apply the reasoning</p><h2><span class="num">33</span><span>Connect the patterns already learned</span></h2>
+<p>Patterns now work together inside a service. Each has a specific job; none replaces the others.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Pattern or technique</th><th scope="col">Role here</th></tr></thead><tbody><tr><td>Command</td><td>PayOrderCommand represents the requested operation.</td></tr><tr><td>Application service / handler</td><td>PayOrderService coordinates the workflow.</td></tr><tr><td>Repository</td><td>OrderRepository expresses persistence needs.</td></tr><tr><td>Adapter</td><td>Translate between the core contract and an external technology.</td></tr><tr><td>Dependency inversion</td><td>Make implementation code depend on core-owned contracts.</td></tr><tr><td>Dependency injection</td><td>Supply collaborators through construction.</td></tr><tr><td>Factory</td><td>Choose or create concrete implementations during composition.</td></tr><tr><td>Decorator / Proxy</td><td>Wrap a port for suitable concerns such as observation or caching.</td></tr><tr><td>Strategy</td><td>Substitute a meaningful policy or algorithm.</td></tr><tr><td>State</td><td>Model lifecycle behavior; an enum alone is not the full State pattern.</td></tr><tr><td>Observer / events</td><td>Notify interested code; broker delivery adds distributed failure semantics.</td></tr></tbody></table></div>
+<p>Decorators must preserve the contract. For example, retrying a payment call or caching a mutable order is not a harmless wrapper unless duplicate handling and consistency are defined.</p></section><section id="section-34" class="lesson-section"><h2><span class="num">34</span><span>Use the first-principles design process</span></h2>
+<ol class="steps"><li><strong>Name the operation.</strong> What does the application let a caller do?</li>
+<li><strong>Put rules in the domain.</strong> Which conditions make that operation valid?</li>
+<li><strong>Identify external capabilities.</strong> What must the application ask the outside world to provide?</li>
+<li><strong>Define meaningful contracts.</strong> Use application language, including success, absence, and failure semantics.</li>
+<li><strong>Translate at the edges.</strong> Let each input or output adapter own its technology.</li>
+<li><strong>Compose from the outside.</strong> Choose implementations at startup and inject them.</li>
+<li><strong>Verify each boundary.</strong> Test the use case in isolation; test actual integrations separately.</li></ol>
+<aside class="callout note"><strong>The central question</strong><div><strong>Which layer should own this dependency?</strong> If the application must import an SDK just to express its business operation, revisit the boundary.</div></aside></section>
+<section id="exercise" class="lesson-section chapter-start">
+<p class="eyebrow">Exercise · build the whole service</p><h2>RegisterCustomer</h2>
+<p>Create one application operation that can be requested from REST or a CLI. It creates a customer, saves the customer, sends a welcome email, and publishes <code>CustomerRegistered</code>.</p>
+<figure class="codeblock"><figcaption>Exercise contract · define the command and ID types</figcaption><pre><code>public interface RegisterCustomerUseCase {
+    CustomerId register(RegisterCustomerCommand command);
+}</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">Dependency</th><th scope="col">Purpose</th><th scope="col">Test substitute</th></tr></thead><tbody><tr><td>CustomerRepository</td><td>Persist and retrieve customers.</td><td>In-memory repository</td></tr><tr><td>WelcomeEmailSender</td><td>Send the application’s welcome message.</td><td>Recording email sender</td></tr><tr><td>EventPublisher</td><td>Publish CustomerRegistered in application language.</td><td>Recording publisher</td></tr><tr><td>java.time.Clock</td><td>Provide the registration timestamp.</td><td>Clock.fixed(...)</td></tr></tbody></table></div>
+<p>First define the business rules: required fields, identity assignment, duplicate registration behavior, and what “registered” means if email delivery fails. State those decisions before choosing SMTP or a broker.</p>
+<h3>Acceptance criteria</h3><div class="checklist" id="exercise-checklist">
+<label><input type="checkbox"><span>Domain/application code imports no JDBC, HTTP, SMTP, Kafka, or vendor SDK classes.</span></label><label><input type="checkbox"><span>REST and CLI call the same RegisterCustomerUseCase.</span></label><label><input type="checkbox"><span>An in-memory repository replaces PostgreSQL for application tests.</span></label><label><input type="checkbox"><span>A recording fake replaces the welcome-email adapter.</span></label><label><input type="checkbox"><span>Broker envelope and schema classes do not leak into the application.</span></label><label><input type="checkbox"><span>Adapters translate external representations into core representations.</span></label><label><input type="checkbox"><span>The composition root chooses and wires concrete implementations.</span></label><label><input type="checkbox"><span>The main use-case test runs without Spring or external services.</span></label><label><input type="checkbox"><span>Explain which adapters are driving and which are driven.</span></label><label><input type="checkbox"><span>Explain why CustomerRepository is a port and JdbcCustomerRepository is an adapter.</span></label></div><p class="small screen-only" id="check-progress" aria-live="polite">0 of 10 criteria checked. This checklist resets when the page reloads.</p>
+<h3>Test beyond the successful path</h3>
+<p>Use a fixed clock and assert the event timestamp. Verify that a persistence failure prevents later calls. Then make email or publishing fail <em>after</em> saving and describe the resulting inconsistent state. Do not hide that behavior with a catch block that reports success.</p>
+</section>
+<section id="next" class="lesson-section"><p class="eyebrow">Next · transactions and the Outbox problem</p><h2>The boundary is clean. The workflow can still fail.</h2>
+<figure class="codeblock"><figcaption>Failure scenario · conceptual excerpt</figcaption><pre><code>customers.save(customer);
+welcomeEmailSender.send(customer);
+events.publish(new CustomerRegistered(/* application data */));</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">Failure window</th><th scope="col">Possible result</th></tr></thead><tbody><tr><td>Database commits; process stops before publishing.</td><td>Customer exists, but no event reaches downstream systems.</td></tr><tr><td>Event is published; database transaction later rolls back.</td><td>Consumers see a fact that was never committed.</td></tr><tr><td>Payment succeeds; saving the order fails.</td><td>The provider has a payment, but local state does not reflect it.</td></tr><tr><td>Message is delivered again after an uncertain acknowledgement.</td><td>A consumer may repeat an effect unless it detects duplicates.</td></tr></tbody></table></div>
+<p>A transactional outbox writes the business change and an outgoing event record in the <strong>same local database transaction</strong>. A relay later publishes committed records. A relay can publish more than once, so consumers must tolerate duplicates. <a class="cite" href="#source-13" aria-label="Source 13">[13]</a></p>
+<p>The outbox does not make a remote payment or email call part of that database transaction. Those effects need their own durable workflow, idempotency, and recovery decisions.</p>
+<p><strong>Next derivation:</strong> transaction boundary → transactional outbox → relay → delivery retries → idempotent consumers. The final demo test deliberately exposes the problem that this next lesson must solve.</p>
+</section>
+<section id="appendix-a" class="lesson-section chapter-start"><p class="eyebrow">Appendix A · complete offline program</p><h2>Run it with only a JDK</h2>
+<p>Save the source as <code>Lesson15.java</code>. All domain, application, adapter, and test types are included. Only <code>Lesson15</code> is public, which permits this single-file layout. No preview features or external dependencies are used.</p>
+<div class="actions screen-only"><a class="button secondary" download="Lesson15.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEudGltZS5DbG9jazsKaW1wb3J0IGphdmEudGltZS5JbnN0YW50OwppbXBvcnQgamF2YS50aW1lLlpvbmVPZmZzZXQ7CmltcG9ydCBqYXZhLnV0aWwuQXJyYXlMaXN0OwppbXBvcnQgamF2YS51dGlsLkN1cnJlbmN5OwppbXBvcnQgamF2YS51dGlsLkhhc2hNYXA7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKaW1wb3J0IGphdmEudXRpbC5NYXA7CmltcG9ydCBqYXZhLnV0aWwuT2JqZWN0czsKaW1wb3J0IGphdmEudXRpbC5PcHRpb25hbDsKCi8vIExlc3NvbiAxNTogc2luZ2xlLWZpbGUgdGVhY2hpbmcgdmVyc2lvbi4gTm8gcHJldmlldyBmZWF0dXJlcyBvciBsaWJyYXJpZXMuCi8vIERvbWFpbiwgYXBwbGljYXRpb24sIGFuZCBhZGFwdGVycyBzaGFyZSBhIGZpbGUgb25seSB0byBzaW1wbGlmeSBydW5uaW5nIGl0LgpwdWJsaWMgZmluYWwgY2xhc3MgTGVzc29uMTUgewogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIGlmIChhcmdzLmxlbmd0aCA9PSAxICYmIGFyZ3NbMF0uZXF1YWxzKCJ0ZXN0IikpIHsKICAgICAgICAgICAgTGVzc29uMTVUZXN0cy5ydW4oKTsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KICAgICAgICB2YXIgb3JkZXJzID0gbmV3IEluTWVtb3J5T3JkZXJSZXBvc2l0b3J5KCk7CiAgICAgICAgb3JkZXJzLnNhdmUoT3JkZXIuY3JlYXRlZCgiTy0xIiwgIkMtMSIsCiAgICAgICAgICAgICAgICBuZXcgTW9uZXkoNTAwMCwgQ3VycmVuY3kuZ2V0SW5zdGFuY2UoIlVTRCIpKSkpOwogICAgICAgIHZhciBwYXltZW50cyA9IG5ldyBGYWtlUGF5bWVudEdhdGV3YXkoKTsKICAgICAgICB2YXIgZXZlbnRzID0gbmV3IFJlY29yZGluZ0V2ZW50UHVibGlzaGVyKCk7CiAgICAgICAgUGF5T3JkZXJVc2VDYXNlIHBheU9yZGVyID0gbmV3IFBheU9yZGVyU2VydmljZSgKICAgICAgICAgICAgICAgIG9yZGVycywgcGF5bWVudHMsIGV2ZW50cywgQ2xvY2suc3lzdGVtVVRDKCkpOwogICAgICAgIG5ldyBQYXlPcmRlckNsaShwYXlPcmRlcikuZXhlY3V0ZSgiTy0xIik7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJTdGF0dXM6ICIKICAgICAgICAgICAgICAgICsgb3JkZXJzLmZpbmRCeUlkKCJPLTEiKS5vckVsc2VUaHJvdygpLnN0YXR1cygpKTsKICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIkV2ZW50czogIiArIGV2ZW50cy5ldmVudHMoKS5zaXplKCkpOwogICAgfQp9CgovLyBET01BSU46IGRhdGEgYW5kIGludmFyaWFudHMsIHdpdGggbm8gcGVyc2lzdGVuY2Ugb3IgcHJvdG9jb2wgY29kZS4KcmVjb3JkIE1vbmV5KGxvbmcgbWlub3JVbml0cywgQ3VycmVuY3kgY3VycmVuY3kpIHsKICAgIE1vbmV5IHsKICAgICAgICBpZiAobWlub3JVbml0cyA8PSAwKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIkFtb3VudCBtdXN0IGJlIHBvc2l0aXZlIik7CiAgICAgICAgfQogICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwoY3VycmVuY3ksICJjdXJyZW5jeSIpOwogICAgfQp9CgplbnVtIE9yZGVyU3RhdHVzIHsgQ1JFQVRFRCwgUEFJRCB9CgpyZWNvcmQgT3JkZXIoU3RyaW5nIGlkLCBTdHJpbmcgY3VzdG9tZXJJZCwgTW9uZXkgdG90YWwsCiAgICAgICAgICAgICBPcmRlclN0YXR1cyBzdGF0dXMsIFN0cmluZyBwYXltZW50SWQpIHsKICAgIE9yZGVyIHsKICAgICAgICByZXF1aXJlVGV4dChpZCwgImlkIik7CiAgICAgICAgcmVxdWlyZVRleHQoY3VzdG9tZXJJZCwgImN1c3RvbWVySWQiKTsKICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHRvdGFsLCAidG90YWwiKTsKICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHN0YXR1cywgInN0YXR1cyIpOwogICAgICAgIGlmIChzdGF0dXMgPT0gT3JkZXJTdGF0dXMuQ1JFQVRFRCAmJiBwYXltZW50SWQgIT0gbnVsbCkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJDcmVhdGVkIG9yZGVyIGhhcyBubyBwYXltZW50Iik7CiAgICAgICAgfQogICAgICAgIGlmIChzdGF0dXMgPT0gT3JkZXJTdGF0dXMuUEFJRCkgewogICAgICAgICAgICByZXF1aXJlVGV4dChwYXltZW50SWQsICJwYXltZW50SWQiKTsKICAgICAgICB9CiAgICB9CgogICAgc3RhdGljIE9yZGVyIGNyZWF0ZWQoU3RyaW5nIGlkLCBTdHJpbmcgY3VzdG9tZXJJZCwgTW9uZXkgdG90YWwpIHsKICAgICAgICByZXR1cm4gbmV3IE9yZGVyKGlkLCBjdXN0b21lcklkLCB0b3RhbCwgT3JkZXJTdGF0dXMuQ1JFQVRFRCwgbnVsbCk7CiAgICB9CgogICAgdm9pZCByZXF1aXJlUGF5YWJsZSgpIHsKICAgICAgICBpZiAoc3RhdHVzICE9IE9yZGVyU3RhdHVzLkNSRUFURUQpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiT25seSBjcmVhdGVkIG9yZGVycyBjYW4gYmUgcGFpZCIpOwogICAgICAgIH0KICAgIH0KCiAgICBPcmRlciBtYXJrUGFpZChTdHJpbmcgcGF5bWVudElkKSB7CiAgICAgICAgcmVxdWlyZVBheWFibGUoKTsKICAgICAgICByZXR1cm4gbmV3IE9yZGVyKGlkLCBjdXN0b21lcklkLCB0b3RhbCwgT3JkZXJTdGF0dXMuUEFJRCwgcGF5bWVudElkKTsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyB2b2lkIHJlcXVpcmVUZXh0KFN0cmluZyB2YWx1ZSwgU3RyaW5nIG5hbWUpIHsKICAgICAgICBpZiAodmFsdWUgPT0gbnVsbCB8fCB2YWx1ZS5pc0JsYW5rKCkpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbihuYW1lICsgIiBtdXN0IG5vdCBiZSBibGFuayIpOwogICAgICAgIH0KICAgIH0KfQoKcmVjb3JkIE9yZGVyUGFpZChTdHJpbmcgb3JkZXJJZCwgU3RyaW5nIHBheW1lbnRJZCwgSW5zdGFudCBvY2N1cnJlZEF0KSB7fQoKLy8gQVBQTElDQVRJT046IHRoZSBpbnB1dCBjb250cmFjdCBhbmQgdGhlIG91dHB1dCBjb250cmFjdHMgaXQgbmVlZHMuCnJlY29yZCBQYXlPcmRlckNvbW1hbmQoU3RyaW5nIG9yZGVySWQpIHsKICAgIFBheU9yZGVyQ29tbWFuZCB7CiAgICAgICAgaWYgKG9yZGVySWQgPT0gbnVsbCB8fCBvcmRlcklkLmlzQmxhbmsoKSkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJvcmRlcklkIG11c3Qgbm90IGJlIGJsYW5rIik7CiAgICAgICAgfQogICAgfQp9CgpyZWNvcmQgUGF5bWVudFJlc3VsdChTdHJpbmcgcGF5bWVudElkKSB7fQpyZWNvcmQgUGF5bWVudFJlcXVlc3QoU3RyaW5nIGlkZW1wb3RlbmN5S2V5LCBTdHJpbmcgY3VzdG9tZXJJZCwgTW9uZXkgYW1vdW50KSB7fQpyZWNvcmQgUGF5bWVudFJlY2VpcHQoU3RyaW5nIHBheW1lbnRJZCkgewogICAgUGF5bWVudFJlY2VpcHQgewogICAgICAgIGlmIChwYXltZW50SWQgPT0gbnVsbCB8fCBwYXltZW50SWQuaXNCbGFuaygpKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oInBheW1lbnRJZCBtdXN0IG5vdCBiZSBibGFuayIpOwogICAgICAgIH0KICAgIH0KfQoKaW50ZXJmYWNlIFBheU9yZGVyVXNlQ2FzZSB7CiAgICBQYXltZW50UmVzdWx0IGhhbmRsZShQYXlPcmRlckNvbW1hbmQgY29tbWFuZCk7Cn0KCmludGVyZmFjZSBPcmRlclJlcG9zaXRvcnkgewogICAgT3B0aW9uYWw8T3JkZXI+IGZpbmRCeUlkKFN0cmluZyBvcmRlcklkKTsKICAgIHZvaWQgc2F2ZShPcmRlciBvcmRlcik7Cn0KCmludGVyZmFjZSBQYXltZW50R2F0ZXdheSB7CiAgICAvLyBTYW1lIGtleSArIHNhbWUgcmVxdWVzdCBtdXN0IHJldXNlIGEgc3VjY2Vzc2Z1bCBsb2dpY2FsIGNoYXJnZS4KICAgIC8vIERlY2xpbmUgb3IgdW5jZXJ0YWluIG91dGNvbWU6IHRocm93OyBuZXZlciByZXR1cm4gYSBzdWNjZXNzIHJlY2VpcHQuCiAgICBQYXltZW50UmVjZWlwdCBjaGFyZ2UoUGF5bWVudFJlcXVlc3QgcmVxdWVzdCk7Cn0KCmludGVyZmFjZSBFdmVudFB1Ymxpc2hlciB7CiAgICAvLyBOYXJyb3cgZXZlbnQgY29udHJhY3QgZm9yIHRoaXMgbGVzc29uOyBub3QgdGllZCB0byBhIGJyb2tlciBtb2RlbC4KICAgIHZvaWQgcHVibGlzaChPcmRlclBhaWQgZXZlbnQpOwp9CgpmaW5hbCBjbGFzcyBQYXlPcmRlclNlcnZpY2UgaW1wbGVtZW50cyBQYXlPcmRlclVzZUNhc2UgewogICAgcHJpdmF0ZSBmaW5hbCBPcmRlclJlcG9zaXRvcnkgb3JkZXJzOwogICAgcHJpdmF0ZSBmaW5hbCBQYXltZW50R2F0ZXdheSBwYXltZW50czsKICAgIHByaXZhdGUgZmluYWwgRXZlbnRQdWJsaXNoZXIgZXZlbnRzOwogICAgcHJpdmF0ZSBmaW5hbCBDbG9jayBjbG9jazsKCiAgICBQYXlPcmRlclNlcnZpY2UoT3JkZXJSZXBvc2l0b3J5IG9yZGVycywgUGF5bWVudEdhdGV3YXkgcGF5bWVudHMsCiAgICAgICAgICAgICAgICAgICAgRXZlbnRQdWJsaXNoZXIgZXZlbnRzLCBDbG9jayBjbG9jaykgewogICAgICAgIHRoaXMub3JkZXJzID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChvcmRlcnMpOwogICAgICAgIHRoaXMucGF5bWVudHMgPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHBheW1lbnRzKTsKICAgICAgICB0aGlzLmV2ZW50cyA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwoZXZlbnRzKTsKICAgICAgICB0aGlzLmNsb2NrID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChjbG9jayk7CiAgICB9CgogICAgQE92ZXJyaWRlCiAgICBwdWJsaWMgUGF5bWVudFJlc3VsdCBoYW5kbGUoUGF5T3JkZXJDb21tYW5kIGNvbW1hbmQpIHsKICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKGNvbW1hbmQpOwogICAgICAgIE9yZGVyIG9yZGVyID0gb3JkZXJzLmZpbmRCeUlkKGNvbW1hbmQub3JkZXJJZCgpKQogICAgICAgICAgICAgICAgLm9yRWxzZVRocm93KCgpIC0+IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIk9yZGVyIG5vdCBmb3VuZCIpKTsKICAgICAgICBvcmRlci5yZXF1aXJlUGF5YWJsZSgpOyAvLyBDaGVjayBCRUZPUkUgYW55IGV4dGVybmFsIGNoYXJnZS4KICAgICAgICBQYXltZW50UmVjZWlwdCByZWNlaXB0ID0gcGF5bWVudHMuY2hhcmdlKG5ldyBQYXltZW50UmVxdWVzdCgKICAgICAgICAgICAgICAgICJwYXktb3JkZXI6IiArIG9yZGVyLmlkKCksIG9yZGVyLmN1c3RvbWVySWQoKSwgb3JkZXIudG90YWwoKSkpOwogICAgICAgIE9yZGVyIHBhaWQgPSBvcmRlci5tYXJrUGFpZChyZWNlaXB0LnBheW1lbnRJZCgpKTsKICAgICAgICBvcmRlcnMuc2F2ZShwYWlkKTsKICAgICAgICBldmVudHMucHVibGlzaChuZXcgT3JkZXJQYWlkKHBhaWQuaWQoKSwgcmVjZWlwdC5wYXltZW50SWQoKSwKICAgICAgICAgICAgICAgIEluc3RhbnQubm93KGNsb2NrKSkpOwogICAgICAgIHJldHVybiBuZXcgUGF5bWVudFJlc3VsdChyZWNlaXB0LnBheW1lbnRJZCgpKTsKICAgIH0KfQoKLy8gRFJJVklORyBBREFQVEVSUzogaW5pdGlhdGUgYSB1c2UgY2FzZS4KZmluYWwgY2xhc3MgUGF5T3JkZXJDbGkgewogICAgcHJpdmF0ZSBmaW5hbCBQYXlPcmRlclVzZUNhc2UgcGF5T3JkZXI7CgogICAgUGF5T3JkZXJDbGkoUGF5T3JkZXJVc2VDYXNlIHBheU9yZGVyKSB7CiAgICAgICAgdGhpcy5wYXlPcmRlciA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwocGF5T3JkZXIpOwogICAgfQoKICAgIHZvaWQgZXhlY3V0ZShTdHJpbmcgb3JkZXJJZCkgewogICAgICAgIHZhciByZXN1bHQgPSBwYXlPcmRlci5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZChvcmRlcklkKSk7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCJQYXltZW50OiAiICsgcmVzdWx0LnBheW1lbnRJZCgpKTsKICAgIH0KfQoKcmVjb3JkIFBheU9yZGVyTWVzc2FnZShTdHJpbmcgb3JkZXJJZCkge30KCmZpbmFsIGNsYXNzIFBheU9yZGVyQ29uc3VtZXIgewogICAgcHJpdmF0ZSBmaW5hbCBQYXlPcmRlclVzZUNhc2UgcGF5T3JkZXI7CgogICAgUGF5T3JkZXJDb25zdW1lcihQYXlPcmRlclVzZUNhc2UgcGF5T3JkZXIpIHsKICAgICAgICB0aGlzLnBheU9yZGVyID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChwYXlPcmRlcik7CiAgICB9CgogICAgdm9pZCBvbk1lc3NhZ2UoUGF5T3JkZXJNZXNzYWdlIG1lc3NhZ2UpIHsKICAgICAgICBwYXlPcmRlci5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZChtZXNzYWdlLm9yZGVySWQoKSkpOwogICAgfQp9CgovLyBEUklWRU4gVEVTVCBBREFQVEVSUzogc2luZ2xlLXRocmVhZGVkLCBpbi1tZW1vcnkgdGVhY2hpbmcgc3Vic3RpdHV0ZXMuCmZpbmFsIGNsYXNzIEluTWVtb3J5T3JkZXJSZXBvc2l0b3J5IGltcGxlbWVudHMgT3JkZXJSZXBvc2l0b3J5IHsKICAgIHByaXZhdGUgZmluYWwgTWFwPFN0cmluZywgT3JkZXI+IGRhdGEgPSBuZXcgSGFzaE1hcDw+KCk7CiAgICBwcml2YXRlIGludCB3cml0ZXM7CgogICAgcHVibGljIE9wdGlvbmFsPE9yZGVyPiBmaW5kQnlJZChTdHJpbmcgb3JkZXJJZCkgewogICAgICAgIHJldHVybiBPcHRpb25hbC5vZk51bGxhYmxlKGRhdGEuZ2V0KG9yZGVySWQpKTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzYXZlKE9yZGVyIG9yZGVyKSB7CiAgICAgICAgZGF0YS5wdXQob3JkZXIuaWQoKSwgb3JkZXIpOyAvLyBJbW11dGFibGUgT3JkZXI6IG5vIGFsaWFzaW5nIG11dGF0aW9uLgogICAgICAgIHdyaXRlcysrOwogICAgfQoKICAgIGludCB3cml0ZXMoKSB7IHJldHVybiB3cml0ZXM7IH0KfQoKZmluYWwgY2xhc3MgRmFrZVBheW1lbnRHYXRld2F5IGltcGxlbWVudHMgUGF5bWVudEdhdGV3YXkgewogICAgcHJpdmF0ZSBmaW5hbCBNYXA8U3RyaW5nLCBQYXltZW50UmVxdWVzdD4gcmVxdWVzdHMgPSBuZXcgSGFzaE1hcDw+KCk7CiAgICBwcml2YXRlIGZpbmFsIE1hcDxTdHJpbmcsIFBheW1lbnRSZWNlaXB0PiByZWNlaXB0cyA9IG5ldyBIYXNoTWFwPD4oKTsKICAgIHByaXZhdGUgaW50IGNoYXJnZXM7CgogICAgcHVibGljIFBheW1lbnRSZWNlaXB0IGNoYXJnZShQYXltZW50UmVxdWVzdCByZXF1ZXN0KSB7CiAgICAgICAgU3RyaW5nIGtleSA9IHJlcXVlc3QuaWRlbXBvdGVuY3lLZXkoKTsKICAgICAgICBpZiAocmVjZWlwdHMuY29udGFpbnNLZXkoa2V5KSkgewogICAgICAgICAgICBpZiAoIXJlcXVlc3RzLmdldChrZXkpLmVxdWFscyhyZXF1ZXN0KSkgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiS2V5IHJldXNlZCBmb3IgY2hhbmdlZCByZXF1ZXN0Iik7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIHJlY2VpcHRzLmdldChrZXkpOwogICAgICAgIH0KICAgICAgICB2YXIgcmVjZWlwdCA9IG5ldyBQYXltZW50UmVjZWlwdCgiUEFZLSIgKyArK2NoYXJnZXMpOwogICAgICAgIHJlcXVlc3RzLnB1dChrZXksIHJlcXVlc3QpOwogICAgICAgIHJlY2VpcHRzLnB1dChrZXksIHJlY2VpcHQpOwogICAgICAgIHJldHVybiByZWNlaXB0OwogICAgfQoKICAgIGludCBjaGFyZ2VzKCkgeyByZXR1cm4gY2hhcmdlczsgfQp9CgpmaW5hbCBjbGFzcyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlciBpbXBsZW1lbnRzIEV2ZW50UHVibGlzaGVyIHsKICAgIHByaXZhdGUgZmluYWwgTGlzdDxPcmRlclBhaWQ+IHJlY29yZGVkID0gbmV3IEFycmF5TGlzdDw+KCk7CgogICAgcHVibGljIHZvaWQgcHVibGlzaChPcmRlclBhaWQgZXZlbnQpIHsgcmVjb3JkZWQuYWRkKGV2ZW50KTsgfQogICAgTGlzdDxPcmRlclBhaWQ+IGV2ZW50cygpIHsgcmV0dXJuIExpc3QuY29weU9mKHJlY29yZGVkKTsgfQp9CgovLyBURVNUUzogdXNlIHJlYWwgZG9tYWluIHZhbHVlczsgcmVwbGFjZSBvbmx5IGJvdW5kYXJ5IGRlcGVuZGVuY2llcy4KZmluYWwgY2xhc3MgTGVzc29uMTVUZXN0cyB7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBJbnN0YW50IE5PVyA9IEluc3RhbnQucGFyc2UoIjIwMjYtMDgtMjhUMTI6MDA6MDBaIik7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBDbG9jayBDTE9DSyA9IENsb2NrLmZpeGVkKE5PVywgWm9uZU9mZnNldC5VVEMpOwoKICAgIHN0YXRpYyB2b2lkIHJ1bigpIHsKICAgICAgICBwYXlzT3JkZXIoKTsKICAgICAgICByZWZ1c2VzU2Vjb25kQ2hhcmdlKCk7CiAgICAgICAgbWlzc2luZ09yZGVySGFzTm9FZmZlY3RzKCk7CiAgICAgICAgcGF5bWVudEZhaWx1cmVEb2VzTm90U2F2ZU9yUHVibGlzaCgpOwogICAgICAgIGltbXV0YWJsZU9yZGVyUmVxdWlyZXNTYXZlKCk7CiAgICAgICAgZ2F0ZXdheVJldXNlc1JlY2VpcHQoKTsKICAgICAgICBwdWJsaXNoRmFpbHVyZUxlYXZlc1BhaWRPcmRlcigpOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiNyBjaGVja3MgcGFzc2VkIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgSW5NZW1vcnlPcmRlclJlcG9zaXRvcnkgc2VlZGVkKCkgewogICAgICAgIHZhciBvcmRlcnMgPSBuZXcgSW5NZW1vcnlPcmRlclJlcG9zaXRvcnkoKTsKICAgICAgICBvcmRlcnMuc2F2ZShPcmRlci5jcmVhdGVkKCJPLTEiLCAiQy0xIiwKICAgICAgICAgICAgICAgIG5ldyBNb25leSg1MDAwLCBDdXJyZW5jeS5nZXRJbnN0YW5jZSgiVVNEIikpKSk7CiAgICAgICAgcmV0dXJuIG9yZGVyczsKICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyB2b2lkIHBheXNPcmRlcigpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgdmFyIHBheW1lbnRzID0gbmV3IEZha2VQYXltZW50R2F0ZXdheSgpOwogICAgICAgIHZhciBldmVudHMgPSBuZXcgUmVjb3JkaW5nRXZlbnRQdWJsaXNoZXIoKTsKICAgICAgICB2YXIgYXBwID0gbmV3IFBheU9yZGVyU2VydmljZShvcmRlcnMsIHBheW1lbnRzLCBldmVudHMsIENMT0NLKTsKICAgICAgICB2YXIgcmVzdWx0ID0gYXBwLmhhbmRsZShuZXcgUGF5T3JkZXJDb21tYW5kKCJPLTEiKSk7CiAgICAgICAgY2hlY2socmVzdWx0LnBheW1lbnRJZCgpLmVxdWFscygiUEFZLTEiKSwgInJlY2VpcHQiKTsKICAgICAgICBjaGVjayhvcmRlcnMuZmluZEJ5SWQoIk8tMSIpLm9yRWxzZVRocm93KCkuc3RhdHVzKCkKICAgICAgICAgICAgICAgID09IE9yZGVyU3RhdHVzLlBBSUQsICJzYXZlZCBzdGF0ZSIpOwogICAgICAgIGNoZWNrKG9yZGVycy53cml0ZXMoKSA9PSAyLCAic2VlZCBwbHVzIGV4cGxpY2l0IHNhdmUiKTsKICAgICAgICBjaGVjayhwYXltZW50cy5jaGFyZ2VzKCkgPT0gMSwgIm9uZSBjaGFyZ2UiKTsKICAgICAgICBjaGVjayhldmVudHMuZXZlbnRzKCkuZXF1YWxzKExpc3Qub2YoCiAgICAgICAgICAgICAgICBuZXcgT3JkZXJQYWlkKCJPLTEiLCAiUEFZLTEiLCBOT1cpKSksICJldmVudCBwYXlsb2FkIGFuZCB0aW1lIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCByZWZ1c2VzU2Vjb25kQ2hhcmdlKCkgewogICAgICAgIHZhciBvcmRlcnMgPSBzZWVkZWQoKTsKICAgICAgICB2YXIgcGF5bWVudHMgPSBuZXcgRmFrZVBheW1lbnRHYXRld2F5KCk7CiAgICAgICAgdmFyIGV2ZW50cyA9IG5ldyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlcigpOwogICAgICAgIHZhciBhcHAgPSBuZXcgUGF5T3JkZXJTZXJ2aWNlKG9yZGVycywgcGF5bWVudHMsIGV2ZW50cywgQ0xPQ0spOwogICAgICAgIGFwcC5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZCgiTy0xIikpOwogICAgICAgIGV4cGVjdChJbGxlZ2FsU3RhdGVFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBhcHAuaGFuZGxlKG5ldyBQYXlPcmRlckNvbW1hbmQoIk8tMSIpKSk7CiAgICAgICAgY2hlY2socGF5bWVudHMuY2hhcmdlcygpID09IDEgJiYgZXZlbnRzLmV2ZW50cygpLnNpemUoKSA9PSAxLAogICAgICAgICAgICAgICAgInBhaWQgb3JkZXIgcmVqZWN0ZWQgYmVmb3JlIGNoYXJnZSBvciBldmVudCIpOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHZvaWQgbWlzc2luZ09yZGVySGFzTm9FZmZlY3RzKCkgewogICAgICAgIHZhciBvcmRlcnMgPSBuZXcgSW5NZW1vcnlPcmRlclJlcG9zaXRvcnkoKTsKICAgICAgICB2YXIgcGF5bWVudHMgPSBuZXcgRmFrZVBheW1lbnRHYXRld2F5KCk7CiAgICAgICAgdmFyIGV2ZW50cyA9IG5ldyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlcigpOwogICAgICAgIHZhciBhcHAgPSBuZXcgUGF5T3JkZXJTZXJ2aWNlKG9yZGVycywgcGF5bWVudHMsIGV2ZW50cywgQ0xPQ0spOwogICAgICAgIGV4cGVjdChJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsCiAgICAgICAgICAgICAgICAoKSAtPiBhcHAuaGFuZGxlKG5ldyBQYXlPcmRlckNvbW1hbmQoIm1pc3NpbmciKSkpOwogICAgICAgIGNoZWNrKHBheW1lbnRzLmNoYXJnZXMoKSA9PSAwICYmIG9yZGVycy53cml0ZXMoKSA9PSAwCiAgICAgICAgICAgICAgICAmJiBldmVudHMuZXZlbnRzKCkuaXNFbXB0eSgpLCAibWlzc2luZyBvcmRlciBoYXMgbm8gZWZmZWN0cyIpOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHZvaWQgcGF5bWVudEZhaWx1cmVEb2VzTm90U2F2ZU9yUHVibGlzaCgpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgUGF5bWVudEdhdGV3YXkgZmFpbGluZyA9IHJlcXVlc3QgLT4gewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbFN0YXRlRXhjZXB0aW9uKCJQYXltZW50IGZhaWxlZCIpOwogICAgICAgIH07CiAgICAgICAgdmFyIGV2ZW50cyA9IG5ldyBSZWNvcmRpbmdFdmVudFB1Ymxpc2hlcigpOwogICAgICAgIHZhciBhcHAgPSBuZXcgUGF5T3JkZXJTZXJ2aWNlKG9yZGVycywgZmFpbGluZywgZXZlbnRzLCBDTE9DSyk7CiAgICAgICAgZXhwZWN0KElsbGVnYWxTdGF0ZUV4Y2VwdGlvbi5jbGFzcywKICAgICAgICAgICAgICAgICgpIC0+IGFwcC5oYW5kbGUobmV3IFBheU9yZGVyQ29tbWFuZCgiTy0xIikpKTsKICAgICAgICBjaGVjayhvcmRlcnMud3JpdGVzKCkgPT0gMSAmJiBldmVudHMuZXZlbnRzKCkuaXNFbXB0eSgpLAogICAgICAgICAgICAgICAgIm5vIHNhdmUgb3IgZXZlbnQgYWZ0ZXIgcGF5bWVudCBmYWlsdXJlIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBpbW11dGFibGVPcmRlclJlcXVpcmVzU2F2ZSgpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgT3JkZXIgbG9hZGVkID0gb3JkZXJzLmZpbmRCeUlkKCJPLTEiKS5vckVsc2VUaHJvdygpOwogICAgICAgIGxvYWRlZC5tYXJrUGFpZCgiUEFZLXVuc2F2ZWQiKTsKICAgICAgICBjaGVjayhvcmRlcnMuZmluZEJ5SWQoIk8tMSIpLm9yRWxzZVRocm93KCkuc3RhdHVzKCkKICAgICAgICAgICAgICAgID09IE9yZGVyU3RhdHVzLkNSRUFURUQsICJ1bnNhdmVkIHZhbHVlIG11c3Qgbm90IGNoYW5nZSByZXBvc2l0b3J5Iik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBnYXRld2F5UmV1c2VzUmVjZWlwdCgpIHsKICAgICAgICB2YXIgZ2F0ZXdheSA9IG5ldyBGYWtlUGF5bWVudEdhdGV3YXkoKTsKICAgICAgICB2YXIgYW1vdW50ID0gbmV3IE1vbmV5KDUwMDAsIEN1cnJlbmN5LmdldEluc3RhbmNlKCJVU0QiKSk7CiAgICAgICAgdmFyIHJlcXVlc3QgPSBuZXcgUGF5bWVudFJlcXVlc3QoImtleS0xIiwgIkMtMSIsIGFtb3VudCk7CiAgICAgICAgY2hlY2soZ2F0ZXdheS5jaGFyZ2UocmVxdWVzdCkuZXF1YWxzKGdhdGV3YXkuY2hhcmdlKHJlcXVlc3QpKSwKICAgICAgICAgICAgICAgICJzYW1lIGxvZ2ljYWwgY2hhcmdlIHJldHVybnMgc2FtZSByZWNlaXB0Iik7CiAgICAgICAgY2hlY2soZ2F0ZXdheS5jaGFyZ2VzKCkgPT0gMSwgIm9uZSBsb2dpY2FsIGNoYXJnZSIpOwogICAgICAgIGV4cGVjdChJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24uY2xhc3MsICgpIC0+IGdhdGV3YXkuY2hhcmdlKAogICAgICAgICAgICAgICAgbmV3IFBheW1lbnRSZXF1ZXN0KCJrZXktMSIsICJDLTIiLCBhbW91bnQpKSk7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBwdWJsaXNoRmFpbHVyZUxlYXZlc1BhaWRPcmRlcigpIHsKICAgICAgICB2YXIgb3JkZXJzID0gc2VlZGVkKCk7CiAgICAgICAgRXZlbnRQdWJsaXNoZXIgZmFpbGluZyA9IGV2ZW50IC0+IHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiQnJva2VyIHVuYXZhaWxhYmxlIik7CiAgICAgICAgfTsKICAgICAgICB2YXIgYXBwID0gbmV3IFBheU9yZGVyU2VydmljZShvcmRlcnMsIG5ldyBGYWtlUGF5bWVudEdhdGV3YXkoKSwKICAgICAgICAgICAgICAgIGZhaWxpbmcsIENMT0NLKTsKICAgICAgICBleHBlY3QoSWxsZWdhbFN0YXRlRXhjZXB0aW9uLmNsYXNzLAogICAgICAgICAgICAgICAgKCkgLT4gYXBwLmhhbmRsZShuZXcgUGF5T3JkZXJDb21tYW5kKCJPLTEiKSkpOwogICAgICAgIGNoZWNrKG9yZGVycy5maW5kQnlJZCgiTy0xIikub3JFbHNlVGhyb3coKS5zdGF0dXMoKQogICAgICAgICAgICAgICAgPT0gT3JkZXJTdGF0dXMuUEFJRCwgImRlbW9uc3RyYXRlcyB0aGUgdW5yZXNvbHZlZCBkdWFsIHdyaXRlIik7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCBjaGVjayhib29sZWFuIGNvbmRpdGlvbiwgU3RyaW5nIG1lc3NhZ2UpIHsKICAgICAgICBpZiAoIWNvbmRpdGlvbikgeyB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IobWVzc2FnZSk7IH0KICAgIH0KCiAgICBwcml2YXRlIHN0YXRpYyB2b2lkIGV4cGVjdChDbGFzczw/IGV4dGVuZHMgUnVudGltZUV4Y2VwdGlvbj4gdHlwZSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFJ1bm5hYmxlIGFjdGlvbikgewogICAgICAgIHRyeSB7CiAgICAgICAgICAgIGFjdGlvbi5ydW4oKTsKICAgICAgICB9IGNhdGNoIChSdW50aW1lRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgaWYgKHR5cGUuaXNJbnN0YW5jZShmYWlsdXJlKSkgeyByZXR1cm47IH0KICAgICAgICAgICAgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKCJVbmV4cGVjdGVkIGV4Y2VwdGlvbiIsIGZhaWx1cmUpOwogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIkV4cGVjdGVkICIgKyB0eXBlLmdldFNpbXBsZU5hbWUoKSk7CiAgICB9Cn0K">Download Lesson15.java</a></div>
+<figure class="codeblock"><figcaption>Commands · use a JDK 25 javac and java</figcaption><pre><code>javac --release 25 -d out Lesson15.java
+java -cp out Lesson15
+java -cp out Lesson15 test</code></pre></figure><figure class="codeblock"><figcaption>Output · first the demo, then the test command</figcaption><pre><code>Payment: PAY-1
+Status: PAID
+Events: 1
+
+7 checks passed</code></pre></figure><aside class="callout note"><strong>Validation record</strong><div><strong>Java 25 compatibility:</strong> uses standard features and APIs documented in Java 25, with no preview feature. <strong>Executed here:</strong> compiled with <code>--release 17</code> on OpenJDK 17.0.20; the demo and all seven checks passed. <strong>⚠️ Limit:</strong> a Java 25 runtime was unavailable, so execution on Java 25 was not directly verified. The commands above are the intended Java 25 check.</div></aside><p class="source-note">Compiler options and Java 25 API references: <a class="cite" href="#source-14" aria-label="Source 14">[14]</a> <a class="cite" href="#source-3" aria-label="Source 3">[3]</a> <a class="cite" href="#source-4" aria-label="Source 4">[4]</a></p><figure class="codeblock long-code"><figcaption>Lesson15.java · complete source</figcaption><pre><code>import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+// Lesson 15: single-file teaching version. No preview features or libraries.
+// Domain, application, and adapters share a file only to simplify running it.
+public final class Lesson15 {
+    public static void main(String[] args) {
+        if (args.length == 1 &amp;&amp; args[0].equals(&quot;test&quot;)) {
+            Lesson15Tests.run();
+            return;
+        }
+        var orders = new InMemoryOrderRepository();
+        orders.save(Order.created(&quot;O-1&quot;, &quot;C-1&quot;,
+                new Money(5000, Currency.getInstance(&quot;USD&quot;))));
+        var payments = new FakePaymentGateway();
+        var events = new RecordingEventPublisher();
+        PayOrderUseCase payOrder = new PayOrderService(
+                orders, payments, events, Clock.systemUTC());
+        new PayOrderCli(payOrder).execute(&quot;O-1&quot;);
+        System.out.println(&quot;Status: &quot;
+                + orders.findById(&quot;O-1&quot;).orElseThrow().status());
+        System.out.println(&quot;Events: &quot; + events.events().size());
+    }
+}
+
+// DOMAIN: data and invariants, with no persistence or protocol code.
+record Money(long minorUnits, Currency currency) {
+    Money {
+        if (minorUnits &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Amount must be positive&quot;);
+        }
+        Objects.requireNonNull(currency, &quot;currency&quot;);
+    }
+}
+
+enum OrderStatus { CREATED, PAID }
+
+record Order(String id, String customerId, Money total,
+             OrderStatus status, String paymentId) {
+    Order {
+        requireText(id, &quot;id&quot;);
+        requireText(customerId, &quot;customerId&quot;);
+        Objects.requireNonNull(total, &quot;total&quot;);
+        Objects.requireNonNull(status, &quot;status&quot;);
+        if (status == OrderStatus.CREATED &amp;&amp; paymentId != null) {
+            throw new IllegalArgumentException(&quot;Created order has no payment&quot;);
+        }
+        if (status == OrderStatus.PAID) {
+            requireText(paymentId, &quot;paymentId&quot;);
+        }
+    }
+
+    static Order created(String id, String customerId, Money total) {
+        return new Order(id, customerId, total, OrderStatus.CREATED, null);
+    }
+
+    void requirePayable() {
+        if (status != OrderStatus.CREATED) {
+            throw new IllegalStateException(&quot;Only created orders can be paid&quot;);
+        }
+    }
+
+    Order markPaid(String paymentId) {
+        requirePayable();
+        return new Order(id, customerId, total, OrderStatus.PAID, paymentId);
+    }
+
+    private static void requireText(String value, String name) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(name + &quot; must not be blank&quot;);
+        }
+    }
+}
+
+record OrderPaid(String orderId, String paymentId, Instant occurredAt) {}
+
+// APPLICATION: the input contract and the output contracts it needs.
+record PayOrderCommand(String orderId) {
+    PayOrderCommand {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException(&quot;orderId must not be blank&quot;);
+        }
+    }
+}
+
+record PaymentResult(String paymentId) {}
+record PaymentRequest(String idempotencyKey, String customerId, Money amount) {}
+record PaymentReceipt(String paymentId) {
+    PaymentReceipt {
+        if (paymentId == null || paymentId.isBlank()) {
+            throw new IllegalArgumentException(&quot;paymentId must not be blank&quot;);
+        }
+    }
+}
+
+interface PayOrderUseCase {
+    PaymentResult handle(PayOrderCommand command);
+}
+
+interface OrderRepository {
+    Optional&lt;Order&gt; findById(String orderId);
+    void save(Order order);
+}
+
+interface PaymentGateway {
+    // Same key + same request must reuse a successful logical charge.
+    // Decline or uncertain outcome: throw; never return a success receipt.
+    PaymentReceipt charge(PaymentRequest request);
+}
+
+interface EventPublisher {
+    // Narrow event contract for this lesson; not tied to a broker model.
+    void publish(OrderPaid event);
+}
+
+final class PayOrderService implements PayOrderUseCase {
+    private final OrderRepository orders;
+    private final PaymentGateway payments;
+    private final EventPublisher events;
+    private final Clock clock;
+
+    PayOrderService(OrderRepository orders, PaymentGateway payments,
+                    EventPublisher events, Clock clock) {
+        this.orders = Objects.requireNonNull(orders);
+        this.payments = Objects.requireNonNull(payments);
+        this.events = Objects.requireNonNull(events);
+        this.clock = Objects.requireNonNull(clock);
+    }
+
+    @Override
+    public PaymentResult handle(PayOrderCommand command) {
+        Objects.requireNonNull(command);
+        Order order = orders.findById(command.orderId())
+                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Order not found&quot;));
+        order.requirePayable(); // Check BEFORE any external charge.
+        PaymentReceipt receipt = payments.charge(new PaymentRequest(
+                &quot;pay-order:&quot; + order.id(), order.customerId(), order.total()));
+        Order paid = order.markPaid(receipt.paymentId());
+        orders.save(paid);
+        events.publish(new OrderPaid(paid.id(), receipt.paymentId(),
+                Instant.now(clock)));
+        return new PaymentResult(receipt.paymentId());
+    }
+}
+
+// DRIVING ADAPTERS: initiate a use case.
+final class PayOrderCli {
+    private final PayOrderUseCase payOrder;
+
+    PayOrderCli(PayOrderUseCase payOrder) {
+        this.payOrder = Objects.requireNonNull(payOrder);
+    }
+
+    void execute(String orderId) {
+        var result = payOrder.handle(new PayOrderCommand(orderId));
+        System.out.println(&quot;Payment: &quot; + result.paymentId());
+    }
+}
+
+record PayOrderMessage(String orderId) {}
+
+final class PayOrderConsumer {
+    private final PayOrderUseCase payOrder;
+
+    PayOrderConsumer(PayOrderUseCase payOrder) {
+        this.payOrder = Objects.requireNonNull(payOrder);
+    }
+
+    void onMessage(PayOrderMessage message) {
+        payOrder.handle(new PayOrderCommand(message.orderId()));
+    }
+}
+
+// DRIVEN TEST ADAPTERS: single-threaded, in-memory teaching substitutes.
+final class InMemoryOrderRepository implements OrderRepository {
+    private final Map&lt;String, Order&gt; data = new HashMap&lt;&gt;();
+    private int writes;
+
+    public Optional&lt;Order&gt; findById(String orderId) {
+        return Optional.ofNullable(data.get(orderId));
+    }
+
+    public void save(Order order) {
+        data.put(order.id(), order); // Immutable Order: no aliasing mutation.
+        writes++;
+    }
+
+    int writes() { return writes; }
+}
+
+final class FakePaymentGateway implements PaymentGateway {
+    private final Map&lt;String, PaymentRequest&gt; requests = new HashMap&lt;&gt;();
+    private final Map&lt;String, PaymentReceipt&gt; receipts = new HashMap&lt;&gt;();
+    private int charges;
+
+    public PaymentReceipt charge(PaymentRequest request) {
+        String key = request.idempotencyKey();
+        if (receipts.containsKey(key)) {
+            if (!requests.get(key).equals(request)) {
+                throw new IllegalArgumentException(&quot;Key reused for changed request&quot;);
+            }
+            return receipts.get(key);
+        }
+        var receipt = new PaymentReceipt(&quot;PAY-&quot; + ++charges);
+        requests.put(key, request);
+        receipts.put(key, receipt);
+        return receipt;
+    }
+
+    int charges() { return charges; }
+}
+
+final class RecordingEventPublisher implements EventPublisher {
+    private final List&lt;OrderPaid&gt; recorded = new ArrayList&lt;&gt;();
+
+    public void publish(OrderPaid event) { recorded.add(event); }
+    List&lt;OrderPaid&gt; events() { return List.copyOf(recorded); }
+}
+
+// TESTS: use real domain values; replace only boundary dependencies.
+final class Lesson15Tests {
+    private static final Instant NOW = Instant.parse(&quot;2026-08-28T12:00:00Z&quot;);
+    private static final Clock CLOCK = Clock.fixed(NOW, ZoneOffset.UTC);
+
+    static void run() {
+        paysOrder();
+        refusesSecondCharge();
+        missingOrderHasNoEffects();
+        paymentFailureDoesNotSaveOrPublish();
+        immutableOrderRequiresSave();
+        gatewayReusesReceipt();
+        publishFailureLeavesPaidOrder();
+        System.out.println(&quot;7 checks passed&quot;);
+    }
+
+    private static InMemoryOrderRepository seeded() {
+        var orders = new InMemoryOrderRepository();
+        orders.save(Order.created(&quot;O-1&quot;, &quot;C-1&quot;,
+                new Money(5000, Currency.getInstance(&quot;USD&quot;))));
+        return orders;
+    }
+
+    private static void paysOrder() {
+        var orders = seeded();
+        var payments = new FakePaymentGateway();
+        var events = new RecordingEventPublisher();
+        var app = new PayOrderService(orders, payments, events, CLOCK);
+        var result = app.handle(new PayOrderCommand(&quot;O-1&quot;));
+        check(result.paymentId().equals(&quot;PAY-1&quot;), &quot;receipt&quot;);
+        check(orders.findById(&quot;O-1&quot;).orElseThrow().status()
+                == OrderStatus.PAID, &quot;saved state&quot;);
+        check(orders.writes() == 2, &quot;seed plus explicit save&quot;);
+        check(payments.charges() == 1, &quot;one charge&quot;);
+        check(events.events().equals(List.of(
+                new OrderPaid(&quot;O-1&quot;, &quot;PAY-1&quot;, NOW))), &quot;event payload and time&quot;);
+    }
+
+    private static void refusesSecondCharge() {
+        var orders = seeded();
+        var payments = new FakePaymentGateway();
+        var events = new RecordingEventPublisher();
+        var app = new PayOrderService(orders, payments, events, CLOCK);
+        app.handle(new PayOrderCommand(&quot;O-1&quot;));
+        expect(IllegalStateException.class,
+                () -&gt; app.handle(new PayOrderCommand(&quot;O-1&quot;)));
+        check(payments.charges() == 1 &amp;&amp; events.events().size() == 1,
+                &quot;paid order rejected before charge or event&quot;);
+    }
+
+    private static void missingOrderHasNoEffects() {
+        var orders = new InMemoryOrderRepository();
+        var payments = new FakePaymentGateway();
+        var events = new RecordingEventPublisher();
+        var app = new PayOrderService(orders, payments, events, CLOCK);
+        expect(IllegalArgumentException.class,
+                () -&gt; app.handle(new PayOrderCommand(&quot;missing&quot;)));
+        check(payments.charges() == 0 &amp;&amp; orders.writes() == 0
+                &amp;&amp; events.events().isEmpty(), &quot;missing order has no effects&quot;);
+    }
+
+    private static void paymentFailureDoesNotSaveOrPublish() {
+        var orders = seeded();
+        PaymentGateway failing = request -&gt; {
+            throw new IllegalStateException(&quot;Payment failed&quot;);
+        };
+        var events = new RecordingEventPublisher();
+        var app = new PayOrderService(orders, failing, events, CLOCK);
+        expect(IllegalStateException.class,
+                () -&gt; app.handle(new PayOrderCommand(&quot;O-1&quot;)));
+        check(orders.writes() == 1 &amp;&amp; events.events().isEmpty(),
+                &quot;no save or event after payment failure&quot;);
+    }
+
+    private static void immutableOrderRequiresSave() {
+        var orders = seeded();
+        Order loaded = orders.findById(&quot;O-1&quot;).orElseThrow();
+        loaded.markPaid(&quot;PAY-unsaved&quot;);
+        check(orders.findById(&quot;O-1&quot;).orElseThrow().status()
+                == OrderStatus.CREATED, &quot;unsaved value must not change repository&quot;);
+    }
+
+    private static void gatewayReusesReceipt() {
+        var gateway = new FakePaymentGateway();
+        var amount = new Money(5000, Currency.getInstance(&quot;USD&quot;));
+        var request = new PaymentRequest(&quot;key-1&quot;, &quot;C-1&quot;, amount);
+        check(gateway.charge(request).equals(gateway.charge(request)),
+                &quot;same logical charge returns same receipt&quot;);
+        check(gateway.charges() == 1, &quot;one logical charge&quot;);
+        expect(IllegalArgumentException.class, () -&gt; gateway.charge(
+                new PaymentRequest(&quot;key-1&quot;, &quot;C-2&quot;, amount)));
+    }
+
+    private static void publishFailureLeavesPaidOrder() {
+        var orders = seeded();
+        EventPublisher failing = event -&gt; {
+            throw new IllegalStateException(&quot;Broker unavailable&quot;);
+        };
+        var app = new PayOrderService(orders, new FakePaymentGateway(),
+                failing, CLOCK);
+        expect(IllegalStateException.class,
+                () -&gt; app.handle(new PayOrderCommand(&quot;O-1&quot;)));
+        check(orders.findById(&quot;O-1&quot;).orElseThrow().status()
+                == OrderStatus.PAID, &quot;demonstrates the unresolved dual write&quot;);
+    }
+
+    private static void check(boolean condition, String message) {
+        if (!condition) { throw new AssertionError(message); }
+    }
+
+    private static void expect(Class&lt;? extends RuntimeException&gt; type,
+                               Runnable action) {
+        try {
+            action.run();
+        } catch (RuntimeException failure) {
+            if (type.isInstance(failure)) { return; }
+            throw new AssertionError(&quot;Unexpected exception&quot;, failure);
+        }
+        throw new AssertionError(&quot;Expected &quot; + type.getSimpleName());
+    }
+}</code></pre></figure></section>
+<section id="appendix-b" class="lesson-section chapter-start"><p class="eyebrow">Appendix B · complete persistence adapter</p><h2>JDBC with PostgreSQL mapping</h2>
+<p>Save this class beside <code>Lesson15.java</code>. It uses the same domain types and port. Compilation needs only the JDK’s JDBC API; running it needs a PostgreSQL JDBC driver, a configured <code>DataSource</code>, and the schema below.</p>
+<div class="actions screen-only"><a class="button secondary" download="JdbcOrderRepository.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmEudXRpbC5DdXJyZW5jeTsKaW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwppbXBvcnQgamF2YS51dGlsLk9wdGlvbmFsOwppbXBvcnQgamF2YXguc3FsLkRhdGFTb3VyY2U7CgovLyBDb21waWxlIGFsb25nc2lkZSBMZXNzb24xNS5qYXZhLiBSdW50aW1lIHJlcXVpcmVzIGEgY29uZmlndXJlZCBEYXRhU291cmNlCi8vIGFuZCBhIEpEQkMgZHJpdmVyLiBFYWNoIG9wZXJhdGlvbiB1c2VzIGl0cyBvd24gYXV0by1jb21taXQgY29ubmVjdGlvbi4KcHVibGljIGZpbmFsIGNsYXNzIEpkYmNPcmRlclJlcG9zaXRvcnkgaW1wbGVtZW50cyBPcmRlclJlcG9zaXRvcnkgewogICAgcHJpdmF0ZSBmaW5hbCBEYXRhU291cmNlIGRhdGFTb3VyY2U7CgogICAgcHVibGljIEpkYmNPcmRlclJlcG9zaXRvcnkoRGF0YVNvdXJjZSBkYXRhU291cmNlKSB7CiAgICAgICAgdGhpcy5kYXRhU291cmNlID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChkYXRhU291cmNlKTsKICAgIH0KCiAgICBAT3ZlcnJpZGUKICAgIHB1YmxpYyBPcHRpb25hbDxPcmRlcj4gZmluZEJ5SWQoU3RyaW5nIG9yZGVySWQpIHsKICAgICAgICBTdHJpbmcgc3FsID0gIiIiCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQsIGN1c3RvbWVyX2lkLCB0b3RhbF9taW5vciwgY3VycmVuY3ksIHN0YXR1cywgcGF5bWVudF9pZAogICAgICAgICAgICAgICAgRlJPTSBvcmRlcnMgV0hFUkUgaWQgPSA/CiAgICAgICAgICAgICAgICAiIiI7CiAgICAgICAgdHJ5ICh2YXIgY29ubmVjdGlvbiA9IGRhdGFTb3VyY2UuZ2V0Q29ubmVjdGlvbigpKSB7CiAgICAgICAgICAgIHJlcXVpcmVBdXRvQ29tbWl0KGNvbm5lY3Rpb24uZ2V0QXV0b0NvbW1pdCgpKTsKICAgICAgICAgICAgdHJ5ICh2YXIgc3RhdGVtZW50ID0gY29ubmVjdGlvbi5wcmVwYXJlU3RhdGVtZW50KHNxbCkpIHsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoMSwgb3JkZXJJZCk7CiAgICAgICAgICAgICAgICB0cnkgKHZhciByb3dzID0gc3RhdGVtZW50LmV4ZWN1dGVRdWVyeSgpKSB7CiAgICAgICAgICAgICAgICAgICAgaWYgKCFyb3dzLm5leHQoKSkgeyByZXR1cm4gT3B0aW9uYWwuZW1wdHkoKTsgfQogICAgICAgICAgICAgICAgICAgIHJldHVybiBPcHRpb25hbC5vZihuZXcgT3JkZXIoCiAgICAgICAgICAgICAgICAgICAgICAgICAgICByb3dzLmdldFN0cmluZygiaWQiKSwgcm93cy5nZXRTdHJpbmcoImN1c3RvbWVyX2lkIiksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBuZXcgTW9uZXkocm93cy5nZXRMb25nKCJ0b3RhbF9taW5vciIpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDdXJyZW5jeS5nZXRJbnN0YW5jZShyb3dzLmdldFN0cmluZygiY3VycmVuY3kiKSkpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgT3JkZXJTdGF0dXMudmFsdWVPZihyb3dzLmdldFN0cmluZygic3RhdHVzIikpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgcm93cy5nZXRTdHJpbmcoInBheW1lbnRfaWQiKSkpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiQ291bGQgbm90IGxvYWQgb3JkZXIiLCBmYWlsdXJlKTsKICAgICAgICB9CiAgICB9CgogICAgQE92ZXJyaWRlCiAgICBwdWJsaWMgdm9pZCBzYXZlKE9yZGVyIG9yZGVyKSB7CiAgICAgICAgU3RyaW5nIHNxbCA9ICIiIgogICAgICAgICAgICAgICAgSU5TRVJUIElOVE8gb3JkZXJzCiAgICAgICAgICAgICAgICAgICAgKGlkLCBjdXN0b21lcl9pZCwgdG90YWxfbWlub3IsIGN1cnJlbmN5LCBzdGF0dXMsIHBheW1lbnRfaWQpCiAgICAgICAgICAgICAgICBWQUxVRVMgKD8sID8sID8sID8sID8sID8pCiAgICAgICAgICAgICAgICBPTiBDT05GTElDVCAoaWQpIERPIFVQREFURSBTRVQKICAgICAgICAgICAgICAgICAgICBjdXN0b21lcl9pZCA9IEVYQ0xVREVELmN1c3RvbWVyX2lkLAogICAgICAgICAgICAgICAgICAgIHRvdGFsX21pbm9yID0gRVhDTFVERUQudG90YWxfbWlub3IsCiAgICAgICAgICAgICAgICAgICAgY3VycmVuY3kgPSBFWENMVURFRC5jdXJyZW5jeSwKICAgICAgICAgICAgICAgICAgICBzdGF0dXMgPSBFWENMVURFRC5zdGF0dXMsCiAgICAgICAgICAgICAgICAgICAgcGF5bWVudF9pZCA9IEVYQ0xVREVELnBheW1lbnRfaWQKICAgICAgICAgICAgICAgICIiIjsKICAgICAgICB0cnkgKHZhciBjb25uZWN0aW9uID0gZGF0YVNvdXJjZS5nZXRDb25uZWN0aW9uKCkpIHsKICAgICAgICAgICAgcmVxdWlyZUF1dG9Db21taXQoY29ubmVjdGlvbi5nZXRBdXRvQ29tbWl0KCkpOwogICAgICAgICAgICB0cnkgKHZhciBzdGF0ZW1lbnQgPSBjb25uZWN0aW9uLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICAgICAgc3RhdGVtZW50LnNldFN0cmluZygxLCBvcmRlci5pZCgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoMiwgb3JkZXIuY3VzdG9tZXJJZCgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRMb25nKDMsIG9yZGVyLnRvdGFsKCkubWlub3JVbml0cygpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoNCwgb3JkZXIudG90YWwoKS5jdXJyZW5jeSgpLmdldEN1cnJlbmN5Q29kZSgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoNSwgb3JkZXIuc3RhdHVzKCkubmFtZSgpKTsKICAgICAgICAgICAgICAgIHN0YXRlbWVudC5zZXRTdHJpbmcoNiwgb3JkZXIucGF5bWVudElkKCkpOwogICAgICAgICAgICAgICAgaWYgKHN0YXRlbWVudC5leGVjdXRlVXBkYXRlKCkgIT0gMSkgewogICAgICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oIkV4cGVjdGVkIG9uZSBzYXZlZCBvcmRlciIpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiQ291bGQgbm90IHNhdmUgb3JkZXIiLCBmYWlsdXJlKTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCByZXF1aXJlQXV0b0NvbW1pdChib29sZWFuIGF1dG9Db21taXQpIHsKICAgICAgICBpZiAoIWF1dG9Db21taXQpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiRGVtbyByZXF1aXJlcyBhdXRvLWNvbW1pdCBjb25uZWN0aW9ucyIpOwogICAgICAgIH0KICAgIH0KfQo=">Download JdbcOrderRepository.java</a></div>
+<figure class="codeblock"><figcaption>Compile · this does not start PostgreSQL</figcaption><pre><code>javac --release 25 -d out Lesson15.java JdbcOrderRepository.java</code></pre></figure><figure class="codeblock"><figcaption>SQL · create the demo table</figcaption><pre><code>CREATE TABLE orders (
+    id          text PRIMARY KEY,
+    customer_id text NOT NULL,
+    total_minor bigint NOT NULL CHECK (total_minor &gt; 0),
+    currency    char(3) NOT NULL,
+    status      text NOT NULL CHECK (status IN (&#x27;CREATED&#x27;, &#x27;PAID&#x27;)),
+    payment_id  text,
+    CHECK (
+        (status = &#x27;CREATED&#x27; AND payment_id IS NULL) OR
+        (status = &#x27;PAID&#x27; AND payment_id IS NOT NULL
+                       AND length(btrim(payment_id)) &gt; 0)
+    )
+);</code></pre></figure>
+<p>The save method uses PostgreSQL’s <code>ON CONFLICT</code> upsert syntax. <a class="cite" href="#source-15" aria-label="Source 15">[15]</a> The adapter is not a transaction manager and its upsert does not enforce the order lifecycle under concurrent writers.</p>
+<aside class="callout note"><strong>Validation limit</strong><div>The class was compiled with the demo. <strong>⚠️</strong> No PostgreSQL instance was available for integration tests. Test row mapping, constraints, failure translation, and the chosen concurrency policy against a real test database before using it.</div></aside><figure class="codeblock long-code"><figcaption>JdbcOrderRepository.java · complete source</figcaption><pre><code>import java.sql.SQLException;
+import java.util.Currency;
+import java.util.Objects;
+import java.util.Optional;
+import javax.sql.DataSource;
+
+// Compile alongside Lesson15.java. Runtime requires a configured DataSource
+// and a JDBC driver. Each operation uses its own auto-commit connection.
+public final class JdbcOrderRepository implements OrderRepository {
+    private final DataSource dataSource;
+
+    public JdbcOrderRepository(DataSource dataSource) {
+        this.dataSource = Objects.requireNonNull(dataSource);
+    }
+
+    @Override
+    public Optional&lt;Order&gt; findById(String orderId) {
+        String sql = &quot;&quot;&quot;
+                SELECT id, customer_id, total_minor, currency, status, payment_id
+                FROM orders WHERE id = ?
+                &quot;&quot;&quot;;
+        try (var connection = dataSource.getConnection()) {
+            requireAutoCommit(connection.getAutoCommit());
+            try (var statement = connection.prepareStatement(sql)) {
+                statement.setString(1, orderId);
+                try (var rows = statement.executeQuery()) {
+                    if (!rows.next()) { return Optional.empty(); }
+                    return Optional.of(new Order(
+                            rows.getString(&quot;id&quot;), rows.getString(&quot;customer_id&quot;),
+                            new Money(rows.getLong(&quot;total_minor&quot;),
+                                    Currency.getInstance(rows.getString(&quot;currency&quot;))),
+                            OrderStatus.valueOf(rows.getString(&quot;status&quot;)),
+                            rows.getString(&quot;payment_id&quot;)));
+                }
+            }
+        } catch (SQLException failure) {
+            throw new IllegalStateException(&quot;Could not load order&quot;, failure);
+        }
+    }
+
+    @Override
+    public void save(Order order) {
+        String sql = &quot;&quot;&quot;
+                INSERT INTO orders
+                    (id, customer_id, total_minor, currency, status, payment_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT (id) DO UPDATE SET
+                    customer_id = EXCLUDED.customer_id,
+                    total_minor = EXCLUDED.total_minor,
+                    currency = EXCLUDED.currency,
+                    status = EXCLUDED.status,
+                    payment_id = EXCLUDED.payment_id
+                &quot;&quot;&quot;;
+        try (var connection = dataSource.getConnection()) {
+            requireAutoCommit(connection.getAutoCommit());
+            try (var statement = connection.prepareStatement(sql)) {
+                statement.setString(1, order.id());
+                statement.setString(2, order.customerId());
+                statement.setLong(3, order.total().minorUnits());
+                statement.setString(4, order.total().currency().getCurrencyCode());
+                statement.setString(5, order.status().name());
+                statement.setString(6, order.paymentId());
+                if (statement.executeUpdate() != 1) {
+                    throw new IllegalStateException(&quot;Expected one saved order&quot;);
+                }
+            }
+        } catch (SQLException failure) {
+            throw new IllegalStateException(&quot;Could not save order&quot;, failure);
+        }
+    }
+
+    private static void requireAutoCommit(boolean autoCommit) {
+        if (!autoCommit) {
+            throw new IllegalStateException(&quot;Demo requires auto-commit connections&quot;);
+        }
+    }
+}</code></pre></figure></section><section id="sources" class="lesson-section chapter-start"><p class="eyebrow">References · verified 2 September 2026</p><h2>Primary sources and validation notes</h2><p>This guide adapts the supplied Lesson 15. Its examples and design commentary are teaching choices; framework and API claims are grounded in the sources below. Reading, navigation, printing, and the code downloads work offline. Opening a source link requires an internet connection.</p><ol class="references"><li id="source-1"><a href="https://alistair.cockburn.us/hexagonal-architecture">Alistair Cockburn · Hexagonal Architecture, original article</a><p>Original pattern, ports and adapters, primary/secondary roles, inside/outside distinction.</p><span class="print-url">https://alistair.cockburn.us/hexagonal-architecture</span></li><li id="source-2"><a href="https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures">Microsoft Learn · Common web application architectures</a><p>Application core, inward source dependencies, runtime composition, related architecture families.</p><span class="print-url">https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures</span></li><li id="source-3"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle · Java 25 record classes</a><p>Records and their generated data-carrier members.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/language/records.html</span></li><li id="source-4"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Clock.html">Oracle · Java 25 Clock API</a><p>Injectable clocks, systemUTC, fixed, and deterministic time in tests.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Clock.html</span></li><li id="source-5"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/javax/sql/DataSource.html">Oracle · Java 25 DataSource API</a><p>JDBC connection source.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/javax/sql/DataSource.html</span></li><li id="source-6"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/PreparedStatement.html">Oracle · Java 25 PreparedStatement and Connection APIs</a><p>Bound parameters and statement execution. See also the linked Connection reference.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/PreparedStatement.html</span></li><li id="source-7"><a href="https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-requestmapping.html">Spring Framework · Mapping requests</a><p>HTTP mappings and path variables.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-requestmapping.html</span></li><li id="source-8"><a href="https://docs.spring.io/spring-boot/system-requirements.html">Spring Boot · System requirements</a><p>Verified page: Boot 4.1.1 supports Java 17 through 26; Java 25 is in that range.</p><span class="print-url">https://docs.spring.io/spring-boot/system-requirements.html</span></li><li id="source-9"><a href="https://docs.stripe.com/payments/payment-intents">Stripe · Payment Intents</a><p>Payment lifecycle and integration flow.</p><span class="print-url">https://docs.stripe.com/payments/payment-intents</span></li><li id="source-10"><a href="https://docs.stripe.com/api/idempotent_requests">Stripe · Idempotent requests</a><p>Provider request-idempotency semantics.</p><span class="print-url">https://docs.stripe.com/api/idempotent_requests</span></li><li id="source-11"><a href="https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html">Apache Kafka · KafkaProducer API, 4.1.2</a><p>Asynchronous send, returned future, delivery configuration and lifecycle.</p><span class="print-url">https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html</span></li><li id="source-12"><a href="https://docs.spring.io/spring-framework/reference/core/beans/java/bean-annotation.html">Spring Framework · Using @Bean</a><p>Bean declarations and dependency injection through configuration.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/core/beans/java/bean-annotation.html</span></li><li id="source-13"><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS Prescriptive Guidance · Transactional outbox</a><p>Dual writes, local transaction with outbox, relay and duplicate handling.</p><span class="print-url">https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html</span></li><li id="source-14"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Oracle · Java 25 javac command</a><p>Compilation and --release option.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li><li id="source-15"><a href="https://www.postgresql.org/docs/current/sql-insert.html">PostgreSQL · INSERT</a><p>ON CONFLICT and upsert semantics.</p><span class="print-url">https://www.postgresql.org/docs/current/sql-insert.html</span></li></ol><p>Additional JDBC transaction reference: <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html">Java 25 Connection API</a>.</p><p><strong>Integration status:</strong> Spring MVC and Kafka excerpts were checked against official documentation but were not compiled against those libraries. The Stripe section is a mapping explanation, not a runnable SDK example. The JDBC class was compiled but not integration-tested.</p></section>
+<footer class="doc-footer">DP · Lesson 15 · Adapted from the supplied lesson. Reference verification: 2 September 2026.</footer></main></div><div class="toast screen-only" role="status" aria-live="polite"></div><script>
+(() => {
+  const toast = document.querySelector('.toast');
+  let timer;
+  function announce(text) {
+    toast.textContent = text;
+    clearTimeout(timer);
+    timer = setTimeout(() => { toast.textContent = ''; }, 2200);
+  }
+  const printButton = document.createElement('button');
+  printButton.type = 'button';
+  printButton.textContent = 'Print / Save PDF';
+  printButton.addEventListener('click', () => window.print());
+  document.querySelector('#hero-actions').prepend(printButton);
+  document.querySelectorAll('.codeblock').forEach((block, index) => {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Copy';
+    btn.setAttribute('aria-label', 'Copy code example ' + (index + 1));
+    btn.addEventListener('click', async () => {
+      const text = block.querySelector('code').textContent;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const area = document.createElement('textarea');
+          area.value = text; area.style.position = 'fixed'; area.style.top = '-9999px';
+          document.body.append(area); area.select();
+          const success = document.execCommand('copy'); area.remove();
+          if (!success) throw new Error('copy unavailable');
+        }
+        announce('Code copied');
+      } catch {
+        announce('Select the code and use your browser’s Copy command.');
+      }
+    });
+    block.querySelector('figcaption').append(btn);
+  });
+  const boxes = [...document.querySelectorAll('#exercise-checklist input')];
+  function progress() {
+    document.querySelector('#check-progress').textContent =
+      `${boxes.filter(b => b.checked).length} of ${boxes.length} criteria checked. This checklist resets when the page reloads.`;
+  }
+  boxes.forEach(b => b.addEventListener('change', progress));
+  const links = [...document.querySelectorAll('.rail nav a')];
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          links.forEach(a => {
+            const active = a.getAttribute('href') === '#' + entry.target.id;
+            a.classList.toggle('active', active);
+            if (active) a.setAttribute('aria-current', 'location');
+            else a.removeAttribute('aria-current');
+          });
+        }
+      });
+    }, {rootMargin: '-5% 0px -75% 0px', threshold: 0});
+    document.querySelectorAll('.lesson-section').forEach(s => observer.observe(s));
+  }
+})();
+</script></body></html>

@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 9: derive Facade from first principles with a complete Java 25-compatible checkout example, workflow tests, reliability limits, and a video-processing exercise."><title>Lesson 9 · Facade · Java 25 guide</title><style>
+:root { color-scheme: light; --ink:#203136; --muted:#52656b; --accent:#146c67; --line:#d5e2e2; --paper:#fff; --tint:#eff7f6; --code:#f4f7f9; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:90px; }
+body { margin:0; background:#edf3f2; color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif; font-size:16px; line-height:1.68; }
+a { color:#0f625c; text-decoration-thickness:1px; text-underline-offset:3px; }
+a:hover { color:#073e3b; }
+a:focus-visible,button:focus-visible { outline:3px solid #aa710d; outline-offset:4px; }
+.skip { position:absolute; left:12px; top:-100px; background:#fff; padding:8px; z-index:5; }
+.skip:focus { top:12px; }
+.toolbar { position:sticky; top:0; z-index:3; background:#ffffffed; border-bottom:1px solid var(--line); padding:12px 28px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.toolbar strong { font-size:14px; letter-spacing:.02em; }
+.actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+button,.button { appearance:none; border:1px solid #b2cfcb; color:#125f5a; background:#f4fbfa; padding:7px 12px; border-radius:6px; font:600 13px/1.4 system-ui,sans-serif; cursor:pointer; text-decoration:none; }
+button:hover,.button:hover { background:#e6f3f0; }
+.layout { max-width:1260px; margin:32px auto; padding:0 24px; display:grid; grid-template-columns:200px minmax(0,900px); gap:30px; }
+.sidebar { position:sticky; top:92px; align-self:start; font-size:13px; line-height:1.6; }
+.sidebar .eyebrow { margin-top:0; }
+.sidebar a { display:block; padding:6px 0; text-decoration:none; color:var(--muted); }
+.sidebar a:hover { color:var(--accent); text-decoration:underline; }
+main { min-width:0; }
+.chapter { background:var(--paper); padding:44px 52px; margin-bottom:22px; border:1px solid var(--line); border-radius:10px; box-shadow:0 3px 10px #20313606; }
+.chapter h2:first-child { margin-top:0; }
+.eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:.13em; font-weight:750; color:var(--accent); margin:0 0 14px; }
+.lesson-number { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:42px; }
+h1 { font-size:78px; line-height:1.05; font-weight:750; letter-spacing:-.05em; margin:14px 0 24px; color:#155e58; }
+.subtitle { font-size:28px; line-height:1.3; letter-spacing:-.025em; margin-bottom:22px; font-weight:620; }
+.lead { font-size:18px; color:var(--muted); max-width:680px; }
+.tags { display:flex; flex-wrap:wrap; gap:8px; margin:25px 0 34px; }
+.tags span { font-size:11px; font-weight:650; border:1px solid #c9deda; color:#246560; padding:4px 10px; border-radius:30px; }
+h2 { font-size:25px; line-height:1.28; letter-spacing:-.02em; margin:34px 0 16px; font-weight:700; break-after:avoid; }
+h3 { font-size:16px; line-height:1.4; margin:25px 0 10px; break-after:avoid; }
+.step { font-size:14px; color:var(--accent); display:inline-block; min-width:37px; vertical-align:3px; letter-spacing:.04em; }
+p { margin:0 0 15px; }
+ul,ol { margin:8px 0 18px; padding-left:23px; }
+li { margin:7px 0; }
+.small { font-size:12.5px; line-height:1.55; color:var(--muted); }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+.principle { border-left:4px solid #448f86; background:var(--tint); padding:19px 23px; margin:26px 0; break-inside:avoid; }
+.principle p:last-child { font-size:20px; font-weight:620; line-height:1.5; margin:0; }
+.read-map { border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:17px 0; margin:20px 0; font-size:13px; }
+.read-map p { margin:6px 0 0; }
+.callout { border-left:3px solid #5c9b92; background:#f2f8f6; padding:15px 19px; margin:20px 0; break-inside:avoid; }
+.callout strong { font-size:14px; color:#245e54; }
+.callout p { font-size:13.5px; line-height:1.6; margin:5px 0 0; }
+.caution { background:#fff8e9; border-color:#bd8c32; }
+.caution strong { color:#785214; }
+.answer { padding-left:16px; border-left:2px solid var(--line); color:var(--muted); font-size:14px; }
+table { border-collapse:collapse; width:100%; margin:20px 0; font-size:13px; line-height:1.55; table-layout:fixed; }
+th { background:#edf5f3; color:#285b55; text-align:left; font-weight:700; }
+th,td { padding:10px 12px; border:1px solid var(--line); vertical-align:top; overflow-wrap:anywhere; }
+tr { break-inside:avoid; }
+thead { display:table-header-group; }
+td p { margin:0; }
+.compact th,.compact td { padding:8px 11px; }
+code { font-family:"DejaVu Sans Mono",Consolas,"Liberation Mono",monospace; font-size:.84em; overflow-wrap:anywhere; }
+p code,li code,td code { background:#f0f5f6; border-radius:3px; padding:1px 3px; }
+.code-panel { margin:19px 0; border:1px solid #d9e3e7; border-radius:6px; overflow:hidden; background:var(--code); break-inside:avoid; }
+figcaption { font:600 11px/1.45 system-ui,sans-serif; color:#586a72; background:#edf2f5; padding:9px 15px; border-bottom:1px solid #dae3e7; letter-spacing:.025em; }
+pre { margin:0; padding:17px 18px; overflow-x:auto; white-space:pre-wrap; overflow-wrap:anywhere; tab-size:4; font-size:12px; line-height:1.65; }
+pre code { font-size:1em; font-weight:400; }
+.keyword { color:#56498b; font-weight:600; }
+.string { color:#1e7461; }
+.comment { color:#62747a; font-style:italic; }
+.ref { font-size:10px; vertical-align:super; white-space:nowrap; text-decoration:none; padding:0 1px; }
+.sources { font-size:11.5px; line-height:1.4; padding-left:22px; }
+.sources li { margin:11px 0; break-inside:avoid; }
+.sources a { font-weight:650; }
+.source-note { display:block; color:var(--muted); margin-top:2px; }
+.source-url { display:block; font-size:9px; color:#5b6f72; overflow-wrap:anywhere; margin-top:2px; }
+.closing { font-size:11px; letter-spacing:.04em; color:var(--muted); border-top:1px solid var(--line); padding-top:17px; margin-top:28px; }
+#copy-status { font-size:12px; color:var(--muted); }
+@media(max-width:1000px) { .layout { display:block; max-width:910px; } .sidebar { display:none; } }
+@media(max-width:600px) { body { font-size:15px; } .layout { margin:12px auto; padding:0 10px; } .chapter { padding:27px 22px; } .toolbar { position:static; padding:12px 18px; align-items:flex-start; flex-direction:column; } .toolbar strong { font-size:13px; } .two-col { grid-template-columns:1fr; gap:0; } h1 { font-size:58px; } .subtitle { font-size:24px; } h2 { font-size:22px; } pre { padding:12px; font-size:10.5px; } th,td { padding:8px; font-size:11px; } .source-url { font-size:8.5px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@page { size:A4; margin:12mm 14mm 14mm; @bottom-left { content:"DP / Lesson 09 · Facade"; font:8pt sans-serif; color:#637773; } @bottom-right { content:counter(page); font:8pt sans-serif; color:#637773; } }
+@media print {
+  html { scroll-behavior:auto; }
+  body { background:white; color:#172e32; font-family:Arial,sans-serif; font-size:10pt; line-height:1.46; }
+  .toolbar,.sidebar,.skip,.screen-only { display:none!important; }
+  .layout { display:block; width:auto; max-width:none; padding:0; margin:0; }
+  .chapter { border:none; box-shadow:none; border-radius:0; padding:0; margin:0; break-before:page; }
+  .chapter:first-child { break-before:auto; }
+  h1 { font-size:59pt; margin:10pt 0 18pt; }
+  h2 { font-size:17pt; margin:15pt 0 8pt; }
+  h3 { font-size:11pt; margin:12pt 0 6pt; }
+  .step { font-size:10pt; min-width:25pt; vertical-align:2pt; }
+  .eyebrow { font-size:7.5pt; margin-bottom:10pt; }
+  .lesson-number { font-size:9pt; margin-top:25pt; }
+  .subtitle { font-size:21pt; line-height:1.3; margin-bottom:15pt; }
+  .lead { font-size:12pt; }
+  .tags { margin:16pt 0 22pt; gap:5pt; }
+  .tags span { font-size:7.5pt; padding:3pt 7pt; }
+  p { margin:0 0 8pt; orphans:3; widows:3; }
+  ul,ol { margin:5pt 0 11pt; padding-left:17pt; }
+  li { margin:5pt 0; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:18pt; }
+  .principle { margin:14pt 0; padding:12pt 15pt; }
+  .principle p:last-child { font-size:14pt; }
+  .read-map { font-size:9pt; padding:11pt 0; margin:15pt 0; }
+  .callout { padding:9pt 12pt; margin:10pt 0; }
+  .callout strong { font-size:9.5pt; }
+  .callout p { font-size:9pt; line-height:1.45; }
+  .small { font-size:8.3pt; line-height:1.43; }
+  .answer { font-size:9.5pt; }
+  table { font-size:9pt; line-height:1.42; margin:10pt 0; }
+  th,td { padding:6pt 8pt; }
+  .compact th,.compact td { padding:6pt 7pt; }
+  .code-panel { margin:10pt 0; border-radius:3pt; }
+  figcaption { font-size:7.4pt; padding:6pt 10pt; }
+  pre { overflow:visible; font-size:8.2pt; line-height:1.32; padding:9pt 10pt; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .source-chapter pre { font-size:8.2pt; line-height:1.24; }
+  .source-chapter h2 { font-size:16pt; }
+  .source-chapter .code-panel { margin:9pt 0; }
+  .source-chapter p { margin-bottom:8pt; }
+  .keyword,.string,.comment { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  .ref { font-size:7pt; }
+  a { color:#174e48; text-decoration:none; }
+  .sources { font-size:8.1pt; line-height:1.32; }
+  .sources li { margin:7pt 0; }
+  .source-url { font-size:6.8pt; line-height:1.25; }
+  .source-note { margin-top:1pt; }
+  .closing { font-size:8pt; margin-top:15pt; padding-top:10pt; }
+}
+</style></head>
+<body><a class="skip" href="#main">Skip to guide</a><div class="toolbar"><strong>DP / Lesson 09 · Facade</strong><div class="actions"><button id="print-guide" type="button">Print / Save PDF</button><a class="button" id="download-source" download="FacadeDemo.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEudXRpbC5BcnJheUxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKaW1wb3J0IGphdmEudXRpbC5PYmplY3RzOwoKcHVibGljIGZpbmFsIGNsYXNzIEZhY2FkZURlbW8gewogICAgLy8gUGFydCBBOiBkYXRhIGFuZCBvdXRjb21lcwogICAgcmVjb3JkIENoZWNrb3V0UmVxdWVzdChTdHJpbmcgb3JkZXJJZCwgU3RyaW5nIGN1c3RvbWVySWQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgIFN0cmluZyBwcm9kdWN0SWQsIGludCBxdWFudGl0eSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgbG9uZyBzdWJ0b3RhbENlbnRzKSB7CiAgICAgICAgQ2hlY2tvdXRSZXF1ZXN0IHsKICAgICAgICAgICAgcmVxdWlyZVRleHQob3JkZXJJZCk7CiAgICAgICAgICAgIHJlcXVpcmVUZXh0KGN1c3RvbWVySWQpOwogICAgICAgICAgICByZXF1aXJlVGV4dChwcm9kdWN0SWQpOwogICAgICAgICAgICBpZiAocXVhbnRpdHkgPD0gMCB8fCBzdWJ0b3RhbENlbnRzIDwgMCkgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiSW52YWxpZCBvcmRlciIpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyB2b2lkIHJlcXVpcmVUZXh0KFN0cmluZyB2YWx1ZSkgewogICAgICAgIGlmICh2YWx1ZSA9PSBudWxsIHx8IHZhbHVlLmlzQmxhbmsoKSkgewogICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJJRCBpcyByZXF1aXJlZCIpOwogICAgICAgIH0KICAgIH0KCiAgICBzZWFsZWQgaW50ZXJmYWNlIENoZWNrb3V0UmVzdWx0CiAgICAgICAgICAgIHBlcm1pdHMgQ2hlY2tvdXRTdWNjZXNzLCBDaGVja291dFJlamVjdGVkIHt9CgogICAgcmVjb3JkIENoZWNrb3V0U3VjY2VzcyhTdHJpbmcgb3JkZXJJZCwgU3RyaW5nIHBheW1lbnRJZCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgU3RyaW5nIHNoaXBtZW50SWQsIGxvbmcgdG90YWxDZW50cykKICAgICAgICAgICAgaW1wbGVtZW50cyBDaGVja291dFJlc3VsdCB7fQoKICAgIGVudW0gUmVqZWN0aW9uIHsgRlJBVURfUkVKRUNURUQsIE9VVF9PRl9TVE9DSywgUEFZTUVOVF9ERUNMSU5FRCB9CgogICAgcmVjb3JkIENoZWNrb3V0UmVqZWN0ZWQoUmVqZWN0aW9uIHJlYXNvbikKICAgICAgICAgICAgaW1wbGVtZW50cyBDaGVja291dFJlc3VsdCB7fQoKICAgIC8vIFBhcnQgQjogc3Vic3lzdGVtIGNvbnRyYWN0cwogICAgaW50ZXJmYWNlIEludmVudG9yeVNlcnZpY2UgewogICAgICAgIC8vIE91dE9mU3RvY2tFeGNlcHRpb24gZ3VhcmFudGVlcyBubyByZXNlcnZhdGlvbiB3YXMgbWFkZS4KICAgICAgICB2b2lkIHJlc2VydmUoU3RyaW5nIG9yZGVySWQsIFN0cmluZyBwcm9kdWN0SWQsIGludCBxdWFudGl0eSk7CiAgICAgICAgLy8gTm9ybWFsIHJldHVybiBndWFyYW50ZWVzIHRoaXMgcmVzZXJ2YXRpb24gd2FzIHJlbGVhc2VkLgogICAgICAgIHZvaWQgcmVsZWFzZShTdHJpbmcgb3JkZXJJZCk7CiAgICB9CgogICAgaW50ZXJmYWNlIFRheFNlcnZpY2UgewogICAgICAgIGxvbmcgY2FsY3VsYXRlVGF4KGxvbmcgc3VidG90YWxDZW50cyk7CiAgICB9CgogICAgaW50ZXJmYWNlIEZyYXVkU2VydmljZSB7CiAgICAgICAgYm9vbGVhbiBhcHByb3ZlKFN0cmluZyBjdXN0b21lcklkLCBsb25nIHRvdGFsQ2VudHMpOwogICAgfQoKICAgIGludGVyZmFjZSBQYXltZW50U2VydmljZSB7CiAgICAgICAgLy8gUGF5bWVudERlY2xpbmVkRXhjZXB0aW9uIGd1YXJhbnRlZXMgbm8gY2hhcmdlIHdhcyBtYWRlLgogICAgICAgIC8vIEEgdGltZW91dCBpcyBOT1QgYSBkZWNsaW5lOiBpdHMgb3V0Y29tZSBtYXkgYmUgdW5rbm93bi4KICAgICAgICBTdHJpbmcgY2hhcmdlKFN0cmluZyBvcmRlcklkLCBTdHJpbmcgY3VzdG9tZXJJZCwgbG9uZyBjZW50cyk7CiAgICB9CgogICAgaW50ZXJmYWNlIFNoaXBwaW5nU2VydmljZSB7CiAgICAgICAgU3RyaW5nIGNyZWF0ZVNoaXBtZW50KFN0cmluZyBvcmRlcklkKTsKICAgIH0KCiAgICBpbnRlcmZhY2UgRW1haWxTZXJ2aWNlIHsKICAgICAgICB2b2lkIHNlbmRDb25maXJtYXRpb24oU3RyaW5nIGN1c3RvbWVySWQsIFN0cmluZyBvcmRlcklkKTsKICAgIH0KCiAgICBzdGF0aWMgZmluYWwgY2xhc3MgT3V0T2ZTdG9ja0V4Y2VwdGlvbiBleHRlbmRzIFJ1bnRpbWVFeGNlcHRpb24gewogICAgICAgIHByaXZhdGUgc3RhdGljIGZpbmFsIGxvbmcgc2VyaWFsVmVyc2lvblVJRCA9IDFMOwogICAgfQoKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBQYXltZW50RGVjbGluZWRFeGNlcHRpb24gZXh0ZW5kcyBSdW50aW1lRXhjZXB0aW9uIHsKICAgICAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBsb25nIHNlcmlhbFZlcnNpb25VSUQgPSAxTDsKICAgIH0KCiAgICAvLyBQYXJ0IEM6IHRoZSBmYWNhZGUgYW5kIGl0cyBjbGllbnQKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBDaGVja291dEZhY2FkZSB7CiAgICAgICAgcHJpdmF0ZSBmaW5hbCBJbnZlbnRvcnlTZXJ2aWNlIGludmVudG9yeTsKICAgICAgICBwcml2YXRlIGZpbmFsIFRheFNlcnZpY2UgdGF4OwogICAgICAgIHByaXZhdGUgZmluYWwgRnJhdWRTZXJ2aWNlIGZyYXVkOwogICAgICAgIHByaXZhdGUgZmluYWwgUGF5bWVudFNlcnZpY2UgcGF5bWVudDsKICAgICAgICBwcml2YXRlIGZpbmFsIFNoaXBwaW5nU2VydmljZSBzaGlwcGluZzsKICAgICAgICBwcml2YXRlIGZpbmFsIEVtYWlsU2VydmljZSBlbWFpbDsKCiAgICAgICAgQ2hlY2tvdXRGYWNhZGUoSW52ZW50b3J5U2VydmljZSBpbnZlbnRvcnksIFRheFNlcnZpY2UgdGF4LAogICAgICAgICAgICAgICAgICAgICAgIEZyYXVkU2VydmljZSBmcmF1ZCwgUGF5bWVudFNlcnZpY2UgcGF5bWVudCwKICAgICAgICAgICAgICAgICAgICAgICBTaGlwcGluZ1NlcnZpY2Ugc2hpcHBpbmcsIEVtYWlsU2VydmljZSBlbWFpbCkgewogICAgICAgICAgICB0aGlzLmludmVudG9yeSA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwoaW52ZW50b3J5KTsKICAgICAgICAgICAgdGhpcy50YXggPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKHRheCk7CiAgICAgICAgICAgIHRoaXMuZnJhdWQgPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKGZyYXVkKTsKICAgICAgICAgICAgdGhpcy5wYXltZW50ID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChwYXltZW50KTsKICAgICAgICAgICAgdGhpcy5zaGlwcGluZyA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwoc2hpcHBpbmcpOwogICAgICAgICAgICB0aGlzLmVtYWlsID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChlbWFpbCk7CiAgICAgICAgfQoKICAgICAgICBwdWJsaWMgQ2hlY2tvdXRSZXN1bHQgY2hlY2tvdXQoQ2hlY2tvdXRSZXF1ZXN0IHJlcXVlc3QpIHsKICAgICAgICAgICAgT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChyZXF1ZXN0KTsKICAgICAgICAgICAgbG9uZyB0YXhDZW50cyA9IHRheC5jYWxjdWxhdGVUYXgocmVxdWVzdC5zdWJ0b3RhbENlbnRzKCkpOwogICAgICAgICAgICBpZiAodGF4Q2VudHMgPCAwKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbFN0YXRlRXhjZXB0aW9uKCJOZWdhdGl2ZSB0YXgiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICBsb25nIHRvdGFsID0gTWF0aC5hZGRFeGFjdChyZXF1ZXN0LnN1YnRvdGFsQ2VudHMoKSwgdGF4Q2VudHMpOwogICAgICAgICAgICBpZiAoIWZyYXVkLmFwcHJvdmUocmVxdWVzdC5jdXN0b21lcklkKCksIHRvdGFsKSkgewogICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGVja291dFJlamVjdGVkKFJlamVjdGlvbi5GUkFVRF9SRUpFQ1RFRCk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgdHJ5IHsKICAgICAgICAgICAgICAgIGludmVudG9yeS5yZXNlcnZlKHJlcXVlc3Qub3JkZXJJZCgpLCByZXF1ZXN0LnByb2R1Y3RJZCgpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVxdWVzdC5xdWFudGl0eSgpKTsKICAgICAgICAgICAgfSBjYXRjaCAoT3V0T2ZTdG9ja0V4Y2VwdGlvbiBkZWNsaW5lZCkgewogICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBDaGVja291dFJlamVjdGVkKFJlamVjdGlvbi5PVVRfT0ZfU1RPQ0spOwogICAgICAgICAgICB9CiAgICAgICAgICAgIFN0cmluZyBwYXltZW50SWQ7CiAgICAgICAgICAgIHRyeSB7CiAgICAgICAgICAgICAgICBwYXltZW50SWQgPSBwYXltZW50LmNoYXJnZShyZXF1ZXN0Lm9yZGVySWQoKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVxdWVzdC5jdXN0b21lcklkKCksIHRvdGFsKTsKICAgICAgICAgICAgfSBjYXRjaCAoUGF5bWVudERlY2xpbmVkRXhjZXB0aW9uIGRlY2xpbmVkKSB7CiAgICAgICAgICAgICAgICAvLyBJZiByZWxlYXNlIGZhaWxzLCBwcm9wYWdhdGUgdGhhdCBzeXN0ZW0gZmFpbHVyZS4KICAgICAgICAgICAgICAgIGludmVudG9yeS5yZWxlYXNlKHJlcXVlc3Qub3JkZXJJZCgpKTsKICAgICAgICAgICAgICAgIHJldHVybiBuZXcgQ2hlY2tvdXRSZWplY3RlZChSZWplY3Rpb24uUEFZTUVOVF9ERUNMSU5FRCk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgLy8gTGF0ZXIgZmFpbHVyZXMgcHJvcGFnYXRlOyBlYXJsaWVyIGVmZmVjdHMgcmVtYWluLgogICAgICAgICAgICBTdHJpbmcgc2hpcG1lbnRJZCA9IHNoaXBwaW5nLmNyZWF0ZVNoaXBtZW50KHJlcXVlc3Qub3JkZXJJZCgpKTsKICAgICAgICAgICAgZW1haWwuc2VuZENvbmZpcm1hdGlvbihyZXF1ZXN0LmN1c3RvbWVySWQoKSwgcmVxdWVzdC5vcmRlcklkKCkpOwogICAgICAgICAgICByZXR1cm4gbmV3IENoZWNrb3V0U3VjY2VzcyhyZXF1ZXN0Lm9yZGVySWQoKSwgcGF5bWVudElkLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaGlwbWVudElkLCB0b3RhbCk7CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBDaGVja291dENvbnRyb2xsZXIgewogICAgICAgIHByaXZhdGUgZmluYWwgQ2hlY2tvdXRGYWNhZGUgY2hlY2tvdXQ7CiAgICAgICAgQ2hlY2tvdXRDb250cm9sbGVyKENoZWNrb3V0RmFjYWRlIGNoZWNrb3V0KSB7CiAgICAgICAgICAgIHRoaXMuY2hlY2tvdXQgPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKGNoZWNrb3V0KTsKICAgICAgICB9CiAgICAgICAgcHVibGljIENoZWNrb3V0UmVzdWx0IGNoZWNrb3V0KENoZWNrb3V0UmVxdWVzdCByZXF1ZXN0KSB7CiAgICAgICAgICAgIHJldHVybiBjaGVja291dC5jaGVja291dChyZXF1ZXN0KTsKICAgICAgICB9CiAgICB9CgogICAgLy8gUGFydCBEOiBhIGRldGVybWluaXN0aWMgZmFrZSBzdWJzeXN0ZW0KICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBSaWcgewogICAgICAgIGZpbmFsIExpc3Q8U3RyaW5nPiBjYWxscyA9IG5ldyBBcnJheUxpc3Q8PigpOwogICAgICAgIGJvb2xlYW4gZnJhdWRBcHByb3ZlZCA9IHRydWUsIGluU3RvY2sgPSB0cnVlOwogICAgICAgIGJvb2xlYW4gcGF5bWVudEFwcHJvdmVkID0gdHJ1ZSwgZmFpbFNoaXBwaW5nLCBmYWlsRW1haWw7CiAgICAgICAgYm9vbGVhbiBmYWlsUmVsZWFzZTsKCiAgICAgICAgQ2hlY2tvdXRGYWNhZGUgZmFjYWRlKCkgewogICAgICAgICAgICByZXR1cm4gbmV3IENoZWNrb3V0RmFjYWRlKG5ldyBJbnZlbnRvcnlTZXJ2aWNlKCkgewogICAgICAgICAgICAgICAgcHVibGljIHZvaWQgcmVzZXJ2ZShTdHJpbmcgb3JkZXIsIFN0cmluZyBwcm9kdWN0LCBpbnQgcXR5KSB7CiAgICAgICAgICAgICAgICAgICAgY2FsbHMuYWRkKCJyZXNlcnZlIik7CiAgICAgICAgICAgICAgICAgICAgaWYgKCFpblN0b2NrKSB0aHJvdyBuZXcgT3V0T2ZTdG9ja0V4Y2VwdGlvbigpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgcHVibGljIHZvaWQgcmVsZWFzZShTdHJpbmcgb3JkZXIpIHsKICAgICAgICAgICAgICAgICAgICBjYWxscy5hZGQoInJlbGVhc2UiKTsKICAgICAgICAgICAgICAgICAgICBpZiAoZmFpbFJlbGVhc2UpIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oInJlbGVhc2UiKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfSwgc3VidG90YWwgLT4gewogICAgICAgICAgICAgICAgY2FsbHMuYWRkKCJ0YXgiKTsKICAgICAgICAgICAgICAgIHJldHVybiAxMDBMOyAvLyBGaXhlZCB0ZXN0IGZpeHR1cmUsIG5vdCBhIHRheCBhbGdvcml0aG0uCiAgICAgICAgICAgIH0sIChjdXN0b21lciwgdG90YWwpIC0+IHsKICAgICAgICAgICAgICAgIGNhbGxzLmFkZCgiZnJhdWQiKTsKICAgICAgICAgICAgICAgIHJldHVybiBmcmF1ZEFwcHJvdmVkOwogICAgICAgICAgICB9LCAob3JkZXIsIGN1c3RvbWVyLCB0b3RhbCkgLT4gewogICAgICAgICAgICAgICAgY2FsbHMuYWRkKCJwYXltZW50Iik7CiAgICAgICAgICAgICAgICBpZiAoIXBheW1lbnRBcHByb3ZlZCkgdGhyb3cgbmV3IFBheW1lbnREZWNsaW5lZEV4Y2VwdGlvbigpOwogICAgICAgICAgICAgICAgcmV0dXJuICJQQVktMSI7CiAgICAgICAgICAgIH0sIG9yZGVyIC0+IHsKICAgICAgICAgICAgICAgIGNhbGxzLmFkZCgic2hpcG1lbnQiKTsKICAgICAgICAgICAgICAgIGlmIChmYWlsU2hpcHBpbmcpIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oInNoaXBwaW5nIik7CiAgICAgICAgICAgICAgICByZXR1cm4gIlNISVAtMSI7CiAgICAgICAgICAgIH0sIChjdXN0b21lciwgb3JkZXIpIC0+IHsKICAgICAgICAgICAgICAgIGNhbGxzLmFkZCgiZW1haWwiKTsKICAgICAgICAgICAgICAgIGlmIChmYWlsRW1haWwpIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oImVtYWlsIik7CiAgICAgICAgICAgIH0pOwogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgdm9pZCBjaGVjayhib29sZWFuIGNvbmRpdGlvbiwgU3RyaW5nIG1lc3NhZ2UpIHsKICAgICAgICBpZiAoIWNvbmRpdGlvbikgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKG1lc3NhZ2UpOwogICAgfQoKICAgIHN0YXRpYyB2b2lkIGV4cGVjdEZhaWx1cmUoUmlnIHJpZywgQ2hlY2tvdXRSZXF1ZXN0IHJlcXVlc3QsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFN0cmluZyBtZXNzYWdlKSB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgcmlnLmZhY2FkZSgpLmNoZWNrb3V0KHJlcXVlc3QpOwogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIkV4cGVjdGVkICIgKyBtZXNzYWdlICsgIiBmYWlsdXJlIik7CiAgICAgICAgfSBjYXRjaCAoSWxsZWdhbFN0YXRlRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgY2hlY2sobWVzc2FnZS5lcXVhbHMoZmFpbHVyZS5nZXRNZXNzYWdlKCkpLCAiV3JvbmcgZmFpbHVyZSIpOwogICAgICAgIH0KICAgIH0KCiAgICAvLyBQYXJ0IEU6IGV4ZWN1dGUgd29ya2Zsb3cgY2hlY2tzIHdpdGhvdXQgYSB0ZXN0IGxpYnJhcnkKICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBtYWluKFN0cmluZ1tdIGFyZ3MpIHsKICAgICAgICB2YXIgcmVxdWVzdCA9IG5ldyBDaGVja291dFJlcXVlc3QoIk9SRC0xIiwgIkNVUy0xIiwgIlNLVS0xIiwgMiwgMjAwMCk7CiAgICAgICAgdmFyIG9rID0gbmV3IFJpZygpOwogICAgICAgIHZhciBjb250cm9sbGVyID0gbmV3IENoZWNrb3V0Q29udHJvbGxlcihvay5mYWNhZGUoKSk7CiAgICAgICAgdmFyIHJlc3VsdCA9IGNvbnRyb2xsZXIuY2hlY2tvdXQocmVxdWVzdCk7CiAgICAgICAgY2hlY2socmVzdWx0IGluc3RhbmNlb2YgQ2hlY2tvdXRTdWNjZXNzLCAiRXhwZWN0ZWQgc3VjY2VzcyIpOwogICAgICAgIGNoZWNrKCgoQ2hlY2tvdXRTdWNjZXNzKSByZXN1bHQpLnRvdGFsQ2VudHMoKSA9PSAyMTAwLCAiV3JvbmcgdG90YWwiKTsKICAgICAgICBjaGVjayhvay5jYWxscy5pbmRleE9mKCJwYXltZW50IikgPCBvay5jYWxscy5pbmRleE9mKCJzaGlwbWVudCIpLAogICAgICAgICAgICAgICJQYXltZW50IG11c3QgcHJlY2VkZSBzaGlwbWVudCIpOwogICAgICAgIGNoZWNrKG9rLmNhbGxzLmNvbnRhaW5zKCJlbWFpbCIpLCAiQ29uZmlybWF0aW9uIGlzIHJlcXVpcmVkIik7CgogICAgICAgIHZhciBmcmF1ZCA9IG5ldyBSaWcoKTsKICAgICAgICBmcmF1ZC5mcmF1ZEFwcHJvdmVkID0gZmFsc2U7CiAgICAgICAgY2hlY2soZnJhdWQuZmFjYWRlKCkuY2hlY2tvdXQocmVxdWVzdCkuZXF1YWxzKAogICAgICAgICAgICAgIG5ldyBDaGVja291dFJlamVjdGVkKFJlamVjdGlvbi5GUkFVRF9SRUpFQ1RFRCkpLCAiRnJhdWQgcmVzdWx0Iik7CiAgICAgICAgY2hlY2soIWZyYXVkLmNhbGxzLmNvbnRhaW5zKCJyZXNlcnZlIikgJiYKICAgICAgICAgICAgICAhZnJhdWQuY2FsbHMuY29udGFpbnMoInBheW1lbnQiKSwgIkZyYXVkIGNhdXNlZCBzaWRlIGVmZmVjdHMiKTsKCiAgICAgICAgdmFyIHN0b2NrID0gbmV3IFJpZygpOwogICAgICAgIHN0b2NrLmluU3RvY2sgPSBmYWxzZTsKICAgICAgICBjaGVjayhzdG9jay5mYWNhZGUoKS5jaGVja291dChyZXF1ZXN0KS5lcXVhbHMoCiAgICAgICAgICAgICAgbmV3IENoZWNrb3V0UmVqZWN0ZWQoUmVqZWN0aW9uLk9VVF9PRl9TVE9DSykpLCAiU3RvY2sgcmVzdWx0Iik7CiAgICAgICAgY2hlY2soIXN0b2NrLmNhbGxzLmNvbnRhaW5zKCJwYXltZW50IiksICJDaGFyZ2VkIHdpdGhvdXQgc3RvY2siKTsKCiAgICAgICAgdmFyIGRlY2xpbmVkID0gbmV3IFJpZygpOwogICAgICAgIGRlY2xpbmVkLnBheW1lbnRBcHByb3ZlZCA9IGZhbHNlOwogICAgICAgIGNoZWNrKGRlY2xpbmVkLmZhY2FkZSgpLmNoZWNrb3V0KHJlcXVlc3QpLmVxdWFscygKICAgICAgICAgICAgICBuZXcgQ2hlY2tvdXRSZWplY3RlZChSZWplY3Rpb24uUEFZTUVOVF9ERUNMSU5FRCkpLCAiRGVjbGluZSByZXN1bHQiKTsKICAgICAgICBjaGVjayhkZWNsaW5lZC5jYWxscy5jb250YWlucygicmVsZWFzZSIpICYmCiAgICAgICAgICAgICAgIWRlY2xpbmVkLmNhbGxzLmNvbnRhaW5zKCJzaGlwbWVudCIpLCAiRGVjbGluZSBjbGVhbnVwIik7CgogICAgICAgIHZhciByZWxlYXNlID0gbmV3IFJpZygpOwogICAgICAgIHJlbGVhc2UucGF5bWVudEFwcHJvdmVkID0gZmFsc2U7CiAgICAgICAgcmVsZWFzZS5mYWlsUmVsZWFzZSA9IHRydWU7CiAgICAgICAgZXhwZWN0RmFpbHVyZShyZWxlYXNlLCByZXF1ZXN0LCAicmVsZWFzZSIpOwoKICAgICAgICB2YXIgc2hpcG1lbnQgPSBuZXcgUmlnKCk7CiAgICAgICAgc2hpcG1lbnQuZmFpbFNoaXBwaW5nID0gdHJ1ZTsKICAgICAgICBleHBlY3RGYWlsdXJlKHNoaXBtZW50LCByZXF1ZXN0LCAic2hpcHBpbmciKTsKICAgICAgICBjaGVjayhzaGlwbWVudC5jYWxscy5jb250YWlucygicGF5bWVudCIpICYmCiAgICAgICAgICAgICAgIXNoaXBtZW50LmNhbGxzLmNvbnRhaW5zKCJlbWFpbCIpLCAiUGFydGlhbCBmYWlsdXJlIHNlbWFudGljcyIpOwoKICAgICAgICB2YXIgZW1haWwgPSBuZXcgUmlnKCk7CiAgICAgICAgZW1haWwuZmFpbEVtYWlsID0gdHJ1ZTsKICAgICAgICBleHBlY3RGYWlsdXJlKGVtYWlsLCByZXF1ZXN0LCAiZW1haWwiKTsKICAgICAgICBjaGVjayhlbWFpbC5jYWxscy5jb250YWlucygicGF5bWVudCIpICYmCiAgICAgICAgICAgICAgZW1haWwuY2FsbHMuY29udGFpbnMoInNoaXBtZW50IiksICJFYXJsaWVyIGVmZmVjdHMgcmVtYWluIik7CgogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbihyZXN1bHQpOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiUEFTUzogNyB3b3JrZmxvdyBzY2VuYXJpb3MiKTsKICAgIH0KfQo=">Download Java</a><button id="copy-source" type="button">Copy Java</button><span id="copy-status" role="status" aria-live="polite"></span></div></div>
+<div class="layout"><nav class="sidebar" aria-label="Guide contents"><p class="eyebrow">In this lesson</p><a href="#top">Overview</a><a href="#step-1">01 · The starting point</a><a href="#step-2">02–04 · Find the pressure</a><a href="#step-5">05 · Extract the facade</a><a href="#step-6">06–09 · Scope and ownership</a><a href="#step-10">10–13 · Related patterns</a><a href="#step-14">14–15 · Results and errors</a><a href="#step-16">16–18 · Sequence and tests</a><a href="#step-19">19 · Reliability limits</a><a href="#step-20">20 · Complete Java code</a><a href="#step-21">21 · Decision guide</a><a href="#exercise">Video-processing exercise</a><a href="#sources">Sources</a></nav><main id="main"><section class="chapter cover">
+<header class="hero" id="top">
+  <p class="eyebrow">DP / Design patterns from first principles</p>
+  <p class="lesson-number">Lesson 09 · Structural pattern</p>
+  <h1>Facade</h1>
+  <p class="subtitle">Hide subsystem complexity behind<br>one useful entry point.</p>
+  <p class="lead">A client wants checkout. It should not have to learn how inventory, tax, fraud, payment, shipping, and email work together.</p>
+  <div class="tags"><span>Java 25 compatible</span><span>No external libraries</span><span>Offline guide</span></div>
+</header>
+<div class="principle"><p class="eyebrow">The question that leads to the pattern</p><p>Why does every caller need to know the subsystem’s internal choreography?</p></div>
+<p>A Facade offers a simpler interface over a larger subsystem. The complexity remains, but a focused boundary owns the common workflow. <a class="ref" href="#source-1" aria-label="Source 1">[1]</a></p>
+<div class="two-col">
+  <div><h3>What you will derive</h3><ol><li>Notice repeated coordination.</li><li>Identify the capability callers want.</li><li>Move workflow knowledge behind that capability.</li><li>Define results, failure semantics, and tests.</li></ol></div>
+  <div><h3>What you will build</h3><p>A checkout facade, six small subsystem contracts, a thin controller, and seven executable workflow checks.</p><p>Then apply the same reasoning to video processing.</p></div>
+</div>
+<div class="read-map"><strong>Reading path</strong><p><a href="#step-1">1–4: derive the need</a> · <a href="#step-5">5–13: design the boundary</a> · <a href="#step-14">14–19: outcomes and reliability</a> · <a href="#step-20">20: complete Java example</a> · <a href="#step-21">21: decision guide</a> · <a href="#exercise">exercise</a></p></div>
+<p class="small screen-only">Everything needed to read this guide and retrieve its Java example is embedded. Use “Print / Save PDF” at the top, or your browser’s print command. Choose A4 or Letter, 100% scale, and disable browser headers and footers.</p>
+</section><section class="chapter "><h2 id="step-1"><span class="step">01</span>Start without Facade</h2>
+<p>Suppose a checkout controller coordinates these components directly. The subsystem is deliberately small enough to inspect.</p>
+<table><thead><tr><th>Component</th><th>Its responsibility in this lesson</th></tr></thead><tbody>
+<tr><td><code>InventoryService</code></td><td>Reserve stock for an order.</td></tr>
+<tr><td><code>TaxService</code></td><td>Calculate tax for a trusted subtotal.</td></tr>
+<tr><td><code>FraudService</code></td><td>Approve or reject the proposed purchase.</td></tr>
+<tr><td><code>PaymentService</code></td><td>Charge the customer.</td></tr>
+<tr><td><code>ShippingService</code></td><td>Create a shipment.</td></tr>
+<tr><td><code>EmailService</code></td><td>Send a confirmation.</td></tr>
+</tbody></table>
+<p>The controller stores these six dependencies. Its method looks like this:</p><figure class="code-panel"><figcaption>Java · teaching excerpt</figcaption><pre><code>CheckoutResult checkout(CheckoutRequest request) {
+    inventory.reserve(request.orderId(), request.productId(),
+                      request.quantity());
+    <span class="keyword">long</span> taxCents = tax.calculateTax(request.subtotalCents());
+    <span class="keyword">long</span> total = Math.addExact(request.subtotalCents(), taxCents);
+
+    <span class="keyword">if</span> (!fraud.approve(request.customerId(), total)) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Fraud check failed&quot;</span>);
+    }
+    String paymentId = payment.charge(request.orderId(),
+                                      request.customerId(), total);
+    String shipmentId = shipping.createShipment(request.orderId());
+    email.sendConfirmation(request.customerId(), request.orderId());
+    <span class="keyword">return</span> <span class="keyword">new</span> CheckoutSuccess(request.orderId(), paymentId,
+                               shipmentId, total);
+}</code></pre></figure>
+<p>The happy path is readable. But the HTTP layer now knows the entire workflow: the participants, their order, and how one step supplies data to the next.</p><aside class="callout caution"><strong>An intentional first draft</strong><p>This version can leave stock reserved after fraud rejection. It is here to expose the design pressure, not to prescribe a safe checkout sequence. Step 20 moves fraud before reservation and handles specific business rejections.</p></aside>
+<p class="small">Early snippets are excerpts, not separate programs. Step 20 defines every type and dependency in one complete source file.</p>
+</section><section class="chapter "><h2 id="step-2"><span class="step">02</span>Add another client</h2>
+<p>Now the REST API, mobile API, admin UI, scheduled order processor, and CLI all need checkout. Each starts copying the same coordination code.</p>
+<p>Duplication is only the visible symptom. The deeper problem is that every caller must learn and maintain the same subsystem knowledge.</p>
+<h2 id="step-3"><span class="step">03</span>Diagnose the coupling</h2>
+<table><thead><tr><th>Knowledge duplicated in clients</th><th>What a change now costs</th></tr></thead><tbody>
+<tr><td>Which services participate</td><td>Adding a required step can affect every client.</td></tr>
+<tr><td>Which steps depend on others</td><td>A sequencing rule can require several coordinated edits.</td></tr>
+<tr><td>Which values cross each boundary</td><td>Internal contract changes spread into entry points.</td></tr>
+<tr><td>How failures become checkout outcomes</td><td>Clients may disagree about what the same failure means.</td></tr>
+</tbody></table>
+<p>If fraud must happen before reservation, one conceptual workflow change may force five callers to change. That is the design smell.</p>
+<h2 id="step-4"><span class="step">04</span>Ask what callers actually want</h2>
+<p>A caller wants to complete checkout. The low-level steps are the means, not the capability it should have to assemble itself.</p>
+<figure class="code-panel"><figcaption>Java · the desired caller experience</figcaption><pre><code>CheckoutResult result = checkout.checkout(request);</code></pre></figure>
+<div class="principle"><p class="eyebrow">Derivation</p><p>Repeated workflow knowledge creates pressure for a smaller, use-case-oriented entry point.</p></div>
+<h3>Pause and reason</h3>
+<p>If you remove five duplicate methods but callers still choose which checkout steps to skip, have you created the intended boundary?</p>
+<p class="answer"><strong>Reasoning:</strong> You have reduced code duplication, but workflow ownership is still scattered. The useful boundary owns the common operation and its required steps.</p>
+</section><section class="chapter "><h2 id="step-5"><span class="step">05</span>Create the Facade</h2>
+<p>Move the common workflow into <code>CheckoutFacade</code>. Supply its collaborators through the constructor. Clients depend on one operation; the facade depends on the subsystem contracts.</p>
+<figure class="code-panel"><figcaption>Java · extraction sketch; complete method appears in Step 20</figcaption><pre><code><span class="keyword">final</span> <span class="keyword">class</span> CheckoutFacade {
+    <span class="keyword">private</span> <span class="keyword">final</span> InventoryService inventory;
+    <span class="keyword">private</span> <span class="keyword">final</span> TaxService tax;
+    <span class="keyword">private</span> <span class="keyword">final</span> FraudService fraud;
+    <span class="keyword">private</span> <span class="keyword">final</span> PaymentService payment;
+    <span class="keyword">private</span> <span class="keyword">final</span> ShippingService shipping;
+    <span class="keyword">private</span> <span class="keyword">final</span> EmailService email;
+
+    CheckoutFacade(InventoryService inventory, TaxService tax,
+                   FraudService fraud, PaymentService payment,
+                   ShippingService shipping, EmailService email) {
+        this.inventory = inventory;
+        this.tax = tax;
+        this.fraud = fraud;
+        this.payment = payment;
+        this.shipping = shipping;
+        this.email = email;
+    }
+
+    <span class="comment">// Move the checkout(...) method from Step 1 here.</span>
+}</code></pre></figure>
+<p>The controller now delegates. It can still own transport concerns such as parsing input and mapping the result to an HTTP response.</p>
+<figure class="code-panel"><figcaption>Java · teaching excerpt</figcaption><pre><code><span class="keyword">final</span> <span class="keyword">class</span> CheckoutController {
+    <span class="keyword">private</span> <span class="keyword">final</span> CheckoutFacade checkout;
+
+    CheckoutController(CheckoutFacade checkout) {
+        this.checkout = checkout;
+    }
+
+    <span class="keyword">public</span> CheckoutResult checkout(CheckoutRequest request) {
+        <span class="keyword">return</span> checkout.checkout(request);
+    }
+}</code></pre></figure>
+<table class="compact"><thead><tr><th>Boundary</th><th>Knowledge it owns</th></tr></thead><tbody>
+<tr><td>Caller</td><td>Request data and checkout outcomes.</td></tr>
+<tr><td>Facade</td><td>Common workflow, coordination, sequencing.</td></tr>
+<tr><td>Subsystem components</td><td>Inventory, tax, payment, and other specialized behavior.</td></tr>
+</tbody></table>
+</section><section class="chapter "><h2 id="step-6"><span class="step">06</span>What actually improved?</h2>
+<p>The amount of knowledge required at the client boundary has decreased. The subsystem may remain complex; its common use is now simpler.</p>
+<h2 id="step-7"><span class="step">07</span>Hide information that changes together</h2>
+<p>Suppose checkout evolves from reserving stock before charging to authorizing payment, reserving stock, and then capturing payment. Clients should not have to coordinate that transition.</p>
+<table><thead><tr><th>Before extraction</th><th>After extraction</th></tr></thead><tbody>
+<tr><td>Each client coordinates the steps.</td><td>The facade coordinates the steps.</td></tr>
+<tr><td>Sequencing edits spread across clients.</td><td>Sequencing edits stay behind the boundary.</td></tr>
+<tr><td>Clients learn internal service details.</td><td>Clients learn the checkout contract.</td></tr>
+</tbody></table>
+<p><strong>Locality of change is conditional:</strong> callers can stay unchanged when the public request and outcome contract remains stable. A new required user input or a new meaning of “completed” may still require caller changes.</p>
+<h2 id="step-8"><span class="step">08</span>Keep the capability coherent</h2>
+<p>A single <code>EverythingFacade</code> with checkout, password reset, reporting, reconciliation, and user creation becomes a god object. Hiding every service behind one class is not a useful goal.</p>
+<p>Prefer boundaries such as <code>CheckoutFacade</code>, <code>ReportingFacade</code>, or <code>MediaProcessingFacade</code>, each with a focused reason to change. Method names should describe capabilities, not mirror every low-level method.</p>
+<h2 id="step-9"><span class="step">09</span>Facade and application service can overlap</h2>
+<p>A <code>CheckoutService</code> that exposes an application operation and coordinates its collaborators can also play the Facade role. Service Layer describes an application boundary and coordinated operations; Facade describes simplifying access to a subsystem. The concepts overlap without being identical. <a class="ref" href="#source-2" aria-label="Source 2">[2]</a></p>
+<p>The facade should coordinate domain behavior. Stock rules belong with inventory, tax rules with the tax component, and payment rules with the payment component. A new wrapper should not absorb every business algorithm.</p>
+<aside class="callout note"><strong>Design test</strong><p>Can you explain the class’s public capability in one sentence, and can you identify the workflow knowledge clients no longer need?</p></aside>
+</section><section class="chapter "><h2 id="step-10"><span class="step">10</span>Facade vs Adapter</h2>
+<p>Adapter reconciles incompatible interfaces; Facade simplifies access to a larger subsystem. An adapter may sit behind a facade when one participant is a legacy or external service. <a class="ref" href="#source-1" aria-label="Source 1">[1]</a></p>
+<table><thead><tr><th>Pattern</th><th>Pressure</th><th>Example</th></tr></thead><tbody>
+<tr><td>Adapter</td><td>A needed interface does not match an existing one.</td><td>Translate <code>shipping.quote(order)</code> into a legacy call using postal code and weight.</td></tr>
+<tr><td>Facade</td><td>A caller must understand too much internal coordination.</td><td>Expose <code>checkout(request)</code> over the checkout subsystem.</td></tr>
+</tbody></table>
+<h2 id="step-11"><span class="step">11</span>Facade vs Factory</h2>
+<p>Factory deals with object creation, often including which implementation to instantiate. Facade deals with using a subsystem through a simpler capability.</p>
+<figure class="code-panel"><figcaption>Java · contrasting responsibilities; illustrative API names</figcaption><pre><code>PaymentProcessor processor = factory.create(method);
+CheckoutResult result = checkout.checkout(request);</code></pre></figure>
+<h2 id="step-12"><span class="step">12</span>Facade vs Command</h2>
+<p>A command represents a request to do something. A command handler executes that request. A facade can provide the capability that the handler calls.</p>
+<p>If <code>CheckoutCommandHandler</code> already owns the entire checkout workflow, adding a pass-through facade may add no value. Choose a clear owner instead of stacking pattern names.</p>
+<table class="compact"><thead><tr><th>Concept</th><th>Question answered</th></tr></thead><tbody>
+<tr><td>Command data</td><td>What action was requested, with which inputs?</td></tr>
+<tr><td>Handler</td><td>How is this request executed?</td></tr>
+<tr><td>Facade role</td><td>What simpler capability should subsystem clients use?</td></tr>
+</tbody></table>
+<h2 id="step-13"><span class="step">13</span>Lower-level access may remain available</h2>
+<p>Normal checkout callers use the facade. A specialized maintenance tool may still need an inventory operation such as rebuilding reservations.</p>
+<p>A Facade does not itself enforce access restrictions. If bypassing the workflow would violate a requirement, enforce that boundary with API design, package or module access, and appropriate authorization.</p>
+</section><section class="chapter "><h2 id="step-14"><span class="step">14</span>Define outcomes at the boundary</h2>
+<p>Callers need a coherent checkout contract. Instead of forcing them to understand every internal business exception, expose explicit outcomes. Records carry data; a sealed interface restricts the permitted result implementations. <a class="ref" href="#source-3" aria-label="Source 3">[3]</a> <a class="ref" href="#source-4" aria-label="Source 4">[4]</a></p>
+<figure class="code-panel"><figcaption>Java · teaching excerpt</figcaption><pre><code><span class="keyword">sealed</span> <span class="keyword">interface</span> CheckoutResult
+        <span class="keyword">permits</span> CheckoutSuccess, CheckoutRejected {}
+
+<span class="keyword">record</span> CheckoutSuccess(String orderId, String paymentId,
+                       String shipmentId, <span class="keyword">long</span> totalCents)
+        <span class="keyword">implements</span> CheckoutResult {}
+
+<span class="keyword">enum</span> Rejection { FRAUD_REJECTED, OUT_OF_STOCK, PAYMENT_DECLINED }
+
+<span class="keyword">record</span> CheckoutRejected(Rejection reason)
+        <span class="keyword">implements</span> CheckoutResult {}</code></pre></figure>
+<p><code>CheckoutSuccess</code> means that all synchronous calls in this example returned successfully. It does not mean a parcel has been delivered or an email has reached the recipient.</p>
+<h2 id="step-15"><span class="step">15</span>Keep meaningful failures distinct</h2>
+<p>Do not catch every <code>Exception</code> and report a business rejection. That would make a programming bug, a database outage, a payment timeout, and an actual payment decline look the same.</p>
+<figure class="code-panel"><figcaption>Java · teaching excerpt</figcaption><pre><code><span class="keyword">try</span> {
+    paymentId = payment.charge(request.orderId(),
+                              request.customerId(), total);
+} <span class="keyword">catch</span> (PaymentDeclinedException declined) {
+    inventory.release(request.orderId());
+    <span class="keyword">return</span> <span class="keyword">new</span> CheckoutRejected(Rejection.PAYMENT_DECLINED);
+}</code></pre></figure>
+<p>This translation relies on a precise contract: the decline exception guarantees no charge occurred, and a successful <code>release</code> call guarantees the reservation is gone. A release failure propagates as a system failure.</p>
+<aside class="callout caution"><strong>A timeout is not a decline</strong><p>The remote payment might have succeeded even when its response was lost. Report and investigate an unknown outcome; do not silently translate it into a safe-to-retry rejection.</p></aside>
+<p class="small">The complete example catches only named business exceptions. Unexpected failures propagate to the application’s error-handling boundary.</p>
+</section><section class="chapter "><h2 id="step-16"><span class="step">16</span>Protect required sequencing</h2>
+<p>If payment must succeed before shipment creation, the facade owns that dependency. Callers request checkout rather than choosing the step order.</p>
+<p>The sequence itself is a business decision. The pattern does not tell you whether authorization should precede reservation or whether email belongs in the synchronous path.</p>
+<h2 id="step-17"><span class="step">17</span>Test workflow semantics with fakes</h2>
+<p>Inject small subsystem interfaces. A recording fake can track calls and simulate a rejection or failure without reaching a payment network or storage service.</p>
+<table><thead><tr><th>Scenario</th><th>Behavior that matters</th></tr></thead><tbody>
+<tr><td>Success</td><td>Total is correct; payment precedes shipment; confirmation is requested.</td></tr>
+<tr><td>Fraud rejection</td><td>No reservation or charge is attempted.</td></tr>
+<tr><td>Out of stock</td><td>No charge is attempted.</td></tr>
+<tr><td>Payment decline</td><td>Stock is released; no shipment is created.</td></tr>
+<tr><td>Release failure</td><td>The failure propagates rather than becoming a clean rejection.</td></tr>
+<tr><td>Shipment or email failure</td><td>The failure propagates; earlier effects are not undone.</td></tr>
+</tbody></table>
+<h2 id="step-18"><span class="step">18</span>Assert order only when it matters</h2>
+<p>Use a shared <code>List&lt;String&gt;</code> for meaningful operations. Assert the required relationship instead of freezing every incidental call into one exact sequence.</p>
+<figure class="code-panel"><figcaption>Java · assertions from the runnable example</figcaption><pre><code>check(result <span class="keyword">instanceof</span> CheckoutSuccess, <span class="string">&quot;Expected success&quot;</span>);
+check(ok.calls.indexOf(<span class="string">&quot;payment&quot;</span>) &lt; ok.calls.indexOf(<span class="string">&quot;shipment&quot;</span>),
+      <span class="string">&quot;Payment must precede shipment&quot;</span>);
+
+check(!fraud.calls.contains(<span class="string">&quot;reserve&quot;</span>) &amp;&amp;
+      !fraud.calls.contains(<span class="string">&quot;payment&quot;</span>), <span class="string">&quot;Fraud caused side effects&quot;</span>);</code></pre></figure>
+<p>Step 20 supplies the <code>check</code> helper and fakes. Checks throw <code>AssertionError</code> on failure, so they do not require the JVM’s <code>-ea</code> flag or a test library.</p>
+<p>Test tax arithmetic and payment-provider behavior separately in their own components. A facade test should tell you whether the workflow obeys its contract.</p>
+</section><section class="chapter "><h2 id="step-19"><span class="step">19</span>Face the hidden reliability problem</h2>
+<p>Suppose inventory reservation succeeds, payment succeeds, and shipment creation fails. One Java method has coordinated three effects; it has not made them one atomic transaction.</p>
+<table><thead><tr><th>Failure point</th><th>What may already be true</th><th>What the sample does</th></tr></thead><tbody>
+<tr><td>Fraud rejection</td><td>No stock reserved or money charged.</td><td>Returns a rejection.</td></tr>
+<tr><td>Payment decline</td><td>Stock is reserved; the contract says no charge occurred.</td><td>Releases stock, then returns a rejection.</td></tr>
+<tr><td>Payment timeout</td><td>Stock is reserved; charge outcome is unknown.</td><td>Propagates the failure; does not retry.</td></tr>
+<tr><td>Shipment failure</td><td>Stock is reserved and payment succeeded; shipment outcome may be unknown.</td><td>Propagates the failure; earlier effects remain.</td></tr>
+<tr><td>Email failure</td><td>Reservation, payment, and shipment calls succeeded.</td><td>Propagates the failure; earlier effects remain.</td></tr>
+</tbody></table>
+<aside class="callout caution"><strong>The dangerous shortcut</strong><p>Retrying the entire checkout method can charge again. An order ID alone does not create idempotency: the services must implement and durably enforce the intended duplicate-handling contract.</p></aside>
+<p>Reliability mechanisms address different gaps. A compensation performs a business action that counters an earlier effect; it can also fail. A saga coordinates local transactions and their recovery. <a class="ref" href="#source-6" aria-label="Source 6">[6]</a> <a class="ref" href="#source-7" aria-label="Source 7">[7]</a></p>
+<p>An outbox records a business change and an event in the same local transaction, then publishes the event separately. It does not make inventory, payment, shipping, and email one transaction. Consumers still need duplicate-safe processing. <a class="ref" href="#source-8" aria-label="Source 8">[8]</a> <a class="ref" href="#source-9" aria-label="Source 9">[9]</a></p>
+<h3>Decide what the API promises</h3>
+<p>This guide’s implementation is synchronous. If you move work to a queue, define an “accepted” response with a durable workflow ID and a way to observe completion. Do not return “completed” merely because work was queued.</p>
+<p>The facade remains the simple capability. Durable state, recovery policy, idempotency, and delivery guarantees need their own explicit design.</p>
+</section><section class="chapter source-chapter"><h2 id="step-20"><span class="step">20</span>A complete, consistent Java example</h2>
+<p>Save the five consecutive code panels below as <code>FacadeDemo.java</code>, in order. The download button embeds that exact file. Every type, fake, and executable check is included.</p>
+<figure class="code-panel"><figcaption>Terminal · run with JDK 25</figcaption><pre><code>javac --release 25 -Xlint:all -d out FacadeDemo.java
+java -cp out FacadeDemo</code></pre></figure>
+<p class="small">Uses standard Java records, sealed interfaces, lambdas, and <code>Math.addExact</code>. No preview features or third-party dependencies. <code>addExact</code> detects integer overflow. <a class="ref" href="#source-3" aria-label="Source 3">[3]</a> <a class="ref" href="#source-4" aria-label="Source 4">[4]</a> <a class="ref" href="#source-5" aria-label="Source 5">[5]</a> <a class="ref" href="#source-10" aria-label="Source 10">[10]</a></p>
+<figure class="code-panel"><figcaption>FacadeDemo.java · 1 of 5 · data and outcomes</figcaption><pre><code data-demo-part="true"><span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.List;
+<span class="keyword">import</span> java.util.Objects;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> FacadeDemo {
+    <span class="comment">// Part A: data and outcomes</span>
+    <span class="keyword">record</span> CheckoutRequest(String orderId, String customerId,
+                           String productId, <span class="keyword">int</span> quantity,
+                           <span class="keyword">long</span> subtotalCents) {
+        CheckoutRequest {
+            requireText(orderId);
+            requireText(customerId);
+            requireText(productId);
+            <span class="keyword">if</span> (quantity &lt;= 0 || subtotalCents &lt; 0) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid order&quot;</span>);
+            }
+        }
+    }
+
+    <span class="keyword">static</span> <span class="keyword">void</span> requireText(String value) {
+        <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.isBlank()) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;ID is required&quot;</span>);
+        }
+    }
+
+    <span class="keyword">sealed</span> <span class="keyword">interface</span> CheckoutResult
+            <span class="keyword">permits</span> CheckoutSuccess, CheckoutRejected {}
+
+    <span class="keyword">record</span> CheckoutSuccess(String orderId, String paymentId,
+                           String shipmentId, <span class="keyword">long</span> totalCents)
+            <span class="keyword">implements</span> CheckoutResult {}
+
+    <span class="keyword">enum</span> Rejection { FRAUD_REJECTED, OUT_OF_STOCK, PAYMENT_DECLINED }
+
+    <span class="keyword">record</span> CheckoutRejected(Rejection reason)
+            <span class="keyword">implements</span> CheckoutResult {}</code></pre></figure>
+<p class="small"><strong>Model boundary:</strong> this single-item example uses one currency in cents. <code>subtotalCents</code> is trusted server-side input; a real public API must derive or verify it against authoritative pricing. The IDs and amounts below are test fixtures.</p>
+</section><section class="chapter source-chapter"><p class="eyebrow">20 / Complete implementation · continued</p><h2>Subsystem contracts and construction</h2>
+<p class="small">The facade receives collaborators; it does not create service implementations. The two business exceptions have explicit side-effect guarantees.</p><figure class="code-panel"><figcaption>FacadeDemo.java · 2 of 5 · contracts and facade constructor</figcaption><pre><code data-demo-part="true">    <span class="comment">// Part B: subsystem contracts</span>
+    <span class="keyword">interface</span> InventoryService {
+        <span class="comment">// OutOfStockException guarantees no reservation was made.</span>
+        <span class="keyword">void</span> reserve(String orderId, String productId, <span class="keyword">int</span> quantity);
+        <span class="comment">// Normal return guarantees this reservation was released.</span>
+        <span class="keyword">void</span> release(String orderId);
+    }
+
+    <span class="keyword">interface</span> TaxService {
+        <span class="keyword">long</span> calculateTax(<span class="keyword">long</span> subtotalCents);
+    }
+
+    <span class="keyword">interface</span> FraudService {
+        <span class="keyword">boolean</span> approve(String customerId, <span class="keyword">long</span> totalCents);
+    }
+
+    <span class="keyword">interface</span> PaymentService {
+        <span class="comment">// PaymentDeclinedException guarantees no charge was made.</span>
+        <span class="comment">// A timeout is NOT a decline: its outcome may be unknown.</span>
+        String charge(String orderId, String customerId, <span class="keyword">long</span> cents);
+    }
+
+    <span class="keyword">interface</span> ShippingService {
+        String createShipment(String orderId);
+    }
+
+    <span class="keyword">interface</span> EmailService {
+        <span class="keyword">void</span> sendConfirmation(String customerId, String orderId);
+    }
+
+    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> OutOfStockException <span class="keyword">extends</span> RuntimeException {
+        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = 1L;
+    }
+
+    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> PaymentDeclinedException <span class="keyword">extends</span> RuntimeException {
+        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = 1L;
+    }
+
+    <span class="comment">// Part C: the facade and its client</span>
+    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> CheckoutFacade {
+        <span class="keyword">private</span> <span class="keyword">final</span> InventoryService inventory;
+        <span class="keyword">private</span> <span class="keyword">final</span> TaxService tax;
+        <span class="keyword">private</span> <span class="keyword">final</span> FraudService fraud;
+        <span class="keyword">private</span> <span class="keyword">final</span> PaymentService payment;
+        <span class="keyword">private</span> <span class="keyword">final</span> ShippingService shipping;
+        <span class="keyword">private</span> <span class="keyword">final</span> EmailService email;
+
+        CheckoutFacade(InventoryService inventory, TaxService tax,
+                       FraudService fraud, PaymentService payment,
+                       ShippingService shipping, EmailService email) {
+            this.inventory = Objects.requireNonNull(inventory);
+            this.tax = Objects.requireNonNull(tax);
+            this.fraud = Objects.requireNonNull(fraud);
+            this.payment = Objects.requireNonNull(payment);
+            this.shipping = Objects.requireNonNull(shipping);
+            this.email = Objects.requireNonNull(email);
+        }</code></pre></figure></section><section class="chapter source-chapter"><p class="eyebrow">20 / Complete implementation · continued</p><h2>One owner of the workflow</h2>
+<p class="small">Tax and fraud run before reservation. A payment decline releases stock; shipping and email failures stay visible. This method continues inside <code>CheckoutFacade</code> from the previous panel.</p><figure class="code-panel"><figcaption>FacadeDemo.java · 3 of 5 · orchestration and client</figcaption><pre><code data-demo-part="true">        <span class="keyword">public</span> CheckoutResult checkout(CheckoutRequest request) {
+            Objects.requireNonNull(request);
+            <span class="keyword">long</span> taxCents = tax.calculateTax(request.subtotalCents());
+            <span class="keyword">if</span> (taxCents &lt; 0) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Negative tax&quot;</span>);
+            }
+            <span class="keyword">long</span> total = Math.addExact(request.subtotalCents(), taxCents);
+            <span class="keyword">if</span> (!fraud.approve(request.customerId(), total)) {
+                <span class="keyword">return</span> <span class="keyword">new</span> CheckoutRejected(Rejection.FRAUD_REJECTED);
+            }
+            <span class="keyword">try</span> {
+                inventory.reserve(request.orderId(), request.productId(),
+                                  request.quantity());
+            } <span class="keyword">catch</span> (OutOfStockException declined) {
+                <span class="keyword">return</span> <span class="keyword">new</span> CheckoutRejected(Rejection.OUT_OF_STOCK);
+            }
+            String paymentId;
+            <span class="keyword">try</span> {
+                paymentId = payment.charge(request.orderId(),
+                                          request.customerId(), total);
+            } <span class="keyword">catch</span> (PaymentDeclinedException declined) {
+                <span class="comment">// If release fails, propagate that system failure.</span>
+                inventory.release(request.orderId());
+                <span class="keyword">return</span> <span class="keyword">new</span> CheckoutRejected(Rejection.PAYMENT_DECLINED);
+            }
+            <span class="comment">// Later failures propagate; earlier effects remain.</span>
+            String shipmentId = shipping.createShipment(request.orderId());
+            email.sendConfirmation(request.customerId(), request.orderId());
+            <span class="keyword">return</span> <span class="keyword">new</span> CheckoutSuccess(request.orderId(), paymentId,
+                                       shipmentId, total);
+        }
+    }
+
+    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> CheckoutController {
+        <span class="keyword">private</span> <span class="keyword">final</span> CheckoutFacade checkout;
+        CheckoutController(CheckoutFacade checkout) {
+            this.checkout = Objects.requireNonNull(checkout);
+        }
+        <span class="keyword">public</span> CheckoutResult checkout(CheckoutRequest request) {
+            <span class="keyword">return</span> checkout.checkout(request);
+        }
+    }</code></pre></figure><aside class="callout note"><strong>What this example intentionally leaves open</strong><p>It has no durable workflow store, automatic retries, or deduplication. Passing an order ID gives collaborators useful context, but does not make these fakes idempotent.</p></aside></section><section class="chapter source-chapter"><p class="eyebrow">20 / Complete implementation · continued</p><h2>Fakes make behavior observable</h2>
+<p class="small">Each scenario gets a fresh <code>Rig</code>. Its fixed 100-cent tax is a test fixture, not a tax rule.</p><figure class="code-panel"><figcaption>FacadeDemo.java · 4 of 5 · recording fakes and test helpers</figcaption><pre><code data-demo-part="true">    <span class="comment">// Part D: a deterministic fake subsystem</span>
+    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> Rig {
+        <span class="keyword">final</span> List&lt;String&gt; calls = <span class="keyword">new</span> ArrayList&lt;&gt;();
+        <span class="keyword">boolean</span> fraudApproved = <span class="keyword">true</span>, inStock = <span class="keyword">true</span>;
+        <span class="keyword">boolean</span> paymentApproved = <span class="keyword">true</span>, failShipping, failEmail;
+        <span class="keyword">boolean</span> failRelease;
+
+        CheckoutFacade facade() {
+            <span class="keyword">return</span> <span class="keyword">new</span> CheckoutFacade(<span class="keyword">new</span> InventoryService() {
+                <span class="keyword">public</span> <span class="keyword">void</span> reserve(String order, String product, <span class="keyword">int</span> qty) {
+                    calls.add(<span class="string">&quot;reserve&quot;</span>);
+                    <span class="keyword">if</span> (!inStock) <span class="keyword">throw</span> <span class="keyword">new</span> OutOfStockException();
+                }
+                <span class="keyword">public</span> <span class="keyword">void</span> release(String order) {
+                    calls.add(<span class="string">&quot;release&quot;</span>);
+                    <span class="keyword">if</span> (failRelease) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;release&quot;</span>);
+                }
+            }, subtotal -&gt; {
+                calls.add(<span class="string">&quot;tax&quot;</span>);
+                <span class="keyword">return</span> 100L; <span class="comment">// Fixed test fixture, not a tax algorithm.</span>
+            }, (customer, total) -&gt; {
+                calls.add(<span class="string">&quot;fraud&quot;</span>);
+                <span class="keyword">return</span> fraudApproved;
+            }, (order, customer, total) -&gt; {
+                calls.add(<span class="string">&quot;payment&quot;</span>);
+                <span class="keyword">if</span> (!paymentApproved) <span class="keyword">throw</span> <span class="keyword">new</span> PaymentDeclinedException();
+                <span class="keyword">return</span> <span class="string">&quot;PAY-1&quot;</span>;
+            }, order -&gt; {
+                calls.add(<span class="string">&quot;shipment&quot;</span>);
+                <span class="keyword">if</span> (failShipping) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;shipping&quot;</span>);
+                <span class="keyword">return</span> <span class="string">&quot;SHIP-1&quot;</span>;
+            }, (customer, order) -&gt; {
+                calls.add(<span class="string">&quot;email&quot;</span>);
+                <span class="keyword">if</span> (failEmail) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;email&quot;</span>);
+            });
+        }
+    }
+
+    <span class="keyword">static</span> <span class="keyword">void</span> check(<span class="keyword">boolean</span> condition, String message) {
+        <span class="keyword">if</span> (!condition) <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(message);
+    }
+
+    <span class="keyword">static</span> <span class="keyword">void</span> expectFailure(Rig rig, CheckoutRequest request,
+                              String message) {
+        <span class="keyword">try</span> {
+            rig.facade().checkout(request);
+            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;Expected &quot;</span> + message + <span class="string">&quot; failure&quot;</span>);
+        } <span class="keyword">catch</span> (IllegalStateException failure) {
+            check(message.equals(failure.getMessage()), <span class="string">&quot;Wrong failure&quot;</span>);
+        }
+    }</code></pre></figure></section><section class="chapter source-chapter"><p class="eyebrow">20 / Complete implementation · continued</p><h2>Run seven workflow scenarios</h2>
+<figure class="code-panel"><figcaption>FacadeDemo.java · 5 of 5 · executable checks and closing brace</figcaption><pre><code data-demo-part="true">    <span class="comment">// Part E: execute workflow checks without a test library</span>
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) {
+        <span class="keyword">var</span> request = <span class="keyword">new</span> CheckoutRequest(<span class="string">&quot;ORD-1&quot;</span>, <span class="string">&quot;CUS-1&quot;</span>, <span class="string">&quot;SKU-1&quot;</span>, 2, 2000);
+        <span class="keyword">var</span> ok = <span class="keyword">new</span> Rig();
+        <span class="keyword">var</span> controller = <span class="keyword">new</span> CheckoutController(ok.facade());
+        <span class="keyword">var</span> result = controller.checkout(request);
+        check(result <span class="keyword">instanceof</span> CheckoutSuccess, <span class="string">&quot;Expected success&quot;</span>);
+        check(((CheckoutSuccess) result).totalCents() == 2100, <span class="string">&quot;Wrong total&quot;</span>);
+        check(ok.calls.indexOf(<span class="string">&quot;payment&quot;</span>) &lt; ok.calls.indexOf(<span class="string">&quot;shipment&quot;</span>),
+              <span class="string">&quot;Payment must precede shipment&quot;</span>);
+        check(ok.calls.contains(<span class="string">&quot;email&quot;</span>), <span class="string">&quot;Confirmation is required&quot;</span>);
+
+        <span class="keyword">var</span> fraud = <span class="keyword">new</span> Rig();
+        fraud.fraudApproved = <span class="keyword">false</span>;
+        check(fraud.facade().checkout(request).equals(
+              <span class="keyword">new</span> CheckoutRejected(Rejection.FRAUD_REJECTED)), <span class="string">&quot;Fraud result&quot;</span>);
+        check(!fraud.calls.contains(<span class="string">&quot;reserve&quot;</span>) &amp;&amp;
+              !fraud.calls.contains(<span class="string">&quot;payment&quot;</span>), <span class="string">&quot;Fraud caused side effects&quot;</span>);
+
+        <span class="keyword">var</span> stock = <span class="keyword">new</span> Rig();
+        stock.inStock = <span class="keyword">false</span>;
+        check(stock.facade().checkout(request).equals(
+              <span class="keyword">new</span> CheckoutRejected(Rejection.OUT_OF_STOCK)), <span class="string">&quot;Stock result&quot;</span>);
+        check(!stock.calls.contains(<span class="string">&quot;payment&quot;</span>), <span class="string">&quot;Charged without stock&quot;</span>);
+
+        <span class="keyword">var</span> declined = <span class="keyword">new</span> Rig();
+        declined.paymentApproved = <span class="keyword">false</span>;
+        check(declined.facade().checkout(request).equals(
+              <span class="keyword">new</span> CheckoutRejected(Rejection.PAYMENT_DECLINED)), <span class="string">&quot;Decline result&quot;</span>);
+        check(declined.calls.contains(<span class="string">&quot;release&quot;</span>) &amp;&amp;
+              !declined.calls.contains(<span class="string">&quot;shipment&quot;</span>), <span class="string">&quot;Decline cleanup&quot;</span>);
+
+        <span class="keyword">var</span> release = <span class="keyword">new</span> Rig();
+        release.paymentApproved = <span class="keyword">false</span>;
+        release.failRelease = <span class="keyword">true</span>;
+        expectFailure(release, request, <span class="string">&quot;release&quot;</span>);
+
+        <span class="keyword">var</span> shipment = <span class="keyword">new</span> Rig();
+        shipment.failShipping = <span class="keyword">true</span>;
+        expectFailure(shipment, request, <span class="string">&quot;shipping&quot;</span>);
+        check(shipment.calls.contains(<span class="string">&quot;payment&quot;</span>) &amp;&amp;
+              !shipment.calls.contains(<span class="string">&quot;email&quot;</span>), <span class="string">&quot;Partial failure semantics&quot;</span>);
+
+        <span class="keyword">var</span> email = <span class="keyword">new</span> Rig();
+        email.failEmail = <span class="keyword">true</span>;
+        expectFailure(email, request, <span class="string">&quot;email&quot;</span>);
+        check(email.calls.contains(<span class="string">&quot;payment&quot;</span>) &amp;&amp;
+              email.calls.contains(<span class="string">&quot;shipment&quot;</span>), <span class="string">&quot;Earlier effects remain&quot;</span>);
+
+        System.out.println(result);
+        System.out.println(<span class="string">&quot;PASS: 7 workflow scenarios&quot;</span>);
+    }
+}</code></pre></figure>
+<p class="small"><strong>Expected result:</strong> the success record contains <code>ORD-1</code>, <code>PAY-1</code>, <code>SHIP-1</code>, and <code>2100</code>; the final line is <code>PASS: 7 workflow scenarios</code>.</p>
+<p class="small"><strong>Verification:</strong> compiled with <code>--release 17 -Xlint:all</code> and ran on OpenJDK 17.0.20 with all seven scenarios passing. The language features and APIs were checked against the Java 25 documentation. A JDK 25 runtime was not available for direct execution.</p>
+</section><section class="chapter "><h2 id="step-21"><span class="step">21</span>Use the first-principles decision process</h2>
+<p>Counting services is a weak reason to add a facade. Look for duplicated workflow knowledge and a capability that can own it.</p>
+<table><thead><tr><th>Ask</th><th>What a “yes” suggests</th></tr></thead><tbody>
+<tr><td>Do several callers repeat the same coordination?</td><td>There may be a missing shared workflow owner.</td></tr>
+<tr><td>Do callers know internal service names and sequencing rules?</td><td>The client boundary may expose too much.</td></tr>
+<tr><td>Does one workflow change force edits in many callers?</td><td>A focused entry point could improve locality of change.</td></tr>
+<tr><td>Can the operation be named in the client’s language?</td><td>You may have a useful public capability.</td></tr>
+<tr><td>Does an existing handler or service already own the workflow?</td><td>It may already play the Facade role.</td></tr>
+<tr><td>Are failure and completion semantics clear?</td><td>The simplified interface is becoming a usable contract.</td></tr>
+</tbody></table>
+<h3>When the extra class earns its place</h3>
+<p>Use it when it removes meaningful knowledge from clients. A thin facade can be valuable even with few collaborators if those collaborators are difficult to use correctly. A wrapper over many services can still be unhelpful if it simply exposes all their methods.</p>
+<div class="principle"><p class="eyebrow">The transferable idea</p><p>A good boundary makes the caller’s intention simple while giving the internal workflow a clear owner.</p></div>
+<h3>Recall prompts</h3>
+<ol class="prompts"><li>Which knowledge moved out of <code>CheckoutController</code>?</li><li>Why can a payment timeout not become <code>PAYMENT_DECLINED</code>?</li><li>Which guarantee does the facade provide, and which transaction guarantee does it not provide?</li><li>When would a command handler make an additional facade redundant?</li></ol>
+</section><section class="chapter "><p class="eyebrow">Apply the reasoning</p><h2 id="exercise">Exercise: a video-processing facade</h2>
+<p>Every caller currently loads a video, decodes video and audio, parses optional subtitles, encodes an output, generates a thumbnail, and uploads the result.</p>
+<table class="compact"><thead><tr><th>Subsystem component</th><th>Focused responsibility</th></tr></thead><tbody>
+<tr><td><code>VideoDecoder</code></td><td>Decode the video stream.</td></tr>
+<tr><td><code>AudioDecoder</code></td><td>Decode the audio stream.</td></tr>
+<tr><td><code>SubtitleParser</code></td><td>Parse supplied subtitles.</td></tr>
+<tr><td><code>VideoEncoder</code></td><td>Produce the encoded output.</td></tr>
+<tr><td><code>ThumbnailGenerator</code></td><td>Generate a thumbnail.</td></tr>
+<tr><td><code>StorageClient</code></td><td>Load input and upload artifacts.</td></tr>
+</tbody></table>
+<figure class="code-panel"><figcaption>Java · exercise skeleton; define request and result types</figcaption><pre><code><span class="keyword">final</span> <span class="keyword">class</span> VideoProcessingFacade {
+    <span class="comment">// Inject the subsystem collaborators through a constructor.</span>
+    ProcessingResult process(ProcessingRequest request) {
+        <span class="comment">// Own the common workflow here.</span>
+        <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException(<span class="string">&quot;Exercise&quot;</span>);
+    }
+}</code></pre></figure>
+<h3>Acceptance criteria</h3>
+<ol><li>The API/controller knows none of the internal processing sequence.</li><li>The facade owns the common workflow.</li><li>A sequencing change with the same public contract does not change callers.</li><li>Low-level components remain independently testable.</li><li>The facade stays focused on media processing.</li><li>You explicitly decide what happens if upload fails after encoding succeeds.</li></ol>
+<h3>Write the contract before the method</h3>
+<p>Define the source reference, output format, optional subtitles, and workflow identity. Decide what success means and whether completion is synchronous.</p>
+<p><strong>Failure-policy choice to justify:</strong> preserve encoded artifacts and retry upload, or clean them up and report failure. Account for a timeout after upload actually succeeded, and for video upload succeeding while thumbnail upload fails. Define stable artifact keys, cleanup ownership, and how a caller observes the outcome.</p>
+<p class="small">Extend the workflow checks with: decode failure prevents encoding; encode failure prevents upload; upload retry does not unnecessarily repeat encoding or publish duplicate artifacts under your chosen policy.</p>
+</section><section class="chapter reference-chapter"><p class="eyebrow">Continue the pattern sequence</p><h2 id="next">Next: Proxy</h2>
+<p>Facade simplifies a subsystem’s interface. Next, keep the same <code>DocumentRepository</code> abstraction and introduce a stand-in that can control access to an expensive, remote, secured, or lazily initialized repository.</p>
+<p>The next pressure is: <strong>how can access be controlled while callers keep using the same abstraction?</strong></p>
+<h2 id="sources">Sources and compatibility</h2>
+<p class="small">The lesson was adapted from the supplied Lesson 9, preserving its 21-step progression. Supporting references below were checked on 1 September 2026. Design choices and test fixtures are specific to this guide.</p>
+<ol class="sources"><li id="source-1"><a href="https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-adapterfaade">Microsoft Learn: Adapter and Façade</a><span class="source-note">Pattern definition and the distinction from Adapter.</span><span class="source-url">https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-adapterfaade</span></li><li id="source-2"><a href="https://martinfowler.com/eaaCatalog/serviceLayer.html">Martin Fowler: Service Layer</a><span class="source-note">Primary pattern-author reference for application boundaries and coordination.</span><span class="source-url">https://martinfowler.com/eaaCatalog/serviceLayer.html</span></li><li id="source-3"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle Java 25: Record Classes</a><span class="source-note">Data carriers, generated accessors, and compact constructors.</span><span class="source-url">https://docs.oracle.com/en/java/javase/25/language/records.html</span></li><li id="source-4"><a href="https://docs.oracle.com/en/java/javase/25/language/sealed-classes-interfaces.html">Oracle Java 25: Sealed Classes</a><span class="source-note">Sealed interfaces and permitted implementations.</span><span class="source-url">https://docs.oracle.com/en/java/javase/25/language/sealed-classes-interfaces.html</span></li><li id="source-5"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Math.html#addExact(long,long)">Oracle Java 25: Math</a><span class="source-note">Overflow-detecting integer addition.</span><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Math.html#addExact(long,long)</span></li><li id="source-6"><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction">Microsoft Learn: Compensating Transaction</a><span class="source-note">Business compensation and recovery limits.</span><span class="source-url">https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction</span></li><li id="source-7"><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/saga">Microsoft Learn: Saga</a><span class="source-note">Coordinating local transactions and recovery.</span><span class="source-url">https://learn.microsoft.com/en-us/azure/architecture/patterns/saga</span></li><li id="source-8"><a href="https://learn.microsoft.com/en-us/azure/architecture/databases/guide/transactional-out-box-cosmos">Microsoft Learn: Transactional Outbox</a><span class="source-note">Saving state and events together before separate publication.</span><span class="source-url">https://learn.microsoft.com/en-us/azure/architecture/databases/guide/transactional-out-box-cosmos</span></li><li id="source-9"><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/idempotent-consumer">Microsoft Learn: Idempotent Consumer</a><span class="source-note">Processing duplicate deliveries without duplicating effects.</span><span class="source-url">https://learn.microsoft.com/en-us/azure/architecture/patterns/idempotent-consumer</span></li><li id="source-10"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Oracle Java 25: javac</a><span class="source-note">Compilation, release targeting, and compiler options.</span><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li></ol>
+<p class="closing">DP / Lesson 09 · Facade · End of guide</p>
+</section></main></div><script>
+document.getElementById('print-guide').addEventListener('click', () => window.print());
+document.getElementById('copy-source').addEventListener('click', async () => {
+  const status = document.getElementById('copy-status');
+  const source = atob(document.getElementById('download-source').href.split(',')[1]);
+  try {
+    await navigator.clipboard.writeText(source);
+    status.textContent = 'Java source copied.';
+  } catch {
+    status.textContent = 'Use Download Java to save the complete source.';
+  }
+});
+</script></body></html>

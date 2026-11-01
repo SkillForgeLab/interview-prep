@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adapter Pattern from First Principles — Java 25</title>
+<style>
+:root {
+  --ink: #1c2430;
+  --muted: #5f6b7a;
+  --line: #dfe5ec;
+  --panel: #f6f8fb;
+  --accent: #164e8a;
+  --accent-soft: #eef5fc;
+  --code: #111827;
+  --code-bg: #f3f4f6;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: #fff;
+  line-height: 1.62;
+}
+main { max-width: 1000px; margin: 0 auto; padding: 48px 32px 72px; }
+h1 { font-size: 2.4rem; line-height: 1.12; margin: 0 0 12px; }
+h2 { margin-top: 52px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+h3 { margin-top: 30px; }
+p, li { max-width: 82ch; }
+.lead { font-size: 1.15rem; color: var(--muted); }
+.badge {
+  display: inline-block; padding: 4px 9px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent);
+  font-weight: 700; font-size: .82rem; margin-right: 8px;
+}
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 14px 18px; margin: 20px 0;
+}
+.warning {
+  border-left: 4px solid #8a5a00;
+  background: #fff8e8;
+  padding: 14px 18px; margin: 20px 0;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  overflow: auto;
+  color: var(--code);
+  font-size: .91rem;
+  line-height: 1.48;
+}
+code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+:not(pre) > code {
+  background: #f1f3f5; border-radius: 4px; padding: 2px 5px;
+}
+table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+th { background: var(--panel); }
+nav {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px 22px; margin: 28px 0 38px;
+}
+nav a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent); }
+.small { font-size: .9rem; color: var(--muted); }
+.grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.card { border: 1px solid var(--line); border-radius: 10px; padding: 16px; background: #fff; }
+footer { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+@media (max-width: 760px) {
+  main { padding: 28px 18px 48px; }
+  .grid { grid-template-columns: 1fr; }
+  h1 { font-size: 2rem; }
+}
+@media print {
+  body { font-size: 10.5pt; }
+  main { max-width: none; padding: 0; }
+  nav { break-inside: avoid; }
+  pre { white-space: pre-wrap; overflow: visible; font-size: 8.5pt; }
+  h2, h3 { break-after: avoid; }
+  .card, .callout, .warning, table { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <span class="badge">Design Patterns</span>
+  <span class="badge">Java 25</span>
+  <h1>Adapter Pattern from First Principles</h1>
+  <p class="lead">A hands-on design and implementation guide derived from Lesson 3. The goal is to understand the engineering pressure that creates an Adapter, not to memorize a class diagram.</p>
+
+  <div class="callout">
+    <strong>Compatibility note.</strong> The sample is written for Java 25 and intentionally uses no preview features. It uses records for small domain/value types; Oracle documents records as standard Java language constructs. The source was also compiled and executed successfully with the available JDK 21, which is a conservative compatibility check for Java 25.
+  </div>
+
+  <nav>
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#goal">What problem are we solving?</a></li>
+      <li><a href="#baseline">Baseline application boundary</a></li>
+      <li><a href="#mismatch">The incompatible SDK</a></li>
+      <li><a href="#derive">Deriving the Adapter</a></li>
+      <li><a href="#implementation">Java 25 implementation</a></li>
+      <li><a href="#testing">Testing the translation boundary</a></li>
+      <li><a href="#errors">Error translation</a></li>
+      <li><a href="#second">Second vendor: deeper translation</a></li>
+      <li><a href="#comparisons">Adapter vs related patterns</a></li>
+      <li><a href="#thought-process">Engineering thought process</a></li>
+      <li><a href="#run">Compile and run</a></li>
+      <li><a href="#exercise">Exercise</a></li>
+      <li><a href="#sources">Official Java 25 references</a></li>
+    </ol>
+  </nav>
+
+  <section id="goal">
+    <h2>1. What problem are we solving?</h2>
+    <p>An Adapter becomes useful when <strong>our application needs one contract</strong> but an existing or third-party component exposes a different contract. We do not want the mismatch to leak through the rest of the system.</p>
+    <pre><code class="language-text">CheckoutService
+      |
+      v
+ShippingPolicy
+      ^
+      |
+LegacyCarrierAdapter
+      |
+      v
+LegacyCarrierClient</code></pre>
+    <p>The design target is simple: <code>CheckoutService</code> knows only the capability it needs—<code>ShippingPolicy</code>. Vendor-specific method names, units, request objects, responses, and exceptions stay behind the adapter.</p>
+  </section>
+
+  <section id="baseline">
+    <h2>2. Baseline application boundary</h2>
+    <h3>Domain model</h3>
+    <pre><code class="language-java">package com.example.shipping.domain;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
+public record Order(
+        double weightKg,
+        BigDecimal subtotal,
+        String destinationZip) {
+
+    public Order {
+        if (!Double.isFinite(weightKg) || weightKg &lt;= 0) {
+            throw new IllegalArgumentException(&quot;weightKg must be finite and &gt; 0&quot;);
+        }
+        Objects.requireNonNull(subtotal, &quot;subtotal&quot;);
+        if (subtotal.signum() &lt; 0) {
+            throw new IllegalArgumentException(&quot;subtotal must be &gt;= 0&quot;);
+        }
+        if (destinationZip == null || destinationZip.isBlank()) {
+            throw new IllegalArgumentException(&quot;destinationZip must not be blank&quot;);
+        }
+    }
+}</code></pre>
+    <p>The record is a small immutable data carrier. Validation belongs at construction because an invalid order should not circulate through the application.</p>
+
+    <h3>Capability required by checkout</h3>
+    <pre><code class="language-java">package com.example.shipping.domain;
+
+import java.math.BigDecimal;
+
+@FunctionalInterface
+public interface ShippingPolicy {
+    BigDecimal calculate(Order order);
+}</code></pre>
+
+    <h3>Stable application code</h3>
+    <pre><code class="language-java">package com.example.shipping.application;
+
+import com.example.shipping.domain.Order;
+import com.example.shipping.domain.ShippingPolicy;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
+public final class CheckoutService {
+    private final ShippingPolicy shippingPolicy;
+
+    public CheckoutService(ShippingPolicy shippingPolicy) {
+        this.shippingPolicy = Objects.requireNonNull(shippingPolicy);
+    }
+
+    public BigDecimal total(Order order) {
+        return order.subtotal().add(shippingPolicy.calculate(order));
+    }
+}</code></pre>
+
+    <div class="callout">
+      <strong>First-principles rule:</strong> the consumer should depend on the capability it needs, not on details of a particular vendor.
+    </div>
+  </section>
+
+  <section id="mismatch">
+    <h2>3. The incompatible SDK</h2>
+    <p>Assume the third-party SDK is outside our control:</p>
+    <pre><code class="language-java">package com.example.shipping.vendor.legacy;
+
+import java.math.BigDecimal;
+
+public class LegacyCarrierClient {
+
+    // Simulates a third-party SDK that our application does not control.
+    public BigDecimal getQuote(String destinationZip, long weightInGrams) {
+        if (&quot;00000&quot;.equals(destinationZip)) {
+            throw new LegacyCarrierUnavailableException(&quot;Legacy carrier is unavailable&quot;);
+        }
+
+        // Example vendor pricing only.
+        return BigDecimal.valueOf(12)
+                .add(BigDecimal.valueOf(weightInGrams)
+                        .multiply(BigDecimal.valueOf(0.002)));
+    }
+}</code></pre>
+    <p>Our code wants <code>calculate(Order)</code>. The SDK gives us <code>getQuote(zip, grams)</code>. It also uses grams while our domain uses kilograms.</p>
+    <pre><code class="language-text">OUR APPLICATION                         THIRD-PARTY SDK
+
+Order                                  getQuote(zip, grams)
+  |                                            ^
+  |                                            |
+  +--&gt; ShippingPolicy.calculate(order)         |
+                 ^                              |
+                 |                              |
+                 +---- LegacyCarrierAdapter ----+
+                       - extracts zip
+                       - kg -&gt; grams
+                       - translates errors</code></pre>
+    <div class="warning">
+      <strong>Weak solution:</strong> inject <code>LegacyCarrierClient</code> directly into <code>CheckoutService</code> and perform conversions there. It works initially, but checkout then owns vendor knowledge and becomes coupled to the external API.
+    </div>
+  </section>
+
+  <section id="derive">
+    <h2>4. Deriving the Adapter</h2>
+    <p>Ask four questions:</p>
+    <ol>
+      <li>What contract does the application want? <code>ShippingPolicy</code>.</li>
+      <li>What contract does the external component provide? <code>getQuote(String, long)</code>.</li>
+      <li>What translation is necessary? Extract ZIP, convert kilograms to grams, translate vendor failures.</li>
+      <li>Where should this knowledge live? In one boundary object.</li>
+    </ol>
+    <p>That boundary object is the Adapter.</p>
+  </section>
+
+  <section id="implementation">
+    <h2>5. Java 25 implementation</h2>
+    <h3>The Adapter</h3>
+    <pre><code class="language-java">package com.example.shipping.adapter;
+
+import com.example.shipping.domain.Order;
+import com.example.shipping.domain.ShippingPolicy;
+import com.example.shipping.domain.ShippingUnavailableException;
+import com.example.shipping.vendor.legacy.LegacyCarrierClient;
+import com.example.shipping.vendor.legacy.LegacyCarrierUnavailableException;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
+public final class LegacyCarrierAdapter implements ShippingPolicy {
+    private final LegacyCarrierClient client;
+
+    public LegacyCarrierAdapter(LegacyCarrierClient client) {
+        this.client = Objects.requireNonNull(client);
+    }
+
+    @Override
+    public BigDecimal calculate(Order order) {
+        long weightInGrams = Math.round(order.weightKg() * 1_000.0);
+
+        try {
+            return client.getQuote(order.destinationZip(), weightInGrams);
+        } catch (LegacyCarrierUnavailableException ex) {
+            throw new ShippingUnavailableException(
+                    &quot;Shipping quote is temporarily unavailable&quot;, ex);
+        }
+    }
+}</code></pre>
+    <p>The adapter has two simultaneous views:</p>
+    <div class="grid">
+      <div class="card"><strong>Facing inward</strong><br>It is a normal <code>ShippingPolicy</code>. The application sees no vendor-specific API.</div>
+      <div class="card"><strong>Facing outward</strong><br>It knows how to call the legacy SDK and how to translate our domain representation into vendor representation.</div>
+    </div>
+
+    <h3>Composition</h3>
+    <pre><code class="language-java">package com.example.shipping;
+
+import com.example.shipping.adapter.LegacyCarrierAdapter;
+import com.example.shipping.application.CheckoutService;
+import com.example.shipping.domain.Order;
+import com.example.shipping.vendor.legacy.LegacyCarrierClient;
+
+import java.math.BigDecimal;
+
+public final class Main {
+    public static void main(String[] args) {
+        var order = new Order(
+                2.0,
+                new BigDecimal(&quot;100.00&quot;),
+                &quot;85001&quot;);
+
+        var shipping = new LegacyCarrierAdapter(
+                new LegacyCarrierClient());
+
+        var checkout = new CheckoutService(shipping);
+
+        System.out.println(&quot;Checkout total = $&quot; + checkout.total(order));
+    }
+}</code></pre>
+    <p>At runtime, dependency flow is:</p>
+    <pre><code class="language-text">Request
+  |
+  v
+Factory (optional)
+  |
+  v
+ShippingPolicy
+  |
+  +--&gt; native Strategy
+  |
+  +--&gt; LegacyCarrierAdapter --&gt; Legacy SDK
+  |
+  +--&gt; NewCarrierAdapter ----&gt; New SDK</code></pre>
+  </section>
+
+  <section id="testing">
+    <h2>6. Test the translation boundary</h2>
+    <p>The adapter's responsibility is translation, so tests should verify translation rather than merely checking that a method returned a value.</p>
+    <pre><code class="language-java">package com.example.shipping.adapter;
+
+import com.example.shipping.domain.Order;
+import com.example.shipping.domain.ShippingUnavailableException;
+import com.example.shipping.vendor.legacy.LegacyCarrierClient;
+import com.example.shipping.vendor.legacy.LegacyCarrierUnavailableException;
+import com.example.shipping.vendor.newcarrier.NewCarrierApi;
+
+import java.math.BigDecimal;
+
+public final class AdapterTests {
+
+    public static void main(String[] args) {
+        shouldTranslateKilogramsToGrams();
+        shouldTranslateVendorException();
+        shouldTranslateNewCarrierRequestAndResponse();
+        System.out.println(&quot;All adapter tests passed.&quot;);
+    }
+
+    private static void shouldTranslateKilogramsToGrams() {
+        var client = new RecordingLegacyCarrierClient();
+        var adapter = new LegacyCarrierAdapter(client);
+
+        var order = new Order(
+                2.0,
+                new BigDecimal(&quot;100.00&quot;),
+                &quot;85001&quot;);
+
+        var result = adapter.calculate(order);
+
+        assertEquals(&quot;85001&quot;, client.lastZip, &quot;zip&quot;);
+        assertEquals(2_000L, client.lastWeightInGrams, &quot;grams&quot;);
+        assertBigDecimalEquals(&quot;25.00&quot;, result, &quot;quote&quot;);
+    }
+
+    private static void shouldTranslateVendorException() {
+        var client = new LegacyCarrierClient() {
+            @Override
+            public BigDecimal getQuote(String zip, long grams) {
+                throw new LegacyCarrierUnavailableException(&quot;vendor down&quot;);
+            }
+        };
+
+        var adapter = new LegacyCarrierAdapter(client);
+        var order = new Order(
+                1.0,
+                BigDecimal.ZERO,
+                &quot;85001&quot;);
+
+        try {
+            adapter.calculate(order);
+            throw new AssertionError(&quot;Expected ShippingUnavailableException&quot;);
+        } catch (ShippingUnavailableException expected) {
+            // pass
+        }
+    }
+
+    private static void shouldTranslateNewCarrierRequestAndResponse() {
+        var api = new RecordingNewCarrierApi();
+        var adapter = new NewCarrierAdapter(api);
+
+        var order = new Order(
+                1.0,
+                BigDecimal.ZERO,
+                &quot;90210&quot;);
+
+        var result = adapter.calculate(order);
+
+        assertEquals(&quot;90210&quot;, api.lastRequest.postalCode(), &quot;postal code&quot;);
+        assertNear(2.2046226218, api.lastRequest.weightPounds(), 0.0000001, &quot;pounds&quot;);
+        assertBigDecimalEquals(&quot;35.00&quot;, result, &quot;cents-to-dollars&quot;);
+    }
+
+    private static final class RecordingLegacyCarrierClient
+            extends LegacyCarrierClient {
+
+        private String lastZip;
+        private long lastWeightInGrams;
+
+        @Override
+        public BigDecimal getQuote(String zip, long grams) {
+            this.lastZip = zip;
+            this.lastWeightInGrams = grams;
+            return new BigDecimal(&quot;25.00&quot;);
+        }
+    }
+
+    private static final class RecordingNewCarrierApi
+            extends NewCarrierApi {
+
+        private PriceRequest lastRequest;
+
+        @Override
+        public PriceResponse price(PriceRequest request) {
+            this.lastRequest = request;
+            return new PriceResponse(3_500);
+        }
+    }
+
+    private static void assertEquals(Object expected, Object actual, String label) {
+        if (!expected.equals(actual)) {
+            throw new AssertionError(
+                    label + &quot;: expected=&quot; + expected + &quot;, actual=&quot; + actual);
+        }
+    }
+
+    private static void assertBigDecimalEquals(
+            String expected,
+            BigDecimal actual,
+            String label) {
+
+        var expectedValue = new BigDecimal(expected);
+        if (expectedValue.compareTo(actual) != 0) {
+            throw new AssertionError(
+                    label + &quot;: expected=&quot; + expectedValue + &quot;, actual=&quot; + actual);
+        }
+    }
+
+    private static void assertNear(
+            double expected,
+            double actual,
+            double tolerance,
+            String label) {
+
+        if (Math.abs(expected - actual) &gt; tolerance) {
+            throw new AssertionError(
+                    label + &quot;: expected=&quot; + expected + &quot;, actual=&quot; + actual);
+        }
+    }
+}</code></pre>
+    <p>The important assertions are:</p>
+    <ul>
+      <li><strong>2.0 kg becomes 2,000 grams</strong> before the legacy API is called.</li>
+      <li>The ZIP code is passed to the correct vendor parameter.</li>
+      <li>A vendor exception becomes an application-level exception.</li>
+      <li>The second vendor's cents response becomes the application's decimal money representation.</li>
+    </ul>
+    <div class="callout">
+      A test double that records vendor parameters is often more useful than a test that only stubs the return value. It tells you whether the adapter translated the request correctly.
+    </div>
+  </section>
+
+  <section id="errors">
+    <h2>7. Error translation</h2>
+    <p>External exception types are also part of the vendor's model. Letting them escape means application services and controllers eventually need vendor-specific knowledge.</p>
+    <pre><code class="language-java">package com.example.shipping.domain;
+
+public final class ShippingUnavailableException extends RuntimeException {
+    public ShippingUnavailableException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}</code></pre>
+    <pre><code class="language-java">package com.example.shipping.vendor.legacy;
+
+public final class LegacyCarrierUnavailableException extends RuntimeException {
+    public LegacyCarrierUnavailableException(String message) {
+        super(message);
+    }
+}</code></pre>
+    <p><code>LegacyCarrierAdapter</code> catches the vendor exception and throws <code>ShippingUnavailableException</code>. This keeps the dependency direction clean:</p>
+    <pre><code class="language-text">Vendor model                        Application model
+
+LegacyCarrierUnavailableException
+              |
+              v
+       LegacyCarrierAdapter
+              |
+              v
+ShippingUnavailableException</code></pre>
+  </section>
+
+  <section id="second">
+    <h2>8. Second vendor: deeper translation</h2>
+    <p>A second vendor makes the benefit clearer because its interface differs in multiple dimensions: request object, pounds rather than kilograms, and integer cents rather than decimal currency.</p>
+    <pre><code class="language-java">package com.example.shipping.vendor.newcarrier;
+
+public class NewCarrierApi {
+
+    public record PriceRequest(String postalCode, double weightPounds) {}
+
+    public record PriceResponse(long amountInCents) {}
+
+    public PriceResponse price(PriceRequest request) {
+        long cents = Math.round(900 + (request.weightPounds() * 175));
+        return new PriceResponse(cents);
+    }
+}</code></pre>
+    <pre><code class="language-java">package com.example.shipping.adapter;
+
+import com.example.shipping.domain.Order;
+import com.example.shipping.domain.ShippingPolicy;
+import com.example.shipping.vendor.newcarrier.NewCarrierApi;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
+public final class NewCarrierAdapter implements ShippingPolicy {
+    private static final double POUNDS_PER_KILOGRAM = 2.2046226218;
+
+    private final NewCarrierApi api;
+
+    public NewCarrierAdapter(NewCarrierApi api) {
+        this.api = Objects.requireNonNull(api);
+    }
+
+    @Override
+    public BigDecimal calculate(Order order) {
+        double pounds = order.weightKg() * POUNDS_PER_KILOGRAM;
+
+        var request = new NewCarrierApi.PriceRequest(
+                order.destinationZip(),
+                pounds);
+
+        var response = api.price(request);
+
+        return BigDecimal.valueOf(response.amountInCents())
+                .movePointLeft(2);
+    }
+}</code></pre>
+    <p>Notice that <code>CheckoutService</code> still does not change. Both vendor adapters satisfy the same application-owned boundary.</p>
+  </section>
+
+  <section id="comparisons">
+    <h2>9. Adapter vs related patterns</h2>
+    <table>
+      <thead><tr><th>Pattern</th><th>Core question</th><th>Interface relationship</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Adapter</strong></td><td>How can I use an incompatible existing component?</td><td>Converts one interface/model into another.</td></tr>
+        <tr><td><strong>Strategy</strong></td><td>How can I interchange algorithms?</td><td>Implementations already satisfy the same conceptual contract.</td></tr>
+        <tr><td><strong>Factory</strong></td><td>Who decides which concrete object gets created?</td><td>Centralizes or delegates construction.</td></tr>
+        <tr><td><strong>Decorator</strong></td><td>How can I add behavior without changing the wrapped implementation?</td><td>Wrapper normally preserves the same interface.</td></tr>
+        <tr><td><strong>Facade</strong></td><td>How can I offer a simpler entry point to a complex subsystem?</td><td>Simplifies a subsystem rather than primarily translating incompatibility.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="thought-process">
+    <h2>10. Engineering thought process</h2>
+    <pre><code class="language-text">1. Identify the stable application capability.
+         |
+         v
+2. Identify the external component&#x27;s actual interface.
+         |
+         v
+3. List every mismatch:
+   - method name
+   - parameter shape
+   - units
+   - response representation
+   - exception model
+         |
+         v
+4. Put those translations in one boundary object.
+         |
+         v
+5. Make application code depend only on its own abstraction.
+         |
+         v
+6. Test the translation boundary independently.</code></pre>
+    <p>Do not start by saying “I need an Adapter.” Start with the dependency mismatch. If the mismatch is real and localized translation solves it, the Adapter pattern has emerged naturally.</p>
+
+    <h3>When not to use Adapter</h3>
+    <p>If you own both sides and can safely change them to the same clean contract, an adapter may be unnecessary. Likewise, wrapping an already-compatible class just to match a textbook diagram creates indirection without reducing coupling.</p>
+  </section>
+
+  <section id="run">
+    <h2>11. Compile and run with JDK 25</h2>
+    <p>The project contains no external dependencies. From the project root:</p>
+    <pre><code class="language-bash">mkdir -p build/classes build/test-classes
+
+javac --release 25 \
+  -d build/classes \
+  $(find src/main/java -name &quot;*.java&quot;)
+
+javac --release 25 \
+  -cp build/classes \
+  -d build/test-classes \
+  $(find src/test/java -name &quot;*.java&quot;)
+
+java -cp build/classes com.example.shipping.Main
+
+java -cp build/classes:build/test-classes \
+  com.example.shipping.adapter.AdapterTests</code></pre>
+    <p>Expected output:</p>
+    <pre><code class="language-text">Checkout total = $116.000
+All adapter tests passed.</code></pre>
+    <p class="small">On Windows, replace the classpath separator <code>:</code> with <code>;</code>. Oracle recommends <code>--release</code> for compiling against a specific Java release.</p>
+  </section>
+
+  <section id="exercise">
+    <h2>12. Hands-on exercise: Old Bank SDK</h2>
+    <p>Build an <code>OldBankAdapter</code> around this incompatible SDK:</p>
+    <pre><code class="language-java">public final class OldBankSdk {
+    public BankResult chargeCents(String accountNumber, long amountInCents) {
+        // third-party behavior
+        return new BankResult(&quot;TX-123&quot;);
+    }
+
+    public record BankResult(String transactionCode) {}
+}</code></pre>
+    <p>Your application should own this contract:</p>
+    <pre><code class="language-java">public interface PaymentProcessor {
+    PaymentResult pay(Payment payment);
+}
+
+public record Payment(String accountId, BigDecimal amount) {}
+public record PaymentResult(String transactionId) {}</code></pre>
+    <p>Acceptance criteria:</p>
+    <ol>
+      <li><code>PaymentService</code> never imports <code>OldBankSdk</code>.</li>
+      <li><code>OldBankSdk</code> remains unchanged.</li>
+      <li>The adapter converts decimal currency to cents at the boundary.</li>
+      <li>The vendor's <code>transactionCode</code> becomes the application's <code>transactionId</code>.</li>
+      <li>Vendor result types do not escape the adapter.</li>
+      <li>A unit test records the arguments passed to <code>chargeCents</code>.</li>
+    </ol>
+  </section>
+
+  <section id="sources">
+    <h2>13. Official Java 25 references</h2>
+    <ul>
+      <li><a href="https://docs.oracle.com/en/java/javase/25/docs/">Oracle Java SE 25 &amp; JDK 25 API Specification</a>.</li>
+      <li><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle: Record Classes</a> — records are concise data carriers with generated accessors and value-oriented methods.</li>
+      <li><a href="https://docs.oracle.com/en/java/javase/25/language/java-language-changes-summary.html">Oracle: Java Language Changes Summary</a> — distinguishes permanent Java 25 features from preview features.</li>
+      <li><a href="https://docs.oracle.com/en/java/javase/25/migrate/preparing-migration.html">Oracle: Preparing for Migration</a> — recommends <code>javac --release</code> for targeting a specific Java release.</li>
+      <li><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/index.html">Oracle: Java SE 25 &amp; JDK 25 Specifications</a>.</li>
+    </ul>
+    <p class="small">The Adapter design discussion is derived from the preceding Lesson 3 in this conversation. The Java language/tooling claims above are linked only to Oracle's official Java 25 documentation.</p>
+  </section>
+
+  <footer>
+    Adapter Pattern from First Principles — Java 25. Generated as a self-contained, print/PDF-friendly HTML study guide.
+  </footer>
+</main>
+</body>
+</html>

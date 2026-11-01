@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 19: derive Transactional Outbox, safe retries and Inbox from first principles. Self-contained Java 25-compatible guide."><title>Lesson 19 · Transactional Outbox</title><style>
+:root { color-scheme:light; --ink:#172c37; --muted:#536570; --teal:#08756b; --line:#d7e2e4; --paper:#fff; --wash:#f4f8f7; --code:#f3f6f8; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:28px; }
+body { margin:0; background:#f4f6f5; color:var(--ink); font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+a { color:#086c67; text-underline-offset:3px; }
+a:hover { color:#004b45; }
+button,select { font:inherit; }
+button { border:1px solid #abc9c4; border-radius:7px; padding:9px 14px; background:white; color:#075f56; cursor:pointer; font-size:.85rem; font-weight:650; }
+button:hover { background:#eaf5f1; }
+button.primary { background:#08756b; color:white; border-color:#08756b; }
+button:focus-visible, a:focus-visible, select:focus-visible, summary:focus-visible { outline:3px solid #d29524; outline-offset:4px; }
+.skip { position:fixed; top:-80px; left:20px; z-index:20; background:white; padding:10px; }
+.skip:focus { top:10px; }
+.layout { max-width:1350px; margin:auto; display:grid; grid-template-columns:240px minmax(0,930px); gap:34px; padding:34px 28px 70px; align-items:start; }
+.sidebar { position:sticky; top:26px; max-height:calc(100vh - 50px); overflow:auto; padding:15px 8px 20px 0; }
+.brand { font-size:12px; letter-spacing:.16em; text-transform:uppercase; font-weight:750; color:var(--teal); margin-bottom:20px; }
+.sidebar h2 { font:700 17px/1.4 Georgia,serif; margin:0 0 18px; }
+.sidebar a { display:block; text-decoration:none; border-left:2px solid #d7e4df; padding:8px 10px 8px 14px; color:#435b61; font-size:13px; line-height:1.45; }
+.sidebar a:hover { border-color:var(--teal); background:#e9f0ed; color:#075f56; }
+.sidebar .range { display:block; font-size:10px; letter-spacing:.06em; color:#667d82; margin-bottom:2px; }
+.sidebar .utility { margin-top:17px; }
+.sidebar .foot { font-size:11px; color:#6c7d80; line-height:1.6; margin-top:20px; }
+main { background:var(--paper); box-shadow:0 8px 40px #24443d0b; border:1px solid #e1e9e6; border-radius:12px; overflow:hidden; min-width:0; }
+.cover { padding:55px 52px 42px; background:linear-gradient(145deg,#f0f8f3 0%,#fff 70%); border-bottom:1px solid var(--line); }
+.eyebrow { font-size:11px; letter-spacing:.17em; font-weight:750; text-transform:uppercase; color:var(--teal); margin:0 0 14px; }
+h1 { font:700 clamp(36px,4vw,57px)/1.09 Georgia,"Times New Roman",serif; letter-spacing:-.03em; margin:0 0 20px; max-width:710px; }
+h1 span { color:var(--teal); }
+.deck { font-size:19px; line-height:1.55; max-width:670px; color:#405a61; margin:0 0 24px; }
+.pills { display:flex; gap:8px; flex-wrap:wrap; margin:20px 0; }
+.pill { border:1px solid #cfe0d8; color:#3b6158; padding:3px 9px; border-radius:5px; font-size:11px; letter-spacing:.04em; font-weight:650; }
+.actions { display:flex; gap:9px; flex-wrap:wrap; margin:22px 0; }
+.scope { font-size:12px; color:#52655e; border-left:3px solid #bfd4c9; padding-left:13px; margin:24px 0; line-height:1.6; }
+.contents { margin-top:28px; }
+.contents h2 { font-size:14px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:12px; }
+.toc-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 20px; }
+.toc-grid a { display:grid; grid-template-columns:28px 1fr; gap:8px; color:var(--ink); text-decoration:none; padding:10px 0; border-top:1px solid var(--line); font-size:12px; line-height:1.4; }
+.toc-grid b { color:var(--teal); font-size:12px; }
+.toc-grid small { display:block; color:var(--muted); margin-top:2px; }
+.part { padding:44px 52px 5px; }
+.part-head { border-top:3px solid var(--teal); padding-top:20px; margin-bottom:34px; }
+.part-head .eyebrow { margin-bottom:9px; }
+.part-head h2 { font:700 32px/1.18 Georgia,serif; margin:0 0 10px; letter-spacing:-.02em; }
+.part-head>p:last-child { color:var(--muted); margin:0; font-size:15px; }
+.lesson-section { margin:0 0 35px; }
+.lesson-section h3 { font-size:20px; line-height:1.35; margin:0 0 14px; letter-spacing:-.015em; }
+.num { color:#0b8174; font-size:12px; font-weight:800; letter-spacing:.08em; margin-right:10px; vertical-align:middle; }
+h4 { font-size:16px; margin:26px 0 10px; }
+p { margin:0 0 14px; }
+strong { font-weight:700; }
+code { font: .88em/1.55 "SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+p code,td code,li code { background:#f0f4f4; padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+.code { margin:18px 0 20px; background:var(--code); border:1px solid #dce5e8; border-radius:7px; overflow:hidden; }
+.code-label { border-bottom:1px solid #dce5e8; padding:7px 15px; font-size:10px; letter-spacing:.08em; font-weight:750; text-transform:uppercase; color:#587178; background:#eaf0f2; }
+pre { margin:0; padding:15px 17px; white-space:pre-wrap; overflow-wrap:anywhere; tab-size:4; color:#1f4658; font-size:12px; line-height:1.6; }
+pre code { font-size:inherit; }
+.callout { padding:16px 18px; border-left:3px solid #d9a13a; background:#fffbf1; margin:20px 0; border-radius:0 6px 6px 0; }
+.callout strong { font-size:14px; }
+.callout p { margin:5px 0 0; font-size:14px; line-height:1.65; }
+.callout.good { border-color:#198674; background:#eff8f4; }
+.table-wrap { margin:18px 0 22px; }
+table { border-collapse:collapse; width:100%; table-layout:fixed; font-size:13px; line-height:1.55; }
+th { background:#eef4f2; color:#285b51; font-size:11px; text-align:left; letter-spacing:.03em; }
+td,th { vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+td:first-child { font-weight:600; }
+tr:last-child td { border-bottom:1px solid #bccfc8; }
+.boundary-map { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+.boundary { border:1px solid #bfd7ce; border-top:4px solid var(--teal); background:#f4faf7; border-radius:6px; padding:18px; }
+.boundary .tag { display:block; text-transform:uppercase; letter-spacing:.07em; color:#426b61; font-size:10px; font-weight:700; }
+.boundary h3 { font-size:17px; margin:10px 0 8px; }
+.boundary p { font-size:13px; margin:0; line-height:1.55; }
+.three { grid-template-columns:1fr 1fr 1fr; }
+.three .boundary { padding:14px; }
+.cite { display:inline; font-size:11px; font-weight:500; white-space:normal; }
+.cite::before { content:'↗ '; }
+blockquote { font:400 22px/1.6 Georgia,serif; color:#145c50; margin:24px 0; padding:20px 24px; border-left:4px solid var(--teal); background:#f1f8f4; }
+.questions { padding-left:25px; }
+.questions li { padding:4px 0 5px 4px; }
+.explorer { background:#eff7f5; border:1px solid #c6dcd5; border-radius:8px; padding:20px; margin:22px 0; }
+.explorer label { display:block; font-size:13px; font-weight:650; margin-bottom:6px; }
+select { width:100%; padding:9px 11px; background:white; border:1px solid #8aada2; color:var(--ink); border-radius:5px; font-size:13px; }
+#failure-result { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin:18px 0; }
+#failure-result div { padding:12px; background:white; border:1px solid #d3e4dd; border-radius:4px; font-size:13px; }
+#failure-result strong { display:block; color:var(--teal); font-size:10px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+.small { font-size:12px; color:var(--muted); }
+.explorer .small { margin:0; }
+.appendix { border-top:1px solid var(--line); padding:44px 52px 25px; }
+.appendix>h2 { font:700 31px/1.2 Georgia,serif; margin:0 0 16px; }
+.reference-piece { margin:24px 0; }
+.reference-piece h3 { font-size:18px; margin:0 0 10px; }
+.sources li { font-size:12px; line-height:1.6; margin:10px 0; }
+.source-url { display:block; font-family:monospace; font-size:10px; color:#56716c; overflow-wrap:anywhere; }
+.endnote { border-top:1px solid var(--line); font-size:12px; padding:25px 52px; color:var(--muted); background:#f8faf9; }
+.status { min-height:1.4em; font-size:12px; color:var(--teal); }
+.screen-only { display:none; }
+.js .screen-only { display:block; }
+.js .actions.screen-only { display:flex; }
+@media (max-width:1050px) { .layout{grid-template-columns:185px minmax(0,1fr);gap:20px;padding:20px 18px;} .cover,.part,.appendix{padding-left:33px;padding-right:33px;} .sidebar a{font-size:12px;} .three{grid-template-columns:1fr;} }
+@media (max-width:760px) { .layout{display:block;padding:0;} .sidebar{display:none;} main{border:0;border-radius:0;} .cover{padding:35px 23px 28px;} .part,.appendix{padding:32px 23px 1px;} .cover h1{font-size:40px;} .part-head h2{font-size:28px;} .deck{font-size:17px;} .boundary-map,.toc-grid{grid-template-columns:1fr;} .lesson-section h3{font-size:19px;} table{font-size:11px;} td,th{padding:8px 7px;} pre{padding:12px;font-size:10.5px;} .endnote{padding:22px;} #failure-result{grid-template-columns:1fr;} }
+@media (prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} }
+@page { size:A4; margin:17mm 15mm 17mm;
+ @top-left { content:'LESSON 19  /  TRANSACTIONAL OUTBOX'; font:8px Arial; color:#72817d; }
+ @bottom-left { content:'DP  ·  JAVA 25 GUIDE'; font:8px Arial; color:#72817d; }
+ @bottom-right { content:counter(page); font:9px Arial; color:#45655c; }
+}
+@media print {
+ html { scroll-behavior:auto; }
+ body { background:white; font:10pt/1.4 Arial,sans-serif; color:#162b32; }
+ .layout{display:block;max-width:none;margin:0;padding:0;}
+ main { border:0;border-radius:0;box-shadow:none;overflow:visible; }
+ .sidebar,.screen-only,.js .screen-only,.js .actions.screen-only,.skip { display:none !important; }
+ .cover{padding:12mm 0 0;background:white;border:0;break-after:page;}
+ h1{font-size:43pt;max-width:none;margin-bottom:5mm;}
+ .deck{font-size:14pt;line-height:1.45;}
+ .eyebrow{font-size:8pt;}
+ .pills{margin:5mm 0;}
+ .pill{font-size:8pt;}
+ .scope{font-size:8.2pt;line-height:1.45;margin:6mm 0;}
+ .contents{margin-top:8mm;}
+ .contents h2{font-size:9pt;}
+ .toc-grid{grid-template-columns:1fr 1fr;gap:0 8mm;}
+ .toc-grid a{font-size:8.5pt;padding:3mm 0;}
+ .toc-grid b{font-size:9pt;}
+ .part{padding:0;break-before:auto;}
+ .part-head{padding-top:5mm;margin:7mm 0 8mm;border-top-width:2px;break-inside:avoid;break-after:avoid;}
+ .part-head h2{font-size:25pt;margin-bottom:3mm;}
+ .part-head>p:last-child{font-size:10pt;}
+ .lesson-section{margin:0 0 5.5mm;}
+ .lesson-section h3{font-size:14pt;margin-bottom:3mm;break-after:avoid;}
+ .num{font-size:9pt;}
+ p{margin:0 0 2.5mm;orphans:3;widows:3;}
+ h2,h3,h4{break-after:avoid;}
+ a{color:#145e55;text-decoration:underline;}
+ .table-wrap{margin:4mm 0 5mm;overflow:visible;}
+ table{font-size:8.7pt;line-height:1.4;}
+ th{font-size:8pt;}
+ td,th{padding:2.7mm 2.8mm;}
+ thead{display:table-header-group;}
+ tr{break-inside:avoid;}
+ .callout{margin:4mm 0;padding:3.5mm 4mm;break-inside:avoid;}
+ .callout strong,.callout p{font-size:9pt;}
+ .code{margin:3mm 0 4mm;border-radius:3px;break-inside:auto;overflow:visible;}
+ .lesson-section .code{break-inside:avoid;}
+ .code-label{font-size:7pt;padding:1.5mm 3mm;break-after:avoid;}
+ pre{padding:3mm;font-size:8.2pt;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;orphans:4;widows:4;}
+ .boundary-map{gap:3mm;margin:4mm 0;break-inside:avoid;}
+ .three{grid-template-columns:1fr 1fr 1fr;}
+ .boundary{padding:3mm;}
+ .boundary .tag{font-size:7pt;}
+ .boundary h3{font-size:11pt;margin:2mm 0;}
+ .boundary p{font-size:9pt;}
+ .cite{font-size:7.7pt;}
+ blockquote{font-size:15pt;margin:5mm 0;padding:4mm 5mm;break-inside:avoid;}
+ .questions li{padding:1mm 0;}
+ .appendix{break-before:page;padding:0;border:0;}
+ .appendix>h2{font-size:25pt;}
+ .reference-piece{margin:4mm 0;break-inside:avoid;}
+ .reference-piece h3{font-size:13pt;}
+ .sources li{font-size:9pt;margin:3mm 0;break-inside:avoid;}
+ .source-url{font-size:7.5pt;}
+ .small{font-size:8pt;}
+ .endnote{padding:4mm 0;background:white;font-size:8pt;break-before:avoid;}
+ #s26,#s47{break-inside:avoid;}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style></head>
+<body><a class="skip" href="#guide">Skip to guide</a><div class="layout"><nav class="sidebar" aria-label="Guide navigation"><div class="brand">DP / Lesson 19</div><h2>Transactional<br>Outbox</h2><a href="#part-01"><span class="range">PART 01 · §§1–8</span>Derive the problem</a><a href="#part-02"><span class="range">PART 02 · §§9–12</span>Make the local change atomic</a><a href="#part-03"><span class="range">PART 03 · §§13–18</span>Make the handoff recoverable</a><a href="#part-04"><span class="range">PART 04 · §§19–26</span>Make the local effect safe</a><a href="#part-05"><span class="range">PART 05 · §§27–31</span>Own recovery in production</a><a href="#part-06"><span class="range">PART 06 · §§32–39</span>Define the limits of the guarantee</a><a href="#part-07"><span class="range">PART 07 · §§40–43</span>Test and choose deliberately</a><a href="#part-08"><span class="range">PART 08 · §§44–47</span>Return to the architecture</a><div class="utility"><a href="#java-reference">A · Complete Java reference</a><a href="#sql-contracts">B · SQL contracts</a><a href="#sources">C · Official references</a></div><p class="foot">One local commit.<br>A durable promise.<br>Recovery you can reason about.</p></nav>
+<main id="guide"><header class="cover"><p class="eyebrow">Design patterns · Lesson 19</p><h1>Transactional<br><span>Outbox</span></h1><p class="deck">Derive reliable event propagation from atomicity, failure, retry, and idempotency.</p><div class="pills"><span class="pill">JAVA 25 COMPATIBLE</span><span class="pill">FIRST PRINCIPLES</span><span class="pill">OFFLINE + PRINT READY</span></div><p>Start with two facts that must agree. Find the transaction that can protect them. Then make every boundary outside it recoverable.</p><div class="actions screen-only"><button class="primary" type="button" data-print>Print / Save PDF</button><button type="button" data-download="java">Download Java source</button><button type="button" data-download="sql">Download SQL schema</button></div><p class="small">Read offline in any modern browser. For PDF, use A4, 100% scale, and disable the browser’s default headers and footers. All explanations and code remain visible when printed.</p><p class="scope"><strong>Edition note:</strong> the supplied excerpt starts near the end of the original opening. Sections 1–8 provide a newly authored setup; sections 9–47 preserve the supplied first-principles sequence. Java API and platform details were checked against official documentation.</p><nav class="contents" aria-label="Contents"><h2>The learning path</h2><div class="toc-grid"><a href="#part-01"><b>01</b><span>Derive the problem<small>Sections 1–8</small></span></a><a href="#part-02"><b>02</b><span>Make the local change atomic<small>Sections 9–12</small></span></a><a href="#part-03"><b>03</b><span>Make the handoff recoverable<small>Sections 13–18</small></span></a><a href="#part-04"><b>04</b><span>Make the local effect safe<small>Sections 19–26</small></span></a><a href="#part-05"><b>05</b><span>Own recovery in production<small>Sections 27–31</small></span></a><a href="#part-06"><b>06</b><span>Define the limits of the guarantee<small>Sections 32–39</small></span></a><a href="#part-07"><b>07</b><span>Test and choose deliberately<small>Sections 40–43</small></span></a><a href="#part-08"><b>08</b><span>Return to the architecture<small>Sections 44–47</small></span></a></div></nav></header>
+<div class="part" id="part-01"><header class="part-head"><p class="eyebrow">Part 01 · Sections 1–8</p><h2>Derive the problem</h2><p>From a business fact to a durable publication obligation.</p></header><section class="lesson-section" id="s1" aria-labelledby="h1"><h3 id="h1"><span class="num">01</span>Start with the business requirement</h3>
+<p>A customer’s payment has been confirmed. The ordering service must record the order as paid, and Shipping must eventually learn about it. The two services have separate storage and communicate through a broker.</p>
+<p>The local use case is <code>PayOrder</code>; the event is <code>OrderPaid</code>. Here, “pay” means recording a confirmed payment. Charging a payment provider is another external boundary, examined in §28.</p>
+<p>Ask first: <strong>which facts must agree?</strong> If an order becomes paid, the obligation to notify Shipping must survive a process crash. If the order does not become paid, we must not announce that it did.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Fact</th><th scope="col">Owner</th></tr></thead><tbody><tr><td>Order is paid</td><td>Ordering database</td></tr><tr><td>OrderPaid is available to other services</td><td>Message broker</td></tr><tr><td>Shipment exists</td><td>Shipping database</td></tr></tbody></table></div></section><section class="lesson-section" id="s2" aria-labelledby="h2"><h3 id="h2"><span class="num">02</span>The straightforward implementation</h3>
+<p>We naturally write two operations: commit the order, then publish its event. Each operation may be correct by itself. Their composition is the problem.</p>
+<div class="code "><div class="code-label">Java</div><pre><code>// Deliberately unsafe sketch: the operations commit independently.
+orders.save(order);
+publisher.publish(event);</code></pre></div><p>A database transaction can group database writes. A normal database transaction does not automatically make a separate broker call atomic with those writes.</p></section><section class="lesson-section" id="s3" aria-labelledby="h3"><h3 id="h3"><span class="num">03</span>Database first: a missing event</h3>
+<p>The order update commits. Before publication, the application crashes. On restart the database says <code>PAID</code>, but no durable record tells the application that publication is still required.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Step</th><th scope="col">Result</th></tr></thead><tbody><tr><td>1. Commit order update</td><td>Order is PAID</td></tr><tr><td>2. Process crashes</td><td>Publish call never happens</td></tr><tr><td>3. Recover</td><td>Shipping may never learn about the payment</td></tr></tbody></table></div><p>A try/catch block does not run after the process has disappeared. The recovery information must already be durable.</p></section><section class="lesson-section" id="s4" aria-labelledby="h4"><h3 id="h4"><span class="num">04</span>Broker first: a false fact</h3>
+<p>Reverse the calls. The broker accepts <code>OrderPaid</code>, then the database update fails or rolls back. Shipping can now act on an event whose corresponding business change never committed.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Ordering</th><th scope="col">Crash window</th></tr></thead><tbody><tr><td>Commit → publish</td><td>Paid order, missing event</td></tr><tr><td>Publish → commit</td><td>Published event, unpaid order</td></tr></tbody></table></div><p>Reordering the operations changes the failure. It does not remove the gap.</p></section><section class="lesson-section" id="s5" aria-labelledby="h5"><h3 id="h5"><span class="num">05</span>A local transaction does not cover the network</h3>
+<p>Putting a broker call between <code>BEGIN</code> and <code>COMMIT</code> does not enlist the broker in that database transaction. A broker success cannot be undone merely by rolling back the database.</p>
+<p>Waiting for both operations to succeed improves the happy path, but the crash points remain. We need to identify the actual atomic boundary rather than infer it from the placement of code.</p>
+<aside class="callout note"><strong>Question to carry forward</strong><p>What can the application commit together, using one resource that already provides transactions?</p></aside></section><section class="lesson-section" id="s6" aria-labelledby="h6"><h3 id="h6"><span class="num">06</span>After-commit callbacks still have a gap</h3>
+<p>An after-commit callback avoids publishing a fact before its transaction commits. But the process can die after commit and before the callback executes. An in-memory event bus or a background task has the same durability limit.</p>
+<p>A “retry later” instruction helps only if something persistent remembers <em>what</em> to retry. We need a durable obligation, not just a convenient place to call the publisher.</p>
+</section><section class="lesson-section" id="s7" aria-labelledby="h7"><h3 id="h7"><span class="num">07</span>Move the obligation inside the transaction</h3>
+<p>Instead of requiring “update the order and publish the event atomically,” require “update the order and record that this event must be published atomically.” Both writes can live in the ordering database.</p>
+<div class="code "><div class="code-label">SQL · transaction shape</div><pre><code>BEGIN;
+UPDATE orders SET status = &#x27;PAID&#x27; WHERE id = ?;
+INSERT INTO outbox_message (...) VALUES (...);
+COMMIT;</code></pre></div><p>The row is a durable promise. A separate process can read it after commit and keep trying to fulfil that promise.</p></section><section class="lesson-section" id="s8" aria-labelledby="h8"><h3 id="h8"><span class="num">08</span>Derive the invariant before naming the pattern</h3>
+<p>For a new payment transition, the database exposes one of two outcomes:</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Transaction outcome</th><th scope="col">Order</th><th scope="col">Publication obligation</th></tr></thead><tbody><tr><td>Commits</td><td>PAID</td><td>Outbox event exists</td></tr><tr><td>Rolls back</td><td>Previous state</td><td>No new outbox event</td></tr></tbody></table></div><p>We replaced <em>publish the message atomically</em> with <strong>record the obligation to publish atomically</strong>. We have derived the Transactional Outbox.</p></section></div><div class="part" id="part-02"><header class="part-head"><p class="eyebrow">Part 02 · Sections 9–12</p><h2>Make the local change atomic</h2><p>The outbox, schema, transaction, and architectural responsibility.</p></header><section class="lesson-section" id="s9" aria-labelledby="h9"><h3 id="h9"><span class="num">09</span>Transactional Outbox</h3>
+<p>The application writes the order and the outbox row in one local transaction. A message relay publishes committed outbox rows later. Shipping remains downstream of the broker.</p>
+<div class="boundary-map" role="img" aria-label="Producer database commits the order and outbox atomically. A relay retries publication to the broker. The consumer later processes the event.">
+ <div class="boundary"><span class="tag">Atomic · producer database</span><h3>Order update + outbox insert</h3><p>Commit the fact and its publication obligation together.</p></div>
+ <div class="boundary"><span class="tag">Asynchronous · network</span><h3>Relay → broker → Shipping</h3><p>Publish after commit. Recover with retry.</p></div>
+</div>
+<p>The outbox row is visible to the relay only after commit. This separates local correctness from broker availability. AWS’s outbox guidance describes the same dual-write problem and the need to handle duplicate delivery. <a class="cite" href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS · Transactional outbox</a></p></section><section class="lesson-section" id="s10" aria-labelledby="h10"><h3 id="h10"><span class="num">10</span>A small, explicit schema</h3>
+<p>The lesson’s smallest outbox needs an ID, type, aggregate ID, payload, occurrence time, and publication marker. This guide includes schema and aggregate versions from the start so the code and later ordering discussion use one consistent model.</p>
+<div class="code "><div class="code-label">PostgreSQL 18</div><pre><code>CREATE TABLE orders (
+    id UUID PRIMARY KEY,
+    status VARCHAR(20) NOT NULL
+        CHECK (status IN (&#x27;PENDING&#x27;, &#x27;PAID&#x27;, &#x27;CANCELLED&#x27;)),
+    version BIGINT NOT NULL DEFAULT 0 CHECK (version &gt;= 0)
+);
+
+CREATE TABLE outbox_message (
+    id UUID PRIMARY KEY,
+    event_type VARCHAR(200) NOT NULL,
+    event_version INTEGER NOT NULL,
+    aggregate_id UUID NOT NULL,
+    aggregate_version BIGINT NOT NULL,
+    payload JSONB NOT NULL,
+    occurred_at TIMESTAMPTZ NOT NULL,
+    published_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_outbox_unpublished
+    ON outbox_message (occurred_at, id)
+    WHERE published_at IS NULL;</code></pre></div><p><code>published_at IS NULL</code> means publication has not been durably recorded as complete. It does <em>not</em> prove the broker has never received the event.</p>
+<p>The outbox is a durable handoff mechanism. It need not be an event store, and the <code>orders</code> table can remain the business source of truth. The index’s timestamp order is a polling convenience, not a guarantee of causal order.</p></section><section class="lesson-section" id="s11" aria-labelledby="h11"><h3 id="h11"><span class="num">11</span>Make the application transaction explicit</h3>
+<p>The key constraint is physical: <code>orders.save</code> and <code>outbox.add</code> must use the <strong>same connection and transaction</strong>. Passing that connection explicitly makes the boundary visible in this teaching example.</p>
+<div class="code "><div class="code-label">Java</div><pre><code>public record PayOrderHandler(
+        TransactionRunner transactions, OrderRepository orders,
+        OutboxRepository outbox, Clock clock) {
+
+    public void handle(PayOrder command) throws SQLException {
+        transactions.inTransaction(c -&gt; {
+            Order order = orders.findForUpdate(c, command.orderId())
+                    .orElseThrow(() -&gt;
+                            new IllegalArgumentException(&quot;Missing order&quot;));
+            if (!order.markPaid()) return null;
+            orders.save(c, order);
+            OrderPaid event = new OrderPaid(
+                    UUID.randomUUID(), order.id(),
+                    order.version(), clock.instant());
+            outbox.add(c, OutboxMessage.from(event));
+            return null;
+        });
+    }
+}</code></pre></div><p><code>findForUpdate</code> locks the order row until the transaction ends. The domain’s <code>markPaid()</code> rejects cancelled orders and returns <code>false</code> for an already-paid order. With the lock, two concurrent commands cannot both generate a new event for this one-way transition. <a class="cite" href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 · Explicit locking</a></p>
+<p>The event ID is created once for the successful transition, then stored with its payload. A failed transaction may create a new ID on a later attempt because the previous event never became visible.</p>
+<aside class="callout note"><strong>Command retries are a separate problem</strong><p>An outbox does not deduplicate incoming commands. This example makes “mark this order paid once” idempotent under a row lock. Workflows allowing repeated payments need a durable command or payment ID and an explicit result record.</p></aside>
+<p>JDBC connections default to auto-commit. The reference runner disables it, commits after the callback, and attempts rollback on failure. The repositories do not commit independently. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html">Java 25 · Connection</a></p>
+<p>The full definitions of the domain, ports, transaction runner, and handler are included in <a href="#java-reference">Appendix A</a>.</p></section><section class="lesson-section" id="s12" aria-labelledby="h12"><h3 id="h12"><span class="num">12</span>What improved architecturally?</h3>
+<p>Before, the application use case directly coordinated two independently failing technologies. Its correctness depended on the combined database and broker outcomes.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Owner</th><th scope="col">Responsibility</th></tr></thead><tbody><tr><td>Application transaction</td><td>Validate and persist the business change plus its durable consequences</td></tr><tr><td>Message relay</td><td>Publication, retries, broker failures, publication bookkeeping</td></tr><tr><td>Consumer transaction</td><td>Apply a local effect safely despite redelivery</td></tr></tbody></table></div>
+<p>These responsibilities change for different reasons. The handler no longer needs a successful broker call to commit a paid order. This is useful only when the business permits asynchronous propagation.</p>
+<p>The domain still knows nothing about Kafka. A composition root supplies database repositories and a broker publisher through explicit ports.</p></section></div><div class="part" id="part-03"><header class="part-head"><p class="eyebrow">Part 03 · Sections 13–18</p><h2>Make the handoff recoverable</h2><p>Relay failure windows explain retries, duplicates, and stable IDs.</p></header><section class="lesson-section" id="s13" aria-labelledby="h13"><h3 id="h13"><span class="num">13</span>The first relay—and its new failure window</h3>
+<p>One worker reads pending rows, publishes each message, then marks it published. The critical sequence is small:</p>
+<div class="code "><div class="code-label">Java</div><pre><code>publisher.publishAndAwaitAcceptance(message);
+outbox.markPublished(message.id(), clock.instant());</code></pre></div><p>The publisher’s contract must mean broker acceptance under the configured durability policy. Returning after adding a message to a local client buffer is insufficient. Kafka’s <code>send</code> is asynchronous; an adapter must observe completion and handle failure before marking the row. <a class="cite" href="https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html">Apache Kafka 4.1 · KafkaProducer API</a></p>
+<p>Polling once per second is an illustrative choice. A scheduled task must handle expected exceptions: an exception escaping a periodic task suppresses later executions in Java’s scheduler. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">Java 25 · ScheduledExecutorService</a></p>
+<aside class="callout note"><strong>A second dual write remains</strong><p>Publish and mark-published are still separate operations. We have arranged the remaining gap so recovery can retry a durable message, instead of forgetting it. The complete relay in Appendix A logs failures, preserves interruption, and assumes one worker.</p></aside>
+<p>The relay must reuse the committed event envelope. It must not rebuild a fresh business event on each poll.</p></section><section class="lesson-section" id="s14" aria-labelledby="h14"><h3 id="h14"><span class="num">14</span>Failure: the broker is unavailable</h3>
+<p>The relay cannot obtain a successful publication result, so it does not mark the row. The event remains pending.</p>
+<p>Once the broker recovers, the relay retries the same stored message. The application could continue accepting local business transactions during the outage, subject to database capacity and any chosen backlog limits.</p>
+<aside class="callout good"><strong>What survived?</strong><p>The committed order and the durable publication obligation. Neither depends on the relay process staying alive.</p></aside></section><section class="lesson-section" id="s15" aria-labelledby="h15"><h3 id="h15"><span class="num">15</span>Failure: publish succeeds, then the relay crashes</h3>
+<p>The broker accepts event <code>abc123</code>. Before the relay commits <code>published_at</code>, it crashes. The database still presents that row as pending.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Attempt</th><th scope="col">Broker</th><th scope="col">Outbox</th></tr></thead><tbody><tr><td>First publication</td><td>Accepts abc123</td><td>Still pending at crash</td></tr><tr><td>Recovery publication</td><td>May accept abc123 again</td><td>Marked published after acceptance</td></tr></tbody></table></div>
+<p>A duplicate is possible even if the initial send succeeded. A timeout or a lost acknowledgement creates the same uncertainty: the relay may not know whether the broker accepted the message.</p></section><section class="lesson-section" id="s16" aria-labelledby="h16"><h3 id="h16"><span class="num">16</span>Why not mark it published first?</h3>
+<p>If the relay commits the marker first and then crashes before sending, future polls skip a message that was never published.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Sequence</th><th scope="col">Crash consequence</th><th scope="col">Chosen semantics</th></tr></thead><tbody><tr><td>Publish → mark</td><td>Possible duplicate</td><td>Retry pending work</td></tr><tr><td>Mark → publish</td><td>Possible permanent loss</td><td>Work may be forgotten</td></tr></tbody></table></div>
+<p>For a business event that must not disappear, choose publish before mark and make duplicates safe downstream. This is the trade that leads to at-least-once delivery.</p></section><section class="lesson-section" id="s17" aria-labelledby="h17"><h3 id="h17"><span class="num">17</span>What at-least-once actually promises</h3>
+<p>A delivered event may arrive more than once; it need not be duplicated in ordinary operation. The ambiguity is unavoidable for this uncoordinated boundary: a failed attempt and a successful attempt with a lost response can look the same to the sender.</p>
+<p><strong>Retry chooses possible duplication over possible loss.</strong> That is a failure policy, not an unconditional liveness guarantee.</p>
+<aside class="callout note"><strong>State the assumptions</strong><p>Eventual delivery requires retained durable state, a functioning relay, eventual destination availability, successful handling of the payload, and continued retries or operator recovery. A permanently failed message placed in quarantine has not been delivered.</p></aside>
+<p>Broker acceptance, consumer delivery, and successful business processing are separate milestones. Marking an outbox row published proves only the first milestone under the publisher’s stated contract.</p></section><section class="lesson-section" id="s18" aria-labelledby="h18"><h3 id="h18"><span class="num">18</span>Retries require stable message identity</h3>
+<p>Create <code>eventId</code> when inserting the outbox row. Every retry sends that ID and the same event content. A deduplicating consumer can then recognize repeated deliveries.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Correct</th><th scope="col">Incorrect</th></tr></thead><tbody><tr><td>abc123 → abc123 → abc123</td><td>abc123 → def456 → ghi789</td></tr><tr><td>One event, several delivery attempts</td><td>Several identities for the same fact</td></tr></tbody></table></div>
+<p>An event ID identifies an occurrence. An aggregate ID identifies the order. A command ID identifies an incoming request. These identities solve different problems.</p>
+<aside class="callout note"><strong>Do not mutate history during retries</strong><p>Use a versioned event schema and an immutable stored payload. An intentional correction should be a new event; redelivery of the original keeps its original ID.</p></aside></section></div><div class="part" id="part-04"><header class="part-head"><p class="eyebrow">Part 04 · Sections 19–26</p><h2>Make the local effect safe</h2><p>Idempotency, Inbox, and acknowledgement after commit.</p></header><section class="lesson-section" id="s19" aria-labelledby="h19"><h3 id="h19"><span class="num">19</span>The consumer now receives duplicates</h3>
+<p>Shipping receives <code>OrderPaid(abc123)</code> twice. If its handler unconditionally creates a shipment, one payment can create two shipments.</p>
+<p>The producer outbox solved the relationship between the order update and publication intent. It did not make downstream processing duplicate-safe. <strong>Distributed correctness is an end-to-end property.</strong></p>
+<p>The next question is not “how can we wish away redelivery?” It is “how can the receiver make repeated processing harmless?”</p></section><section class="lesson-section" id="s20" aria-labelledby="h20"><h3 id="h20"><span class="num">20</span>First choice: a naturally idempotent effect</h3>
+<p>An idempotent operation has the same effective result when repeated. If the business permits exactly one shipment per order, encode that rule in the database:</p>
+<div class="code "><div class="code-label">PostgreSQL 18</div><pre><code>CREATE TABLE shipment (
+    id UUID PRIMARY KEY,
+    order_id UUID NOT NULL UNIQUE
+);
+
+INSERT INTO shipment (id, order_id)
+VALUES (?, ?)
+ON CONFLICT (order_id) DO NOTHING;</code></pre></div>
+<p>The first delivery creates the shipment; a duplicate leaves the same one-shipment state. The unique constraint handles concurrent attempts. A separate “does it exist?” query followed by an unconstrained insert would race. <a class="cite" href="https://www.postgresql.org/docs/18/sql-insert.html">PostgreSQL 18 · INSERT</a></p>
+<p>This is the simplest solution when it matches the real business invariant. If partial shipments are allowed, <code>UNIQUE(order_id)</code> is the wrong rule. Choose the actual business identity.</p></section><section class="lesson-section" id="s21" aria-labelledby="h21"><h3 id="h21"><span class="num">21</span>Some effects accumulate</h3>
+<p>Adding loyalty points is not naturally idempotent:</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Delivery</th><th scope="col">Effect</th><th scope="col">Total added</th></tr></thead><tbody><tr><td>OrderPaid abc123</td><td>Add 100 points</td><td>100</td></tr><tr><td>Duplicate abc123</td><td>Add 100 points again</td><td>200</td></tr></tbody></table></div>
+<p>We need to remember whether this particular consumer already applied this particular message. That memory must survive restarts and concurrent processing.</p>
+<p>A durable, uniquely keyed loyalty-credit ledger can also solve this. A generic processed-message record is useful when the effect spans several local writes.</p></section><section class="lesson-section" id="s22" aria-labelledby="h22"><h3 id="h22"><span class="num">22</span>Derive the Inbox pattern</h3>
+<p>Record a processed-message identity in the receiving database.</p>
+<div class="code "><div class="code-label">PostgreSQL 18</div><pre><code>CREATE TABLE inbox_message (
+    consumer_name VARCHAR(200) NOT NULL,
+    message_id UUID NOT NULL,
+    processed_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY (consumer_name, message_id)
+);</code></pre></div>
+<p>The identity is <code>(consumer_name, message_id)</code>. Shipping having processed an event does not imply that Loyalty or Analytics has processed it.</p>
+<p>Use a stable logical consumer name, shared across replicas. A new random name per process defeats deduplication. Renaming a consumer or deleting its inbox history can cause old messages to be applied again; treat either as a replay decision.</p></section><section class="lesson-section" id="s23" aria-labelledby="h23"><h3 id="h23"><span class="num">23</span>The consumer transaction</h3>
+<p>Insert the inbox identity and apply the business effect in the same local transaction. The unique key arbitrates concurrent deliveries.</p>
+<div class="code "><div class="code-label">Java</div><pre><code>public record OrderPaidConsumer(
+        TransactionRunner transactions, InboxRepository inbox,
+        LoyaltyRepository loyalty) {
+
+    public void handle(OrderPaid event) throws SQLException {
+        transactions.inTransaction(c -&gt; {
+            boolean firstTime = inbox.tryInsert(
+                    c, &quot;loyalty-order-paid-v1&quot;, event.eventId());
+            if (!firstTime) return null;
+            loyalty.addPointsForOrder(c, event.orderId(), 100);
+            return null;
+        });
+        // Broker adapter acknowledges only after handle returns.
+    }
+}</code></pre></div>
+<p><code>tryInsert</code> uses <code>ON CONFLICT (consumer_name, message_id) DO NOTHING</code> and checks whether one row was inserted. It does not swallow unrelated constraint failures. <a class="cite" href="https://www.postgresql.org/docs/18/sql-insert.html">PostgreSQL 18 · INSERT</a></p>
+<p>The loyalty adapter resolves the order’s customer and adds points using the supplied connection. A missing target must fail the transaction; silently updating zero rows and committing the inbox would lose the effect.</p></section><section class="lesson-section" id="s24" aria-labelledby="h24"><h3 id="h24"><span class="num">24</span>Why the Inbox and effect must commit together</h3>
+<p>Committing the inbox first and adding points later creates another lost-effect window. A crash between those commits leaves a permanent “processed” marker for work that never happened.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">One transaction</th><th scope="col">Outcome</th></tr></thead><tbody><tr><td>Inbox insert succeeds; effect fails</td><td>Roll back both</td></tr><tr><td>Inbox insert and effect succeed</td><td>Commit both</td></tr><tr><td>Duplicate identity conflicts</td><td>Skip the effect; commit the no-op</td></tr></tbody></table></div>
+<p>An uncommitted inbox insert is not a claim that processing is complete. It becomes a durable processed marker only when the business effect commits beside it.</p>
+<aside class="callout good"><strong>The same principle appears twice</strong><p>Related correctness state should share one atomic boundary whenever possible. First: order plus outbox. Now: inbox plus local effect.</p></aside></section><section class="lesson-section" id="s25" aria-labelledby="h25"><h3 id="h25"><span class="num">25</span>Acknowledge after the consumer commit</h3>
+<p>The broker adapter delivers the event, calls the consumer, and acknowledges only after the database transaction succeeds. If the process crashes after commit but before acknowledgement, redelivery finds the inbox identity and skips the effect.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Crash point</th><th scope="col">Durable consumer state</th><th scope="col">Recovery</th></tr></thead><tbody><tr><td>Before DB commit</td><td>Neither inbox nor effect committed</td><td>Process the redelivery</td></tr><tr><td>After DB commit, before ACK</td><td>Inbox and effect committed</td><td>Skip duplicate effect, then ACK</td></tr></tbody></table></div>
+<p>For Kafka, the corresponding action is committing the consumer offset. Disable automatic offset advancement that can acknowledge work prematurely. A partition offset covers a position in the stream: do not commit past earlier unfinished records when processing concurrently. <a class="cite" href="https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html">Apache Kafka 4.1 · KafkaConsumer API</a></p>
+<p>The useful guarantee is a <strong>deduplicated local business effect</strong>. Messages may still be delivered and handler code invoked multiple times.</p></section><section class="lesson-section" id="s26" aria-labelledby="h26"><h3 id="h26"><span class="num">26</span>The end-to-end design</h3>
+<div class="boundary-map three">
+ <div class="boundary"><span class="tag">1 · producer database</span><h3>Fact + obligation</h3><p>Commit the order change and outbox event together.</p></div>
+ <div class="boundary"><span class="tag">2 · broker boundary</span><h3>Publish + retry</h3><p>Send the stable event. Duplicate publication and delivery are possible.</p></div>
+ <div class="boundary"><span class="tag">3 · consumer database</span><h3>Identity + effect</h3><p>Commit the inbox identity and business effect together.</p></div>
+</div>
+<p>The architecture contains failure in places where retry can be made safe. It does not remove crashes, delays, ambiguous responses, or the need to operate the system.</p></section></div><div class="part" id="part-05"><header class="part-head"><p class="eyebrow">Part 05 · Sections 27–31</p><h2>Own recovery in production</h2><p>Failure analysis, external effects, worker coordination, and operations.</p></header><section class="lesson-section" id="s27" aria-labelledby="h27"><h3 id="h27"><span class="num">27</span>Use a failure matrix, not a pattern slogan</h3>
+<p>At each crash point, ask what is durable and what recovery will do. A pattern name is not evidence that a guarantee is implemented.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Failure</th><th scope="col">Durable state</th><th scope="col">Recovery</th></tr></thead><tbody><tr><td>Domain validation fails</td><td>No new order or outbox commit</td><td>Reject the command</td></tr><tr><td>Order update fails</td><td>Transaction rolls back</td><td>Retry only if the cause is recoverable</td></tr><tr><td>Outbox insert fails</td><td>Order update rolls back too</td><td>Fix the cause; retry the transaction</td></tr><tr><td>Commit is definitively rolled back</td><td>Neither new fact commits</td><td>Retry if appropriate</td></tr><tr><td>Commit response is lost / outcome unknown</td><td>Both may have committed, or neither</td><td>Reconcile durable state; use an idempotent command retry</td></tr><tr><td>Broker unavailable / no acceptance observed</td><td>Outbox is pending; acceptance may be uncertain</td><td>Retry the same event identity</td></tr><tr><td>Relay crashes before send</td><td>Outbox pending</td><td>Retry</td></tr><tr><td>Relay crashes after send, before marker commit</td><td>Outbox pending; broker may have event</td><td>Republish; duplicate possible</td></tr><tr><td>Consumer fails before DB commit</td><td>No committed inbox or effect</td><td>Redeliver and retry</td></tr><tr><td>Consumer commit response is lost</td><td>Inbox and effect may already exist together</td><td>Do not ACK failure; redelivery checks the inbox</td></tr><tr><td>Consumer crashes after DB commit, before ACK</td><td>Inbox and effect committed</td><td>Redelivery skips the effect</td></tr><tr><td>Duplicate event arrives</td><td>Inbox identity already exists</td><td>Skip effect; ACK after successful handling</td></tr></tbody></table></div>
+<p><strong>A commit exception does not always prove rollback.</strong> A lost connection can hide a successful commit. PostgreSQL distinguishes conditions such as statement completion unknown and transaction resolution unknown. Atomicity still holds in the database; the client’s knowledge is uncertain. <a class="cite" href="https://www.postgresql.org/docs/18/errcodes-appendix.html">PostgreSQL 18 · Error codes</a></p>
+<div class="explorer screen-only" id="explorer">
+ <p class="eyebrow">Inspect a crash point</p>
+ <label for="failure-choice">Choose the failure</label>
+ <select id="failure-choice"><option value="0">Domain validation fails</option><option value="1">Order update fails</option><option value="2">Outbox insert fails</option><option value="3">Commit is definitively rolled back</option><option value="4">Commit response is lost / outcome unknown</option><option value="5">Broker unavailable / no acceptance observed</option><option value="6">Relay crashes before send</option><option value="7">Relay crashes after send, before marker commit</option><option value="8">Consumer fails before DB commit</option><option value="9">Consumer commit response is lost</option><option value="10">Consumer crashes after DB commit, before ACK</option><option value="11">Duplicate event arrives</option></select>
+ <div id="failure-result" aria-live="polite"></div>
+ <p class="small">A teaching model of the table above; it does not connect to a database or broker.</p>
+</div></section><section class="lesson-section" id="s28" aria-labelledby="h28"><h3 id="h28"><span class="num">28</span>An external effect creates another boundary</h3>
+<p>Suppose the consumer sends an email inside its database transaction. The email provider can accept the request, then the consumer can crash and roll back its inbox. A redelivery sends the email again. The database cannot undo that external effect.</p>
+<p>A consumer-side outbox can atomically record an email obligation beside the inbox and local state. Its dispatcher then retries the email request. This prevents forgetting the obligation, but <strong>does not by itself prevent duplicate emails</strong>.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Technique</th><th scope="col">What it achieves</th><th scope="col">Remaining requirement</th></tr></thead><tbody><tr><td>Consumer inbox + local state + email outbox in one DB transaction</td><td>Durable, deduplicated creation of the email obligation</td><td>Dispatcher still has a send/mark gap</td></tr><tr><td>Stable provider idempotency key</td><td>Can deduplicate retried external requests</td><td>Provider must support the exact operation and retain the key for the retry window</td></tr><tr><td>Reconciliation / workflow state</td><td>Resolves uncertain external outcomes</td><td>Requires an authoritative status query or business recovery process</td></tr></tbody></table></div>
+<p>Use an effect-specific key such as <code>abc123:receipt-email</code> when one event produces multiple external actions. Keep the payload stable. Provider contracts vary; Stripe’s documented idempotency behavior is one concrete API example. <a class="cite" href="https://docs.stripe.com/api/idempotent_requests">Stripe · Idempotent requests</a></p>
+<aside class="callout note"><strong>General rule</strong><p>Every non-transactional boundary needs explicit failure semantics. Another outbox makes the handoff durable; the destination’s capabilities determine whether the final external effect can be deduplicated.</p></aside></section><section class="lesson-section" id="s29" aria-labelledby="h29"><h3 id="h29"><span class="num">29</span>Relay concurrency and row claiming</h3>
+<p>Several workers can read the same pending rows unless they coordinate. PostgreSQL can skip rows locked by another worker:</p>
+<div class="code "><div class="code-label">PostgreSQL 18 · locking approach</div><pre><code>BEGIN;
+SELECT *
+FROM outbox_message
+WHERE published_at IS NULL
+ORDER BY occurred_at, id
+LIMIT 100
+FOR UPDATE SKIP LOCKED;
+-- Publish selected messages; mark accepted messages.
+COMMIT;</code></pre></div>
+<p>The locks only protect the selection while the transaction remains open. Committing immediately after this <code>SELECT</code>, without recording a claim, releases the protection. PostgreSQL describes <code>SKIP LOCKED</code> as suitable for queue-like access, not as a generally consistent view of the data. <a class="cite" href="https://www.postgresql.org/docs/18/sql-select.html">PostgreSQL 18 · SELECT</a></p>
+<p>Keeping this transaction open during broker I/O holds locks and a connection. A scalable alternative is a short transaction that writes a lease and claim token, followed by publication outside the transaction.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">State transition</th><th scope="col">Condition</th></tr></thead><tbody><tr><td>PENDING → PROCESSING</td><td>Claim atomically; set owner/token and expiry</td></tr><tr><td>PROCESSING → PUBLISHED</td><td>Broker acceptance; update only with the current claim token</td></tr><tr><td>PROCESSING → eligible again</td><td>Lease expires before successful completion</td></tr></tbody></table></div>
+<p>A token prevents a stale worker from overwriting a newer claim. It cannot stop that stale worker from publishing after its lease expires. Duplicates remain possible. Bound network timeouts, choose lease duration deliberately, and add this complexity only when multiple workers or throughput require it.</p></section><section class="lesson-section" id="s30" aria-labelledby="h30"><h3 id="h30"><span class="num">30</span>Operational ownership is part of the pattern</h3>
+<p>A pending table with no owner can quietly become a permanent backlog. Someone must be able to find failures, diagnose them, and recover them.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Data or signal</th><th scope="col">Question it answers</th></tr></thead><tbody><tr><td>Pending count and oldest pending age</td><td>Are we keeping up? How stale is propagation?</td></tr><tr><td>attempts, next_attempt_at, last_error</td><td>What failed, and when will it retry?</td></tr><tr><td>event_type and event_version</td><td>Can this consumer understand the payload?</td></tr><tr><td>aggregate_id and aggregate_version</td><td>Which business object is affected?</td></tr><tr><td>claim_token and locked_until, if leasing</td><td>Which worker owns the current attempt?</td></tr><tr><td>Published retention and consumer inbox retention</td><td>Can we replay safely? What deduplication history remains?</td></tr></tbody></table></div>
+<p>Keep event schema version and aggregate version separate: one describes the payload contract; the other describes business sequence. Evolve both deliberately.</p>
+<p>Retention is correctness-sensitive. Deleting inbox entries before the possible replay window ends re-enables duplicate effects. Deleting an outbox row before accepted publication can lose the obligation. Backlog limits and alerts should reflect the business tolerance for delay.</p></section><section class="lesson-section" id="s31" aria-labelledby="h31"><h3 id="h31"><span class="num">31</span>Poison messages and deliberate recovery</h3>
+<p>A malformed payload, unsupported schema, or permanent destination rejection may never succeed. Retrying it every second forever creates noise and can block useful work.</p>
+<p>Classify retryable and permanent failures. Use bounded exponential backoff with jitter for transient problems, then quarantine persistent failures with an alert and a recovery path. A dead-letter destination is a place to investigate, not evidence of successful business processing.</p>
+<p>Persist a valid payload in the business transaction where possible. Even then, the relay can fail while mapping the envelope to a transport or a consumer can reject a new schema.</p>
+<aside class="callout note"><strong>Retry policy and ordering interact</strong><p>If per-order sequence is required, letting version 18 pass a quarantined version 17 can violate the contract. Decide whether to block that aggregate, reconcile it, or explicitly relax the requirement. The minimal relay stops a failed batch and does not implement production backoff or quarantine.</p></aside></section></div><div class="part" id="part-06"><header class="part-head"><p class="eyebrow">Part 06 · Sections 32–39</p><h2>Define the limits of the guarantee</h2><p>Ordering, exactly-once claims, and distributed transactions.</p></header><section class="lesson-section" id="s32" aria-labelledby="h32"><h3 id="h32"><span class="num">32</span>Ask which ordering the business needs</h3>
+<p>Suppose one order emits version 7 <code>OrderPaid</code> and version 8 <code>OrderShipped</code>. A consumer whose logic depends on that sequence cannot safely treat arbitrary arrival order as causal order.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Scope</th><th scope="col">Design implication</th></tr></thead><tbody><tr><td>No ordering</td><td>Parallelism is easy; effects must tolerate arrival order</td></tr><tr><td>Per order</td><td>Serialize or validate effects for one order</td></tr><tr><td>Per customer</td><td>A wider key coordinates several orders</td></tr><tr><td>Global order</td><td>Every event shares one ordering requirement; often unnecessary</td></tr></tbody></table></div>
+<p>“Events must stay ordered” is not a complete requirement. Name the key, the events included, and the behavior when an earlier event is delayed or missing.</p></section><section class="lesson-section" id="s33" aria-labelledby="h33"><h3 id="h33"><span class="num">33</span>Use logical sequence rather than wall-clock time</h3>
+<p>One transaction may create an event at 10:00:00.100 and commit at 10:00:03. Another creates an event at 10:00:00.200 and commits at 10:00:01. Timestamp order and visibility order differ; timestamps can also tie.</p>
+<div class="code "><div class="code-label">Java</div><pre><code>public record OrderPaid(
+        UUID eventId,
+        UUID orderId,
+        long orderVersion,
+        Instant occurredAt) {}</code></pre></div>
+<p>A version assigned under the aggregate’s concurrency control expresses business sequence. <code>occurredAt</code> is useful context; it is not proof of causal order.</p>
+<aside class="callout note"><strong>Versions are not automatically contiguous for every consumer</strong><p>If only some aggregate changes emit events—or a consumer subscribes to only some event types—seeing versions 17 and 19 need not mean version 18 was lost. A next-version check requires an explicit complete stream or its own contiguous event sequence.</p></aside></section><section class="lesson-section" id="s34" aria-labelledby="h34"><h3 id="h34"><span class="num">34</span>Broker ordering has a scope</h3>
+<p>Kafka orders records within a partition. Under compatible partitioning, using a stable order ID as the message key routes that order’s events to the same partition. This does not create one global order. <a class="cite" href="https://kafka.apache.org/41/design/design/">Apache Kafka 4.1 · Design</a></p>
+<p>The relay can already violate the sequence: worker A claims order A version 17, worker B claims version 18, and B publishes first. The broker then correctly records the arrival sequence 18, 17.</p>
+<p>A broker cannot repair a sequence the producer already inverted. Changes to partition routing also require care when the business relies on a stable per-key sequence.</p></section><section class="lesson-section" id="s35" aria-labelledby="h35"><h3 id="h35"><span class="num">35</span>Ordering is end-to-end too</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Stage</th><th scope="col">Required decision when promising per-order sequence</th></tr></thead><tbody><tr><td>Domain</td><td>Assign a meaningful version under concurrency control</td></tr><tr><td>Outbox / relay</td><td>Do not let a later event overtake an earlier one for that order</td></tr><tr><td>Broker</td><td>Use compatible partition routing and producer settings</td></tr><tr><td>Consumer</td><td>Do not apply the same key concurrently out of order</td></tr><tr><td>Recovery</td><td>Define what to do with gaps, retries, duplicates, and poison messages</td></tr></tbody></table></div>
+<p>Possible recovery choices include waiting, retrying, fetching authoritative state, or reconciliation. An additive effect such as loyalty points has different needs from a state projection that replaces its current value.</p>
+<p>The guide’s minimal polling relay deliberately makes <strong>no strict ordering promise</strong>. Sorting by timestamp and UUID is deterministic for a query but does not solve commit visibility, worker coordination, or retry ordering.</p></section><section class="lesson-section" id="s36" aria-labelledby="h36"><h3 id="h36"><span class="num">36</span>Disambiguate “exactly once”</h3>
+<p>“Send the message exactly once” often hides several different requests. Be precise about the stage whose result matters.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Possible meaning</th><th scope="col">What must be examined</th></tr></thead><tbody><tr><td>One logical broker append</td><td>Producer retries and broker idempotence</td></tr><tr><td>One delivery or one handler invocation</td><td>Redelivery and acknowledgement behavior</td></tr><tr><td>One local database effect</td><td>Transaction boundaries and deduplication</td></tr><tr><td>One external charge or email</td><td>Destination idempotency and uncertain outcomes</td></tr></tbody></table></div>
+<p>A guarantee at one stage does not automatically extend to the others. Ask for the observable business outcome, then prove the path to it.</p></section><section class="lesson-section" id="s37" aria-labelledby="h37"><h3 id="h37"><span class="num">37</span>Transport guarantees do not cover every business effect</h3>
+<p>Even if duplicate appends are prevented, a consumer can call an external service and crash before recording completion. The unresolved question is whether retrying will repeat that external effect.</p>
+<p>Kafka’s transactional primitives support exactly-once processing in specified Kafka workflows, including consuming, processing, and writing results back to Kafka with the appropriate isolation and offset handling. External destinations require cooperation from those destinations. <a class="cite" href="https://kafka.apache.org/41/design/design/">Apache Kafka 4.1 · Design</a></p>
+<p>Therefore “we use Kafka exactly-once” is insufficient evidence that an email is sent or a card is charged once. State the actual resource boundary.</p></section><section class="lesson-section" id="s38" aria-labelledby="h38"><h3 id="h38"><span class="num">38</span>Idempotent producers do not replace the outbox</h3>
+<p>A producer’s retry deduplication cannot help when the application commits PostgreSQL and crashes before invoking the producer at all. There is no broker request to deduplicate.</p>
+<p>Likewise, committing a Kafka transaction does not automatically commit or roll back a separate PostgreSQL transaction. The outbox addresses the durable handoff from the local database; broker idempotence addresses supported producer retries.</p>
+<p>These mechanisms can complement one another. Do not rely on producer idempotence to deduplicate every application-level resend of a stored outbox event. <a class="cite" href="https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html">Apache Kafka 4.1 · KafkaProducer API</a></p></section><section class="lesson-section" id="s39" aria-labelledby="h39"><h3 id="h39"><span class="num">39</span>Could distributed transactions solve it?</h3>
+<p>Two-phase commit coordinates participating resources through prepare and commit decisions. It requires suitable transaction infrastructure and compatible participants.</p>
+<p>PostgreSQL supports prepared transactions intended for an external transaction manager. That support alone does not enlist an arbitrary broker or make a particular application stack a distributed transaction system. <a class="cite" href="https://www.postgresql.org/docs/18/two-phase.html">PostgreSQL 18 · Two-phase transactions</a></p>
+<p>Coordination brings participant support requirements, resource retention while prepared, failure recovery, and operational coupling. The outbox instead commits local intent and accepts asynchronous retry.</p>
+<aside class="callout note"><strong>Compare the actual contracts</strong><p>Use distributed coordination when the required resources and operational model support it. Use an outbox when local atomicity plus asynchronous recovery fits the business. Neither choice erases its failure modes.</p></aside></section></div><div class="part" id="part-07"><header class="part-head"><p class="eyebrow">Part 07 · Sections 40–43</p><h2>Test and choose deliberately</h2><p>Prove the failure contract, then decide whether the cost fits.</p></header><section class="lesson-section" id="s40" aria-labelledby="h40"><h3 id="h40"><span class="num">40</span>Test the transaction boundaries and crash windows</h3>
+<p>A mock verifying <code>outbox.add()</code> was called does not prove atomicity. Test durable outcomes after deliberately interrupting the sequence.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Test</th><th scope="col">Arrange / act</th><th scope="col">Assert</th></tr></thead><tbody><tr><td>1. Successful payment</td><td>Execute the handler against a real database</td><td>PAID and exactly one new outbox row</td></tr><tr><td>2. Outbox insertion fails</td><td>Make the insert fail after the order update</td><td>Order unchanged; no new outbox row</td></tr><tr><td>3. Domain rejection</td><td>Pay a cancelled order</td><td>Exception; no business or outbox change</td></tr><tr><td>4. Broker unavailable</td><td>Reject a pending event, then restore acceptance</td><td>Row remains pending, then publishes</td></tr><tr><td>5. Publish succeeds; mark fails</td><td>Accept event, fail marker write, rerun relay</td><td>Same event ID may be published twice</td></tr><tr><td>6. Duplicate consumer delivery</td><td>Deliver the same ID twice, including concurrently</td><td>One inbox identity and one committed effect</td></tr><tr><td>7. Consumer effect fails</td><td>Insert inbox, then force effect failure</td><td>Both roll back; later redelivery succeeds</td></tr><tr><td>8. Consumer ACK fails</td><td>Commit consumer transaction, lose ACK, redeliver</td><td>Business effect remains once</td></tr><tr><td>9. Concurrent relays</td><td>Exercise real locking / lease behavior</td><td>Documented claiming and recovery hold; duplicates still safe</td></tr><tr><td>10. Required ordering</td><td>Publish versions under concurrency and failure</td><td>Exactly the promised ordering scope holds</td></tr></tbody></table></div>
+<p>Add command-retry tests for the handler in this guide: call it twice and race two calls for the same pending order. Both cases must create only one transition event. Also test uncertain commit responses and recovery with a new connection.</p>
+<p>For leases, include expiry while an old worker is still alive. For retention, replay an old event at the edge of the deduplication window. These tests check actual promised behavior, not a stronger guarantee the design does not provide.</p></section><section class="lesson-section" id="s41" aria-labelledby="h41"><h3 id="h41"><span class="num">41</span>Choose the test level that can expose the failure</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Level</th><th scope="col">Useful coverage</th></tr></thead><tbody><tr><td>Unit</td><td>Domain transitions, event construction, retry classification, serialization mapping</td></tr><tr><td>Database integration</td><td>Rollback, order/outbox atomicity, inbox/effect atomicity, constraints, locks, leases</td></tr><tr><td>System</td><td>Broker outage, relay restart, consumer restart, offset/ACK behavior, duplicate delivery, ordering</td></tr></tbody></table></div>
+<p>The more a guarantee depends on locks, commit, network acknowledgement, or process death, the less convincing a pure mock test becomes.</p>
+<p>The reference source accompanies this explanation; it is not a claim that this guide executed a real PostgreSQL/Kafka integration suite. The verification scope is recorded in Appendix A.</p></section><section class="lesson-section" id="s42" aria-labelledby="h42"><h3 id="h42"><span class="num">42</span>When not to use an outbox</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Situation</th><th scope="col">Better starting point</th></tr></thead><tbody><tr><td>All required writes are in one database</td><td>Use one ordinary database transaction</td></tr><tr><td>Losing the notification is acceptable</td><td>Use explicitly best-effort delivery</td></tr><tr><td>The request must wait for an external reservation</td><td>Design a synchronous or explicit multi-step workflow</td></tr><tr><td>Infrastructure already covers the exact resources atomically</td><td>Use and verify that actual transaction contract</td></tr></tbody></table></div>
+<p>An asynchronous event cannot satisfy a rule that requires confirmed external success before the request may succeed. An outbox can record an intent or a pending workflow state, but the application must expose that state honestly.</p></section><section class="lesson-section" id="s43" aria-labelledby="h43"><h3 id="h43"><span class="num">43</span>The costs are real</h3>
+<p>The pattern adds a table, relay, retry policy, event identities, schema evolution, monitoring, retention, publication latency, and duplicate handling. Some systems also need an inbox, lease management, and ordering controls.</p>
+<p>The temporal contract changes: the request commits local state and its obligation now; downstream propagation follows later. “Paid” and “Shipping has reacted” can be true at different times.</p>
+<p>Patterns move complexity. Here, the useful move is from an unrecoverable dual-write gap to durable work plus explicit recovery. It is still your responsibility to keep that recovery working.</p></section></div><div class="part" id="part-08"><header class="part-head"><p class="eyebrow">Part 08 · Sections 44–47</p><h2>Return to the architecture</h2><p>Dependencies, first-principles questions, and the final contract.</p></header><section class="lesson-section" id="s44" aria-labelledby="h44"><h3 id="h44"><span class="num">44</span>Connect this to the earlier patterns</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Pattern</th><th scope="col">What this lesson adds</th></tr></thead><tbody><tr><td>Repository</td><td>Abstractions must preserve shared transaction ownership. Independent hidden commits break the invariant.</td></tr><tr><td>Dependency Injection</td><td>The handler receives transaction, repository, and clock dependencies explicitly.</td></tr><tr><td>Composition Root</td><td>Wire the database repositories, transaction runner, relay, and publisher in one construction layer.</td></tr><tr><td>Ports & Adapters</td><td>Kafka stays behind a publisher port. The domain has no broker dependency.</td></tr><tr><td>Commands vs Events</td><td>PayOrder requests a transition. OrderPaid records a fact only after its transaction commits.</td></tr><tr><td>Observer</td><td>An in-memory notification disappears with its process unless its delivery obligation is persisted.</td></tr></tbody></table></div>
+<p>Explicit JDBC connections are a teaching choice that makes the boundary visible. A framework transaction manager or unit-of-work abstraction can express the same rule, provided both repositories truly share its transaction.</p></section><section class="lesson-section" id="s45" aria-labelledby="h45"><h3 id="h45"><span class="num">45</span>The resulting dependency structure</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Component</th><th scope="col">Depends on</th><th scope="col">Owns</th></tr></thead><tbody><tr><td>PayOrderHandler</td><td>TransactionRunner, OrderRepository, OutboxRepository, Clock</td><td>Business transition and publication intent</td></tr><tr><td>OutboxRelay</td><td>OutboxRepository, MessagePublisher, Clock, Logger</td><td>Delivery attempts and publication bookkeeping</td></tr><tr><td>OrderPaidConsumer</td><td>TransactionRunner, InboxRepository, LoyaltyRepository</td><td>Deduplicated local effect</td></tr></tbody></table></div>
+<p>The producer says: <strong>if my local transaction commits, the business fact and the obligation to propagate it are durable together.</strong> It does not require Kafka to be available at that instant.</p>
+<p>The composition root must supply the producer ports with access to the same producer database and the consumer ports with access to the same consumer database. The two services’ databases need not be the same database.</p></section><section class="lesson-section" id="s46" aria-labelledby="h46"><h3 id="h46"><span class="num">46</span>Re-derive the design from nine questions</h3>
+<ol class="questions">
+ <li>What facts must agree?</li>
+ <li>Which facts can share one local transaction?</li>
+ <li>What can fail independently outside that boundary?</li>
+ <li>Can we durably record the obligation to cross it?</li>
+ <li>Can the crossing be retried?</li>
+ <li>Can retry produce duplicates?</li>
+ <li>Can the receiver make repeated processing harmless?</li>
+ <li>Is ordering required, and for which key?</li>
+ <li>What is durable at every crash point, and what happens next?</li>
+</ol>
+<p>These questions lead to local atomicity, an outbox, retry, at-least-once semantics, and an idempotent consumer or inbox. The pattern names come after the reasoning.</p></section><section class="lesson-section" id="s47" aria-labelledby="h47"><h3 id="h47"><span class="num">47</span>The final correctness contract</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">Boundary</th><th scope="col">Operations</th><th scope="col">Contract</th></tr></thead><tbody><tr><td>Producer database</td><td>Domain change + outbox insert</td><td>Atomic local commit</td></tr><tr><td>Relay / broker</td><td>Publish + retry + mark</td><td>No global atomicity; duplicates possible</td></tr><tr><td>Consumer database</td><td>Inbox insert + local effect</td><td>Atomic local commit; duplicate effects suppressed</td></tr></tbody></table></div>
+<blockquote>If the producer transaction commits, the event is durably scheduled for publication. Publication is retried and may occur more than once. Consumers are designed so repeated delivery of the same event does not repeat the committed local business effect.</blockquote>
+<p>This promise assumes retained data, eventual recovery, a valid event contract, correct transaction ownership, and a suitable deduplication window. It makes no automatic promise about arbitrary external effects or ordering.</p>
+<p>That is a concrete contract you can test at each failure window.</p></section></div>
+<section class="appendix" id="java-reference">
+<p class="eyebrow">Appendix A · Complete reference core</p>
+<h2>Java that makes the boundary visible</h2>
+<p>The listing is one source file, <code>Lesson19.java</code>. It uses standard Java APIs and language features supported by Java 25, including records and text blocks; no preview features or framework imports are required. Records keep the dependency containers concise. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html">Java 25 · Record</a></p>
+<p><strong>Scope:</strong> this is a compilable teaching core, not a runnable distributed application. It includes a transaction runner, domain, handlers, relay, ports, and a JDBC inbox adapter. Supply the remaining PostgreSQL repositories, broker publisher, event decoder, database schema, and application lifecycle to run it against real services.</p>
+<div class="actions screen-only"><button type="button" class="primary" data-download="java">Download Lesson19.java</button><button type="button" id="copy-source">Copy complete source</button></div>
+<p class="status screen-only" id="copy-status" aria-live="polite"></p>
+<div class="code "><div class="code-label">Compile on JDK 25</div><pre><code>javac --release 25 Lesson19.java</code></pre></div>
+<p class="small">Verification: the complete source was compiled and domain behavior checked using the available JDK 17 compiler. Its API usage was checked against Java 25 documentation. A JDK 25 compilation and PostgreSQL/Kafka integration tests were not run in this environment.</p>
+<p>The composition root owns scheduler shutdown. The minimal relay has no persisted backoff, leases, quarantine, or strict ordering; §§29–35 explain those extensions.</p>
+<p>To assemble the printed listing, place all seven groups below inside the outer class shown in the imports block, in order. The embedded download already contains that complete assembly.</p>
+<div class="code "><div class="code-label">Java · file wrapper</div><pre><code>import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import javax.sql.DataSource;
+
+public final class Lesson19 {
+    private Lesson19() {}
+    // Insert groups A1–A7 here.
+}</code></pre></div><section class="reference-piece"><h3>A1 · Domain and immutable event</h3><div class="code "><div class="code-label">Java</div><pre><code>public enum Status { PENDING, PAID, CANCELLED }
+
+public record PayOrder(UUID orderId) {
+    public PayOrder { Objects.requireNonNull(orderId); }
+}
+
+public record OrderPaid(
+        UUID eventId, UUID orderId,
+        long orderVersion, Instant occurredAt) {
+    public OrderPaid {
+        Objects.requireNonNull(eventId);
+        Objects.requireNonNull(orderId);
+        Objects.requireNonNull(occurredAt);
+        if (orderVersion &lt; 1) {
+            throw new IllegalArgumentException(&quot;Invalid version&quot;);
+        }
+    }
+}
+
+public static final class Order {
+    private final UUID id;
+    private Status status;
+    private long version;
+
+    public Order(UUID id, Status status, long version) {
+        this.id = Objects.requireNonNull(id);
+        this.status = Objects.requireNonNull(status);
+        if (version &lt; 0) {
+            throw new IllegalArgumentException(&quot;Invalid version&quot;);
+        }
+        this.version = version;
+    }
+
+    public boolean markPaid() {
+        if (status == Status.CANCELLED) {
+            throw new IllegalStateException(&quot;Order is cancelled&quot;);
+        }
+        if (status == Status.PAID) return false;
+        long nextVersion = Math.incrementExact(version);
+        status = Status.PAID;
+        version = nextVersion;
+        return true;
+    }
+
+    public UUID id() { return id; }
+    public Status status() { return status; }
+    public long version() { return version; }
+}</code></pre></div></section><section class="reference-piece"><h3>A2 · Transaction runner</h3><div class="code "><div class="code-label">Java</div><pre><code>@FunctionalInterface
+public interface SqlWork&lt;T&gt; {
+    T apply(Connection connection) throws SQLException;
+}
+
+public interface TransactionRunner {
+    &lt;T&gt; T inTransaction(SqlWork&lt;T&gt; work) throws SQLException;
+}
+
+public record JdbcTransactions(DataSource dataSource)
+        implements TransactionRunner {
+    public JdbcTransactions { Objects.requireNonNull(dataSource); }
+
+    @Override
+    public &lt;T&gt; T inTransaction(SqlWork&lt;T&gt; work)
+            throws SQLException {
+        try (Connection c = dataSource.getConnection()) {
+            c.setAutoCommit(false);
+            try {
+                T result = work.apply(c);
+                c.commit();
+                return result;
+            } catch (SQLException | RuntimeException | Error ex) {
+                try {
+                    c.rollback();
+                } catch (SQLException rollbackFailure) {
+                    ex.addSuppressed(rollbackFailure);
+                }
+                throw ex;
+            }
+        }
+    }
+}</code></pre></div><aside class="callout note"><strong>Runner contract</strong><p>The runner owns a fresh connection for each call. Do not nest it inside another transaction or retain the callback’s connection. A pooled DataSource must reset connection state on reuse. Rollback failure is preserved as a suppressed exception. A commit or close exception can leave the caller uncertain about a transaction that committed; recovery must inspect durable state and use safe command semantics.</p></aside></section><section class="reference-piece"><h3>A3 · Producer ports and persisted envelope</h3><div class="code "><div class="code-label">Java</div><pre><code>public interface OrderRepository {
+    // Must SELECT ... FOR UPDATE on c, in this transaction.
+    Optional&lt;Order&gt; findForUpdate(Connection c, UUID id)
+            throws SQLException;
+    // Persist status/version using c; never commit here.
+    void save(Connection c, Order order) throws SQLException;
+}
+
+public record OutboxMessage(
+        UUID id, UUID aggregateId, long aggregateVersion,
+        String eventType, int eventVersion,
+        String payload, Instant occurredAt) {
+    public OutboxMessage {
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(aggregateId);
+        Objects.requireNonNull(eventType);
+        Objects.requireNonNull(payload);
+        Objects.requireNonNull(occurredAt);
+    }
+
+    public static OutboxMessage from(OrderPaid event) {
+        // Safe for these typed UUID/long/Instant values only.
+        // Use a JSON codec when the schema adds arbitrary strings.
+        String json = &quot;&quot;&quot;
+                {&quot;eventId&quot;:&quot;%s&quot;,&quot;orderId&quot;:&quot;%s&quot;,
+                 &quot;orderVersion&quot;:%d,&quot;occurredAt&quot;:&quot;%s&quot;}
+                &quot;&quot;&quot;.formatted(event.eventId(), event.orderId(),
+                        event.orderVersion(), event.occurredAt());
+        return new OutboxMessage(event.eventId(), event.orderId(),
+                event.orderVersion(), &quot;OrderPaid&quot;, 1,
+                json, event.occurredAt());
+    }
+}
+
+public interface OutboxRepository {
+    // Use the supplied producer transaction; never commit here.
+    void add(Connection c, OutboxMessage message)
+            throws SQLException;
+    // Read committed, pending rows; this simple relay has one worker.
+    List&lt;OutboxMessage&gt; findUnpublished(int limit)
+            throws SQLException;
+    // Own short transaction; return only after its commit succeeds.
+    void markPublished(UUID id, Instant time) throws SQLException;
+}</code></pre></div></section><section class="reference-piece"><h3>A4 · Application handler</h3><div class="code "><div class="code-label">Java</div><pre><code>public record PayOrderHandler(
+        TransactionRunner transactions, OrderRepository orders,
+        OutboxRepository outbox, Clock clock) {
+
+    public void handle(PayOrder command) throws SQLException {
+        transactions.inTransaction(c -&gt; {
+            Order order = orders.findForUpdate(c, command.orderId())
+                    .orElseThrow(() -&gt;
+                            new IllegalArgumentException(&quot;Missing order&quot;));
+            if (!order.markPaid()) return null;
+            orders.save(c, order);
+            OrderPaid event = new OrderPaid(
+                    UUID.randomUUID(), order.id(),
+                    order.version(), clock.instant());
+            outbox.add(c, OutboxMessage.from(event));
+            return null;
+        });
+    }
+}</code></pre></div></section><section class="reference-piece"><h3>A5 · Single-worker relay and scheduler</h3><div class="code "><div class="code-label">Java</div><pre><code>public interface MessagePublisher {
+    // Use aggregateId as the key. Return after broker acceptance
+    // under the configured durability policy, not local enqueue.
+    // Preserve id, payload, type, schema version on every retry.
+    void publishAndAwaitAcceptance(OutboxMessage message)
+            throws Exception;
+}
+
+public record OutboxRelay(
+        OutboxRepository outbox, MessagePublisher publisher,
+        Clock clock, System.Logger logger) {
+
+    public void runOnce() throws SQLException, InterruptedException {
+        for (OutboxMessage message : outbox.findUnpublished(100)) {
+            try {
+                publisher.publishAndAwaitAcceptance(message);
+                outbox.markPublished(message.id(), clock.instant());
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw ex;
+            } catch (Exception ex) {
+                logger.log(System.Logger.Level.WARNING,
+                        &quot;Retry required for &quot; + message.id(), ex);
+                // Stop this batch. No per-aggregate ordering promise.
+                break;
+            }
+        }
+    }
+
+    public ScheduledFuture&lt;?&gt; schedule(
+            ScheduledExecutorService scheduler) {
+        return scheduler.scheduleWithFixedDelay(() -&gt; {
+            try {
+                runOnce();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            } catch (Exception ex) {
+                logger.log(System.Logger.Level.WARNING,
+                        &quot;Outbox poll failed&quot;, ex);
+            }
+        }, 0, 1, TimeUnit.SECONDS);
+    }
+}</code></pre></div></section><section class="reference-piece"><h3>A6 · Consumer ports and handler</h3><div class="code "><div class="code-label">Java</div><pre><code>public interface InboxRepository {
+    boolean tryInsert(Connection c, String consumer, UUID messageId)
+            throws SQLException;
+}
+
+public interface LoyaltyRepository {
+    // Resolve the order&#x27;s customer and update in the SAME database
+    // transaction as the inbox insert. Fail if the target is absent.
+    void addPointsForOrder(Connection c, UUID orderId, int points)
+            throws SQLException;
+}
+
+public record OrderPaidConsumer(
+        TransactionRunner transactions, InboxRepository inbox,
+        LoyaltyRepository loyalty) {
+
+    public void handle(OrderPaid event) throws SQLException {
+        transactions.inTransaction(c -&gt; {
+            boolean firstTime = inbox.tryInsert(
+                    c, &quot;loyalty-order-paid-v1&quot;, event.eventId());
+            if (!firstTime) return null;
+            loyalty.addPointsForOrder(c, event.orderId(), 100);
+            return null;
+        });
+        // Broker adapter acknowledges only after handle returns.
+    }
+}</code></pre></div></section><section class="reference-piece"><h3>A7 · JDBC inbox adapter</h3><div class="code "><div class="code-label">Java</div><pre><code>public record JdbcInbox(Clock clock) implements InboxRepository {
+    @Override
+    public boolean tryInsert(
+            Connection c, String consumer, UUID messageId)
+            throws SQLException {
+        String sql = &quot;&quot;&quot;
+                INSERT INTO inbox_message
+                    (consumer_name, message_id, processed_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT (consumer_name, message_id) DO NOTHING
+                &quot;&quot;&quot;;
+        try (var statement = c.prepareStatement(sql)) {
+            statement.setString(1, consumer);
+            statement.setObject(2, messageId);
+            statement.setTimestamp(3, Timestamp.from(clock.instant()));
+            return statement.executeUpdate() == 1;
+        }
+    }
+}</code></pre></div></section></section>
+<section class="appendix" id="sql-contracts"><p class="eyebrow">Appendix B · Adapter contracts</p>
+<h2>Keep the SQL boundary honest</h2>
+<p>The producer adapter methods receive the transaction’s connection. Their statements must not open another connection or commit on their own. The following SQL is PostgreSQL-specific; <code>?</code> is a JDBC parameter placeholder.</p>
+<p>For the consumer, <code>JdbcInbox</code> is implemented in Appendix A. The loyalty adapter must update the same consumer database in that transaction. Its application-specific customer mapping and loyalty schema remain a named port.</p>
+<div class="code "><div class="code-label">PostgreSQL 18 · producer transaction</div><pre><code>-- OrderRepository.findForUpdate, on the handler&#x27;s connection
+SELECT id, status, version
+FROM orders
+WHERE id = ?
+FOR UPDATE;
+
+-- OrderRepository.save, on that SAME connection
+UPDATE orders
+SET status = ?, version = ?
+WHERE id = ?;
+-- Require exactly one affected row.
+
+-- OutboxRepository.add, on that SAME connection
+INSERT INTO outbox_message (
+    id, event_type, event_version,
+    aggregate_id, aggregate_version, payload, occurred_at
+)
+VALUES (?, ?, ?, ?, ?, CAST(? AS JSONB), ?);</code></pre></div>
+<p>Bind UUIDs with the driver’s UUID support, the payload as a string for the explicit JSONB cast, and the time as a supported timestamp value. Persist the complete event envelope; <code>event_type</code> and <code>event_version</code> travel with the payload to the consumer.</p>
+<div class="code "><div class="code-label">PostgreSQL 18 · relay operations</div><pre><code>-- Relay read: committed rows only; one worker in this example
+SELECT id, event_type, event_version,
+       aggregate_id, aggregate_version, payload, occurred_at
+FROM outbox_message
+WHERE published_at IS NULL
+ORDER BY occurred_at, id
+LIMIT ?;
+
+-- Separate short transaction AFTER observed broker acceptance
+UPDATE outbox_message
+SET published_at = ?
+WHERE id = ? AND published_at IS NULL;</code></pre></div>
+<p><code>markPublished</code> returns only after its own transaction commits. A failed response leaves the outcome uncertain, but retrying the marker is safe. If another attempt already marked the row, zero affected rows is a no-op; a missing row needs an explicit cleanup/recovery policy.</p>
+<div class="actions screen-only"><button type="button" data-download="sql">Download lesson19-schema.sql</button></div>
+</section>
+<section class="appendix" id="sources"><p class="eyebrow">Appendix C · Official references</p><h2>Sources and editorial scope</h2>
+<p>The guide adapts the Lesson 19 excerpt supplied in this conversation. Sections 9–47 retain its conceptual order. The original opening was not present: sections 1–8 are an explicitly authored bridge into the supplied derivation, not a recovered transcript.</p>
+<p>Technical references were checked on 2 September 2026. Java references target release 25; PostgreSQL and Kafka references are versioned documentation, not claims about the newest available release. The source lesson supplies the first-principles argument; the links below verify API and platform behavior.</p>
+<ol class="sources"><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html">Java 25 · Connection</a><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html">Java 25 · Record</a><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">Java 25 · ScheduledExecutorService</a><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html</span></li><li><a href="https://www.postgresql.org/docs/18/sql-insert.html">PostgreSQL 18 · INSERT</a><span class="source-url">https://www.postgresql.org/docs/18/sql-insert.html</span></li><li><a href="https://www.postgresql.org/docs/18/sql-select.html">PostgreSQL 18 · SELECT</a><span class="source-url">https://www.postgresql.org/docs/18/sql-select.html</span></li><li><a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 · Explicit locking</a><span class="source-url">https://www.postgresql.org/docs/18/explicit-locking.html</span></li><li><a href="https://www.postgresql.org/docs/18/errcodes-appendix.html">PostgreSQL 18 · Error codes</a><span class="source-url">https://www.postgresql.org/docs/18/errcodes-appendix.html</span></li><li><a href="https://www.postgresql.org/docs/18/two-phase.html">PostgreSQL 18 · Two-phase transactions</a><span class="source-url">https://www.postgresql.org/docs/18/two-phase.html</span></li><li><a href="https://kafka.apache.org/41/design/design/">Apache Kafka 4.1 · Design</a><span class="source-url">https://kafka.apache.org/41/design/design/</span></li><li><a href="https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html">Apache Kafka 4.1 · KafkaProducer API</a><span class="source-url">https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html</span></li><li><a href="https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html">Apache Kafka 4.1 · KafkaConsumer API</a><span class="source-url">https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html</span></li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS · Transactional outbox</a><span class="source-url">https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html</span></li><li><a href="https://docs.stripe.com/api/idempotent_requests">Stripe · Idempotent requests</a><span class="source-url">https://docs.stripe.com/api/idempotent_requests</span></li></ol>
+<p>This edition tightens five implementation details: uncertain commit outcomes, acceptance before publication marking, safe command retries, external-effect limits, and the scope of version-based ordering checks.</p></section><footer class="endnote">Lesson 19 · Transactional Outbox · Java 25-compatible reference · Self-contained HTML, light theme, no external assets.</footer></main></div><script id="embedded-data" type="application/json">{"java": "import java.sql.Connection;\nimport java.sql.SQLException;\nimport java.sql.Timestamp;\nimport java.time.Clock;\nimport java.time.Instant;\nimport java.util.List;\nimport java.util.Objects;\nimport java.util.Optional;\nimport java.util.UUID;\nimport java.util.concurrent.ScheduledExecutorService;\nimport java.util.concurrent.ScheduledFuture;\nimport java.util.concurrent.TimeUnit;\nimport javax.sql.DataSource;\n\n/** Java 25-compatible teaching core; database/broker ports need adapters. */\npublic final class Lesson19 {\n    private Lesson19() {}\n\n    // region domain\n    public enum Status { PENDING, PAID, CANCELLED }\n\n    public record PayOrder(UUID orderId) {\n        public PayOrder { Objects.requireNonNull(orderId); }\n    }\n\n    public record OrderPaid(\n            UUID eventId, UUID orderId,\n            long orderVersion, Instant occurredAt) {\n        public OrderPaid {\n            Objects.requireNonNull(eventId);\n            Objects.requireNonNull(orderId);\n            Objects.requireNonNull(occurredAt);\n            if (orderVersion \u003c 1) {\n                throw new IllegalArgumentException(\"Invalid version\");\n            }\n        }\n    }\n\n    public static final class Order {\n        private final UUID id;\n        private Status status;\n        private long version;\n\n        public Order(UUID id, Status status, long version) {\n            this.id = Objects.requireNonNull(id);\n            this.status = Objects.requireNonNull(status);\n            if (version \u003c 0) {\n                throw new IllegalArgumentException(\"Invalid version\");\n            }\n            this.version = version;\n        }\n\n        public boolean markPaid() {\n            if (status == Status.CANCELLED) {\n                throw new IllegalStateException(\"Order is cancelled\");\n            }\n            if (status == Status.PAID) return false;\n            long nextVersion = Math.incrementExact(version);\n            status = Status.PAID;\n            version = nextVersion;\n            return true;\n        }\n\n        public UUID id() { return id; }\n        public Status status() { return status; }\n        public long version() { return version; }\n    }\n    // endregion domain\n\n    // region transactions\n    @FunctionalInterface\n    public interface SqlWork\u003cT> {\n        T apply(Connection connection) throws SQLException;\n    }\n\n    public interface TransactionRunner {\n        \u003cT> T inTransaction(SqlWork\u003cT> work) throws SQLException;\n    }\n\n    public record JdbcTransactions(DataSource dataSource)\n            implements TransactionRunner {\n        public JdbcTransactions { Objects.requireNonNull(dataSource); }\n\n        @Override\n        public \u003cT> T inTransaction(SqlWork\u003cT> work)\n                throws SQLException {\n            try (Connection c = dataSource.getConnection()) {\n                c.setAutoCommit(false);\n                try {\n                    T result = work.apply(c);\n                    c.commit();\n                    return result;\n                } catch (SQLException | RuntimeException | Error ex) {\n                    try {\n                        c.rollback();\n                    } catch (SQLException rollbackFailure) {\n                        ex.addSuppressed(rollbackFailure);\n                    }\n                    throw ex;\n                }\n            }\n        }\n    }\n    // endregion transactions\n\n    // region producer_ports\n    public interface OrderRepository {\n        // Must SELECT ... FOR UPDATE on c, in this transaction.\n        Optional\u003cOrder> findForUpdate(Connection c, UUID id)\n                throws SQLException;\n        // Persist status/version using c; never commit here.\n        void save(Connection c, Order order) throws SQLException;\n    }\n\n    public record OutboxMessage(\n            UUID id, UUID aggregateId, long aggregateVersion,\n            String eventType, int eventVersion,\n            String payload, Instant occurredAt) {\n        public OutboxMessage {\n            Objects.requireNonNull(id);\n            Objects.requireNonNull(aggregateId);\n            Objects.requireNonNull(eventType);\n            Objects.requireNonNull(payload);\n            Objects.requireNonNull(occurredAt);\n        }\n\n        public static OutboxMessage from(OrderPaid event) {\n            // Safe for these typed UUID/long/Instant values only.\n            // Use a JSON codec when the schema adds arbitrary strings.\n            String json = \"\"\"\n                    {\"eventId\":\"%s\",\"orderId\":\"%s\",\n                     \"orderVersion\":%d,\"occurredAt\":\"%s\"}\n                    \"\"\".formatted(event.eventId(), event.orderId(),\n                            event.orderVersion(), event.occurredAt());\n            return new OutboxMessage(event.eventId(), event.orderId(),\n                    event.orderVersion(), \"OrderPaid\", 1,\n                    json, event.occurredAt());\n        }\n    }\n\n    public interface OutboxRepository {\n        // Use the supplied producer transaction; never commit here.\n        void add(Connection c, OutboxMessage message)\n                throws SQLException;\n        // Read committed, pending rows; this simple relay has one worker.\n        List\u003cOutboxMessage> findUnpublished(int limit)\n                throws SQLException;\n        // Own short transaction; return only after its commit succeeds.\n        void markPublished(UUID id, Instant time) throws SQLException;\n    }\n    // endregion producer_ports\n\n    // region handler\n    public record PayOrderHandler(\n            TransactionRunner transactions, OrderRepository orders,\n            OutboxRepository outbox, Clock clock) {\n\n        public void handle(PayOrder command) throws SQLException {\n            transactions.inTransaction(c -> {\n                Order order = orders.findForUpdate(c, command.orderId())\n                        .orElseThrow(() ->\n                                new IllegalArgumentException(\"Missing order\"));\n                if (!order.markPaid()) return null;\n                orders.save(c, order);\n                OrderPaid event = new OrderPaid(\n                        UUID.randomUUID(), order.id(),\n                        order.version(), clock.instant());\n                outbox.add(c, OutboxMessage.from(event));\n                return null;\n            });\n        }\n    }\n    // endregion handler\n\n    // region relay\n    public interface MessagePublisher {\n        // Use aggregateId as the key. Return after broker acceptance\n        // under the configured durability policy, not local enqueue.\n        // Preserve id, payload, type, schema version on every retry.\n        void publishAndAwaitAcceptance(OutboxMessage message)\n                throws Exception;\n    }\n\n    public record OutboxRelay(\n            OutboxRepository outbox, MessagePublisher publisher,\n            Clock clock, System.Logger logger) {\n\n        public void runOnce() throws SQLException, InterruptedException {\n            for (OutboxMessage message : outbox.findUnpublished(100)) {\n                try {\n                    publisher.publishAndAwaitAcceptance(message);\n                    outbox.markPublished(message.id(), clock.instant());\n                } catch (InterruptedException ex) {\n                    Thread.currentThread().interrupt();\n                    throw ex;\n                } catch (Exception ex) {\n                    logger.log(System.Logger.Level.WARNING,\n                            \"Retry required for \" + message.id(), ex);\n                    // Stop this batch. No per-aggregate ordering promise.\n                    break;\n                }\n            }\n        }\n\n        public ScheduledFuture\u003c?> schedule(\n                ScheduledExecutorService scheduler) {\n            return scheduler.scheduleWithFixedDelay(() -> {\n                try {\n                    runOnce();\n                } catch (InterruptedException ex) {\n                    Thread.currentThread().interrupt();\n                } catch (Exception ex) {\n                    logger.log(System.Logger.Level.WARNING,\n                            \"Outbox poll failed\", ex);\n                }\n            }, 0, 1, TimeUnit.SECONDS);\n        }\n    }\n    // endregion relay\n\n    // region consumer\n    public interface InboxRepository {\n        boolean tryInsert(Connection c, String consumer, UUID messageId)\n                throws SQLException;\n    }\n\n    public interface LoyaltyRepository {\n        // Resolve the order's customer and update in the SAME database\n        // transaction as the inbox insert. Fail if the target is absent.\n        void addPointsForOrder(Connection c, UUID orderId, int points)\n                throws SQLException;\n    }\n\n    public record OrderPaidConsumer(\n            TransactionRunner transactions, InboxRepository inbox,\n            LoyaltyRepository loyalty) {\n\n        public void handle(OrderPaid event) throws SQLException {\n            transactions.inTransaction(c -> {\n                boolean firstTime = inbox.tryInsert(\n                        c, \"loyalty-order-paid-v1\", event.eventId());\n                if (!firstTime) return null;\n                loyalty.addPointsForOrder(c, event.orderId(), 100);\n                return null;\n            });\n            // Broker adapter acknowledges only after handle returns.\n        }\n    }\n    // endregion consumer\n\n    // region jdbc_inbox\n    public record JdbcInbox(Clock clock) implements InboxRepository {\n        @Override\n        public boolean tryInsert(\n                Connection c, String consumer, UUID messageId)\n                throws SQLException {\n            String sql = \"\"\"\n                    INSERT INTO inbox_message\n                        (consumer_name, message_id, processed_at)\n                    VALUES (?, ?, ?)\n                    ON CONFLICT (consumer_name, message_id) DO NOTHING\n                    \"\"\";\n            try (var statement = c.prepareStatement(sql)) {\n                statement.setString(1, consumer);\n                statement.setObject(2, messageId);\n                statement.setTimestamp(3, Timestamp.from(clock.instant()));\n                return statement.executeUpdate() == 1;\n            }\n        }\n    }\n    // endregion jdbc_inbox\n}\n", "sql": "CREATE TABLE orders (\n    id UUID PRIMARY KEY,\n    status VARCHAR(20) NOT NULL\n        CHECK (status IN ('PENDING', 'PAID', 'CANCELLED')),\n    version BIGINT NOT NULL DEFAULT 0 CHECK (version >= 0)\n);\n\nCREATE TABLE outbox_message (\n    id UUID PRIMARY KEY,\n    event_type VARCHAR(200) NOT NULL,\n    event_version INTEGER NOT NULL,\n    aggregate_id UUID NOT NULL,\n    aggregate_version BIGINT NOT NULL,\n    payload JSONB NOT NULL,\n    occurred_at TIMESTAMPTZ NOT NULL,\n    published_at TIMESTAMPTZ\n);\n\nCREATE INDEX idx_outbox_unpublished\n    ON outbox_message (occurred_at, id)\n    WHERE published_at IS NULL;\n\nCREATE TABLE inbox_message (\n    consumer_name VARCHAR(200) NOT NULL,\n    message_id UUID NOT NULL,\n    processed_at TIMESTAMPTZ NOT NULL,\n    PRIMARY KEY (consumer_name, message_id)\n);\n", "failures": [["Domain validation fails", "No new order or outbox commit", "Reject the command"], ["Order update fails", "Transaction rolls back", "Retry only if the cause is recoverable"], ["Outbox insert fails", "Order update rolls back too", "Fix the cause; retry the transaction"], ["Commit is definitively rolled back", "Neither new fact commits", "Retry if appropriate"], ["Commit response is lost / outcome unknown", "Both may have committed, or neither", "Reconcile durable state; use an idempotent command retry"], ["Broker unavailable / no acceptance observed", "Outbox is pending; acceptance may be uncertain", "Retry the same event identity"], ["Relay crashes before send", "Outbox pending", "Retry"], ["Relay crashes after send, before marker commit", "Outbox pending; broker may have event", "Republish; duplicate possible"], ["Consumer fails before DB commit", "No committed inbox or effect", "Redeliver and retry"], ["Consumer commit response is lost", "Inbox and effect may already exist together", "Do not ACK failure; redelivery checks the inbox"], ["Consumer crashes after DB commit, before ACK", "Inbox and effect committed", "Redelivery skips the effect"], ["Duplicate event arrives", "Inbox identity already exists", "Skip effect; ACK after successful handling"]]}</script><script>
+document.documentElement.classList.add('js');
+const data = JSON.parse(document.getElementById('embedded-data').textContent);
+document.querySelectorAll('[data-print]').forEach(b => b.addEventListener('click', () => window.print()));
+document.querySelectorAll('[data-download]').forEach(b => b.addEventListener('click', () => {
+  const isJava = b.dataset.download === 'java';
+  const blob = new Blob([isJava ? data.java : data.sql], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = isJava ? 'Lesson19.java' : 'lesson19-schema.sql';
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}));
+document.getElementById('copy-source').addEventListener('click', async () => {
+  const status = document.getElementById('copy-status');
+  try {
+    await navigator.clipboard.writeText(data.java);
+    status.textContent = 'Complete Java source copied.';
+  } catch (_) {
+    status.textContent = 'Clipboard access is unavailable here. Use the source download button.';
+  }
+});
+const choice = document.getElementById('failure-choice');
+function showFailure() {
+  const row = data.failures[Number(choice.value)];
+  const output = document.getElementById('failure-result'); output.replaceChildren();
+  ['Durable state', 'Recovery'].forEach((label, i) => {
+    const div=document.createElement('div'); const strong=document.createElement('strong');
+    strong.textContent=label; div.append(strong,document.createTextNode(row[i+1])); output.append(div);
+  });
+}
+choice.addEventListener('change', showFailure); showFailure();
+</script></body></html>

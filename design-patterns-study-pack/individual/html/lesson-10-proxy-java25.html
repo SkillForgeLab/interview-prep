@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 10: derive the Proxy pattern from first principles with Java 25-compatible examples, tests, and complete embedded source."><title>Lesson 10 · Proxy — A Java 25 Guide</title><style>
+:root{color-scheme:light;--ink:#203341;--muted:#54636b;--paper:#fff;--bg:#f5f3ed;--line:#d9dfdf;--teal:#18675f;--teal-soft:#edf6f3;--gold:#ae7730;--code:#f4f6f7;--warn:#fff7e9}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.7}a{color:var(--teal);text-underline-offset:3px}a:hover{text-decoration-thickness:2px}button,select{font:inherit}button{border:1px solid #b8c9c5;background:#fff;color:var(--teal);border-radius:6px;padding:8px 13px;cursor:pointer;font-size:13px;font-weight:650}button:hover{background:var(--teal-soft)}button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #bd7834;outline-offset:3px}.skip{position:absolute;left:20px;top:-60px;background:#fff;padding:8px;z-index:20}.skip:focus{top:10px}.layout{display:grid;grid-template-columns:235px minmax(0,900px);gap:38px;max-width:1230px;margin:0 auto;padding:42px 26px 70px}.sidebar{position:sticky;top:30px;height:calc(100vh - 60px);overflow:auto;padding-right:16px}.brand{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--teal);margin-bottom:24px}.side-title{font-size:25px;line-height:1.2;font-weight:750;margin:0 0 7px}.side-subtitle{font-size:12px;color:var(--muted);margin:0 0 27px}.sidebar nav a{display:grid;grid-template-columns:24px 1fr;gap:6px;text-decoration:none;color:var(--muted);font-size:13px;line-height:1.5;padding:9px 0;border-bottom:1px solid #e1e5e2}.sidebar nav a span{color:var(--teal);font-size:11px;padding-top:2px}.sidebar nav a:hover{color:var(--teal)}.sidebar .utility{margin-top:24px}.sidebar .utility p{font-size:11px;color:var(--muted);line-height:1.55}.sidebar button{width:100%}.sidebar .page-indicator{height:3px;background:#dce4df;margin-top:20px;overflow:hidden}.page-indicator span{display:block;background:var(--teal);height:100%;width:0}.document{background:var(--paper);border:1px solid #e0e5e1;box-shadow:0 8px 28px #2c413709;min-width:0}.cover{padding:52px 52px 38px;border-top:7px solid var(--teal);border-bottom:1px solid var(--line)}.eyebrow{font-size:11px;letter-spacing:.17em;font-weight:800;color:var(--teal);display:block}.cover-top{display:flex;justify-content:space-between;gap:20px;align-items:center}.badge{font-size:11px;padding:4px 9px;border:1px solid #bfd3cc;border-radius:4px;color:var(--teal);white-space:nowrap}.cover h1{font-family:Georgia,"Times New Roman",serif;font-size:74px;line-height:1.08;letter-spacing:-3px;margin:21px 0 7px;font-weight:500}.cover .subtitle{font-size:25px;line-height:1.35;max-width:600px;margin:0 0 25px;font-weight:520}.cover .intro{font-size:16px;color:var(--muted);max-width:620px}.core{border-left:4px solid var(--gold);padding:10px 0 10px 20px;margin-top:28px}.core p{font-family:Georgia,serif;font-size:22px;line-height:1.5;margin:4px 0}.cover-meta{display:flex;gap:10px 22px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:27px}.reading-note{padding:25px 52px;background:#fafbf9;border-bottom:1px solid var(--line)}.reading-note p{font-size:13px;margin:5px 0}.roadmap{display:flex;gap:10px;flex-wrap:wrap;color:var(--teal);font-size:12px;font-weight:700;margin-bottom:10px}.chapter{padding:36px 52px 10px}.chapter+.chapter{border-top:1px solid var(--line);margin-top:30px}.chapter-heading{padding-bottom:17px;margin-bottom:25px;border-bottom:2px solid var(--ink)}.chapter-heading h2{font-family:Georgia,serif;font-size:31px;line-height:1.2;font-weight:500;margin:8px 0 6px;letter-spacing:-.5px}.chapter-heading p{color:var(--muted);font-size:12px;margin:0}.step{margin:0 0 38px;scroll-margin-top:25px}h3{font-size:20px;line-height:1.4;margin:0 0 16px;letter-spacing:-.2px}.step h3{display:block}.step-number{display:inline-block;margin-right:11px}.step-number{font-size:12px;font-weight:800;letter-spacing:.02em;min-width:28px;color:var(--teal);border-top:2px solid var(--teal);padding-top:5px}h4{font-size:17px;margin:5px 0 10px}p{margin:0 0 16px}.small{font-size:12px;color:var(--muted)}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:.86em;background:#f0f3f3;padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}figure.code{margin:20px 0;background:var(--code);border:1px solid var(--line);border-radius:7px;overflow:hidden}.code figcaption{padding:7px 14px;border-bottom:1px solid var(--line);background:#ecf0f1;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.035em}.code pre{padding:15px 17px;margin:0;line-height:1.55;white-space:pre-wrap;tab-size:4;overflow-wrap:anywhere;font-size:12px}.code pre code{font:inherit;color:#243747;background:none;padding:0;border:0;border-radius:0;overflow-wrap:inherit}.keyword{color:#6a4693;font-weight:600}.string{color:#126a52}.comment{color:#657480;font-style:italic}.table-wrap{margin:18px 0 22px;max-width:100%}table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6;table-layout:fixed}th{text-align:left;color:var(--teal);font-size:10px;text-transform:uppercase;letter-spacing:.07em;padding:10px 11px;background:#edf4f1;border-bottom:2px solid #bfcec9}td{padding:11px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}td:first-child{font-weight:600;width:31%}tbody tr:nth-child(even){background:#fafbfa}td code{font-size:11px}.callout{padding:16px 18px;border-left:3px solid var(--teal);background:var(--teal-soft);margin:23px 0;font-size:13px}.callout strong{display:block;font-size:13px;margin-bottom:6px}.callout p{margin:0}.callout.warning{background:var(--warn);border-color:var(--gold)}.callout.key{font-size:15px}.source-ref{font-size:11px;white-space:normal}.lab{display:none;padding:21px;border:1px solid #b4ccc4;border-radius:8px;background:#f7fbf8;margin:24px 0}.js .lab{display:block}.lab-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}.lab-controls label{font-size:12px}.lab-controls label:first-child{grid-column:1/-1}.lab-controls select{display:block;width:100%;border:1px solid #bacac4;padding:9px;background:white;border-radius:5px;color:var(--ink);font-size:13px;margin-top:4px}.check{display:flex;align-items:center;gap:8px}.check input{accent-color:var(--teal);width:16px;height:16px}.lab ol{padding-left:22px;font-size:13px}.lab-result{font-weight:650;font-size:13px;padding:10px;background:#e4f0e9;border-radius:4px;margin-bottom:0}.lab-result.risk{background:#fce8d3;color:#7b3d17}.order-line{background:var(--teal-soft);padding:13px 16px;border:1px solid #cbdcd5;font-weight:650;color:var(--teal);font-size:14px}.decision-list,.acceptance{padding-left:24px}.decision-list li,.acceptance li{padding:5px 0}.reflection{background:#f6f4ee;padding:20px;margin:25px 0}.reflection p{font-size:14px;margin-bottom:0}details.answer{border:1px solid var(--line);border-radius:6px;padding:13px 16px;font-size:14px;margin-bottom:20px}summary{cursor:pointer;font-weight:650;color:var(--teal)}details.answer div{padding-top:12px}.next{padding:24px 0 5px;margin:30px 0 15px;border-top:1px solid var(--line)}.next h3{font-family:Georgia,serif;font-size:26px;margin:8px 0}.source-title{display:flex;flex-direction:column;gap:8px;padding:16px 0;border-top:1px solid var(--line)}.source-title h3{font-size:16px;margin:0;font-family:Consolas,monospace}.source-actions{display:none;gap:8px;flex-wrap:wrap}.js .source-actions{display:flex}.js .source-body{display:none}.js .source-body.is-open{display:block}.source-file .code{margin-top:5px}.references{padding-bottom:30px}.references ol{padding-left:20px;font-size:13px}.references li{margin:14px 0}.reference-url{display:block;font-size:10px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere;margin-top:3px}.footer{padding:24px 52px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);display:flex;justify-content:space-between}.print-only{display:none}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:9px 17px;border-radius:6px;font-size:12px;z-index:30}.toast:empty{display:none}
+@media(max-width:1050px){.layout{grid-template-columns:190px minmax(0,1fr);gap:20px;padding:25px 20px}.cover{padding:40px 32px 30px}.chapter{padding:30px 32px 5px}.reading-note,.footer{padding-left:32px;padding-right:32px}.cover h1{font-size:65px}.cover .subtitle{font-size:23px}}
+@media(max-width:760px){.layout{display:block;padding:0}.sidebar{position:static;height:auto;padding:19px 22px;background:#f7f8f5}.brand{margin-bottom:8px}.side-title,.side-subtitle,.page-indicator{display:none}.sidebar nav{display:none}.sidebar .utility{margin:0;display:flex;align-items:center;gap:15px}.sidebar button{width:auto}.sidebar .utility p{margin:0}.document{border:0}.cover{padding:32px 23px 26px}.cover h1{font-size:57px}.cover-top{gap:12px}.cover .subtitle{font-size:23px}.cover-meta{gap:8px 15px}.chapter{padding:27px 23px 5px}.chapter-heading h2{font-size:28px}.reading-note{padding:20px 23px}h3{font-size:19px}.code pre{font-size:10.5px;padding:13px 12px}.code figcaption{font-size:9px}.table-wrap{overflow:visible}table{font-size:12px}th,td{padding:8px 7px}td code{font-size:10px}.lab{padding:16px}.lab-controls{display:flex;flex-direction:column}.footer{padding:20px 23px;display:block}.source-actions button{padding:7px 10px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A4;margin:16mm 15mm 18mm;@bottom-left{content:"DESIGN PATTERNS / 10 · PROXY";font-family:Arial,sans-serif;font-size:8pt;color:#59666c}@bottom-right{content:counter(page);font-family:Arial,sans-serif;font-size:8pt;color:#59666c}}
+@media print{html{scroll-behavior:auto}body{background:#fff;color:#142732;font-size:10pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}.layout{display:block;max-width:none;padding:0;margin:0}.sidebar,.screen-only,.source-actions,.toast,.skip{display:none!important}.document{border:0;box-shadow:none}.cover{padding:7mm 0 8mm;border-top:1.5mm solid var(--teal);break-after:avoid}.cover h1{font-size:53pt;line-height:1.05;margin:5mm 0 2mm}.cover .subtitle{font-size:21pt;max-width:145mm}.cover .intro{font-size:10pt}.cover-top .eyebrow{font-size:8pt}.cover .core{margin-top:5mm;padding:2mm 0 2mm 5mm}.core p{font-size:15pt}.cover-meta{font-size:8pt;margin-top:5mm}.badge{font-size:8pt}.reading-note{padding:5mm 0;background:white;border-bottom:1px solid var(--line)}.reading-note p{font-size:9pt}.chapter{padding:6mm 0 0;border:0!important;margin:0!important;break-before:auto}.reading-note{break-after:page}.chapter-heading{padding:0 0 4mm;margin:0 0 6mm;break-inside:avoid;break-after:avoid}.chapter-heading h2{font-size:24pt}.chapter-heading p{font-size:9pt}.eyebrow{font-size:8pt}.step{margin-bottom:7mm}.step h3{font-size:14pt;margin:0 0 3mm;break-after:avoid}.step-number{font-size:9pt;min-width:6mm}h4{font-size:11pt;break-after:avoid}p{margin:0 0 3.5mm;orphans:3;widows:3}.small{font-size:8.2pt}h2,h3,h4,figcaption,summary{break-after:avoid}figure.code{margin:4mm 0;break-inside:avoid;border-radius:0;overflow:visible}.code figcaption{font-size:7.3pt;padding:1.5mm 3mm}.code pre{font-size:8.2pt;line-height:1.45;padding:3mm;white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere}.code code{font-size:inherit}table{font-size:9pt;line-height:1.5;table-layout:fixed}th{font-size:7.5pt}th,td{padding:2.4mm}td code{font-size:8pt}.table-wrap{margin:4mm 0 5mm;overflow:visible;break-inside:avoid}tr{break-inside:avoid}thead{display:table-header-group}.callout{padding:3.5mm 4mm;font-size:9pt;break-inside:avoid;margin:4mm 0}.callout strong{font-size:9.5pt}.callout.key{font-size:10pt}.source-ref{font-size:8pt}.decision-list li,.acceptance li{padding:1.2mm 0}.order-line{font-size:10pt;padding:3mm}.reflection{padding:4mm;break-inside:avoid}.reflection p{font-size:9.5pt}.next{break-inside:avoid;padding-top:5mm}.next h3{font-size:18pt}.answer{break-inside:avoid}.answer>div{display:block!important}.answer::details-content{display:block;content-visibility:visible!important}.source-title{padding:4mm 0 2mm;break-after:avoid}.source-title h3{font-size:12pt}.source-file{break-before:auto;margin-top:5mm}#file-0{break-before:page}.references{break-before:auto}.source-body,.js .source-body{display:block!important}.source-file .code{break-inside:auto}.source-file pre{font-size:8pt;line-height:1.45;break-inside:auto;orphans:4;widows:4}.references li{font-size:9pt;break-inside:avoid;margin:4mm 0}.reference-url{font-size:7.5pt}.footer{padding:5mm 0;font-size:8pt}.print-only{display:block}a{color:#15584f;text-decoration:underline}.source-file .code figcaption{break-after:avoid}}
+</style></head>
+<body><a class="skip" href="#main">Skip to guide</a><div class="layout"><aside class="sidebar" aria-label="Guide navigation"><div class="brand">DESIGN PATTERNS</div><p class="side-title">10 / Proxy</p><p class="side-subtitle">A first-principles guide · Java 25</p><nav><a href="#pressure"><span>01</span>Start with the pressure</a><a href="#protection"><span>02</span>Protect, cache, and defer</a><a href="#remote"><span>03</span>Respect the remote boundary</a><a href="#distinctions"><span>04</span>Distinguish intent from shape</a><a href="#dynamic"><span>05</span>Generate the wrapper at runtime</a><a href="#policies"><span>06</span>Make policy semantics explicit</a><a href="#tests"><span>07</span>Test the behavior the proxy owns</a><a href="#judgment"><span>08</span>Decide whether Proxy fits</a><a href="#exercise"><span>↗</span>Practice exercise</a><a href="#source"><span>{ }</span>Complete source</a><a href="#references"><span>↗</span>Official references</a></nav><div class="utility"><button type="button" id="print">Print / Save as PDF</button><p>A4 print layout. All examples and source are embedded. Use your browser’s print command if scripts are disabled.</p></div><div class="page-indicator" aria-hidden="true"><span></span></div></aside>
+<main class="document" id="main"><header class="cover"><div class="cover-top"><span class="eyebrow">LESSON 10 / STRUCTURAL PATTERNS</span><span class="badge">JAVA 25</span></div><h1>Proxy</h1><p class="subtitle">Control access.<br>Keep the caller’s abstraction.</p><p class="intro">Derive the pattern from a document repository that acquires authorization, caching, auditing, rate limits, and expensive initialization—one pressure at a time.</p><div class="core"><span class="eyebrow">THE FIRST-PRINCIPLES QUESTION</span><p>Should an object stand between the caller and the real implementation to control how access happens?</p></div><div class="cover-meta"><span>31 steps + exercise</span><span>Complete Java source</span><span>Offline · light theme · print ready</span></div></header>
+<div class="reading-note"><div class="roadmap"><span>Pressure</span><span>→ Contract</span><span>→ Wrapper</span><span>→ Semantics</span><span>→ Tests</span></div><p><strong>Read in order.</strong> The pattern name follows the problem. Later sections revisit early simplifications and make the runtime policies explicit.</p><p><strong>Prerequisites:</strong> Java interfaces, constructors, composition, exceptions, and basic collections. Lambdas and reflection are explained where they enter the design.</p><p><strong>Print:</strong> choose A4 or Letter, use 100% scale, and disable browser-generated headers and footers if they duplicate the page labels. The guide prints all essential text, review notes, and complete source.</p></div>
+<section class="chapter" id="pressure"><div class="chapter-heading"><span class="eyebrow">PART 01</span><h2>Start with the pressure</h2><p>Steps 1–4 · Derive the need before naming the pattern</p></div><section class="step" id="step-1"><h3><span class="step-number">01</span>Start with a remote document repository</h3><p>A client needs a document. A repository delegates retrieval to a storage client. At this point, the design has one job and needs no extra wrapper.</p><figure class="code "><figcaption>Contract · declarations inside ProxyLesson</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">record</span> Document(String id, String body) {}
+
+<span class="keyword">public</span> <span class="keyword">interface</span> DocumentRepository {
+    Document findById(String id);
+}
+
+<span class="keyword">public</span> <span class="keyword">interface</span> StorageClient {
+    Document download(String id);
+}</code></pre></figure><figure class="code "><figcaption>Real subject · ProxyLesson.RemoteDocumentRepository</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> RemoteDocumentRepository
+        <span class="keyword">implements</span> DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">final</span> StorageClient storage;
+
+    <span class="keyword">public</span> RemoteDocumentRepository(StorageClient storage) {
+        this.storage = Objects.requireNonNull(storage);
+    }
+
+    @Override
+    <span class="keyword">public</span> Document findById(String id) {
+        <span class="keyword">return</span> Objects.requireNonNull(storage.download(id));
+    }
+}</code></pre></figure><figure class="code "><figcaption>Client · wiring excerpt</figcaption><pre><code>DocumentRepository repository =
+        <span class="keyword">new</span> RemoteDocumentRepository(storageClient);
+Document document = repository.findById(<span class="string">&quot;DOC-123&quot;</span>);</code></pre></figure><p>Throughout this guide, a read returns a <strong>non-null document</strong> or throws an unchecked exception. A missing document is not represented by <code>null</code>. The complete source adds null checks and defines every supporting type.</p></section><section class="step" id="step-2"><h3><span class="step-number">02</span>New requirement: authorization</h3><p>Security adds a rule: a user must have permission before reading a document. The obvious implementation puts the check directly in the remote repository:</p><figure class="code "><figcaption>Naive version · method body; assumes injected dependencies</figcaption><pre><code>@Override
+<span class="keyword">public</span> Document findById(String id) {
+    authorization.checkCanRead(currentUser.get(), id);
+    <span class="keyword">return</span> storage.download(id);
+}</code></pre></figure><p>This can be reasonable for a small system. But retrieval now changes for two separate reasons: storage behavior and access policy. More pressure will tell us whether separation is useful.</p></section><section class="step" id="step-3"><h3><span class="step-number">03</span>More pressure arrives</h3><div class="table-wrap "><table><thead><tr><th scope="col">Requirement</th><th scope="col">What it changes</th></tr></thead><tbody><tr><td>Authorization</td><td>Whether a caller may read a document.</td></tr><tr><td>Caching</td><td>Whether this read needs to reach storage.</td></tr><tr><td>Auditing</td><td>What must be recorded for attempted, successful, and failed access.</td></tr><tr><td>Rate limiting</td><td>Whether another remote operation is allowed now.</td></tr><tr><td>Lazy creation</td><td>When an expensive dependency is constructed.</td></tr></tbody></table></div><p>Putting every rule in <code>RemoteDocumentRepository</code> ties together policies with different lifecycles. The design pressure is to give access decisions a separate place while keeping retrieval focused.</p></section><section class="step" id="step-4"><h3><span class="step-number">04</span>What does the caller actually need?</h3><p>The caller already depends on <code>DocumentRepository</code>. It does not need a new API for each policy. Place another object in front of the real repository, and have it implement that same interface.</p><div class="table-wrap "><table><thead><tr><th scope="col">Role</th><th scope="col">Responsibility in this lesson</th></tr></thead><tbody><tr><td>Client</td><td>Calls <code>DocumentRepository.findById(id)</code>.</td></tr><tr><td>Subject</td><td><code>DocumentRepository</code>, the shared contract.</td></tr><tr><td>Proxy</td><td>Implements the contract and decides how access proceeds.</td></tr><tr><td>Real subject</td><td><code>RemoteDocumentRepository</code>, which performs retrieval.</td></tr></tbody></table></div><aside class="callout key"><strong>The Proxy idea</strong><p>Stand in for another object and control whether, when, or how it is accessed, while preserving the caller’s abstraction.</p></aside></section></section><section class="chapter" id="protection"><div class="chapter-heading"><span class="eyebrow">PART 02</span><h2>Protect, cache, and defer</h2><p>Steps 5–10 · Learn from the path a call takes</p></div><section class="step" id="step-5"><h3><span class="step-number">05</span>Build a protection proxy</h3><figure class="code "><figcaption>Protection proxy · complete nested class</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> AuthorizedDocumentRepository
+        <span class="keyword">implements</span> DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+    <span class="keyword">private</span> <span class="keyword">final</span> AuthorizationService authorization;
+    <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt;String&gt; currentUser;
+
+    <span class="keyword">public</span> AuthorizedDocumentRepository(
+            DocumentRepository target,
+            AuthorizationService authorization,
+            Supplier&lt;String&gt; currentUser) {
+        this.target = Objects.requireNonNull(target);
+        this.authorization = Objects.requireNonNull(authorization);
+        this.currentUser = Objects.requireNonNull(currentUser);
+    }
+
+    @Override
+    <span class="keyword">public</span> Document findById(String id) {
+        authorization.checkCanRead(currentUser.get(), id);
+        <span class="keyword">return</span> target.findById(id);
+    }
+}</code></pre></figure><p>The proxy checks permission <em>before</em> delegation. If the check throws, the real repository is never reached. <code>currentUser</code> is an injected supplier of trusted request identity; the caller must not be able to choose another user’s identity.</p><figure class="code "><figcaption>Composition · dependencies supplied by application startup</figcaption><pre><code>DocumentRepository repository =
+        <span class="keyword">new</span> AuthorizedDocumentRepository(
+                <span class="keyword">new</span> RemoteDocumentRepository(storageClient),
+                authorizationService,
+                currentUser);</code></pre></figure></section><section class="step" id="step-6"><h3><span class="step-number">06</span>Trace the execution</h3><div class="table-wrap "><table><thead><tr><th scope="col">Step</th><th scope="col">Allowed request</th><th scope="col">Denied request</th></tr></thead><tbody><tr><td>1 · Client</td><td>Calls <code>findById("DOC-123")</code>.</td><td>Same call.</td></tr><tr><td>2 · Proxy</td><td>Permission check succeeds.</td><td>Permission check throws.</td></tr><tr><td>3 · Target</td><td>Storage retrieval runs.</td><td><strong>Not reached.</strong></td></tr><tr><td>4 · Result</td><td>Document or retrieval failure propagates.</td><td>Access denial propagates.</td></tr></tbody></table></div><p>The responsibility is precise: <strong>may this call reach the target?</strong> The proxy enforces this only for calls routed through it. Do not expose a bypassing target reference to untrusted callers.</p></section><section class="step" id="step-7"><h3><span class="step-number">07</span>Add a simple caching proxy</h3><figure class="code "><figcaption>First cache · intentionally single-threaded and unbounded</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> SimpleCachedRepository
+        <span class="keyword">implements</span> DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Document&gt; cache = <span class="keyword">new</span> HashMap&lt;&gt;();
+
+    <span class="keyword">public</span> SimpleCachedRepository(DocumentRepository target) {
+        this.target = Objects.requireNonNull(target);
+    }
+
+    @Override
+    <span class="keyword">public</span> Document findById(String id) {
+        Document cached = cache.get(id);
+        <span class="keyword">if</span> (cached != <span class="keyword">null</span>) <span class="keyword">return</span> cached;
+        Document loaded = Objects.requireNonNull(target.findById(id));
+        cache.put(id, loaded);
+        <span class="keyword">return</span> loaded;
+    }
+}</code></pre></figure><figure class="code "><figcaption>Call order · Authorization, Cache, Remote</figcaption><pre><code>DocumentRepository repository =
+        <span class="keyword">new</span> AuthorizedDocumentRepository(
+                <span class="keyword">new</span> SimpleCachedRepository(
+                        <span class="keyword">new</span> RemoteDocumentRepository(storageClient)),
+                authorizationService,
+                currentUser);</code></pre></figure><p>A hit returns early. A miss delegates, then stores a successful result. This first version teaches the structure; section 22 adds a size bound, expiration, and synchronization.</p></section><section class="step" id="step-8"><h3><span class="step-number">08</span>Order changes runtime semantics</h3><div class="table-wrap "><table><thead><tr><th scope="col">Outer → inner</th><th scope="col">Warm-cache behavior</th></tr></thead><tbody><tr><td><strong>Authorization → Cache → Remote</strong></td><td>Authorization runs even when the cache has the document.</td></tr><tr><td>Cache → Authorization → Remote</td><td>A hit can return before authorization runs. A denied caller may receive cached data.</td></tr></tbody></table></div><p>This comparison assumes a cache shared across callers and keyed only by document ID. Even a per-user cache needs a deliberate permission-revocation policy. If document content varies by tenant, user, locale, or version, the cache key must represent those dimensions too.</p>
+<div class="lab screen-only" id="order-lab">
+<div class="lab-heading"><span class="eyebrow">TRY THE CALL PATH</span><h4>Can a cached read bypass permission?</h4></div>
+<p class="small">A single-request model with a shared cache. This illustrates control flow; it does not run Java.</p>
+<div class="lab-controls"><label>Wrapper order<select id="lab-order"><option value="safe">Authorization → Cache → Remote</option><option value="unsafe">Cache → Authorization → Remote</option></select></label>
+<label class="check"><input id="lab-allowed" type="checkbox">User has permission</label><label class="check"><input id="lab-cached" type="checkbox" checked>Document is cached</label></div>
+<ol id="lab-trace" aria-live="polite"></ol><p class="lab-result" id="lab-result" role="status"></p></div><aside class="callout warning"><strong>Ordering rule</strong><p>Put authorization outside every cache that can return protected data. Wrapping the wrong object can preserve the interface and break the security requirement.</p></aside></section><section class="step" id="step-9"><h3><span class="step-number">09</span>Defer construction with a lazy proxy</h3><p>If creating a client or repository is expensive, defer that work until a call actually needs it. Inject a factory so the proxy does not also decide how storage is configured.</p><figure class="code "><figcaption>Virtual proxy · synchronized initialization</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> LazyDocumentRepository
+        <span class="keyword">implements</span> DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt;DocumentRepository&gt; factory;
+    <span class="keyword">private</span> DocumentRepository target;
+
+    <span class="keyword">public</span> LazyDocumentRepository(Supplier&lt;DocumentRepository&gt; factory) {
+        this.factory = Objects.requireNonNull(factory);
+    }
+
+    <span class="keyword">private</span> <span class="keyword">synchronized</span> DocumentRepository target() {
+        <span class="keyword">if</span> (target == <span class="keyword">null</span>) {
+            target = Objects.requireNonNull(factory.get());
+        }
+        <span class="keyword">return</span> target;
+    }
+
+    @Override
+    <span class="keyword">public</span> Document findById(String id) {
+        <span class="keyword">return</span> target().findById(id);
+    }
+}</code></pre></figure><p>Constructing this proxy does not call the factory. The first read creates the target; later reads reuse it. The synchronized helper guards construction and publication. Delegation happens after the helper releases the monitor. <a class="source-ref" href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-17.html">JLS 25: synchronization</a></p>
+<p>If the factory throws, <code>target</code> stays unset, so a later request retries construction. This is an explicit policy. It does not make the target itself thread-safe, and the factory must not re-enter the same lazy proxy. Defer the expensive work <em>inside</em> the supplier; creating it before the supplier defeats laziness.</p></section><section class="step" id="step-10"><h3><span class="step-number">10</span>Why is this different from Factory?</h3><div class="table-wrap "><table><thead><tr><th scope="col">Question</th><th scope="col">Factory</th><th scope="col">Proxy</th></tr></thead><tbody><tr><td>Primary job</td><td>Create and return an object.</td><td>Stand between caller and subject.</td></tr><tr><td>Lifetime in the call path</td><td>The caller uses the created object afterward.</td><td>Every call through the proxy reference enters it.</td></tr><tr><td>Can they cooperate?</td><td>Supplies the real repository.</td><td>A lazy proxy invokes the factory on demand.</td></tr></tbody></table></div><p>Factory answers <em>how do I obtain it?</em> Proxy answers <em>how should access to it proceed?</em></p></section></section><section class="chapter" id="remote"><div class="chapter-heading"><span class="eyebrow">PART 03</span><h2>Respect the remote boundary</h2><p>Steps 11–13 · Preserve the interface without concealing cost</p></div><section class="step" id="step-11"><h3><span class="step-number">11</span>Use a remote proxy</h3><p>A remote implementation lets client code express <code>repository.findById(id)</code> while the implementation handles a protocol. With the JDK API, build an <code>HttpRequest</code> and call <code>HttpClient.send</code>. There is no JDK <code>client.get(path, Document.class)</code> convenience method. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html">Java 25 HttpClient</a></p>
+<p>The complete <code>HttpDocumentRepository.java</code> is in the appendix. It implements the same lesson contract and expects an HTTPS endpoint returning a bounded UTF-8 plain-text document. Its IDs are restricted to letters, digits, underscores, and hyphens.</p><figure class="code "><figcaption>HTTP request and response · excerpt from findById</figcaption><pre><code>HttpRequest request = HttpRequest.newBuilder(base.resolve(id))
+        .timeout(Duration.ofSeconds(3))
+        .header(<span class="string">&quot;Accept&quot;</span>, <span class="string">&quot;text/plain&quot;</span>)
+        .GET()
+        .build();
+<span class="keyword">try</span> {
+    HttpResponse&lt;String&gt; response = client.send(request,
+            HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    <span class="keyword">int</span> status = response.statusCode();
+    <span class="keyword">if</span> (status == 404) <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException(<span class="string">&quot;Document not found&quot;</span>);
+    <span class="keyword">if</span> (status == 401 || status == 403) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> ProxyLesson.AccessDeniedException();
+    }
+    <span class="keyword">if</span> (status != 200) <span class="keyword">throw</span> <span class="keyword">new</span> RepositoryException(<span class="string">&quot;HTTP &quot;</span> + status);
+    <span class="comment">// Teaching endpoint contract: bounded, UTF-8 plain-text body.</span>
+    <span class="keyword">return</span> <span class="keyword">new</span> ProxyLesson.Document(id, response.body());</code></pre></figure><figure class="code "><figcaption>Failure translation · same method</figcaption><pre><code>} <span class="keyword">catch</span> (InterruptedException interrupted) {
+    Thread.currentThread().interrupt();
+    <span class="keyword">throw</span> <span class="keyword">new</span> RepositoryException(<span class="string">&quot;Document read interrupted&quot;</span>, interrupted);
+} <span class="keyword">catch</span> (IOException failure) {
+    <span class="keyword">throw</span> <span class="keyword">new</span> RepositoryException(<span class="string">&quot;Document transport failed&quot;</span>, failure);
+}</code></pre></figure><p>The proxy retains the original cause and restores interrupt status when translating interruption. It explicitly maps status codes instead of treating every response as a successful document.</p></section><section class="step" id="step-12"><h3><span class="step-number">12</span>Remote calls are not local calls</h3><div class="table-wrap "><table><thead><tr><th scope="col">Concern</th><th scope="col">Decision that belongs in the contract or application</th></tr></thead><tbody><tr><td>Latency and blocking</td><td>Set time budgets and avoid accidental serial work.</td></tr><tr><td>Timeouts and failures</td><td>Define how callers distinguish transport failure, denial, and missing data.</td></tr><tr><td>Retries</td><td>Choose retryability, idempotency, backoff, and an overall deadline.</td></tr><tr><td>Payload and identity</td><td>Define schema, response-size limits, credentials, and data sensitivity.</td></tr><tr><td>Resource ownership</td><td>Share the configured client and decide who closes it at shutdown.</td></tr></tbody></table></div><p>The example sets a per-request timeout. A real composition root should also configure the client’s connection timeout. These settings address different parts of the operation; they are not a complete application deadline. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html">Request timeout</a> · <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html">Client lifecycle</a></p><aside class="callout note"><strong>Scope of the HTTP example</strong><p>The endpoint and plain-text protocol are teaching assumptions. Authentication headers, JSON mapping, retry policy, response-size enforcement, and live service integration are outside this example. The code has no endpoint to contact until you supply one.</p></aside></section><section class="step" id="step-13"><h3><span class="step-number">13</span>Avoid the fallacy of transparent remoting</h3><figure class="code "><figcaption>Same source code · potentially different operational cost</figcaption><pre><code><span class="keyword">for</span> (String id : ids) {
+    repository.findById(id);
+}</code></pre></figure><p>For 100 uncached IDs, an implementation that sends one request per call makes 100 remote requests. A local implementation can execute the same loop without those network exchanges. Identical method syntax does not imply identical cost.</p>
+<p>If the use case is bulk retrieval, a deliberate batch operation such as <code>findAllByIds(ids)</code> may express it better. Define batch size, partial failures, result ordering, and limits instead of promising that remote access is transparent.</p></section></section><section class="chapter" id="distinctions"><div class="chapter-heading"><span class="eyebrow">PART 04</span><h2>Distinguish intent from shape</h2><p>Steps 14–17 · Similar class structures can solve different problems</p></div><section class="step" id="step-14"><h3><span class="step-number">14</span>Proxy vs Decorator</h3><div class="table-wrap "><table><thead><tr><th scope="col">Pattern</th><th scope="col">Primary intent</th><th scope="col">Example</th></tr></thead><tbody><tr><td>Proxy</td><td>Stand in for a subject or control access to it.</td><td><code>AuthorizedDocumentRepository</code> gates access.</td></tr><tr><td>Decorator</td><td>Add composable behavior to a component.</td><td>A metrics wrapper adds measurement.</td></tr></tbody></table></div><p>Both often implement the same interface and delegate to another instance. Caching, auditing, and logging can be described through either lens depending on why the wrapper exists. Pattern names describe intent; they are not mutually exclusive runtime types.</p></section><section class="step" id="step-15"><h3><span class="step-number">15</span>Structural similarity is not enough</h3><figure class="code "><figcaption>Structural sketch · uses the lesson’s document types</figcaption><pre><code><span class="keyword">final</span> <span class="keyword">class</span> Wrapper <span class="keyword">implements</span> DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+
+    Wrapper(DocumentRepository target) {
+        this.target = target;
+    }
+
+    @Override
+    <span class="keyword">public</span> Document findById(String id) {
+        <span class="comment">// Policy or additional behavior can live here.</span>
+        <span class="keyword">return</span> target.findById(id);
+    }
+}</code></pre></figure><p>Reading this shape cannot tell you whether the design is Proxy or Decorator. Ask: <strong>why does this wrapper exist?</strong> Also ask whether callers can rely on the original contract after wrapping.</p></section><section class="step" id="step-16"><h3><span class="step-number">16</span>Proxy vs Adapter</h3><div class="table-wrap "><table><thead><tr><th scope="col">Pattern</th><th scope="col">Relationship to the interface</th></tr></thead><tbody><tr><td>Adapter</td><td>Translates an incompatible API into the API a client expects.</td></tr><tr><td>Proxy</td><td>Preserves the subject’s conceptual API while mediating access.</td></tr></tbody></table></div><p>A remote repository can have both aspects: it stands in for a document service and translates HTTP into an application interface. The useful question is which problem you are explaining.</p></section><section class="step" id="step-17"><h3><span class="step-number">17</span>Proxy vs Facade</h3><p>A Facade offers a simpler entry point over subsystem operations. It need not share an interface with those components. A Proxy stands in for a subject behind the same conceptual contract.</p><div class="table-wrap "><table><thead><tr><th scope="col">Pattern</th><th scope="col">Question it answers</th></tr></thead><tbody><tr><td>Adapter</td><td>How do incompatible interfaces communicate?</td></tr><tr><td>Decorator</td><td>How do I add composable behavior?</td></tr><tr><td>Facade</td><td>How do I simplify a subsystem?</td></tr><tr><td>Proxy</td><td>How do I control access to a subject?</td></tr></tbody></table></div></section></section><section class="chapter" id="dynamic"><div class="chapter-heading"><span class="eyebrow">PART 05</span><h2>Generate the wrapper at runtime</h2><p>Steps 18–21 · Java dynamic proxies and their tradeoffs</p></div><section class="step" id="step-18"><h3><span class="step-number">18</span>Java can generate interface-based proxies</h3><p><code>java.lang.reflect.Proxy</code> creates runtime objects implementing specified interfaces. Interface calls are dispatched to an associated <code>InvocationHandler</code>. These JDK proxies do not subclass your concrete service class. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Proxy.html">Java 25 Proxy</a></p><figure class="code "><figcaption>Contract and real service · nested in DynamicProxyDemo</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">interface</span> PaymentService {
+    <span class="keyword">void</span> charge(<span class="keyword">long</span> cents);
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> DemoPaymentService <span class="keyword">implements</span> PaymentService {
+    @Override
+    <span class="keyword">public</span> <span class="keyword">void</span> charge(<span class="keyword">long</span> cents) {
+        <span class="keyword">if</span> (cents &lt;= 0) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Positive cents required&quot;</span>);
+        System.out.println(<span class="string">&quot;Charging &quot;</span> + cents);
+    }
+}</code></pre></figure><p>This service only prints a message. It is a local demonstration and does not invoke a payment provider.</p></section><section class="step" id="step-19"><h3><span class="step-number">19</span>Route calls through an InvocationHandler</h3><figure class="code "><figcaption>LoggingHandler.invoke · full method</figcaption><pre><code>@Override
+    <span class="keyword">public</span> Object invoke(Object proxy, Method method, Object[] args)
+            <span class="keyword">throws</span> Throwable {
+        <span class="comment">// Explicit identity semantics for this teaching proxy.</span>
+        <span class="keyword">if</span> (method.getDeclaringClass() == Object.<span class="keyword">class</span>) {
+            <span class="keyword">return</span> <span class="keyword">switch</span> (method.getName()) {
+                <span class="keyword">case</span> <span class="string">&quot;equals&quot;</span> -&gt; proxy == args[0];
+                <span class="keyword">case</span> <span class="string">&quot;hashCode&quot;</span> -&gt; System.identityHashCode(proxy);
+                <span class="keyword">case</span> <span class="string">&quot;toString&quot;</span> -&gt; <span class="string">&quot;LoggingProxy[&quot;</span>
+                        + target.getClass().getSimpleName() + <span class="string">&quot;]&quot;</span>;
+                <span class="keyword">default</span> -&gt; <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(method);
+            };
+        }
+        System.out.println(<span class="string">&quot;Calling &quot;</span> + method.getName());
+        <span class="keyword">try</span> {
+            <span class="keyword">return</span> method.invoke(target, args);
+        } <span class="keyword">catch</span> (InvocationTargetException failure) {
+            <span class="keyword">throw</span> failure.getCause();
+        }</code></pre></figure><figure class="code "><figcaption>Create and invoke · complete program in appendix</figcaption><pre><code>PaymentService proxy = (PaymentService) Proxy.newProxyInstance(
+        PaymentService.<span class="keyword">class</span>.getClassLoader(),
+        <span class="keyword">new</span> Class&lt;?&gt;[] { PaymentService.<span class="keyword">class</span> },
+        <span class="keyword">new</span> LoggingHandler(<span class="keyword">new</span> DemoPaymentService()));
+
+proxy.charge(5000);</code></pre></figure><p><code>Method.invoke</code> wraps a target-thrown exception in <code>InvocationTargetException</code>. Unwrapping its cause preserves the target’s failure at the proxy boundary. Otherwise an undeclared checked wrapper can emerge as <code>UndeclaredThrowableException</code>. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html#invoke(java.lang.Object,java.lang.Object...)">Method.invoke</a> · <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/InvocationHandler.html">InvocationHandler exception contract</a></p>
+<p>The handler also gives <code>equals</code>, <code>hashCode</code>, and <code>toString</code> an explicit identity-based policy. Blindly forwarding <code>equals</code> to the target can make <code>proxy.equals(proxy)</code> false. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Proxy.html">Object-method dispatch</a></p></section><section class="step" id="step-20"><h3><span class="step-number">20</span>Why dynamic proxies matter</h3><p>If payment, order, and user services need the same interception logic, generating wrappers can avoid repeating one forwarding class per interface. A handler can centralize logging or another cross-cutting policy.</p>
+<p>Dynamic generation is a mechanism. A generic logging handler may have Decorator intent, while a permission handler may have Proxy intent. Generating a proxy does not supply transaction, authorization, or audit correctness automatically.</p></section><section class="step" id="step-21"><h3><span class="step-number">21</span>The costs and edge cases</h3><div class="table-wrap "><table><thead><tr><th scope="col">Question</th><th scope="col">What to remember</th></tr></thead><tbody><tr><td>Can this target be proxied?</td><td>JDK dynamic proxies require interfaces; Java 25 disallows sealed or hidden proxy interfaces. Visibility and module rules also apply.</td></tr><tr><td>What reaches the handler?</td><td>Calls made through the proxy reference. A target’s internal calls on <code>this</code> bypass this wrapper.</td></tr><tr><td>What about arguments?</td><td><code>args</code> may be <code>null</code> for a no-argument method.</td></tr><tr><td>What about default methods?</td><td>Choose target delegation or an explicit <code>InvocationHandler.invokeDefault</code> policy.</td></tr><tr><td>What can be thrown?</td><td>Unchecked exceptions, errors, and checked exceptions allowed by the interface contract.</td></tr><tr><td>Is it worth it?</td><td>Use generic interception when it offsets less explicit control flow and more difficult debugging.</td></tr></tbody></table></div><p>In this example, default methods use normal reflective delegation to the target. No special default-method dispatch is required by <code>PaymentService</code>. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Proxy.html">Proxy restrictions</a> · <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/InvocationHandler.html">Handler and default-method rules</a></p></section></section><section class="chapter" id="policies"><div class="chapter-heading"><span class="eyebrow">PART 06</span><h2>Make policy semantics explicit</h2><p>Steps 22–26 · Caching, quotas, auditing, and composition</p></div><section class="step" id="step-22"><h3><span class="step-number">22</span>A better teaching cache still needs a policy</h3><p>The initial map grows without limit. Adding an <code>expiresAt</code> field does not remove expired entries that are never read again, so TTL alone does not bound memory. A concurrent map also does not make a multi-step check/load/store sequence one atomic operation. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html">ConcurrentHashMap contract</a></p>
+<p>The second cache uses a capacity-limited, access-order <code>LinkedHashMap</code>, elapsed-time TTL, and one monitor. It removes the least recently used entry when capacity is exceeded. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/LinkedHashMap.html">LinkedHashMap ordering</a></p><figure class="code "><figcaption>Bounded cache · read and invalidation methods</figcaption><pre><code>@Override
+    <span class="keyword">public</span> <span class="keyword">synchronized</span> Document findById(String id) {
+        Entry entry = cache.get(id);
+        <span class="keyword">long</span> now = ticker.getAsLong();
+        <span class="keyword">if</span> (entry != <span class="keyword">null</span> &amp;&amp; now - entry.loadedAt() &lt; ttlNanos) {
+            <span class="keyword">return</span> entry.document();
+        }
+        cache.remove(id);
+        Document loaded = Objects.requireNonNull(target.findById(id));
+        cache.put(id, <span class="keyword">new</span> Entry(loaded, ticker.getAsLong()));
+        <span class="keyword">if</span> (cache.size() &gt; maxEntries) {
+            <span class="keyword">var</span> eldest = cache.entrySet().iterator();
+            eldest.next();
+            eldest.remove();
+        }
+        <span class="keyword">return</span> loaded;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> invalidate(String id) {
+        cache.remove(id);</code></pre></figure><div class="table-wrap "><table><thead><tr><th scope="col">Policy</th><th scope="col">Choice in the complete example</th></tr></thead><tbody><tr><td>Clock</td><td><code>System.nanoTime()</code> for elapsed time; injectable ticker for tests.</td></tr><tr><td>TTL start</td><td>After a successful load finishes; equality at the TTL boundary counts as expired.</td></tr><tr><td>Capacity</td><td>A positive maximum number of entries, with least-recently-used eviction.</td></tr><tr><td>Failures and missing values</td><td>Do not cache exceptions or <code>null</code>.</td></tr><tr><td>Concurrency</td><td>Serialize lookup and load under one monitor, including remote work.</td></tr><tr><td>Invalidation</td><td>Explicit per-ID invalidation; no background cleanup or distributed coherence.</td></tr></tbody></table></div><p>Elapsed-time subtraction follows the JDK’s guidance; do not treat the ticker as wall-clock time. <a class="source-ref" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()">System.nanoTime</a></p><aside class="callout warning"><strong>Deliberate tradeoff</strong><p>The monitor makes this example easy to reason about, but one slow load blocks all reads through this cache, even for other keys. A high-throughput system needs a separately designed loading and concurrency policy. The pattern supplies a location for caching, not cache correctness.</p></aside></section><section class="step" id="step-23"><h3><span class="step-number">23</span>Control capacity with a rate-limiting proxy</h3><figure class="code "><figcaption>Rate-limiting proxy · complete nested class</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> RateLimitedRepository
+        <span class="keyword">implements</span> DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+    <span class="keyword">private</span> <span class="keyword">final</span> RateLimiter limiter;
+
+    <span class="keyword">public</span> RateLimitedRepository(DocumentRepository target, RateLimiter limiter) {
+        this.target = Objects.requireNonNull(target);
+        this.limiter = Objects.requireNonNull(limiter);
+    }
+
+    @Override
+    <span class="keyword">public</span> Document findById(String id) {
+        <span class="keyword">if</span> (!limiter.tryAcquire()) <span class="keyword">throw</span> <span class="keyword">new</span> RateLimitExceededException();
+        <span class="keyword">return</span> target.findById(id);
+    }
+}</code></pre></figure><p><code>RateLimiter</code> is a lesson-defined interface, not a JDK class. The complete source supplies a synchronized fixed-window implementation. Each permit counts an attempted target call, including a call that later fails.</p><div class="table-wrap "><table><thead><tr><th scope="col">Outer → inner</th><th scope="col">What consumes a permit?</th></tr></thead><tbody><tr><td>Cache → RateLimit → Remote</td><td>Cache misses that attempt remote access.</td></tr><tr><td>RateLimit → Cache → Remote</td><td>Every allowed call reaching the limiter, including cache hits.</td></tr></tbody></table></div><p>The original requirement was to limit <strong>remote storage calls</strong>, so our composition places the cache outside the limiter. The supplied limiter is local to one instance, shares one quota, and allows bursts around a window boundary. It is not a distributed or per-user limit.</p></section><section class="step" id="step-24"><h3><span class="step-number">24</span>Audit attempts and outcomes</h3><p>An audit wrapper records an attempt, then either success or failure. It must also decide what happens when recording itself fails. The full implementation preserves a target failure and adds a failure-log error as a suppressed exception.</p><figure class="code "><figcaption>Audit method · constructor and AuditEvent are in the appendix</figcaption><pre><code>@Override
+    <span class="keyword">public</span> Document findById(String id) {
+        String user = currentUser.get();
+        audit.<span class="keyword">record</span>(<span class="keyword">new</span> AuditEvent(user, id, <span class="string">&quot;ATTEMPT&quot;</span>, <span class="string">&quot;&quot;</span>));
+        Document result;
+        <span class="keyword">try</span> {
+            result = target.findById(id);
+        } <span class="keyword">catch</span> (RuntimeException failure) {
+            <span class="keyword">try</span> {
+                audit.<span class="keyword">record</span>(<span class="keyword">new</span> AuditEvent(user, id, <span class="string">&quot;FAILURE&quot;</span>,
+                        failure.getClass().getSimpleName()));
+            } <span class="keyword">catch</span> (RuntimeException auditFailure) {
+                <span class="keyword">if</span> (auditFailure != failure) failure.addSuppressed(auditFailure);
+            }
+            <span class="keyword">throw</span> failure;
+        }
+        audit.<span class="keyword">record</span>(<span class="keyword">new</span> AuditEvent(user, id, <span class="string">&quot;SUCCESS&quot;</span>, <span class="string">&quot;&quot;</span>));
+        <span class="keyword">return</span> result;</code></pre></figure><p>This example propagates an attempt-log failure before delegation and a success-log failure before returning the result. It catches target <code>RuntimeException</code>s; it is not an exhaustive recorder of JVM errors or process crashes. Audit durability, sensitive-field redaction, correlation IDs, and sink failure policy need explicit production decisions.</p></section><section class="step" id="step-25"><h3><span class="step-number">25</span>Combine wrappers around a stated policy</h3><p>For this lesson, the decisions are: record attempts including denials; authorize every read; count only remote attempts against the quota; create storage only when needed.</p><div class="table-wrap "><table><thead><tr><th scope="col">Call enters in this order</th><th scope="col">Purpose</th></tr></thead><tbody><tr><td>1 · Audit</td><td>See attempts, denied reads, successful cache hits, and retrieval failures.</td></tr><tr><td>2 · Authorization</td><td>Check permission before any protected value can be returned.</td></tr><tr><td>3 · Cache</td><td>Return a valid cached document without consuming a remote permit.</td></tr><tr><td>4 · Rate limit</td><td>Gate calls that need the remote target.</td></tr><tr><td>5 · Lazy repository</td><td>Create the target on the first permitted remote read.</td></tr><tr><td>6 · Remote repository</td><td>Download the document.</td></tr></tbody></table></div><aside class="callout warning"><strong>An inconsistency to resolve</strong><p>Authorization → Audit cannot record authorization denials in that audit wrapper, because the call never reaches it. If “audit every failed access” includes denied requests, Audit must be outside Authorization, or denials must be recorded separately.</p></aside><p>The innermost successful result returns outward through the chain. A wrapper can return early or throw, so later wrappers may never run. Runtime semantics come from the whole chain.</p></section><section class="step" id="step-26"><h3><span class="step-number">26</span>Keep wiring at the composition root</h3><figure class="code "><figcaption>Composition root · complete factory method</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">static</span> DocumentRepository buildDocumentRepository(
+        Supplier&lt;StorageClient&gt; storageFactory,
+        AuthorizationService authorization,
+        Supplier&lt;String&gt; currentUser, AuditLog audit,
+        RateLimiter limiter) {
+    DocumentRepository repository = <span class="keyword">new</span> LazyDocumentRepository(
+            () -&gt; <span class="keyword">new</span> RemoteDocumentRepository(storageFactory.get()));
+    repository = <span class="keyword">new</span> RateLimitedRepository(repository, limiter);
+    repository = <span class="keyword">new</span> CachedDocumentRepository(repository,
+            Duration.ofMinutes(5), 100, System::nanoTime);
+    repository = <span class="keyword">new</span> AuthorizedDocumentRepository(
+            repository, authorization, currentUser);
+    <span class="keyword">return</span> <span class="keyword">new</span> AuditedRepository(repository, audit, currentUser);
+}</code></pre></figure><p>Build from the target outward, then hand the outer reference to business code. This keeps policy wiring in one reviewable place. The factory assembles the chain once; the proxy objects remain in the path of subsequent calls.</p>
+<p>In a concurrent application, use a trusted request context that remains consistent throughout the call. The audit sink, authorization service, and target must each support the intended concurrency. A synchronized cache does not make the entire application thread-safe.</p></section></section><section class="chapter" id="tests"><div class="chapter-heading"><span class="eyebrow">PART 07</span><h2>Test the behavior the proxy owns</h2><p>Steps 27–28 · Verify both isolation and the assembled chain</p></div><section class="step" id="step-27"><h3><span class="step-number">27</span>Prove denied access never reaches the target</h3><figure class="code "><figcaption>Self-check pattern · helpers defined in ProxyLesson.java</figcaption><pre><code>AtomicInteger calls = <span class="keyword">new</span> AtomicInteger();
+DocumentRepository target = id -&gt; {
+    calls.incrementAndGet();
+    <span class="keyword">return</span> <span class="keyword">new</span> Document(id, <span class="string">&quot;body&quot;</span>);
+};
+AuthorizationService deny = (user, id) -&gt; {
+    <span class="keyword">throw</span> <span class="keyword">new</span> AccessDeniedException();
+};
+<span class="keyword">var</span> proxy = <span class="keyword">new</span> AuthorizedDocumentRepository(
+        target, deny, () -&gt; <span class="string">&quot;learner&quot;</span>);
+
+expect(AccessDeniedException.<span class="keyword">class</span>,
+        () -&gt; proxy.findById(<span class="string">&quot;DOC-1&quot;</span>));
+check(calls.get() == 0, <span class="string">&quot;Denied request reached target&quot;</span>);</code></pre></figure><p>The important assertion is not only that an exception occurred. It is that the target was never called. Repeat this test with a warmed cache inside authorization; a cache hit must not bypass the check.</p></section><section class="step" id="step-28"><h3><span class="step-number">28</span>Test cache and composition semantics</h3><div class="table-wrap "><table><thead><tr><th scope="col">Scenario</th><th scope="col">Required observation</th></tr></thead><tbody><tr><td>Read one ID twice before expiry</td><td>Only one target load.</td></tr><tr><td>Reach the TTL boundary</td><td>A new load occurs without sleeping in the test.</td></tr><tr><td>Exceed capacity and revisit an evicted key</td><td>The evicted key is loaded again.</td></tr><tr><td>Invalidate a key</td><td>The next read loads it again.</td></tr><tr><td>Concurrent first use of the lazy proxy</td><td>One target construction.</td></tr><tr><td>Cache hit with the remote quota exhausted</td><td>The cached read succeeds; a miss is rejected.</td></tr><tr><td>Authorization denial inside outer audit</td><td>Attempt and failure are recorded.</td></tr><tr><td>Target failure plus audit-sink failure</td><td>The original failure survives; audit failure is suppressed.</td></tr><tr><td>Full chain: repeated public read, then denied read</td><td>One load, two audited successes, one audited denial.</td></tr></tbody></table></div><p>The complete source runs these checks with explicit <code>AssertionError</code>s. No test framework, extra dependency, sleeps, or <code>-ea</code> flag is required. The dynamic-proxy demo separately verifies target exception propagation and its Object-method policy.</p></section></section><section class="chapter" id="judgment"><div class="chapter-heading"><span class="eyebrow">PART 08</span><h2>Decide whether Proxy fits</h2><p>Steps 29–31 · Keep the abstraction honest</p></div><section class="step" id="step-29"><h3><span class="step-number">29</span>When Proxy is useful</h3><p>Strong signals include expensive initialization, remote access, permission checks, cache access, resource quotas, and audit policy. In each case, ask whether an intervening object can preserve the caller’s contract while controlling access.</p>
+<p>A wrapper is useful when it separates a meaningful policy. A forwarding class with no policy, no substituted location, and no expected variation may add little value.</p></section><section class="step" id="step-30"><h3><span class="step-number">30</span>When Proxy hides too much</h3><p>A method that looks like a simple lookup may perform authorization, cache loading, remote calls, and retry attempts. Hiding the plumbing can help clients; hiding latency and failure behavior can mislead them.</p>
+<p>Make timeouts, consistency, authorization, and failure semantics part of the documented contract. Track the actual path in diagnostics. Choose explicit bulk or asynchronous APIs when the use case needs them.</p><aside class="callout key"><strong>The boundary to preserve</strong><p>Interface compatibility is not a promise of identical performance, failure modes, or consistency. A good abstraction still tells callers what they need to plan around.</p></aside></section><section class="step" id="step-31"><h3><span class="step-number">31</span>Reason from first principles</h3><ol class="decision-list"><li>Does the caller already depend on the right abstraction?</li><li>Do I need an object to stand between the caller and the implementation?</li><li>Should it control whether, when, or how the target is accessed?</li><li>Should callers keep seeing the same interface?</li><li>Can I state and test the semantics of the resulting call path?</li></ol>
+<p>If these answers fit the problem, Proxy is a strong candidate. Choose the abstraction and policy first; use the pattern name to communicate the resulting design.</p></section></section><section class="chapter" id="exercise"><div class="chapter-heading"><span class="eyebrow">PRACTICE</span><h2>Exercise · protect user profiles</h2><p>Transfer the reasoning to a new subject.</p></div>
+<p>Start with this contract. Implement a fake remote repository that returns a real value and counts calls, then add independent authorization, cache, rate-limit, and audit wrappers.</p><figure class="code "><figcaption>Exercise contract · use separate files for public top-level types</figcaption><pre><code><span class="keyword">public</span> <span class="keyword">record</span> UserProfile(String userId, String displayName) {}
+
+<span class="keyword">public</span> <span class="keyword">interface</span> UserProfileRepository {
+    UserProfile find(String userId);
+}</code></pre></figure>
+<p>Use this call order when auditing includes denied access and rate limiting counts remote attempts:</p>
+<p class="order-line">Audit → Authorization → Cache → RateLimit → Remote</p>
+<ol class="acceptance"><li>The client depends only on <code>UserProfileRepository</code>.</li><li>Unauthorized requests return no protected profile and never reach the remote repository.</li><li>Cache hits avoid network work and still undergo authorization.</li><li>Cached reads do not consume the remote-call quota; explain how to change that policy.</li><li>Audit attempted, successful, and failed access, including authorization denial.</li><li>Test each wrapper and at least one complete composition.</li><li>Explain one concrete behavior change caused by reversing two wrappers.</li></ol>
+<div class="reflection"><h4>Questions to answer before coding</h4><p>Is a profile’s content identical for all authorized callers? Which dimensions belong in the cache key? What happens when permission is revoked or the profile changes? Should an unavailable audit sink block the read?</p></div>
+<details class="answer"><summary>Review notes</summary><div><p>For the stated policy, outer audit sees denial; authorization outside cache checks every read; cache outside limiter avoids charging for hits. A per-user read quota would move the limiter outside cache. None of those choices alone solves cache invalidation or a changing authorization decision during an in-flight request.</p></div></details>
+<div class="next"><span class="eyebrow">NEXT · LESSON 11</span><h3>Composite</h3><p>The next pressure is a part-whole hierarchy. When a file and a directory can support a meaningful common operation such as <code>size()</code>, a shared component abstraction lets callers operate on one item or an entire tree. Proxy’s question is access; Composite’s question is recursive structure.</p></div></section><section class="chapter appendix" id="source"><div class="chapter-heading"><span class="eyebrow">RUNNABLE SOURCE</span><h2>Complete Java examples</h2><p>Three source files are embedded below. No external assets or dependencies.</p></div>
+<p>Save all three files in the same directory. On JDK 25, use:</p><figure class="code "><figcaption>Terminal · JDK 25</figcaption><pre><code>javac --release 25 ProxyLesson.java DynamicProxyDemo.java HttpDocumentRepository.java
+java ProxyLesson
+java DynamicProxyDemo</code></pre></figure>
+<p><code>ProxyLesson</code> uses a fake storage client, so its checks run offline. <code>DynamicProxyDemo</code> also runs locally. <code>HttpDocumentRepository</code> is a reusable implementation with no <code>main</code>; compile it with <code>ProxyLesson</code> and supply a real client and endpoint when integrating it.</p>
+<p>The main checks print <code>ProxyLesson: all checks passed</code>. The dynamic demo prints its call trace, then <code>DynamicProxyDemo: all checks passed</code>.</p>
+<aside class="callout validation"><strong>Compatibility and validation</strong><p>Uses stable Java features and APIs available in Java 25; no preview flags. All three files compiled, and both executable check suites passed, on the available OpenJDK 17.0.20 runtime. Java 25 APIs were checked against Oracle’s versioned documentation. A JDK 25 execution and live HTTP integration were not available in this validation environment.</p></aside>
+<p class="small">Lesson excerpts omit imports and surrounding containers where indicated. In <code>ProxyLesson.java</code> and <code>DynamicProxyDemo.java</code>, helper types are nested so each program fits in one file. The complete files below are the authoritative runnable versions.</p><section class="source-file" id="file-0"><div class="source-title"><h3>ProxyLesson.java</h3><div class="source-actions"><button type="button" data-toggle="source-0" aria-expanded="false">Show source</button><button type="button" data-copy="source-0">Copy</button><button type="button" data-download="source-0" data-name="ProxyLesson.java">Download .java</button></div></div><div class="source-body" id="source-0"><figure class="code full-source"><figcaption>ProxyLesson.java</figcaption><pre><code><span class="keyword">import</span> java.time.Duration;
+<span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.HashMap;
+<span class="keyword">import</span> java.util.LinkedHashMap;
+<span class="keyword">import</span> java.util.List;
+<span class="keyword">import</span> java.util.Map;
+<span class="keyword">import</span> java.util.Objects;
+<span class="keyword">import</span> java.util.concurrent.Executors;
+<span class="keyword">import</span> java.util.concurrent.Callable;
+<span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;
+<span class="keyword">import</span> java.util.concurrent.atomic.AtomicLong;
+<span class="keyword">import</span> java.util.function.LongSupplier;
+<span class="keyword">import</span> java.util.function.Supplier;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> ProxyLesson {
+    <span class="comment">// Contract: return a non-null document, or throw a RuntimeException.</span>
+    <span class="keyword">public</span> <span class="keyword">record</span> Document(String id, String body) {
+        <span class="keyword">public</span> Document {
+            Objects.requireNonNull(id);
+            Objects.requireNonNull(body);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">interface</span> DocumentRepository {
+        Document findById(String id);
+    }
+
+    @FunctionalInterface
+    <span class="keyword">public</span> <span class="keyword">interface</span> StorageClient {
+        Document download(String id);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> RemoteDocumentRepository
+            <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">final</span> StorageClient storage;
+
+        <span class="keyword">public</span> RemoteDocumentRepository(StorageClient storage) {
+            this.storage = Objects.requireNonNull(storage);
+        }
+
+        @Override
+        <span class="keyword">public</span> Document findById(String id) {
+            <span class="keyword">return</span> Objects.requireNonNull(storage.download(id));
+        }
+    }
+
+    @FunctionalInterface
+    <span class="keyword">public</span> <span class="keyword">interface</span> AuthorizationService {
+        <span class="keyword">void</span> checkCanRead(String userId, String documentId);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> AccessDeniedException
+            <span class="keyword">extends</span> RuntimeException {
+        <span class="keyword">public</span> AccessDeniedException() { super(<span class="string">&quot;Access denied&quot;</span>); }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> AuthorizedDocumentRepository
+            <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+        <span class="keyword">private</span> <span class="keyword">final</span> AuthorizationService authorization;
+        <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt;String&gt; currentUser;
+
+        <span class="keyword">public</span> AuthorizedDocumentRepository(
+                DocumentRepository target,
+                AuthorizationService authorization,
+                Supplier&lt;String&gt; currentUser) {
+            this.target = Objects.requireNonNull(target);
+            this.authorization = Objects.requireNonNull(authorization);
+            this.currentUser = Objects.requireNonNull(currentUser);
+        }
+
+        @Override
+        <span class="keyword">public</span> Document findById(String id) {
+            authorization.checkCanRead(currentUser.get(), id);
+            <span class="keyword">return</span> target.findById(id);
+        }
+    }
+
+    <span class="comment">// Stage 1: single-threaded, unbounded, no expiration.</span>
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> SimpleCachedRepository
+            <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+        <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Document&gt; cache = <span class="keyword">new</span> HashMap&lt;&gt;();
+
+        <span class="keyword">public</span> SimpleCachedRepository(DocumentRepository target) {
+            this.target = Objects.requireNonNull(target);
+        }
+
+        @Override
+        <span class="keyword">public</span> Document findById(String id) {
+            Document cached = cache.get(id);
+            <span class="keyword">if</span> (cached != <span class="keyword">null</span>) <span class="keyword">return</span> cached;
+            Document loaded = Objects.requireNonNull(target.findById(id));
+            cache.put(id, loaded);
+            <span class="keyword">return</span> loaded;
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> LazyDocumentRepository
+            <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt;DocumentRepository&gt; factory;
+        <span class="keyword">private</span> DocumentRepository target;
+
+        <span class="keyword">public</span> LazyDocumentRepository(Supplier&lt;DocumentRepository&gt; factory) {
+            this.factory = Objects.requireNonNull(factory);
+        }
+
+        <span class="keyword">private</span> <span class="keyword">synchronized</span> DocumentRepository target() {
+            <span class="keyword">if</span> (target == <span class="keyword">null</span>) {
+                target = Objects.requireNonNull(factory.get());
+            }
+            <span class="keyword">return</span> target;
+        }
+
+        @Override
+        <span class="keyword">public</span> Document findById(String id) {
+            <span class="keyword">return</span> target().findById(id);
+        }
+    }
+
+    <span class="comment">// Stage 2: bounded LRU + TTL; serializes all reads and loads.</span>
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> CachedDocumentRepository
+            <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">record</span> Entry(Document document, <span class="keyword">long</span> loadedAt) {}
+        <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+        <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> ttlNanos;
+        <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> maxEntries;
+        <span class="keyword">private</span> <span class="keyword">final</span> LongSupplier ticker;
+        <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Entry&gt; cache =
+                <span class="keyword">new</span> LinkedHashMap&lt;&gt;(16, 0.75f, <span class="keyword">true</span>);
+
+        <span class="keyword">public</span> CachedDocumentRepository(DocumentRepository target,
+                Duration ttl, <span class="keyword">int</span> maxEntries, LongSupplier ticker) {
+            this.target = Objects.requireNonNull(target);
+            this.ticker = Objects.requireNonNull(ticker);
+            this.ttlNanos = Objects.requireNonNull(ttl).toNanos();
+            <span class="keyword">if</span> (ttlNanos &lt;= 0 || maxEntries &lt;= 0) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Positive TTL and capacity required&quot;</span>);
+            }
+            this.maxEntries = maxEntries;
+        }
+
+        @Override
+        <span class="keyword">public</span> <span class="keyword">synchronized</span> Document findById(String id) {
+            Entry entry = cache.get(id);
+            <span class="keyword">long</span> now = ticker.getAsLong();
+            <span class="keyword">if</span> (entry != <span class="keyword">null</span> &amp;&amp; now - entry.loadedAt() &lt; ttlNanos) {
+                <span class="keyword">return</span> entry.document();
+            }
+            cache.remove(id);
+            Document loaded = Objects.requireNonNull(target.findById(id));
+            cache.put(id, <span class="keyword">new</span> Entry(loaded, ticker.getAsLong()));
+            <span class="keyword">if</span> (cache.size() &gt; maxEntries) {
+                <span class="keyword">var</span> eldest = cache.entrySet().iterator();
+                eldest.next();
+                eldest.remove();
+            }
+            <span class="keyword">return</span> loaded;
+        }
+
+        <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> invalidate(String id) {
+            cache.remove(id);
+        }
+    }
+
+    @FunctionalInterface
+    <span class="keyword">public</span> <span class="keyword">interface</span> RateLimiter {
+        <span class="keyword">boolean</span> tryAcquire();
+    }
+
+    <span class="comment">// One limiter instance, one fixed window; not a distributed quota.</span>
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> FixedWindowRateLimiter <span class="keyword">implements</span> RateLimiter {
+        <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> limit;
+        <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> windowNanos;
+        <span class="keyword">private</span> <span class="keyword">final</span> LongSupplier ticker;
+        <span class="keyword">private</span> <span class="keyword">long</span> started;
+        <span class="keyword">private</span> <span class="keyword">int</span> used;
+
+        <span class="keyword">public</span> FixedWindowRateLimiter(<span class="keyword">int</span> limit, Duration window,
+                LongSupplier ticker) {
+            this.windowNanos = Objects.requireNonNull(window).toNanos();
+            <span class="keyword">if</span> (limit &lt;= 0 || windowNanos &lt;= 0) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Positive limit and window required&quot;</span>);
+            }
+            this.limit = limit;
+            this.ticker = Objects.requireNonNull(ticker);
+            this.started = ticker.getAsLong();
+        }
+
+        @Override
+        <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">boolean</span> tryAcquire() {
+            <span class="keyword">long</span> now = ticker.getAsLong();
+            <span class="keyword">if</span> (now - started &gt;= windowNanos) {
+                started = now;
+                used = 0;
+            }
+            <span class="keyword">if</span> (used &gt;= limit) <span class="keyword">return</span> <span class="keyword">false</span>;
+            used++;
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> RateLimitExceededException
+            <span class="keyword">extends</span> RuntimeException {
+        <span class="keyword">public</span> RateLimitExceededException() { super(<span class="string">&quot;Rate limit exceeded&quot;</span>); }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> RateLimitedRepository
+            <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+        <span class="keyword">private</span> <span class="keyword">final</span> RateLimiter limiter;
+
+        <span class="keyword">public</span> RateLimitedRepository(DocumentRepository target, RateLimiter limiter) {
+            this.target = Objects.requireNonNull(target);
+            this.limiter = Objects.requireNonNull(limiter);
+        }
+
+        @Override
+        <span class="keyword">public</span> Document findById(String id) {
+            <span class="keyword">if</span> (!limiter.tryAcquire()) <span class="keyword">throw</span> <span class="keyword">new</span> RateLimitExceededException();
+            <span class="keyword">return</span> target.findById(id);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">record</span> AuditEvent(String user, String documentId,
+            String outcome, String detail) {}
+
+    @FunctionalInterface
+    <span class="keyword">public</span> <span class="keyword">interface</span> AuditLog {
+        <span class="keyword">void</span> <span class="keyword">record</span>(AuditEvent event);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> AuditedRepository <span class="keyword">implements</span> DocumentRepository {
+        <span class="keyword">private</span> <span class="keyword">final</span> DocumentRepository target;
+        <span class="keyword">private</span> <span class="keyword">final</span> AuditLog audit;
+        <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt;String&gt; currentUser;
+
+        <span class="keyword">public</span> AuditedRepository(DocumentRepository target, AuditLog audit,
+                Supplier&lt;String&gt; currentUser) {
+            this.target = Objects.requireNonNull(target);
+            this.audit = Objects.requireNonNull(audit);
+            this.currentUser = Objects.requireNonNull(currentUser);
+        }
+
+        @Override
+        <span class="keyword">public</span> Document findById(String id) {
+            String user = currentUser.get();
+            audit.<span class="keyword">record</span>(<span class="keyword">new</span> AuditEvent(user, id, <span class="string">&quot;ATTEMPT&quot;</span>, <span class="string">&quot;&quot;</span>));
+            Document result;
+            <span class="keyword">try</span> {
+                result = target.findById(id);
+            } <span class="keyword">catch</span> (RuntimeException failure) {
+                <span class="keyword">try</span> {
+                    audit.<span class="keyword">record</span>(<span class="keyword">new</span> AuditEvent(user, id, <span class="string">&quot;FAILURE&quot;</span>,
+                            failure.getClass().getSimpleName()));
+                } <span class="keyword">catch</span> (RuntimeException auditFailure) {
+                    <span class="keyword">if</span> (auditFailure != failure) failure.addSuppressed(auditFailure);
+                }
+                <span class="keyword">throw</span> failure;
+            }
+            audit.<span class="keyword">record</span>(<span class="keyword">new</span> AuditEvent(user, id, <span class="string">&quot;SUCCESS&quot;</span>, <span class="string">&quot;&quot;</span>));
+            <span class="keyword">return</span> result;
+        }
+    }
+
+    <span class="comment">// Request flow: Audit -&gt; Authorization -&gt; Cache -&gt; RateLimit -&gt; Lazy -&gt; Remote.</span>
+    <span class="keyword">public</span> <span class="keyword">static</span> DocumentRepository buildDocumentRepository(
+            Supplier&lt;StorageClient&gt; storageFactory,
+            AuthorizationService authorization,
+            Supplier&lt;String&gt; currentUser, AuditLog audit,
+            RateLimiter limiter) {
+        DocumentRepository repository = <span class="keyword">new</span> LazyDocumentRepository(
+                () -&gt; <span class="keyword">new</span> RemoteDocumentRepository(storageFactory.get()));
+        repository = <span class="keyword">new</span> RateLimitedRepository(repository, limiter);
+        repository = <span class="keyword">new</span> CachedDocumentRepository(repository,
+                Duration.ofMinutes(5), 100, System::nanoTime);
+        repository = <span class="keyword">new</span> AuthorizedDocumentRepository(
+                repository, authorization, currentUser);
+        <span class="keyword">return</span> <span class="keyword">new</span> AuditedRepository(repository, audit, currentUser);
+    }
+
+    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> check(<span class="keyword">boolean</span> condition, String message) {
+        <span class="keyword">if</span> (!condition) <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(message);
+    }
+
+    <span class="keyword">private</span> <span class="keyword">static</span> &lt;T <span class="keyword">extends</span> RuntimeException&gt; T expect(
+            Class&lt;T&gt; type, Runnable action) {
+        <span class="keyword">try</span> {
+            action.run();
+        } <span class="keyword">catch</span> (RuntimeException failure) {
+            <span class="keyword">if</span> (type.isInstance(failure)) <span class="keyword">return</span> type.cast(failure);
+            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;Unexpected failure&quot;</span>, failure);
+        }
+        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;Expected &quot;</span> + type.getSimpleName());
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) <span class="keyword">throws</span> Exception {
+        AtomicInteger remoteCalls = <span class="keyword">new</span> AtomicInteger();
+        DocumentRepository remote = id -&gt; {
+            remoteCalls.incrementAndGet();
+            <span class="keyword">return</span> <span class="keyword">new</span> Document(id, <span class="string">&quot;body&quot;</span>);
+        };
+        AuthorizationService deny = (user, id) -&gt; {
+            <span class="keyword">throw</span> <span class="keyword">new</span> AccessDeniedException();
+        };
+        Supplier&lt;String&gt; user = () -&gt; <span class="string">&quot;learner&quot;</span>;
+
+        <span class="comment">// A denied request never reaches the target.</span>
+        <span class="keyword">var</span> protectedRemote = <span class="keyword">new</span> AuthorizedDocumentRepository(remote, deny, user);
+        expect(AccessDeniedException.<span class="keyword">class</span>, () -&gt; protectedRemote.findById(<span class="string">&quot;DOC-1&quot;</span>));
+        check(remoteCalls.get() == 0, <span class="string">&quot;Denied request reached remote&quot;</span>);
+
+        <span class="comment">// Authorization stays outside a warm cache.</span>
+        <span class="keyword">var</span> cache = <span class="keyword">new</span> SimpleCachedRepository(remote);
+        cache.findById(<span class="string">&quot;DOC-1&quot;</span>);
+        cache.findById(<span class="string">&quot;DOC-1&quot;</span>);
+        check(remoteCalls.get() == 1, <span class="string">&quot;Cache did not reuse the value&quot;</span>);
+        <span class="keyword">var</span> protectedCache = <span class="keyword">new</span> AuthorizedDocumentRepository(cache, deny, user);
+        expect(AccessDeniedException.<span class="keyword">class</span>, () -&gt; protectedCache.findById(<span class="string">&quot;DOC-1&quot;</span>));
+        check(remoteCalls.get() == 1, <span class="string">&quot;Denied cached read reached remote&quot;</span>);
+
+        <span class="comment">// Bounded cache: deterministic TTL and eviction checks, without sleeps.</span>
+        AtomicLong time = <span class="keyword">new</span> AtomicLong();
+        AtomicInteger loads = <span class="keyword">new</span> AtomicInteger();
+        <span class="keyword">var</span> bounded = <span class="keyword">new</span> CachedDocumentRepository(id -&gt; {
+            loads.incrementAndGet();
+            <span class="keyword">return</span> <span class="keyword">new</span> Document(id, <span class="string">&quot;body&quot;</span>);
+        }, Duration.ofNanos(10), 2, time::get);
+        bounded.findById(<span class="string">&quot;A&quot;</span>);
+        time.set(9);
+        bounded.findById(<span class="string">&quot;A&quot;</span>);
+        check(loads.get() == 1, <span class="string">&quot;Entry expired too early&quot;</span>);
+        time.set(10);
+        bounded.findById(<span class="string">&quot;A&quot;</span>);
+        check(loads.get() == 2, <span class="string">&quot;Entry must expire at the TTL boundary&quot;</span>);
+        bounded.findById(<span class="string">&quot;B&quot;</span>);
+        bounded.findById(<span class="string">&quot;A&quot;</span>); <span class="comment">// A becomes the most recently used.</span>
+        bounded.findById(<span class="string">&quot;C&quot;</span>); <span class="comment">// B is evicted.</span>
+        bounded.findById(<span class="string">&quot;B&quot;</span>);
+        check(loads.get() == 5, <span class="string">&quot;LRU capacity rule failed&quot;</span>);
+        bounded.invalidate(<span class="string">&quot;B&quot;</span>);
+        bounded.findById(<span class="string">&quot;B&quot;</span>);
+        check(loads.get() == 6, <span class="string">&quot;Invalidation failed&quot;</span>);
+
+        <span class="comment">// Concurrent callers construct a lazy target only once.</span>
+        AtomicInteger builds = <span class="keyword">new</span> AtomicInteger();
+        <span class="keyword">var</span> lazy = <span class="keyword">new</span> LazyDocumentRepository(() -&gt; {
+            builds.incrementAndGet();
+            <span class="keyword">return</span> remote;
+        });
+        check(builds.get() == 0, <span class="string">&quot;Lazy proxy constructed eagerly&quot;</span>);
+        <span class="keyword">var</span> pool = Executors.newFixedThreadPool(4);
+        <span class="keyword">try</span> {
+            List&lt;Callable&lt;Document&gt;&gt; tasks = <span class="keyword">new</span> ArrayList&lt;&gt;();
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; 8; i++) tasks.add(() -&gt; lazy.findById(<span class="string">&quot;A&quot;</span>));
+            <span class="keyword">for</span> (<span class="keyword">var</span> result : pool.invokeAll(tasks)) result.get();
+        } finally {
+            pool.shutdown();
+        }
+        check(builds.get() == 1, <span class="string">&quot;Lazy target was constructed more than once&quot;</span>);
+
+        <span class="comment">// Cache hits do not consume this remote-call quota.</span>
+        time.set(0);
+        <span class="keyword">var</span> limiter = <span class="keyword">new</span> FixedWindowRateLimiter(1,
+                Duration.ofNanos(10), time::get);
+        <span class="keyword">var</span> limitedCache = <span class="keyword">new</span> SimpleCachedRepository(
+                <span class="keyword">new</span> RateLimitedRepository(remote, limiter));
+        limitedCache.findById(<span class="string">&quot;X&quot;</span>);
+        limitedCache.findById(<span class="string">&quot;X&quot;</span>);
+        expect(RateLimitExceededException.<span class="keyword">class</span>, () -&gt; limitedCache.findById(<span class="string">&quot;Y&quot;</span>));
+        time.set(10);
+        limitedCache.findById(<span class="string">&quot;Y&quot;</span>);
+
+        <span class="comment">// Outer audit sees authorization failures.</span>
+        List&lt;AuditEvent&gt; events = <span class="keyword">new</span> ArrayList&lt;&gt;();
+        <span class="keyword">var</span> audited = <span class="keyword">new</span> AuditedRepository(protectedRemote, events::add, user);
+        expect(AccessDeniedException.<span class="keyword">class</span>, () -&gt; audited.findById(<span class="string">&quot;SECRET&quot;</span>));
+        check(events.size() == 2
+                &amp;&amp; events.get(0).outcome().equals(<span class="string">&quot;ATTEMPT&quot;</span>)
+                &amp;&amp; events.get(1).outcome().equals(<span class="string">&quot;FAILURE&quot;</span>), <span class="string">&quot;Denied read was not audited&quot;</span>);
+
+        <span class="comment">// A failed failure-log write must not hide the original error.</span>
+        RuntimeException original = <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;storage down&quot;</span>);
+        <span class="keyword">var</span> auditFailureProxy = <span class="keyword">new</span> AuditedRepository(id -&gt; { <span class="keyword">throw</span> original; }, event -&gt; {
+            <span class="keyword">if</span> (event.outcome().equals(<span class="string">&quot;FAILURE&quot;</span>)) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;log down&quot;</span>);
+        }, user);
+        RuntimeException caught = expect(IllegalStateException.<span class="keyword">class</span>,
+                () -&gt; auditFailureProxy.findById(<span class="string">&quot;A&quot;</span>));
+        check(caught == original &amp;&amp; caught.getSuppressed().length == 1,
+                <span class="string">&quot;Original failure was lost&quot;</span>);
+
+        <span class="comment">// Full composition: one remote read, two audited successes, one denial.</span>
+        AtomicInteger fullLoads = <span class="keyword">new</span> AtomicInteger();
+        List&lt;AuditEvent&gt; fullAudit = <span class="keyword">new</span> ArrayList&lt;&gt;();
+        DocumentRepository repository = buildDocumentRepository(
+                () -&gt; id -&gt; {
+                    fullLoads.incrementAndGet();
+                    <span class="keyword">return</span> <span class="keyword">new</span> Document(id, <span class="string">&quot;body&quot;</span>);
+                }, (who, id) -&gt; {
+                    <span class="keyword">if</span> (id.equals(<span class="string">&quot;SECRET&quot;</span>)) <span class="keyword">throw</span> <span class="keyword">new</span> AccessDeniedException();
+                }, user, fullAudit::add, () -&gt; <span class="keyword">true</span>);
+        repository.findById(<span class="string">&quot;PUBLIC&quot;</span>);
+        repository.findById(<span class="string">&quot;PUBLIC&quot;</span>);
+        expect(AccessDeniedException.<span class="keyword">class</span>, () -&gt; repository.findById(<span class="string">&quot;SECRET&quot;</span>));
+        check(fullLoads.get() == 1 &amp;&amp; fullAudit.size() == 6,
+                <span class="string">&quot;Composition semantics changed&quot;</span>);
+        System.out.println(<span class="string">&quot;ProxyLesson: all checks passed&quot;</span>);
+    }
+}</code></pre></figure></div></section><section class="source-file" id="file-1"><div class="source-title"><h3>DynamicProxyDemo.java</h3><div class="source-actions"><button type="button" data-toggle="source-1" aria-expanded="false">Show source</button><button type="button" data-copy="source-1">Copy</button><button type="button" data-download="source-1" data-name="DynamicProxyDemo.java">Download .java</button></div></div><div class="source-body" id="source-1"><figure class="code full-source"><figcaption>DynamicProxyDemo.java</figcaption><pre><code><span class="keyword">import</span> java.lang.reflect.InvocationHandler;
+<span class="keyword">import</span> java.lang.reflect.InvocationTargetException;
+<span class="keyword">import</span> java.lang.reflect.Method;
+<span class="keyword">import</span> java.lang.reflect.Proxy;
+<span class="keyword">import</span> java.util.Objects;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> DynamicProxyDemo {
+    <span class="keyword">public</span> <span class="keyword">interface</span> PaymentService {
+        <span class="keyword">void</span> charge(<span class="keyword">long</span> cents);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> DemoPaymentService <span class="keyword">implements</span> PaymentService {
+        @Override
+        <span class="keyword">public</span> <span class="keyword">void</span> charge(<span class="keyword">long</span> cents) {
+            <span class="keyword">if</span> (cents &lt;= 0) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Positive cents required&quot;</span>);
+            System.out.println(<span class="string">&quot;Charging &quot;</span> + cents);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> LoggingHandler <span class="keyword">implements</span> InvocationHandler {
+        <span class="keyword">private</span> <span class="keyword">final</span> Object target;
+
+        <span class="keyword">public</span> LoggingHandler(Object target) {
+            this.target = Objects.requireNonNull(target);
+        }
+
+        @Override
+        <span class="keyword">public</span> Object invoke(Object proxy, Method method, Object[] args)
+                <span class="keyword">throws</span> Throwable {
+            <span class="comment">// Explicit identity semantics for this teaching proxy.</span>
+            <span class="keyword">if</span> (method.getDeclaringClass() == Object.<span class="keyword">class</span>) {
+                <span class="keyword">return</span> <span class="keyword">switch</span> (method.getName()) {
+                    <span class="keyword">case</span> <span class="string">&quot;equals&quot;</span> -&gt; proxy == args[0];
+                    <span class="keyword">case</span> <span class="string">&quot;hashCode&quot;</span> -&gt; System.identityHashCode(proxy);
+                    <span class="keyword">case</span> <span class="string">&quot;toString&quot;</span> -&gt; <span class="string">&quot;LoggingProxy[&quot;</span>
+                            + target.getClass().getSimpleName() + <span class="string">&quot;]&quot;</span>;
+                    <span class="keyword">default</span> -&gt; <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(method);
+                };
+            }
+            System.out.println(<span class="string">&quot;Calling &quot;</span> + method.getName());
+            <span class="keyword">try</span> {
+                <span class="keyword">return</span> method.invoke(target, args);
+            } <span class="keyword">catch</span> (InvocationTargetException failure) {
+                <span class="keyword">throw</span> failure.getCause();
+            }
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) {
+        PaymentService target = <span class="keyword">new</span> DemoPaymentService();
+        PaymentService proxy = (PaymentService) Proxy.newProxyInstance(
+                PaymentService.<span class="keyword">class</span>.getClassLoader(),
+                <span class="keyword">new</span> Class&lt;?&gt;[] { PaymentService.<span class="keyword">class</span> },
+                <span class="keyword">new</span> LoggingHandler(target));
+        proxy.charge(5000);
+        <span class="keyword">try</span> {
+            proxy.charge(-1);
+            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;Expected IllegalArgumentException&quot;</span>);
+        } <span class="keyword">catch</span> (IllegalArgumentException expected) {
+            <span class="comment">// Original unchecked exception survives the reflective call.</span>
+        }
+        <span class="keyword">if</span> (!proxy.equals(proxy) || proxy.equals(target)
+                || proxy.hashCode() != System.identityHashCode(proxy)
+                || !proxy.toString().equals(<span class="string">&quot;LoggingProxy[DemoPaymentService]&quot;</span>)) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;Object method policy failed&quot;</span>);
+        }
+        System.out.println(<span class="string">&quot;DynamicProxyDemo: all checks passed&quot;</span>);
+    }
+}</code></pre></figure></div></section><section class="source-file" id="file-2"><div class="source-title"><h3>HttpDocumentRepository.java</h3><div class="source-actions"><button type="button" data-toggle="source-2" aria-expanded="false">Show source</button><button type="button" data-copy="source-2">Copy</button><button type="button" data-download="source-2" data-name="HttpDocumentRepository.java">Download .java</button></div></div><div class="source-body" id="source-2"><figure class="code full-source"><figcaption>HttpDocumentRepository.java</figcaption><pre><code><span class="keyword">import</span> java.io.IOException;
+<span class="keyword">import</span> java.net.URI;
+<span class="keyword">import</span> java.net.http.HttpClient;
+<span class="keyword">import</span> java.net.http.HttpRequest;
+<span class="keyword">import</span> java.net.http.HttpResponse;
+<span class="keyword">import</span> java.nio.charset.StandardCharsets;
+<span class="keyword">import</span> java.time.Duration;
+<span class="keyword">import</span> java.util.NoSuchElementException;
+<span class="keyword">import</span> java.util.Objects;
+<span class="keyword">import</span> java.util.regex.Pattern;
+
+<span class="comment">// Compile together with ProxyLesson.java. This class has no main method.</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> HttpDocumentRepository
+        <span class="keyword">implements</span> ProxyLesson.DocumentRepository {
+    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Pattern ID = Pattern.compile(<span class="string">&quot;[A-Za-z0-9_-]+&quot;</span>);
+    <span class="keyword">private</span> <span class="keyword">final</span> HttpClient client;
+    <span class="keyword">private</span> <span class="keyword">final</span> URI base;
+
+    <span class="keyword">public</span> HttpDocumentRepository(HttpClient client, URI base) {
+        this.client = Objects.requireNonNull(client);
+        this.base = Objects.requireNonNull(base);
+        <span class="keyword">if</span> (!<span class="string">&quot;https&quot;</span>.equalsIgnoreCase(base.getScheme())
+                || base.getHost() == <span class="keyword">null</span> || base.getRawUserInfo() != <span class="keyword">null</span>
+                || base.getRawQuery() != <span class="keyword">null</span> || base.getRawFragment() != <span class="keyword">null</span>
+                || !base.getPath().endsWith(<span class="string">&quot;/&quot;</span>)) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Expected HTTPS directory URI&quot;</span>);
+        }
+    }
+
+    @Override
+    <span class="keyword">public</span> ProxyLesson.Document findById(String id) {
+        <span class="comment">// Deliberately narrow ID contract: no arbitrary path input.</span>
+        <span class="keyword">if</span> (id == <span class="keyword">null</span> || !ID.matcher(id).matches()) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid document id&quot;</span>);
+        }
+        HttpRequest request = HttpRequest.newBuilder(base.resolve(id))
+                .timeout(Duration.ofSeconds(3))
+                .header(<span class="string">&quot;Accept&quot;</span>, <span class="string">&quot;text/plain&quot;</span>)
+                .GET()
+                .build();
+        <span class="keyword">try</span> {
+            HttpResponse&lt;String&gt; response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            <span class="keyword">int</span> status = response.statusCode();
+            <span class="keyword">if</span> (status == 404) <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException(<span class="string">&quot;Document not found&quot;</span>);
+            <span class="keyword">if</span> (status == 401 || status == 403) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> ProxyLesson.AccessDeniedException();
+            }
+            <span class="keyword">if</span> (status != 200) <span class="keyword">throw</span> <span class="keyword">new</span> RepositoryException(<span class="string">&quot;HTTP &quot;</span> + status);
+            <span class="comment">// Teaching endpoint contract: bounded, UTF-8 plain-text body.</span>
+            <span class="keyword">return</span> <span class="keyword">new</span> ProxyLesson.Document(id, response.body());
+        } <span class="keyword">catch</span> (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            <span class="keyword">throw</span> <span class="keyword">new</span> RepositoryException(<span class="string">&quot;Document read interrupted&quot;</span>, interrupted);
+        } <span class="keyword">catch</span> (IOException failure) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> RepositoryException(<span class="string">&quot;Document transport failed&quot;</span>, failure);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> RepositoryException <span class="keyword">extends</span> RuntimeException {
+        <span class="keyword">public</span> RepositoryException(String message) { super(message); }
+        <span class="keyword">public</span> RepositoryException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+}</code></pre></figure></div></section><p class="small">Source controls work offline when JavaScript is enabled. Without JavaScript, all source is visible. Printing always includes the complete source and review notes.</p></section><section class="chapter references" id="references"><div class="chapter-heading"><span class="eyebrow">REFERENCE</span><h2>Official Java 25 sources</h2><p>The supplied Lesson 10 provides the design progression; these sources ground the JDK-specific behavior.</p></div><ol><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Proxy.html">Proxy · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Proxy.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/InvocationHandler.html">InvocationHandler · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/InvocationHandler.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html#invoke(java.lang.Object,java.lang.Object...)">Method.invoke · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html#invoke(java.lang.Object,java.lang.Object...)</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html">HttpClient · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html">HttpRequest.Builder · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/LinkedHashMap.html">LinkedHashMap · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/LinkedHashMap.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html">ConcurrentHashMap · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html</span></li><li><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()">System.nanoTime · Java SE 25</a><span class="reference-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()</span></li><li><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-17.html">JLS 25 §17 · Threads and Locks</a><span class="reference-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-17.html</span></li></ol><p class="small">Edition prepared 1 September 2026. The guide deliberately targets Java 25, including the versioned reflection and HTTP documentation.</p></section><footer class="footer"><span>DESIGN PATTERNS / LESSON 10</span><span>Proxy · Java 25 edition</span></footer></main></div><div id="toast" class="toast" role="status" aria-live="polite"></div><script>
+document.documentElement.classList.add('js');
+const toast = document.getElementById('toast');
+let toastTimer;
+function notify(message){toast.textContent=message;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.textContent='',2600)}
+document.getElementById('print').addEventListener('click',()=>window.print());
+document.querySelectorAll('[data-toggle]').forEach(button=>button.addEventListener('click',()=>{
+ const target=document.getElementById(button.dataset.toggle);
+ const open=target.classList.toggle('is-open');button.setAttribute('aria-expanded',String(open));button.textContent=open?'Hide source':'Show source';
+}));
+document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{
+ const target=document.getElementById(button.dataset.copy),text=target.querySelector('code').textContent;
+ try{await navigator.clipboard.writeText(text+'\n');notify('Source copied.')}catch(e){target.classList.add('is-open');const b=document.querySelector('[data-toggle="'+button.dataset.copy+'"]');b.setAttribute('aria-expanded','true');b.textContent='Hide source';notify('Clipboard unavailable. Select and copy the visible source.');}
+}));
+document.querySelectorAll('[data-download]').forEach(button=>button.addEventListener('click',()=>{
+ const text=document.getElementById(button.dataset.download).querySelector('code').textContent+'\n';
+ const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download=button.dataset.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}));
+const order=document.getElementById('lab-order'),allowed=document.getElementById('lab-allowed'),cached=document.getElementById('lab-cached');
+function trace(){
+ const steps=['Client requests DOC-123.'];let result='',risk=false;
+ const unsafe=order.value==='unsafe';
+ if(unsafe&&cached.checked){steps.push('Cache finds the document and returns immediately.','Authorization and remote storage are never reached.');result=allowed.checked?'Returned from cache without checking permission.':'Protected data returned to a denied caller.';risk=true}
+ else{if(unsafe)steps.push('Cache misses and delegates.');steps.push('Authorization checks the caller.');if(!allowed.checked){steps.push('Authorization throws; no document is returned.');result='Access denied. Remote calls: 0.'}else{steps.push('Permission granted.');if(!unsafe&&cached.checked){steps.push('Cache returns the document.');result='Authorized cache hit. Remote calls: 0.'}else{if(!unsafe)steps.push('Cache misses.');steps.push('Remote repository loads the document; cache stores it.');result='Authorized cache miss. Remote calls: 1.'}}}
+ const ol=document.getElementById('lab-trace');ol.replaceChildren(...steps.map(text=>{const li=document.createElement('li');li.textContent=text;return li}));
+ const p=document.getElementById('lab-result');p.textContent=result;p.classList.toggle('risk',risk);
+}
+[order,allowed,cached].forEach(el=>el.addEventListener('change',trace));trace();
+const progress=document.querySelector('.page-indicator span');
+addEventListener('scroll',()=>{const range=document.documentElement.scrollHeight-innerHeight;progress.style.width=(range>0?scrollY/range*100:0)+'%'},{passive:true});
+let priorDetails=[];
+addEventListener('beforeprint',()=>{priorDetails=Array.from(document.querySelectorAll('details')).map(d=>[d,d.open]);priorDetails.forEach(([d])=>d.open=true)});
+addEventListener('afterprint',()=>{priorDetails.forEach(([d,open])=>d.open=open)});
+</script></body></html>

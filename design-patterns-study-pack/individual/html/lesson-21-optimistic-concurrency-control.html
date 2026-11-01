@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="A first-principles guide to optimistic concurrency control, with Java 25-compatible JDBC code, transactions, retries, outbox events, and database race tests."><title>21. Optimistic Concurrency Control — DP</title><style>:root {color-scheme:light;--ink:#24332f;--muted:#5c6c66;--green:#21614c;--line:#dbe3dd;--paper:#fff;--tint:#f0f6f2;--warm:#fcfbf8}
+* {box-sizing:border-box}
+html {scroll-behavior:smooth;scroll-padding-top:100px}
+body {margin:0;background:var(--warm);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+a {color:var(--green);text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
+a:hover {color:#103e2d}
+button {font:inherit;cursor:pointer;color:var(--green);border:1px solid #abc4b7;background:white;border-radius:5px;padding:7px 15px;font-size:13px;font-weight:650}
+button:hover {background:var(--tint)}
+button:focus-visible,a:focus-visible {outline:3px solid #c99738;outline-offset:4px}
+.skip {position:absolute;top:-100px;left:15px;z-index:10;background:white;padding:10px}.skip:focus {top:8px}
+.progress {height:3px;position:fixed;top:0;left:0;right:0;z-index:6;background:#e4ebe5}#progress-fill {height:100%;background:var(--green);width:0}
+.toolbar {position:sticky;top:0;z-index:5;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1240px)/2));background:rgba(252,251,248,.97);border-bottom:1px solid var(--line);gap:20px}
+.brand {display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--muted);font-size:13px;font-weight:600}.brand-mark {display:inline-grid;place-items:center;width:33px;height:33px;background:var(--green);border-radius:7px;color:#fff;letter-spacing:1px;font-size:12px}
+.tools {display:flex;align-items:center;gap:24px;font-size:13px}.tools>a {text-decoration:none}
+.layout {display:grid;grid-template-columns:245px minmax(0,860px);gap:66px;max-width:1240px;margin:0 auto;padding:46px 24px 90px}
+.contents {align-self:start;position:sticky;top:105px;max-height:calc(100vh - 125px);overflow:auto;padding-right:9px;font-size:13px}
+.toc-kicker {font-size:10px;font-weight:750;letter-spacing:1.8px;color:var(--muted);margin:0 0 16px 8px}
+nav>a {display:flex;gap:10px;line-height:1.4;padding:9px 8px;border-radius:5px;text-decoration:none;color:var(--muted);margin-bottom:3px;border-left:2px solid transparent}
+nav>a:hover,nav>a.active {background:#eaf2ec;color:var(--green);border-left-color:var(--green)}
+.toc-num {width:28px;flex-shrink:0;font-size:10px;letter-spacing:.5px;font-weight:700;padding-top:2px}
+nav small {display:block;font-size:10px;color:#738177;margin-top:3px}.toc-foot {font-size:11px;line-height:1.7;border-top:1px solid var(--line);padding:17px 8px;margin-top:23px;color:var(--muted)}
+main {min-width:0;background:var(--paper);border:1px solid var(--line);padding:50px 56px 35px;border-radius:8px;box-shadow:0 4px 24px #17302005}
+.eyebrow {font-size:10px;font-weight:750;color:var(--green);text-transform:uppercase;letter-spacing:2px;margin:0 0 16px}
+h1 {font:600 clamp(34px,3.4vw,46px)/1.15 Georgia,"Times New Roman",serif;letter-spacing:-1.2px;margin:0 0 27px;color:#203e30}
+.lead {font-size:18px;line-height:1.7;margin-top:0}.meta {font-size:11px;color:var(--muted);margin-top:25px;letter-spacing:.2px}
+blockquote.invariant {font:24px/1.5 Georgia,"Times New Roman",serif;margin:25px 0;padding:22px 25px;border-left:4px solid var(--green);background:var(--tint);color:#24523c}
+.invariant strong {font-weight:700}
+.reading-note {padding:20px 23px;margin:34px 0 44px;border:1px solid var(--line);border-radius:5px;background:#fafbf8;font-size:13px;line-height:1.7}.reading-note strong {font-size:13px;color:var(--green)}.reading-note p {margin:8px 0}
+h2 {font:600 26px/1.3 Georgia,"Times New Roman",serif;color:#234b36;letter-spacing:-.4px;margin:58px 0 26px;padding:25px 0 0;border-top:2px solid #b7ccbf;scroll-margin-top:95px}
+h3 {display:flex;align-items:baseline;gap:13px;margin:32px 0 12px;font-size:18px;line-height:1.45;font-weight:700;scroll-margin-top:100px;color:#273d32}
+.step-number {font-size:11px;color:var(--green);font-weight:750;letter-spacing:1px;flex-shrink:0;min-width:23px}
+h4 {font-size:15px;margin:28px 0 12px;color:#254835}
+p {margin:12px 0}strong {font-weight:700}p,li {overflow-wrap:break-word}li {padding-left:4px;margin-bottom:7px}
+code {font: .86em/1.6 "SFMono-Regular",Consolas,"Liberation Mono",monospace;background:#eff3ef;border-radius:3px;padding:2px 4px;color:#2b4936;overflow-wrap:anywhere}
+.code-block {margin:18px 0 22px;border:1px solid #d5ded6;border-radius:5px;overflow:hidden;background:#f6f8f5}
+.code-label {display:flex;align-items:center;justify-content:space-between;height:33px;background:#edf2ec;border-bottom:1px solid #dce4db;padding:0 15px;font-size:10px;color:#5e7061;letter-spacing:1px;font-weight:700}
+.copy-btn {padding:1px 9px;font-size:10px;font-weight:600;background:transparent;border:0;border-radius:3px;color:#47654e;letter-spacing:0;display:none}.js .copy-btn {display:block}
+pre {margin:0;padding:17px 18px;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;font:12px/1.7 "SFMono-Regular",Consolas,"Liberation Mono",monospace;color:#293e31}pre code {font:inherit;color:inherit;background:transparent;padding:0;border-radius:0;white-space:inherit}
+table {border-collapse:collapse;width:100%;margin:20px 0 24px;font-size:13px;line-height:1.65;table-layout:fixed}
+th,td {text-align:left;vertical-align:top;border:1px solid var(--line);padding:10px 12px;overflow-wrap:anywhere}th {background:#edf3ed;color:#32523b;font-size:12px;font-weight:700}tr:nth-child(even) td {background:#fafbf9}
+td code {font-size:.89em}thead {display:table-header-group}
+.outcome {display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:12px;margin:22px 0;padding:15px 19px;background:#eaf4eb;border:1px solid #c2d8c7;border-radius:5px;color:#2a5b39}.outcome strong {width:100%;font-size:14px}
+.principle {border-left:4px solid #327252;padding:20px 24px;margin:20px 0;background:#eef6ef;font:19px/1.6 Georgia,"Times New Roman",serif;color:#285438}
+.source-actions {font-size:12px;margin:8px 0}.source-actions a {display:inline-block;background:#eff5ef;border:1px solid #c8d8cc;padding:5px 12px;border-radius:4px;text-decoration:none}
+.endnote {font-size:11px;text-transform:uppercase;letter-spacing:1px;border-top:1px solid var(--line);padding-top:24px;margin-top:35px;color:var(--muted)}
+#toast {position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#fff;color:var(--green);border:1px solid #9bbda8;border-radius:7px;padding:9px 18px;font-size:13px;box-shadow:0 3px 15px #0001;opacity:0;pointer-events:none;transition:opacity .2s;z-index:8}#toast.show {opacity:1}
+@media (max-width:1050px) {.layout {grid-template-columns:190px minmax(0,1fr);gap:24px;padding:30px 20px}main {padding:38px 35px}.contents {font-size:12px}.toc-num{width:22px}}
+@media (max-width:760px) {html{scroll-padding-top:80px}.toolbar {height:64px;padding:0 16px}.tools>a {display:none}.brand {font-size:11px}.layout {display:block;padding:22px 14px 45px}.contents {position:static;max-height:none;padding:0;margin:0 0 25px}.contents nav {display:grid;grid-template-columns:1fr 1fr;gap:0 8px}nav>a {padding:6px;font-size:11px}nav small {display:none}.toc-foot{display:none}.toc-kicker{margin-bottom:8px}main {padding:30px 23px}h1 {font-size:36px}h2 {font-size:24px}h3 {font-size:17px}body{font-size:15px}.lead{font-size:16px}pre{font-size:10.5px;padding:14px}table{font-size:11px}th,td {padding:8px}.invariant {font-size:21px!important;padding:16px!important}}
+@media (prefers-reduced-motion:reduce) {html {scroll-behavior:auto}* {transition:none!important}}
+@page {size:A4;margin:17mm 16mm 18mm;@bottom-left {content:"DP · 21 / Optimistic Concurrency Control";font:8pt Arial,sans-serif;color:#627369}@bottom-right {content:counter(page);font:8pt Arial,sans-serif;color:#627369}}
+@media print {
+ html {scroll-behavior:auto;scroll-padding:0}body {background:white;color:#17291e;font:10.4pt/1.55 Arial,sans-serif}
+ .toolbar,.contents,.progress,.skip,.copy-btn,.source-actions,#toast {display:none!important}
+ .layout {display:block;max-width:none;margin:0;padding:0}main {padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:white}
+ h1 {font-size:31pt;margin-bottom:15pt;line-height:1.14}.eyebrow{font-size:8pt}.lead{font-size:12pt}.meta{font-size:8pt}
+ blockquote.invariant {font-size:18pt;margin:15pt 0;padding:12pt 16pt}.reading-note {font-size:9pt;padding:12pt 15pt;margin:20pt 0;break-inside:avoid}
+ h2 {font-size:19pt;margin:0 0 16pt;padding:0;border:0;break-before:page;break-after:avoid;scroll-margin:0}
+ h3 {font-size:12.3pt;margin:19pt 0 7pt;gap:9pt;break-after:avoid;scroll-margin:0}.step-number{font-size:8pt;min-width:17pt}h4{font-size:11pt;break-after:avoid}
+ p {margin:8pt 0;orphans:3;widows:3}li{margin-bottom:5pt;orphans:3;widows:3}ul,ol{padding-left:20pt}
+ a {color:#27553c;text-decoration:underline;overflow-wrap:anywhere}code{font-size:.88em;background:#f3f5f1}
+ .code-block {break-inside:avoid;margin:11pt 0 14pt;background:#f7f8f5;border-color:#ccd7cc;overflow:visible;border-radius:0}
+ .long-code {break-inside:auto;page-break-inside:auto}.code-label {height:21pt;font-size:7pt;padding:0 10pt;break-after:avoid}
+ pre {font-size:8.1pt;line-height:1.52;padding:10pt;white-space:pre-wrap;overflow-wrap:anywhere;orphans:3;widows:3;box-decoration-break:clone}
+ table {font-size:9pt;line-height:1.45;margin:12pt 0 16pt;break-inside:auto}th,td {padding:6pt 8pt}th{font-size:8.5pt}tr {break-inside:avoid}thead{display:table-header-group}
+ .principle {font-size:13pt;padding:13pt 16pt;break-inside:avoid}.outcome {font-size:9pt;break-inside:avoid}.endnote{font-size:8pt}
+ * {-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style></head>
+<body><a class="skip" href="#content">Skip to guide</a><div class="progress" aria-hidden="true"><div id="progress-fill"></div></div>
+<header class="toolbar"><a class="brand" href="#top"><span class="brand-mark">DP</span><span>First principles / 21</span></a><div class="tools"><a href="#reference">Java reference</a><button type="button" id="print-btn">Print / Save PDF</button></div></header>
+<div class="layout" id="top"><aside class="contents"><p class="toc-kicker">IN THIS GUIDE</p><nav aria-label="Contents"><a href="#pressure"><span class="toc-num">I</span><span>The pressure<small>1–4</small></span></a><a href="#mechanism"><span class="toc-num">II</span><span>Compare and advance<small>5–11</small></span></a><a href="#boundary"><span class="toc-num">III</span><span>Consistency boundary<small>12–15</small></span></a><a href="#recovery"><span class="toc-num">IV</span><span>Recovery and retries<small>16–21</small></span></a><a href="#events"><span class="toc-num">V</span><span>Outbox and events<small>22–26</small></span></a><a href="#persistence"><span class="toc-num">VI</span><span>Persistence and ORM<small>27–32</small></span></a><a href="#api"><span class="toc-num">VII</span><span>API and user workflows<small>33–36</small></span></a><a href="#alternatives"><span class="toc-num">VIII</span><span>Alternatives and limits<small>37–44</small></span></a><a href="#tests"><span class="toc-num">IX</span><span>Database testing<small>45–50</small></span></a><a href="#synthesis"><span class="toc-num">X</span><span>Guarantee and connections<small>51–58</small></span></a><a href="#reference"><span class="toc-num">A</span><span>Complete Java / JDBC<small></small></span></a><a href="#race-test"><span class="toc-num">B</span><span>Database race test<small></small></span></a><a href="#sources"><span class="toc-num">↗</span><span>Official sources<small></small></span></a></nav><p class="toc-foot">Read → decide → verify<br>Then commit or reconsider.</p></aside>
+<main id="content"><div class="opening">
+<p class="eyebrow">DP · Design patterns from first principles</p>
+<h1>21. Optimistic Concurrency Control</h1>
+<p class="lead">We ended with an <code>Order</code> aggregate protecting this invariant:</p>
+<blockquote class="invariant">An order may contain at most <strong>100 total units.</strong></blockquote>
+<p>The next question is what happens when two requests each load a valid order, each make a valid decision, and then try to persist both decisions.</p>
+<p class="meta">Java 25-compatible code · PostgreSQL 18 examples · 58 reasoning steps</p>
+</div>
+
+<div class="reading-note">
+<strong>How to use this guide</strong>
+<p>Read the numbered steps in order: each introduces the pressure that motivates the next mechanism. The short code blocks explain one idea at a time. Appendix A contains the complete JDBC reference implementation and schema; Appendix B contains a real two-connection race test.</p>
+<p>All content, styles, and controls are embedded. The guide works offline. Use <strong>Print / Save PDF</strong> for a single-column print layout; the entire guide prints even with JavaScript disabled. Official-source links require a connection.</p>
+</div>
+
+<h2 id="pressure">I. The pressure: two correct decisions can conflict</h2>
+
+<h3 id="step-1"><span class="step-number">01</span><span>Re-establish the aggregate</span></h3>
+<p>An aggregate is a group of domain objects whose consistency rules are protected through a root. Here, callers ask <code>Order</code> to add a line; they do not mutate its internal list directly. A repository loads and saves the whole order as one consistency boundary.</p>
+<p>Start with a draft order containing Product A, quantity 90. Its remaining capacity is 10. The local rule is straightforward:</p>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-1">Copy</button></div><pre><code id="code-1">void addLine(UUID productId, int quantity) {
+    requireDraft();
+    Objects.requireNonNull(productId);
+    if (quantity &lt;= 0) throw new IllegalArgumentException(&quot;Quantity&quot;);
+    if (quantity &gt; 100 - totalUnits()) {
+        throw new OrderCapacityExceeded();
+    }
+    lines.add(new Line(UUID.randomUUID(), productId, quantity));
+}
+</code></pre></div>
+<p>The subtraction avoids overflowing an <code>int</code> when checking a large requested quantity. Positive quantities and a previously valid total make this check safe. Immutable <code>Line</code> values and defensive list copies prevent callers from bypassing the root.</p>
+<h3 id="step-2"><span class="step-number">02</span><span>Introduce two concurrent requests</span></h3>
+<p>Request A adds 10 units of Product B. Request B adds 10 units of Product C. Both load the same committed order before either saves.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Transaction A</th>
+<th>Transaction B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Load total = 90</td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td>Load total = 90</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Check 90 + 10 ≤ 100: valid</td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td>Check 90 + 10 ≤ 100: valid</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Insert Product B, quantity 10; commit</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td></td>
+<td>Insert Product C, quantity 10; commit</td>
+</tr>
+</tbody></table>
+<p>If persistence applies independent child inserts without coordinating the root, the final total can be <strong>110</strong>. A different naive save strategy, such as replacing a stale snapshot of all lines, might instead lose one request&#39;s update. The exact failure depends on the writes; neither result is a valid concurrency policy.</p>
+<h3 id="step-3"><span class="step-number">03</span><span>Diagnose the missing question</span></h3>
+<p>Each Java object correctly checked its own copy. Neither knew the other copy existed. We have <strong>two independently loaded instances of the same consistency boundary</strong>.</p>
+<p>The missing question is: <strong>Has the relevant state changed since I loaded it?</strong> Local validation answers whether a decision fits the examined state. Concurrency control must establish whether that examined state is still suitable for committing the decision.</p>
+<h3 id="step-4"><span class="step-number">04</span><span>Why a transaction alone is not enough</span></h3>
+<p>Atomicity makes a transaction&#39;s changes commit or roll back together. Isolation determines what concurrent transactions can observe and how their operations interact. These are separate guarantees.</p>
+<p>PostgreSQL&#39;s default <code>READ COMMITTED</code> gives an ordinary query a snapshot at the start of that statement. Separate queries in one transaction can therefore see different committed states. Two transactions can both read 90 before either writes. <a href="https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED">PostgreSQL: transaction isolation</a></p>
+<p>Putting both handlers in transactions preserves each handler&#39;s atomicity. It does not, by itself, implement the cross-line 100-unit rule under every interleaving. We need an explicit concurrency decision.</p>
+<h2 id="mechanism">II. Derive the mechanism: remember, compare, advance</h2>
+
+<h3 id="step-5"><span class="step-number">05</span><span>Remember which revision was loaded</span></h3>
+<p>Add a version to the root row:</p>
+<div class="code-block"><div class="code-label"><span>SQL</span><button class="copy-btn" type="button" data-copy="code-2">Copy</button></div><pre><code id="code-2">ALTER TABLE orders
+ADD COLUMN version BIGINT NOT NULL DEFAULT 0;
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Order</th>
+<th>Status</th>
+<th>Version</th>
+<th>Total units</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#123</td>
+<td>DRAFT</td>
+<td>7</td>
+<td>90</td>
+</tr>
+</tbody></table>
+<p>When we load version 7, our decisions are based on revision 7. The version is a token for the aggregate&#39;s relevant state, not a count of child rows.</p>
+<p>In the reference implementation, <code>Order.loadedVersion</code> is immutable metadata: it records the revision read. The repository returns a candidate next version, and the transaction wrapper returns it to the caller only after commit. An alternative design can keep the token in a <code>LoadedOrder</code> wrapper outside the domain object.</p>
+<h3 id="step-6"><span class="step-number">06</span><span>Make the update conditional</span></h3>
+<p>A blind update only identifies the order:</p>
+<div class="code-block"><div class="code-label"><span>SQL</span><button class="copy-btn" type="button" data-copy="code-3">Copy</button></div><pre><code id="code-3">UPDATE orders SET version = 8 WHERE id = :order_id;
+</code></pre></div>
+<p>Both writers could execute it. Instead, require the original revision:</p>
+<div class="code-block"><div class="code-label"><span>SQL</span><button class="copy-btn" type="button" data-copy="code-4">Copy</button></div><pre><code id="code-4">UPDATE orders
+SET version = 8
+WHERE id = :order_id AND version = 7;
+</code></pre></div>
+<p>The named parameter here is explanatory SQL notation; JDBC uses <code>?</code> placeholders. The comparison and update must be <strong>one atomic database operation</strong>. A separate <code>SELECT version</code>, followed by an unconditional <code>UPDATE</code>, leaves another race between those statements.</p>
+<h3 id="step-7"><span class="step-number">07</span><span>Recognize compare-and-swap</span></h3>
+<p>We have derived a compare-and-swap operation: compare the stored version with the expected version; advance it only when they match.</p>
+<table>
+<thead>
+<tr>
+<th>Expected revision</th>
+<th>Current revision</th>
+<th>Conditional update result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>7</td>
+<td>7</td>
+<td>One row updated; candidate revision becomes 8</td>
+</tr>
+<tr>
+<td>7</td>
+<td>8</td>
+<td>Zero rows updated; stale write rejected</td>
+</tr>
+</tbody></table>
+<p>A primary key limits the update to at most one root. Zero rows can also mean the root was deleted. The repository can report this as “the expected revision no longer exists” without pretending it knows which change occurred.</p>
+<h3 id="step-8"><span class="step-number">08</span><span>Run the race again</span></h3>
+<p>Both A and B load total 90 at version 7. Both locally add 10. A&#39;s conditional root update affects one row; A writes its children and commits version 8, total 100. B&#39;s update expecting 7 affects zero rows; B rolls back.</p>
+<p>If B reaches the root update before A finishes, it can wait. At <code>READ COMMITTED</code>, PostgreSQL rechecks the update condition after a conflicting updater commits. If A commits version 8, B no longer matches; if A rolls back, B can still succeed. <a href="https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED">PostgreSQL: concurrent updates</a></p>
+<div class="outcome"><strong>One committed winner</strong><span>100 units</span><span>version 8</span><span>stale writer rejected</span></div>
+
+<h3 id="step-9"><span class="step-number">09</span><span>Let the repository detect the conflict</span></h3>
+<p>The save method computes the candidate revision and checks the affected-row count:</p>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-5">Copy</button></div><pre><code id="code-5">long next = Math.incrementExact(order.loadedVersion());
+String sql = &quot;&quot;&quot;
+    UPDATE orders SET status = ?, version = ?
+    WHERE id = ? AND version = ?
+    &quot;&quot;&quot;;
+try (var p = c.prepareStatement(sql)) {
+    p.setString(1, order.status().name());
+    p.setLong(2, next);
+    p.setObject(3, order.id());
+    p.setLong(4, order.loadedVersion());
+    if (p.executeUpdate() != 1) {
+        throw new ConcurrentOrderModification(
+                order.id(), order.loadedVersion());
+    }
+    replaceLines(order);
+    return next; // Provisional until the surrounding commit.
+}
+</code></pre></div>
+<p>This is an excerpt from the complete adapter. JDBC&#39;s update API supplies the row count used for the check. <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Statement.html#executeUpdate(java.lang.String)">Java 25: Statement</a></p>
+<h3 id="step-10"><span class="step-number">10</span><span>Keep child writes in the same transaction</span></h3>
+<p>Suppose B inserted a child before detecting the conflict. That insert must roll back with the failed save. The same rule applies if a child write fails after the root version update: the root update must roll back too.</p>
+<p>Use <strong>one connection, one transaction, one commit decision</strong> for root, children, and any outbox rows. Throwing a Java exception alone does not undo SQL. The transaction owner must roll back; JDBC advises explicitly committing or rolling back before closing an active connection. <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html#close()">Java 25: Connection</a></p>
+<h3 id="step-11"><span class="step-number">11</span><span>Explain “optimistic” precisely</span></h3>
+<p>We first read and decide without acquiring an exclusive root lock for the whole decision period. At write time, we verify the assumption that our revision is still valid.</p>
+<p>This does <strong>not</strong> mean “no locks.” The conditional <code>UPDATE</code> still participates in database locking and can wait for another writer. Pessimistic locking moves coordination earlier, commonly with <code>SELECT ... FOR UPDATE</code>. PostgreSQL holds that row lock until the transaction ends and blocks conflicting writers and lockers. <a href="https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS">PostgreSQL: row-level locks</a></p>
+<h2 id="boundary">III. Put the token on the consistency boundary</h2>
+
+<h3 id="step-12"><span class="step-number">12</span><span>Version the aggregate, not just each child</span></h3>
+<p>If A creates Line B while B creates Line C, they touch different child rows. Individual line versions have nothing to compare with one another. Yet the invariant depends on their <strong>combined quantities</strong>.</p>
+<p>The order root supplies a shared concurrency token. Every writer whose change can affect the order&#39;s rule must contend on that token. The token covers the decision&#39;s dependency set: all state whose change could invalidate the decision.</p>
+<h3 id="step-13"><span class="step-number">13</span><span>Make every relevant mutation participate</span></h3>
+<p>Changing only an <code>OrderLine</code> still changes the aggregate. The root version must advance even when no other root column needs updating. Apply the same discipline to line removal, quantity changes, confirmation, and version-aware deletion.</p>
+<p>Background jobs, administrative tools, batch SQL, and other services cannot bypass this protocol without weakening its guarantee. A bulk update that skips the version is a bypass. A read-only operation need not advance a revision merely because it loaded the order.</p>
+<h3 id="step-14"><span class="step-number">14</span><span>Keep ownership clear</span></h3>
+<table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Question it answers</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Order</code></td>
+<td>Does this operation satisfy the business rules for the state I hold?</td>
+</tr>
+<tr>
+<td>Repository / Unit of Work</td>
+<td>Does the database still match the revision on which this work depends?</td>
+</tr>
+<tr>
+<td>Application</td>
+<td>Should a conflict be rejected, reloaded, or retried?</td>
+</tr>
+</tbody></table>
+<p>Keep <code>addLine(productId, quantity)</code> focused on business behavior. It should not accept a JDBC connection or an expected database version. Passive revision metadata is a design choice; SQL coordination inside domain behavior is a dependency leak.</p>
+<h3 id="step-15"><span class="step-number">15</span><span>Preserve Ports &amp; Adapters</span></h3>
+<p>The application depends on domain objects and ports. The JDBC adapter implements the ports. The domain does not call the repository to save itself.</p>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-6">Copy</button></div><pre><code id="code-6">interface OrderRepository {
+    Order get(UUID id);
+    long save(Order order);
+}
+
+interface Transactions {
+    &lt;T&gt; T execute(Work&lt;T&gt; work);
+}
+</code></pre></div>
+<p>The adapter binds both the repository and outbox to the same connection. No <code>Connection</code> appears in these application-facing signatures. Keeping a connection parameter in an explicitly infrastructure-only helper is fine; putting it in a domain port would change the dependency contract.</p>
+<h2 id="recovery">IV. Recover by redoing the decision</h2>
+
+<h3 id="step-16"><span class="step-number">16</span><span>Separate stale state from invalid behavior</span></h3>
+<p><code>OrderCapacityExceeded</code> means the request did not fit the state examined. <code>ConcurrentOrderModification</code> means the examined revision no longer matched at save time.</p>
+<p>These are different outcomes. A domain rejection does not prove the state remains current forever; a concurrency rejection does not prove the command is intrinsically invalid. Reloading may change the answer.</p>
+<h3 id="step-17"><span class="step-number">17</span><span>Classify failures before deciding to retry</span></h3>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Meaning</th>
+<th>Appropriate next step</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Domain failure</td>
+<td>Business rule rejects the operation on the examined state</td>
+<td>Explain the rejection; retry only if inputs or relevant state change</td>
+</tr>
+<tr>
+<td>Optimistic conflict</td>
+<td>Expected revision no longer matches</td>
+<td>Roll back; reject or reconsider on fresh state</td>
+</tr>
+<tr>
+<td>Infrastructure failure</td>
+<td>A database operation or communication failed</td>
+<td>Classify the cause and determine whether the outcome is known</td>
+</tr>
+</tbody></table>
+<p>Do not catch every exception and blindly retry. In particular, a lost connection during commit can leave the caller uncertain about whether the operation committed. An idempotency key or reconciliation may be needed before replaying an additive command. This is an outcome-uncertainty problem, separate from a known failed version check.</p>
+<h3 id="step-18"><span class="step-number">18</span><span>See what a correct retry does</span></h3>
+<p>In our example, A commits 100 units. B receives a version conflict. B then reloads and tries its original intent—add 10—against total 100. The aggregate now throws <code>OrderCapacityExceeded</code>.</p>
+<p>The retry did its job even though the command did not succeed. Its purpose was to obtain a valid decision on fresh state. It must never turn a stale approval into permission to exceed capacity.</p>
+<h3 id="step-19"><span class="step-number">19</span><span>Retry the whole transaction</span></h3>
+<p>Discard the stale order and the failed transaction. Begin a new transaction, reload, rerun the business operation, attempt the save, and commit. Retrying only the failed <code>UPDATE</code>, or replacing its expected version with the latest version without revalidating, defeats the protection.</p>
+<p>PostgreSQL similarly requires complete transaction retries for serialization failures, including the logic that chose the SQL and its values. Those failures use SQLSTATE <code>40001</code>; they need an explicit policy alongside application version conflicts. <a href="https://www.postgresql.org/docs/18/mvcc-serialization-failure-handling.html">PostgreSQL: serialization failure handling</a></p>
+<h3 id="step-20"><span class="step-number">20</span><span>Use a bounded, specific retry wrapper</span></h3>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-7">Copy</button></div><pre><code id="code-7">static &lt;T&gt; T retryConflict(int maxAttempts, Supplier&lt;T&gt; entireAttempt) {
+    if (maxAttempts &lt; 1) throw new IllegalArgumentException(&quot;maxAttempts&quot;);
+    for (int attempt = 1; ; attempt++) {
+        try {
+            return entireAttempt.get();
+        } catch (ConcurrentOrderModification conflict) {
+            if (attempt == maxAttempts || conflict.getSuppressed().length != 0) {
+                throw conflict;
+            }
+        }
+    }
+}
+</code></pre></div>
+<p>Call it around the transaction-owning use case, so each invocation opens fresh work:</p>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-8">Copy</button></div><pre><code id="code-8">long committedVersion = retryConflict(3,
+        () -&gt; addLine(tx, orderId, productId, 10));
+</code></pre></div>
+<p>This sample retries only its own <code>ConcurrentOrderModification</code>. Java&#39;s <code>java.util.ConcurrentModificationException</code> is a different type and is not a database conflict contract. The sample omits backoff for clarity; under contention, use a bounded delay with jitter, a deadline, and cancellation appropriate to the service. Never retry a domain rejection or an arbitrary SQL error through this wrapper.</p>
+<h3 id="step-21"><span class="step-number">21</span><span>Keep external effects outside retryable work</span></h3>
+<p>Charging a card before the conditional save is dangerous. If the save conflicts, a retry might charge again even though the first local database transaction rolled back. An HTTP call is not undone by JDBC rollback.</p>
+<p>A retryable unit should usually load state, run domain behavior, write the aggregate, write any durable outgoing message, then commit. Delivery happens afterward. If an external call must occur synchronously, it needs its own idempotency and recovery design.</p>
+<h2 id="events">V. Combine the version check with an outbox</h2>
+
+<h3 id="step-22"><span class="step-number">22</span><span>Commit state and the event together</span></h3>
+<p>An outbox is a table of outgoing messages written in the same transaction as the state change. A separate relay delivers committed rows later. Here is the application flow for confirming an order:</p>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-9">Copy</button></div><pre><code id="code-9">static long confirm(Transactions tx, UUID id) {
+    return tx.execute(s -&gt; {
+        Order order = s.orders().get(id);
+        order.confirm();
+        long next = s.orders().save(order);
+        s.outbox().append(UUID.randomUUID(), id, next, &quot;OrderConfirmed&quot;);
+        return next;
+    });
+}
+</code></pre></div>
+<p>If save or outbox insertion fails, the wrapper rolls back both. The relay must publish only committed rows. Outbox delivery can still duplicate messages, so consumers need idempotency. <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS: transactional outbox</a></p>
+<h3 id="step-23"><span class="step-number">23</span><span>Do not let the outbox survive a failed transition</span></h3>
+<p>An outbox insert in its own transaction could survive while order confirmation fails. That would advertise an event which never happened. The version check, child writes, root state, and outbox insert must share the <strong>same local commit or rollback</strong>.</p>
+<p>The event ID is durable message identity. It helps a consumer deduplicate repeated delivery of one committed message. It does not automatically deduplicate two separately accepted client requests.</p>
+<h3 id="step-24"><span class="step-number">24</span><span>Attach the committed aggregate revision to events</span></h3>
+<table>
+<thead>
+<tr>
+<th>State transition</th>
+<th>Event metadata</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Order v7 → v8: confirm</td>
+<td><code>OrderConfirmed</code>, <code>aggregateVersion = 8</code></td>
+</tr>
+<tr>
+<td>Order v8 → v9: pack</td>
+<td><code>OrderPacked</code>, <code>aggregateVersion = 9</code></td>
+</tr>
+<tr>
+<td>Order v9 → v10: ship</td>
+<td><code>OrderShipped</code>, <code>aggregateVersion = 10</code></td>
+</tr>
+</tbody></table>
+<p>Packing and shipping illustrate later behavior; the reference domain implements draft and confirmed states only. Version metadata lets a consumer relate an event to a revision of that order.</p>
+<p><strong>A gap is meaningful only under an explicit event contract.</strong> Receiving v10 after v8 suggests a missing or out-of-order event only if the consumer was entitled to an event for v9. Some mutations may emit no event, or the subscription may filter event types. An aggregate version alone does not prove that a message was lost.</p>
+<h3 id="step-25"><span class="step-number">25</span><span>Do not treat it as a global sequence</span></h3>
+<p>Order A v10 and Order B v10 have no shared ordering meaning. Even when v8 precedes v9 for one order, version metadata does not itself force transport delivery order. The relay, partitioning, consumer, and reconciliation policy must implement whatever ordering the workflow requires.</p>
+<p>Use the pair <code>(aggregateId, aggregateVersion)</code> to identify a revision. Do not compare unrelated aggregates&#39; numeric versions to infer which business event happened first.</p>
+<h3 id="step-26"><span class="step-number">26</span><span>Handle multiple events from one revision deliberately</span></h3>
+<p>One confirmation might produce <code>OrderConfirmed</code>, <code>CustomerNotificationRequested</code>, and <code>InventoryReservationRequested</code>, all at version 8. The revision identifies their shared state transition, not their order within it.</p>
+<p>If consumers require that order, add an event index such as <code>(aggregateId, version, eventIndex)</code>, and retain a unique event ID for deduplication. If no consumer needs the ordering, avoid introducing a sequencing protocol merely because it is possible.</p>
+<h2 id="persistence">VI. Make persistence implement the model</h2>
+
+<h3 id="step-27"><span class="step-number">27</span><span>Build a concrete JDBC repository</span></h3>
+<p>Use a root table with <code>id</code>, <code>status</code>, and <code>version</code>, a child table with <code>order_id</code> and positive <code>quantity</code>, and an outbox table. Appendix A supplies the complete schema, including a draft order seeded at version 7 with 90 units.</p>
+<p>The reference loader deliberately uses a single joined query:</p>
+<div class="code-block"><div class="code-label"><span>SQL</span><button class="copy-btn" type="button" data-copy="code-10">Copy</button></div><pre><code id="code-10">SELECT o.status, o.version, l.id AS line_id, l.product_id, l.quantity
+FROM orders o
+LEFT JOIN order_line l ON l.order_id = o.id
+WHERE o.id = ?
+ORDER BY l.id;
+</code></pre></div>
+<p>This reconstructs the root and children from one statement snapshot. With separate reads at <code>READ COMMITTED</code>, the root and children can come from different revisions. The later version check might reject such work, but a mixed read can already produce confusing validation or read responses. A coherent load avoids that problem. <a href="https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED">PostgreSQL: statement snapshots</a></p>
+<h3 id="step-28"><span class="step-number">28</span><span>Check the root before writing children</span></h3>
+<p>The implementation order is: conditionally advance the root; persist the lines; append required outbox messages; commit. Stale work fails before doing unnecessary child writes.</p>
+<p>For this small example, line persistence deletes and reinserts the order&#39;s lines while preserving their IDs. Positive quantities and the 100-unit cap bound the line count. This is a teaching choice: use a diff when row churn, audit triggers, or external references make replacement inappropriate. The concurrency contract remains the same.</p>
+<h3 id="step-29"><span class="step-number">29</span><span>Distinguish “saved” from “committed”</span></h3>
+<p>An <code>UPDATE</code> returning one row means that statement succeeded inside the transaction. A later child failure, outbox failure, or commit failure can still prevent a successful unit of work.</p>
+<p>The reference design therefore keeps <code>loadedVersion</code> unchanged, returns a provisional number from <code>save</code>, and exposes that number from the transaction wrapper only after <code>commit</code> returns. It saves each order once per transaction and discards its mutable instance afterward. It never calls <code>markPersistedAt</code> before commit.</p>
+<p>If a design reuses objects after rollback, it needs an explicit restoration strategy. Request-scoped disposal is simpler. A commit communication failure still needs outcome reconciliation; changing the in-memory number cannot resolve that uncertainty.</p>
+<h3 id="step-30"><span class="step-number">30</span><span>Map the idea to Jakarta Persistence / Hibernate</span></h3>
+<div class="code-block"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-11">Copy</button></div><pre><code id="code-11">import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
+import java.util.UUID;
+
+@Entity
+public class OrderEntity {
+    @Id
+    private UUID id;
+    @Version
+    private long version;
+
+    protected OrderEntity() {}
+}
+</code></pre></div>
+<p>This separate mapping example requires the Jakarta Persistence API and a provider; they are not part of the JDK. A versioned entity gives the provider a concurrency token. A mismatch causes an optimistic-lock failure. Detection may occur at flush or commit, so handle the outcome around the transaction boundary, not only around <code>save</code> or <code>merge</code>. <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#entity-versions-and-optimistic-locking">Jakarta Persistence 3.2: entity versions</a></p>
+<h3 id="step-31"><span class="step-number">31</span><span>Verify the ORM&#39;s aggregate behavior</span></h3>
+<p>An ORM manages entities and relationships according to their mappings. A business aggregate may span several such entities. <code>@Version</code> on the root does not automatically prove that every change to a child&#39;s scalar fields participates in that root&#39;s version check.</p>
+<p>Audit each mutation path. Where needed, request a root version increment with <code>LockModeType.OPTIMISTIC_FORCE_INCREMENT</code> within the transaction, and verify the generated behavior with a race test. The standard distinguishes owned relationships from unowned ones; it does not promise whole-graph consistency merely because one entity is versioned. <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#locking-and-concurrency">Jakarta Persistence 3.2: locking</a></p>
+<h3 id="step-32"><span class="step-number">32</span><span>Prefer a dedicated version to a timestamp</span></h3>
+<p>A numeric revision gives a clear comparison: 7, then 8, then 9. Timestamp tokens require care about precision, generation, and equality across writes. Hibernate documents timestamp locking as less reliable than dedicated version numbers. <a href="https://docs.hibernate.org/orm/7.1/userguide/html_single/#locking-optimistic">Hibernate ORM 7.1: optimistic locking</a></p>
+<p>A numeric token still needs a policy: never reset or reuse revisions for an existing identity, and do not silently wrap on overflow. <code>Math.incrementExact</code> makes the example fail explicitly at the numeric limit.</p>
+<h2 id="api">VII. Extend the idea across a user workflow</h2>
+
+<h3 id="step-33"><span class="step-number">33</span><span>Carry the revision across an edit</span></h3>
+<p>The server may finish a GET long before a person submits their edit. A fresh transaction at submission time cannot, by itself, identify the revision the person originally saw.</p>
+<div class="code-block"><div class="code-label"><span>HTTP</span><button class="copy-btn" type="button" data-copy="code-12">Copy</button></div><pre><code id="code-12">HTTP/1.1 200 OK
+ETag: &quot;order-123-v7&quot;
+Content-Type: application/json
+
+{&quot;id&quot;:&quot;123&quot;,&quot;version&quot;:7,&quot;status&quot;:&quot;DRAFT&quot;}
+</code></pre></div>
+<div class="code-block"><div class="code-label"><span>HTTP</span><button class="copy-btn" type="button" data-copy="code-13">Copy</button></div><pre><code id="code-13">PUT /orders/123 HTTP/1.1
+If-Match: &quot;order-123-v7&quot;
+Content-Type: application/json
+
+{&quot;shippingAddress&quot;:&quot;New address&quot;}
+</code></pre></div>
+<p><code>If-Match</code> uses strong entity-tag comparison. On a failed precondition, the usual response is <strong>412 Precondition Failed</strong>. A strong ETag derived from a version is valid only when it identifies the selected representation correctly; include representation variants or another validator scheme when needed. <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1.1">RFC 9110: If-Match</a></p>
+<h3 id="step-34"><span class="step-number">34</span><span>Do not require a client version mechanically</span></h3>
+<table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>Where the relevant revision comes from</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Short server command: load, add, save</td>
+<td>Repository remembers the loaded revision</td>
+</tr>
+<tr>
+<td>Human edits a previously displayed order</td>
+<td>Client returns a validator or expected revision</td>
+</tr>
+<tr>
+<td>Offline edit or detached form</td>
+<td>Client revision is part of the conflict contract</td>
+</tr>
+</tbody></table>
+<p>For a conditional edit, check the client&#39;s expectation and still use the repository&#39;s atomic version check. A separate precheck followed by a blind save creates another race. Do not automatically retry a stale client edit against a newer revision: that would discard the very condition the client supplied.</p>
+<h3 id="step-35"><span class="step-number">35</span><span>Define the response policy</span></h3>
+<p>A version mismatch says something relevant changed. It does not explain whether two human intentions can safely merge. An address edit and a quantity change might be compatible, depending on the business rules.</p>
+<p>For an application conflict without an HTTP precondition, <strong>409 Conflict</strong> can express that the request conflicts with current resource state. Explain the conflict and return enough current information for the caller to recover under the API&#39;s access rules. <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-15.5.10">RFC 9110: 409 Conflict</a></p>
+<p>Semantic merging requires renewed validation of the combined result. It cannot be implemented safely by ignoring a failed token check.</p>
+<h3 id="step-36"><span class="step-number">36</span><span>Weigh coarse and fine-grained checks</span></h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Benefit</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>One aggregate token</td>
+<td>Simple dependency boundary; catches changes anywhere within it</td>
+<td>Can reject compatible edits</td>
+</tr>
+<tr>
+<td>Field or child tokens</td>
+<td>More independent changes can proceed</td>
+<td>Cross-field rules become harder to protect</td>
+</tr>
+</tbody></table>
+<p>Begin with the boundary required by the invariant. Narrow it only when measured contention justifies a more complex proof. A “false conflict” may be a tolerable cost; a missed cross-child invariant is a correctness failure.</p>
+<h2 id="alternatives">VIII. Compare alternatives and expose the limits</h2>
+
+<h3 id="step-37"><span class="step-number">37</span><span>Compare optimistic and pessimistic concurrency</span></h3>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Optimistic root version</th>
+<th>Pessimistic root lock</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Coordination point</td>
+<td>Conditional save</td>
+<td>Lock before reading decision state</td>
+</tr>
+<tr>
+<td>Another writer</td>
+<td>May do work and later conflict</td>
+<td>Waits when it requests a conflicting lock</td>
+</tr>
+<tr>
+<td>Main cost</td>
+<td>Discarded work, retries, rejections</td>
+<td>Waiting, lock duration, connection occupancy</td>
+</tr>
+<tr>
+<td>Required discipline</td>
+<td>Every relevant writer checks the token</td>
+<td>Every relevant writer coordinates on the root</td>
+</tr>
+</tbody></table>
+<p>To protect this aggregate pessimistically, lock its root first, then read its children and decide. Merely locking whatever child row happens to be updated still misses the shared invariant. PostgreSQL row locks block conflicting writers and lockers, not ordinary nonlocking reads; deadlocks remain possible. <a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL: explicit locking</a></p>
+<h3 id="step-38"><span class="step-number">38</span><span>Decide using contention and work cost</span></h3>
+<p>Suppose, hypothetically, 60% of attempts collide and each attempt is expensive. Repeatedly discarding that work may cost more than early serialization. A scarce resource with sustained competition may benefit from a shared lock or a queue.</p>
+<p>Measure conflict rate, time spent before conflict, lock wait, retry count, latency, and exhausted attempts. Keep transactions short whichever strategy you choose. Do not hold a database transaction open while a human edits a form or while avoidable external work runs.</p>
+<h3 id="step-39"><span class="step-number">39</span><span>Consider serializable isolation</span></h3>
+<p>PostgreSQL <code>SERIALIZABLE</code> ensures that committed transactions have effects consistent with some serial execution. It can abort transactions with serialization failures, so callers must be prepared to retry. <a href="https://www.postgresql.org/docs/18/sql-set-transaction.html">PostgreSQL: transaction modes</a></p>
+<p>This is another way to protect an invariant when the full relevant read and write set participates correctly. It is not a promise that every attempted transaction succeeds. Do not substitute the name of an isolation level for testing the actual workload and its failure handling.</p>
+<h3 id="step-40"><span class="step-number">40</span><span>Keep versions when they serve an application contract</span></h3>
+<p>Even with stronger isolation, a version can still express stale browser edits, offline edits, aggregate revision metadata, and explicit expected-state commands. A database transaction cannot cover the minutes a user spent looking at an earlier representation.</p>
+<p>Choose mechanisms by responsibility. Database isolation governs overlapping transactions. A client revision can govern a longer decision interval. They may both be needed.</p>
+<h3 id="step-41"><span class="step-number">41</span><span>Understand write skew</span></h3>
+<p>Two doctors are on call. The rule says at least one must remain on call. Each doctor has an independent version.</p>
+<table>
+<thead>
+<tr>
+<th>Transaction A</th>
+<th>Transaction B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reads A = on and B = on</td>
+<td>Reads A = on and B = on</td>
+</tr>
+<tr>
+<td>Turns A off, checking A&#39;s version</td>
+<td>Turns B off, checking B&#39;s version</td>
+</tr>
+<tr>
+<td>Its own version check succeeds</td>
+<td>Its own version check succeeds</td>
+</tr>
+</tbody></table>
+<p>Under isolation that allows this interleaving, both can commit because they update different tokens. Nobody remains on call. The invariant spans more state than either token covers.</p>
+<p>Possible designs include a shared roster aggregate/token, a shared coordination lock, or appropriately used serializable transactions. Reservations can make coordination explicit. Eventual consistency is an option only if the business accepts temporarily relaxing the rule; it cannot preserve a strict “always at least one” invariant.</p>
+<h3 id="step-42"><span class="step-number">42</span><span>Revisit the aggregate boundary</span></h3>
+<p>Ask both questions: <strong>What must remain consistent together? What state must participate in the same concurrency decision?</strong> Their answers often point to the same aggregate boundary.</p>
+<p>An aggregate is useful operationally because it aligns invariant scope, load/save scope, and coordination. This does not require every application transaction to contain exactly one aggregate, or all emitted messages to form a gapless stream. The boundary must fit the actual correctness requirement.</p>
+<h3 id="step-43"><span class="step-number">43</span><span>Make temporal coupling visible</span></h3>
+<p>The two requests were already related through shared mutable state. Versioning makes that relationship explicit: both expect revision 7, and at most one competing transaction may successfully commit the transition from that revision under the protocol.</p>
+<p>The pattern exposes an existing dependency. It does not make independent operations dependent by accident; an overly broad aggregate can, however, introduce avoidable contention and deserves examination when measurements show it matters.</p>
+<h3 id="step-44"><span class="step-number">44</span><span>Centralize the concurrency mechanism</span></h3>
+<p>If add-line, change-quantity, and confirm handlers each implement their own SQL version checks, a change to the protocol touches every handler. Missing one path creates a bypass.</p>
+<p>Centralize expected-version persistence in the repository or Unit of Work. Let application code choose retry policy and express any client precondition. Let domain behavior remain responsible for invariants. These distinct responsibilities keep the change surface small without hiding the policy.</p>
+<h2 id="tests">IX. Test the contract against the database</h2>
+
+<h3 id="step-45"><span class="step-number">45</span><span>Test a normal save and a stale writer</span></h3>
+<p>Start from version 7. Load and mutate, commit, and assert version 8 plus the expected children. Then load two copies at version 7 in separate transactions; commit one and attempt to save the other. Assert a conflict and verify that only the winning change is durable.</p>
+<p>Use a real PostgreSQL instance with the intended isolation and schema. A mock can test that an exception is handled; it cannot establish the database&#39;s concurrency behavior.</p>
+<h3 id="step-46"><span class="step-number">46</span><span>Test rollback of child writes</span></h3>
+<p>Inject a failure after the conditional root update and at least one child write. After rollback, use a separate connection to assert the original root version and original lines. This tests the actual ordering in the reference repository.</p>
+<p>If another implementation writes children before checking the root, deliberately create a stale version, write a child, fail the check, and verify the child is absent after rollback. Testing only the thrown exception misses the atomicity requirement.</p>
+<h3 id="step-47"><span class="step-number">47</span><span>Test the invariant after retry</span></h3>
+<p>Coordinate two attempts so both load 90 at v7 before either saves. Each adds 10. One commits; the other receives a conflict. Run the losing command in a fresh transaction and expect <code>OrderCapacityExceeded</code>.</p>
+<p>Assert final total 100 and final version 8. If policy rejects without retry, the losing result is the original concurrency error. “Eventually a capacity error” is only expected when a fresh retry actually happens and no intervening operation changes capacity.</p>
+<h3 id="step-48"><span class="step-number">48</span><span>Test outbox rollback</span></h3>
+<p>Inject a failure after inserting an outbox row but before commit. Assert neither the aggregate transition nor that event ID is durable. Also verify that a stale save never leaves an event behind.</p>
+<p>The first test proves rollback after an actual insert; the second proves the stale path. With a root-first implementation, the stale path may never reach outbox insertion, so testing only that path would be incomplete.</p>
+<h3 id="step-49"><span class="step-number">49</span><span>Test the event revision contract</span></h3>
+<p>After successful confirmation, assert that the outbox&#39;s <code>aggregate_version</code> equals the resulting committed root version. If a later transition emits another event, assert its corresponding revision.</p>
+<p>Where required, separately test event indexes, deduplication by event ID, and out-of-order processing. Do not assert gapless versions for a subscription unless the publisher&#39;s contract guarantees them.</p>
+<h3 id="step-50"><span class="step-number">50</span><span>Run genuinely overlapping transactions</span></h3>
+<p>A sequential stale-copy test is useful, but it does not exercise contention during simultaneous save attempts. Appendix B uses two threads, separate transactions, and a timed barrier after loading. That ensures both decisions begin from the same revision before the writes race.</p>
+<p>The test expects one committed result, one optimistic conflict, total 100, version 8, and a capacity rejection on a fresh retry. It also gives the root updates a database lock timeout so a locking regression fails rather than hanging indefinitely. ORM implementations should repeat this test for every child-only mutation path.</p>
+<h2 id="synthesis">X. State the guarantee and connect the patterns</h2>
+
+<h3 id="step-51"><span class="step-number">51</span><span>Know when a version adds little value</span></h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Why a token may be unnecessary or unsuitable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Immutable historical rows</td>
+<td>No update race exists for that data</td>
+</tr>
+<tr>
+<td>Independent append-only records</td>
+<td>There may be no shared decision to invalidate</td>
+</tr>
+<tr>
+<td>A correctly enforced database constraint or atomic SQL rule</td>
+<td>The required invariant may already be protected</td>
+</tr>
+<tr>
+<td>Very high contention</td>
+<td>Early serialization or a different model may cost less</td>
+</tr>
+</tbody></table>
+<p>“Append-only” is not sufficient by itself: our failing example appended independent lines while violating a shared sum. Look for the shared invariant before concluding that independent row inserts are independent business operations.</p>
+<h3 id="step-52"><span class="step-number">52</span><span>Keep database constraints</span></h3>
+<p>Positive quantities, foreign keys, primary keys, and appropriate uniqueness rules are still valuable. If the business permits only one line per product, for example, add <code>UNIQUE (order_id, product_id)</code> and make the domain behavior match. The reference model permits repeated products as separate lines, so it does not add that constraint.</p>
+<p>A PostgreSQL <code>CHECK</code> on one row is not a general way to enforce a sum across all child rows. PostgreSQL explicitly cautions against checks that depend on other rows. <a href="https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS">PostgreSQL: constraints</a></p>
+<p>The database protects the constraints declared in its schema. Domain behavior expresses richer business operations. The version protocol prevents stale decisions from committing through participating writers. None makes the other two redundant.</p>
+<h3 id="step-53"><span class="step-number">53</span><span>Use an ownership map</span></h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Responsibility in this example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Domain: <code>Order</code></td>
+<td>At most 100 units; positive additions; confirmed order cannot change; empty order cannot confirm</td>
+</tr>
+<tr>
+<td>Application</td>
+<td>Load, invoke behavior, request save; choose conflict policy; coordinate a transaction through a port</td>
+</tr>
+<tr>
+<td>Persistence adapter</td>
+<td>Reconstruct one revision; execute conditional root update; persist children; insert outbox</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Atomic statements, transaction commit/rollback, isolation, locks, declared constraints</td>
+</tr>
+<tr>
+<td>Delivery / consumer</td>
+<td>Publish committed outbox records; handle duplicate delivery and required ordering</td>
+</tr>
+</tbody></table>
+<h3 id="step-54"><span class="step-number">54</span><span>Trace the complete use case</span></h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Success path</th>
+<th>Failure path</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Begin and load</td>
+<td>Reconstruct order v7 and its lines</td>
+<td>Missing order or load failure ends work</td>
+</tr>
+<tr>
+<td>Domain operation</td>
+<td><code>addLine</code> validates and changes local state</td>
+<td>Domain rejection; roll back</td>
+</tr>
+<tr>
+<td>Conditional save</td>
+<td>One root row updated to candidate v8</td>
+<td>Zero rows; throw conflict and roll back</td>
+</tr>
+<tr>
+<td>Persist children and required outbox</td>
+<td>All local writes succeed</td>
+<td>Any failure rolls the unit back</td>
+</tr>
+<tr>
+<td>Commit</td>
+<td>Expose the committed result</td>
+<td>Classify failure; reconcile an uncertain outcome</td>
+</tr>
+<tr>
+<td>Optional conflict recovery</td>
+<td>Start a fresh transaction and reconsider</td>
+<td>Stop at retry bound or return a new domain rejection</td>
+</tr>
+</tbody></table>
+<h3 id="step-55"><span class="step-number">55</span><span>State exactly what the pattern guarantees</span></h3>
+<div class="principle"><strong>A stale aggregate decision cannot silently commit through this save protocol if every consistency-relevant mutation participates in the same token check and all dependent writes share the transaction.</strong></div>
+
+<p>That guarantee assumes a coherent load, correct local rules, and tokens that are not reused. It does not prevent all concurrency, prove that every rejected edit is semantically incompatible, solve cross-token invariants, deliver messages exactly once, or resolve an uncertain commit outcome.</p>
+<p>The proof for our example is simple: a valid revision is read; only one competing writer can commit its advancement; that writer&#39;s rules limit its new total to 100; stale dependent writes roll back. Each next successful command must validate against a revision it can still claim.</p>
+<h3 id="step-56"><span class="step-number">56</span><span>Connect the patterns already learned</span></h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Its question</th>
+<th>Connection to optimistic concurrency</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Aggregate</td>
+<td>What must stay consistent together?</td>
+<td>Defines the state covered by the token</td>
+</tr>
+<tr>
+<td>Repository</td>
+<td>How is that state loaded and persisted?</td>
+<td>Applies expected-version persistence centrally</td>
+</tr>
+<tr>
+<td>Unit of Work</td>
+<td>What commits or rolls back together?</td>
+<td>Makes a conflict undo root, child, and outbox writes</td>
+</tr>
+<tr>
+<td>Transactional Outbox</td>
+<td>How does a committed change create a durable outgoing message?</td>
+<td>Event survives only with its successful transition</td>
+</tr>
+<tr>
+<td>Inbox / idempotency</td>
+<td>Has this message or command already been handled?</td>
+<td>Handles duplicates, a different problem from competing writers</td>
+</tr>
+<tr>
+<td>State</td>
+<td>Which behavior is allowed in a logical state?</td>
+<td>Domain behavior uses state; the token checks its revision</td>
+</tr>
+</tbody></table>
+<h3 id="step-57"><span class="step-number">57</span><span>Re-derive it instead of memorizing an annotation</span></h3>
+<ol>
+<li>I read mutable business state.</li>
+<li>I make a decision based on that revision.</li>
+<li>Another writer may change the state that matters.</li>
+<li>My earlier decision may no longer be valid.</li>
+<li>My save must atomically verify the revision it depends on.</li>
+<li>If verification fails, all dependent local writes must roll back.</li>
+<li>Recovery means reloading and reconsidering, or explicitly rejecting the operation.</li>
+</ol>
+<p>These steps derive the version, conditional update, conflict, rollback, and retry policy. <code>@Version</code> is one implementation mechanism, not the reasoning itself.</p>
+<h3 id="step-58"><span class="step-number">58</span><span>Reach the next design pressure</span></h3>
+<p>An aggregate is a statement about correctness under transactions and concurrency. Its boundary should cover the state whose changes can invalidate its decisions.</p>
+<p>Now extend the workflow across Order, Payment, Inventory, and Shipping, each with separately committed state. The local order token cannot atomically control all of those commits. Some steps may succeed before a later step fails, and their effects may need business compensation.</p>
+<p>That is the next pressure from which <strong>Saga and compensating transactions</strong> emerge. Carry forward the same habit: identify the required guarantee, find the boundary that can actually enforce it, and make failure semantics explicit.</p>
+<h2 id="reference">Appendix A. Complete Java / JDBC reference</h2>
+
+<p>This is a small teaching implementation, not a production framework. All nested types are in one file so the example is copyable and self-contained. It implements loading, adding a line, confirmation, root-first saves, child replacement, atomic outbox insertion, and bounded optimistic retries. It updates existing orders; creation is represented by the SQL seed.</p>
+<p><strong>Implementation contract:</strong> use one fresh connection per transaction; do not let a mutable <code>Order</code>, repository, or session escape its transaction; save each order once; let failures propagate to the transaction owner. The outbox stores a minimal event envelope. A real integration event may need an immutable payload describing the committed transition; loading “whatever the order looks like later” is not an equivalent event snapshot. The relay is outside this example.</p>
+<p><strong>Compatibility and validation:</strong> source uses standard Java features and JDBC APIs supported by Java 25, with no preview features. The reference and race-test sources were compiled with the available Java 17 compiler; the domain smoke test passed. A Java 25 runtime and PostgreSQL server were not available for execution here, so the database race test is supplied for verification in your environment. The ORM mapping example is separate and requires its own dependencies.</p>
+<p><strong>Print validation:</strong> the HTML includes A4 print styles, wrapping code, repeated table headers, and page-break rules. ⚠ Browser print preview could not be verified in this environment; check the preview before exporting your final PDF.</p>
+<h4>Compile and run the domain-only smoke test on JDK 25</h4>
+<div class="code-block"><div class="code-label"><span>SH</span><button class="copy-btn" type="button" data-copy="code-14">Copy</button></div><pre><code id="code-14">javac --release 25 OrderOccExample.java
+java OrderOccExample
+</code></pre></div>
+<h4>Run against PostgreSQL</h4>
+<p>Execute the schema below once in a disposable database. Obtain a PostgreSQL JDBC driver from the <a href="https://jdbc.postgresql.org/download/">official pgJDBC download page</a> and add the JAR to the runtime classpath. Set <code>OCC_JDBC_URL</code>, <code>OCC_DB_USER</code>, and <code>OCC_DB_PASSWORD</code> to your database values. The URL has the form <code>jdbc:postgresql://localhost:5432/occ_example</code>. <a href="https://jdbc.postgresql.org/documentation/use/">pgJDBC: connecting</a></p>
+<p>Then add 10 units to the seed order (Unix-style classpath separator shown; Windows uses <code>;</code>):</p>
+<div class="code-block"><div class="code-label"><span>SH</span><button class="copy-btn" type="button" data-copy="code-15">Copy</button></div><pre><code id="code-15">java -cp &quot;.:postgresql.jar&quot; OrderOccExample \
+  00000000-0000-0000-0000-000000000123 \
+  00000000-0000-0000-0000-00000000000b 10
+</code></pre></div>
+<p>Here <code>postgresql.jar</code> stands for your downloaded driver filename. The first successful run prints <code>Committed version: 8</code>. An unchanged second run rejects the additional 10 because the order is already full. This command has no idempotency key; rerunning a successful additive command is a new command.</p>
+<h4>schema.sql</h4>
+<div class="source-actions"><a download="schema.sql" href="data:text/plain;charset=utf-8;base64,LS0gUG9zdGdyZVNRTCAxOC4gUnVuIG9uY2UgaW4gYSBkaXNwb3NhYmxlIGV4YW1wbGUgZGF0YWJhc2UuCkNSRUFURSBUQUJMRSBvcmRlcnMgKAogICAgaWQgVVVJRCBQUklNQVJZIEtFWSwKICAgIHN0YXR1cyBWQVJDSEFSKDIwKSBOT1QgTlVMTCBDSEVDSyAoc3RhdHVzIElOICgnRFJBRlQnLCAnQ09ORklSTUVEJykpLAogICAgdmVyc2lvbiBCSUdJTlQgTk9UIE5VTEwgREVGQVVMVCAwIENIRUNLICh2ZXJzaW9uID49IDApCik7CgpDUkVBVEUgVEFCTEUgb3JkZXJfbGluZSAoCiAgICBpZCBVVUlEIFBSSU1BUlkgS0VZLAogICAgb3JkZXJfaWQgVVVJRCBOT1QgTlVMTCBSRUZFUkVOQ0VTIG9yZGVycyhpZCksCiAgICBwcm9kdWN0X2lkIFVVSUQgTk9UIE5VTEwsCiAgICBxdWFudGl0eSBJTlRFR0VSIE5PVCBOVUxMIENIRUNLIChxdWFudGl0eSA+IDApCik7CkNSRUFURSBJTkRFWCBvcmRlcl9saW5lX29yZGVyX2lkX2lkeCBPTiBvcmRlcl9saW5lKG9yZGVyX2lkKTsKCkNSRUFURSBUQUJMRSBvdXRib3hfbWVzc2FnZSAoCiAgICBpZCBVVUlEIFBSSU1BUlkgS0VZLAogICAgYWdncmVnYXRlX2lkIFVVSUQgTk9UIE5VTEwsCiAgICBhZ2dyZWdhdGVfdmVyc2lvbiBCSUdJTlQgTk9UIE5VTEwsCiAgICBldmVudF90eXBlIFZBUkNIQVIoODApIE5PVCBOVUxMLAogICAgY3JlYXRlZF9hdCBUSU1FU1RBTVBUWiBOT1QgTlVMTCBERUZBVUxUIENVUlJFTlRfVElNRVNUQU1QCik7CgpJTlNFUlQgSU5UTyBvcmRlcnMgKGlkLCBzdGF0dXMsIHZlcnNpb24pClZBTFVFUyAoJzAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDEyMycsICdEUkFGVCcsIDcpOwoKSU5TRVJUIElOVE8gb3JkZXJfbGluZSAoaWQsIG9yZGVyX2lkLCBwcm9kdWN0X2lkLCBxdWFudGl0eSkKVkFMVUVTICgKICAgICcwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEnLAogICAgJzAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDEyMycsCiAgICAnMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDBhJywgOTAKKTsK">Download schema.sql</a></div>
+
+<div class="code-block"><div class="code-label"><span>SQL</span><button class="copy-btn" type="button" data-copy="code-16">Copy</button></div><pre><code id="code-16">-- PostgreSQL 18. Run once in a disposable example database.
+CREATE TABLE orders (
+    id UUID PRIMARY KEY,
+    status VARCHAR(20) NOT NULL CHECK (status IN (&#39;DRAFT&#39;, &#39;CONFIRMED&#39;)),
+    version BIGINT NOT NULL DEFAULT 0 CHECK (version &gt;= 0)
+);
+
+CREATE TABLE order_line (
+    id UUID PRIMARY KEY,
+    order_id UUID NOT NULL REFERENCES orders(id),
+    product_id UUID NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity &gt; 0)
+);
+CREATE INDEX order_line_order_id_idx ON order_line(order_id);
+
+CREATE TABLE outbox_message (
+    id UUID PRIMARY KEY,
+    aggregate_id UUID NOT NULL,
+    aggregate_version BIGINT NOT NULL,
+    event_type VARCHAR(80) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO orders (id, status, version)
+VALUES (&#39;00000000-0000-0000-0000-000000000123&#39;, &#39;DRAFT&#39;, 7);
+
+INSERT INTO order_line (id, order_id, product_id, quantity)
+VALUES (
+    &#39;00000000-0000-0000-0000-000000000001&#39;,
+    &#39;00000000-0000-0000-0000-000000000123&#39;,
+    &#39;00000000-0000-0000-0000-00000000000a&#39;, 90
+);
+</code></pre></div>
+<h4>OrderOccExample.java</h4>
+<div class="source-actions"><a download="OrderOccExample.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5Ecml2ZXJNYW5hZ2VyOwppbXBvcnQgamF2YS5zcWwuU1FMRXhjZXB0aW9uOwppbXBvcnQgamF2YS51dGlsLkFycmF5TGlzdDsKaW1wb3J0IGphdmEudXRpbC5IYXNoU2V0OwppbXBvcnQgamF2YS51dGlsLkxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuT2JqZWN0czsKaW1wb3J0IGphdmEudXRpbC5TZXQ7CmltcG9ydCBqYXZhLnV0aWwuVVVJRDsKaW1wb3J0IGphdmEudXRpbC5mdW5jdGlvbi5TdXBwbGllcjsKCnB1YmxpYyBmaW5hbCBjbGFzcyBPcmRlck9jY0V4YW1wbGUgewogICAgcHJpdmF0ZSBPcmRlck9jY0V4YW1wbGUoKSB7fQoKICAgIGVudW0gU3RhdHVzIHsgRFJBRlQsIENPTkZJUk1FRCB9CgogICAgcmVjb3JkIExpbmUoVVVJRCBpZCwgVVVJRCBwcm9kdWN0SWQsIGludCBxdWFudGl0eSkgewogICAgICAgIExpbmUgewogICAgICAgICAgICBPYmplY3RzLnJlcXVpcmVOb25OdWxsKGlkKTsKICAgICAgICAgICAgT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChwcm9kdWN0SWQpOwogICAgICAgICAgICBpZiAocXVhbnRpdHkgPD0gMCkgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiUXVhbnRpdHkgbXVzdCBiZSBwb3NpdGl2ZSIpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBPcmRlckNhcGFjaXR5RXhjZWVkZWQgZXh0ZW5kcyBSdW50aW1lRXhjZXB0aW9uIHsKICAgICAgICBPcmRlckNhcGFjaXR5RXhjZWVkZWQoKSB7IHN1cGVyKCJBbiBvcmRlciBtYXkgY29udGFpbiBhdCBtb3N0IDEwMCB1bml0cyIpOyB9CiAgICB9CgogICAgc3RhdGljIGZpbmFsIGNsYXNzIENvbmN1cnJlbnRPcmRlck1vZGlmaWNhdGlvbiBleHRlbmRzIFJ1bnRpbWVFeGNlcHRpb24gewogICAgICAgIENvbmN1cnJlbnRPcmRlck1vZGlmaWNhdGlvbihVVUlEIGlkLCBsb25nIGV4cGVjdGVkVmVyc2lvbikgewogICAgICAgICAgICBzdXBlcigiT3JkZXIgIiArIGlkICsgIiBubyBsb25nZXIgbWF0Y2hlcyB2IiArIGV4cGVjdGVkVmVyc2lvbik7CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBQZXJzaXN0ZW5jZUZhaWx1cmUgZXh0ZW5kcyBSdW50aW1lRXhjZXB0aW9uIHsKICAgICAgICBQZXJzaXN0ZW5jZUZhaWx1cmUoVGhyb3dhYmxlIGNhdXNlKSB7IHN1cGVyKGNhdXNlKTsgfQogICAgfQoKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBPcmRlciB7CiAgICAgICAgcHJpdmF0ZSBmaW5hbCBVVUlEIGlkOwogICAgICAgIHByaXZhdGUgZmluYWwgbG9uZyBsb2FkZWRWZXJzaW9uOwogICAgICAgIHByaXZhdGUgU3RhdHVzIHN0YXR1czsKICAgICAgICBwcml2YXRlIGZpbmFsIExpc3Q8TGluZT4gbGluZXM7CgogICAgICAgIE9yZGVyKFVVSUQgaWQsIGxvbmcgbG9hZGVkVmVyc2lvbiwgU3RhdHVzIHN0YXR1cywgTGlzdDxMaW5lPiBsaW5lcykgewogICAgICAgICAgICB0aGlzLmlkID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChpZCk7CiAgICAgICAgICAgIGlmIChsb2FkZWRWZXJzaW9uIDwgMCkgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiVmVyc2lvbiIpOwogICAgICAgICAgICB0aGlzLmxvYWRlZFZlcnNpb24gPSBsb2FkZWRWZXJzaW9uOwogICAgICAgICAgICB0aGlzLnN0YXR1cyA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwoc3RhdHVzKTsKICAgICAgICAgICAgdGhpcy5saW5lcyA9IG5ldyBBcnJheUxpc3Q8PihMaXN0LmNvcHlPZihsaW5lcykpOwogICAgICAgICAgICBpZiAodGhpcy5saW5lcy5zdHJlYW0oKS5tYXBUb0xvbmcoTGluZTo6cXVhbnRpdHkpLnN1bSgpID4gMTAwKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgT3JkZXJDYXBhY2l0eUV4Y2VlZGVkKCk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgaWYgKHN0YXR1cyA9PSBTdGF0dXMuQ09ORklSTUVEICYmIHRoaXMubGluZXMuaXNFbXB0eSgpKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJDb25maXJtZWQgb3JkZXIgaXMgZW1wdHkiKTsKICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgVVVJRCBpZCgpIHsgcmV0dXJuIGlkOyB9CiAgICAgICAgbG9uZyBsb2FkZWRWZXJzaW9uKCkgeyByZXR1cm4gbG9hZGVkVmVyc2lvbjsgfQogICAgICAgIFN0YXR1cyBzdGF0dXMoKSB7IHJldHVybiBzdGF0dXM7IH0KICAgICAgICBMaXN0PExpbmU+IGxpbmVzKCkgeyByZXR1cm4gTGlzdC5jb3B5T2YobGluZXMpOyB9CiAgICAgICAgaW50IHRvdGFsVW5pdHMoKSB7IHJldHVybiBsaW5lcy5zdHJlYW0oKS5tYXBUb0ludChMaW5lOjpxdWFudGl0eSkuc3VtKCk7IH0KCiAgICAgICAgdm9pZCBhZGRMaW5lKFVVSUQgcHJvZHVjdElkLCBpbnQgcXVhbnRpdHkpIHsKICAgICAgICAgICAgcmVxdWlyZURyYWZ0KCk7CiAgICAgICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwocHJvZHVjdElkKTsKICAgICAgICAgICAgaWYgKHF1YW50aXR5IDw9IDApIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIlF1YW50aXR5Iik7CiAgICAgICAgICAgIGlmIChxdWFudGl0eSA+IDEwMCAtIHRvdGFsVW5pdHMoKSkgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IE9yZGVyQ2FwYWNpdHlFeGNlZWRlZCgpOwogICAgICAgICAgICB9CiAgICAgICAgICAgIGxpbmVzLmFkZChuZXcgTGluZShVVUlELnJhbmRvbVVVSUQoKSwgcHJvZHVjdElkLCBxdWFudGl0eSkpOwogICAgICAgIH0KCiAgICAgICAgdm9pZCBjb25maXJtKCkgewogICAgICAgICAgICByZXF1aXJlRHJhZnQoKTsKICAgICAgICAgICAgaWYgKGxpbmVzLmlzRW1wdHkoKSkgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbigiRW1wdHkgb3JkZXIiKTsKICAgICAgICAgICAgc3RhdHVzID0gU3RhdHVzLkNPTkZJUk1FRDsKICAgICAgICB9CgogICAgICAgIHByaXZhdGUgdm9pZCByZXF1aXJlRHJhZnQoKSB7CiAgICAgICAgICAgIGlmIChzdGF0dXMgIT0gU3RhdHVzLkRSQUZUKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgSWxsZWdhbFN0YXRlRXhjZXB0aW9uKCJPcmRlciBpcyBhbHJlYWR5IGNvbmZpcm1lZCIpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGludGVyZmFjZSBPcmRlclJlcG9zaXRvcnkgewogICAgICAgIE9yZGVyIGdldChVVUlEIGlkKTsKICAgICAgICBsb25nIHNhdmUoT3JkZXIgb3JkZXIpOyAvLyBOZXcgdmVyc2lvbiBpcyBwcm92aXNpb25hbCB1bnRpbCBjb21taXQuCiAgICB9CgogICAgaW50ZXJmYWNlIE91dGJveCB7CiAgICAgICAgdm9pZCBhcHBlbmQoVVVJRCBldmVudElkLCBVVUlEIG9yZGVySWQsIGxvbmcgdmVyc2lvbiwgU3RyaW5nIHR5cGUpOwogICAgfQoKICAgIHJlY29yZCBTZXNzaW9uKE9yZGVyUmVwb3NpdG9yeSBvcmRlcnMsIE91dGJveCBvdXRib3gpIHt9CgogICAgQEZ1bmN0aW9uYWxJbnRlcmZhY2UKICAgIGludGVyZmFjZSBXb3JrPFQ+IHsgVCBydW4oU2Vzc2lvbiBzZXNzaW9uKTsgfQoKICAgIGludGVyZmFjZSBUcmFuc2FjdGlvbnMgewogICAgICAgIDxUPiBUIGV4ZWN1dGUoV29yazxUPiB3b3JrKTsKICAgIH0KCiAgICBARnVuY3Rpb25hbEludGVyZmFjZQogICAgaW50ZXJmYWNlIENvbm5lY3Rpb25GYWN0b3J5IHsgQ29ubmVjdGlvbiBvcGVuKCkgdGhyb3dzIFNRTEV4Y2VwdGlvbjsgfQoKICAgIHN0YXRpYyBmaW5hbCBjbGFzcyBKZGJjVHJhbnNhY3Rpb25zIGltcGxlbWVudHMgVHJhbnNhY3Rpb25zIHsKICAgICAgICBwcml2YXRlIGZpbmFsIENvbm5lY3Rpb25GYWN0b3J5IGNvbm5lY3Rpb25zOwoKICAgICAgICBKZGJjVHJhbnNhY3Rpb25zKENvbm5lY3Rpb25GYWN0b3J5IGNvbm5lY3Rpb25zKSB7CiAgICAgICAgICAgIHRoaXMuY29ubmVjdGlvbnMgPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKGNvbm5lY3Rpb25zKTsKICAgICAgICB9CgogICAgICAgIHB1YmxpYyA8VD4gVCBleGVjdXRlKFdvcms8VD4gd29yaykgewogICAgICAgICAgICB0cnkgKENvbm5lY3Rpb24gYyA9IGNvbm5lY3Rpb25zLm9wZW4oKSkgewogICAgICAgICAgICAgICAgYy5zZXRUcmFuc2FjdGlvbklzb2xhdGlvbihDb25uZWN0aW9uLlRSQU5TQUNUSU9OX1JFQURfQ09NTUlUVEVEKTsKICAgICAgICAgICAgICAgIGMuc2V0QXV0b0NvbW1pdChmYWxzZSk7CiAgICAgICAgICAgICAgICB0cnkgewogICAgICAgICAgICAgICAgICAgIHZhciBzZXNzaW9uID0gbmV3IFNlc3Npb24oCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBuZXcgSmRiY09yZGVycyhjKSwgbmV3IEpkYmNPdXRib3goYykpOwogICAgICAgICAgICAgICAgICAgIFQgcmVzdWx0ID0gd29yay5ydW4oc2Vzc2lvbik7CiAgICAgICAgICAgICAgICAgICAgYy5jb21taXQoKTsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gcmVzdWx0OwogICAgICAgICAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIHwgUnVudGltZUV4Y2VwdGlvbiB8IEVycm9yIGZhaWx1cmUpIHsKICAgICAgICAgICAgICAgICAgICB0cnkgewogICAgICAgICAgICAgICAgICAgICAgICBjLnJvbGxiYWNrKCk7CiAgICAgICAgICAgICAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIHJvbGxiYWNrRmFpbHVyZSkgewogICAgICAgICAgICAgICAgICAgICAgICBmYWlsdXJlLmFkZFN1cHByZXNzZWQocm9sbGJhY2tGYWlsdXJlKTsKICAgICAgICAgICAgICAgICAgICAgICAgLy8gRG8gbm90IHRyZWF0IGFuIHVuY2VydGFpbiByb2xsYmFjayBhcyByZXRyeWFibGUgT0NDLgogICAgICAgICAgICAgICAgICAgICAgICB0aHJvdyBuZXcgUGVyc2lzdGVuY2VGYWlsdXJlKGZhaWx1cmUpOwogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICB0aHJvdyBmYWlsdXJlOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9IGNhdGNoIChTUUxFeGNlcHRpb24gZmFpbHVyZSkgewogICAgICAgICAgICAgICAgdGhyb3cgbmV3IFBlcnNpc3RlbmNlRmFpbHVyZShmYWlsdXJlKTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgZmluYWwgY2xhc3MgSmRiY09yZGVycyBpbXBsZW1lbnRzIE9yZGVyUmVwb3NpdG9yeSB7CiAgICAgICAgcHJpdmF0ZSBmaW5hbCBDb25uZWN0aW9uIGM7CiAgICAgICAgcHJpdmF0ZSBmaW5hbCBTZXQ8VVVJRD4gc2F2ZWQgPSBuZXcgSGFzaFNldDw+KCk7CgogICAgICAgIEpkYmNPcmRlcnMoQ29ubmVjdGlvbiBjKSB7IHRoaXMuYyA9IGM7IH0KCiAgICAgICAgcHVibGljIE9yZGVyIGdldChVVUlEIGlkKSB7CiAgICAgICAgICAgIC8vIE9uZSBzdGF0ZW1lbnQgZ2l2ZXMgdGhlIHJvb3QgYW5kIGNoaWxkcmVuIG9uZSByZWFkIHNuYXBzaG90LgogICAgICAgICAgICBTdHJpbmcgc3FsID0gIiIiCiAgICAgICAgICAgICAgICBTRUxFQ1Qgby5zdGF0dXMsIG8udmVyc2lvbiwgbC5pZCBBUyBsaW5lX2lkLAogICAgICAgICAgICAgICAgICAgICAgIGwucHJvZHVjdF9pZCwgbC5xdWFudGl0eQogICAgICAgICAgICAgICAgRlJPTSBvcmRlcnMgbwogICAgICAgICAgICAgICAgTEVGVCBKT0lOIG9yZGVyX2xpbmUgbCBPTiBsLm9yZGVyX2lkID0gby5pZAogICAgICAgICAgICAgICAgV0hFUkUgby5pZCA9ID8KICAgICAgICAgICAgICAgIE9SREVSIEJZIGwuaWQKICAgICAgICAgICAgICAgICIiIjsKICAgICAgICAgICAgdHJ5ICh2YXIgcCA9IGMucHJlcGFyZVN0YXRlbWVudChzcWwpKSB7CiAgICAgICAgICAgICAgICBwLnNldE9iamVjdCgxLCBpZCk7CiAgICAgICAgICAgICAgICB0cnkgKHZhciByID0gcC5leGVjdXRlUXVlcnkoKSkgewogICAgICAgICAgICAgICAgICAgIGlmICghci5uZXh0KCkpIHsKICAgICAgICAgICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxBcmd1bWVudEV4Y2VwdGlvbigiT3JkZXIgbm90IGZvdW5kOiAiICsgaWQpOwogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBTdGF0dXMgc3RhdHVzID0gU3RhdHVzLnZhbHVlT2Yoci5nZXRTdHJpbmcoInN0YXR1cyIpKTsKICAgICAgICAgICAgICAgICAgICBsb25nIHZlcnNpb24gPSByLmdldExvbmcoInZlcnNpb24iKTsKICAgICAgICAgICAgICAgICAgICB2YXIgbGluZXMgPSBuZXcgQXJyYXlMaXN0PExpbmU+KCk7CiAgICAgICAgICAgICAgICAgICAgZG8gewogICAgICAgICAgICAgICAgICAgICAgICBVVUlEIGxpbmVJZCA9IHIuZ2V0T2JqZWN0KCJsaW5lX2lkIiwgVVVJRC5jbGFzcyk7CiAgICAgICAgICAgICAgICAgICAgICAgIGlmIChsaW5lSWQgIT0gbnVsbCkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgbGluZXMuYWRkKG5ldyBMaW5lKGxpbmVJZCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgci5nZXRPYmplY3QoInByb2R1Y3RfaWQiLCBVVUlELmNsYXNzKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgci5nZXRJbnQoInF1YW50aXR5IikpKTsKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIH0gd2hpbGUgKHIubmV4dCgpKTsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbmV3IE9yZGVyKGlkLCB2ZXJzaW9uLCBzdGF0dXMsIGxpbmVzKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBQZXJzaXN0ZW5jZUZhaWx1cmUoZmFpbHVyZSk7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIHB1YmxpYyBsb25nIHNhdmUoT3JkZXIgb3JkZXIpIHsKICAgICAgICAgICAgaWYgKCFzYXZlZC5hZGQob3JkZXIuaWQoKSkpIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oIlNhdmUgb25jZSBwZXIgb3JkZXIgcGVyIHRyYW5zYWN0aW9uIik7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgbG9uZyBuZXh0ID0gTWF0aC5pbmNyZW1lbnRFeGFjdChvcmRlci5sb2FkZWRWZXJzaW9uKCkpOwogICAgICAgICAgICBTdHJpbmcgc3FsID0gIiIiCiAgICAgICAgICAgICAgICBVUERBVEUgb3JkZXJzIFNFVCBzdGF0dXMgPSA/LCB2ZXJzaW9uID0gPwogICAgICAgICAgICAgICAgV0hFUkUgaWQgPSA/IEFORCB2ZXJzaW9uID0gPwogICAgICAgICAgICAgICAgIiIiOwogICAgICAgICAgICB0cnkgKHZhciBwID0gYy5wcmVwYXJlU3RhdGVtZW50KHNxbCkpIHsKICAgICAgICAgICAgICAgIHAuc2V0U3RyaW5nKDEsIG9yZGVyLnN0YXR1cygpLm5hbWUoKSk7CiAgICAgICAgICAgICAgICBwLnNldExvbmcoMiwgbmV4dCk7CiAgICAgICAgICAgICAgICBwLnNldE9iamVjdCgzLCBvcmRlci5pZCgpKTsKICAgICAgICAgICAgICAgIHAuc2V0TG9uZyg0LCBvcmRlci5sb2FkZWRWZXJzaW9uKCkpOwogICAgICAgICAgICAgICAgaWYgKHAuZXhlY3V0ZVVwZGF0ZSgpICE9IDEpIHsKICAgICAgICAgICAgICAgICAgICB0aHJvdyBuZXcgQ29uY3VycmVudE9yZGVyTW9kaWZpY2F0aW9uKAogICAgICAgICAgICAgICAgICAgICAgICAgICAgb3JkZXIuaWQoKSwgb3JkZXIubG9hZGVkVmVyc2lvbigpKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHJlcGxhY2VMaW5lcyhvcmRlcik7CiAgICAgICAgICAgICAgICByZXR1cm4gbmV4dDsKICAgICAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBQZXJzaXN0ZW5jZUZhaWx1cmUoZmFpbHVyZSk7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIHByaXZhdGUgdm9pZCByZXBsYWNlTGluZXMoT3JkZXIgb3JkZXIpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgICAgICB0cnkgKHZhciBwID0gYy5wcmVwYXJlU3RhdGVtZW50KAogICAgICAgICAgICAgICAgICAgICJERUxFVEUgRlJPTSBvcmRlcl9saW5lIFdIRVJFIG9yZGVyX2lkID0gPyIpKSB7CiAgICAgICAgICAgICAgICBwLnNldE9iamVjdCgxLCBvcmRlci5pZCgpKTsKICAgICAgICAgICAgICAgIHAuZXhlY3V0ZVVwZGF0ZSgpOwogICAgICAgICAgICB9CiAgICAgICAgICAgIFN0cmluZyBzcWwgPSAiIiIKICAgICAgICAgICAgICAgIElOU0VSVCBJTlRPIG9yZGVyX2xpbmUoaWQsIG9yZGVyX2lkLCBwcm9kdWN0X2lkLCBxdWFudGl0eSkKICAgICAgICAgICAgICAgIFZBTFVFUyAoPywgPywgPywgPykKICAgICAgICAgICAgICAgICIiIjsKICAgICAgICAgICAgdHJ5ICh2YXIgcCA9IGMucHJlcGFyZVN0YXRlbWVudChzcWwpKSB7CiAgICAgICAgICAgICAgICBmb3IgKExpbmUgbGluZSA6IG9yZGVyLmxpbmVzKCkpIHsKICAgICAgICAgICAgICAgICAgICBwLnNldE9iamVjdCgxLCBsaW5lLmlkKCkpOwogICAgICAgICAgICAgICAgICAgIHAuc2V0T2JqZWN0KDIsIG9yZGVyLmlkKCkpOwogICAgICAgICAgICAgICAgICAgIHAuc2V0T2JqZWN0KDMsIGxpbmUucHJvZHVjdElkKCkpOwogICAgICAgICAgICAgICAgICAgIHAuc2V0SW50KDQsIGxpbmUucXVhbnRpdHkoKSk7CiAgICAgICAgICAgICAgICAgICAgcC5hZGRCYXRjaCgpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgcC5leGVjdXRlQmF0Y2goKTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgZmluYWwgY2xhc3MgSmRiY091dGJveCBpbXBsZW1lbnRzIE91dGJveCB7CiAgICAgICAgcHJpdmF0ZSBmaW5hbCBDb25uZWN0aW9uIGM7CiAgICAgICAgSmRiY091dGJveChDb25uZWN0aW9uIGMpIHsgdGhpcy5jID0gYzsgfQoKICAgICAgICBwdWJsaWMgdm9pZCBhcHBlbmQoVVVJRCBldmVudElkLCBVVUlEIG9yZGVySWQsIGxvbmcgdmVyc2lvbiwgU3RyaW5nIHR5cGUpIHsKICAgICAgICAgICAgU3RyaW5nIHNxbCA9ICIiIgogICAgICAgICAgICAgICAgSU5TRVJUIElOVE8gb3V0Ym94X21lc3NhZ2UKICAgICAgICAgICAgICAgICAgICAoaWQsIGFnZ3JlZ2F0ZV9pZCwgYWdncmVnYXRlX3ZlcnNpb24sIGV2ZW50X3R5cGUpCiAgICAgICAgICAgICAgICBWQUxVRVMgKD8sID8sID8sID8pCiAgICAgICAgICAgICAgICAiIiI7CiAgICAgICAgICAgIHRyeSAodmFyIHAgPSBjLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICAgICAgcC5zZXRPYmplY3QoMSwgZXZlbnRJZCk7CiAgICAgICAgICAgICAgICBwLnNldE9iamVjdCgyLCBvcmRlcklkKTsKICAgICAgICAgICAgICAgIHAuc2V0TG9uZygzLCB2ZXJzaW9uKTsKICAgICAgICAgICAgICAgIHAuc2V0U3RyaW5nKDQsIHR5cGUpOwogICAgICAgICAgICAgICAgcC5leGVjdXRlVXBkYXRlKCk7CiAgICAgICAgICAgIH0gY2F0Y2ggKFNRTEV4Y2VwdGlvbiBmYWlsdXJlKSB7CiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgUGVyc2lzdGVuY2VGYWlsdXJlKGZhaWx1cmUpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHN0YXRpYyBsb25nIGFkZExpbmUoVHJhbnNhY3Rpb25zIHR4LCBVVUlEIGlkLCBVVUlEIHByb2R1Y3RJZCwgaW50IHF1YW50aXR5KSB7CiAgICAgICAgcmV0dXJuIHR4LmV4ZWN1dGUocyAtPiB7CiAgICAgICAgICAgIE9yZGVyIG9yZGVyID0gcy5vcmRlcnMoKS5nZXQoaWQpOwogICAgICAgICAgICBvcmRlci5hZGRMaW5lKHByb2R1Y3RJZCwgcXVhbnRpdHkpOwogICAgICAgICAgICByZXR1cm4gcy5vcmRlcnMoKS5zYXZlKG9yZGVyKTsKICAgICAgICB9KTsKICAgIH0KCiAgICBzdGF0aWMgbG9uZyBjb25maXJtKFRyYW5zYWN0aW9ucyB0eCwgVVVJRCBpZCkgewogICAgICAgIHJldHVybiB0eC5leGVjdXRlKHMgLT4gewogICAgICAgICAgICBPcmRlciBvcmRlciA9IHMub3JkZXJzKCkuZ2V0KGlkKTsKICAgICAgICAgICAgb3JkZXIuY29uZmlybSgpOwogICAgICAgICAgICBsb25nIG5leHQgPSBzLm9yZGVycygpLnNhdmUob3JkZXIpOwogICAgICAgICAgICBzLm91dGJveCgpLmFwcGVuZChVVUlELnJhbmRvbVVVSUQoKSwgaWQsIG5leHQsICJPcmRlckNvbmZpcm1lZCIpOwogICAgICAgICAgICByZXR1cm4gbmV4dDsKICAgICAgICB9KTsKICAgIH0KCiAgICBzdGF0aWMgPFQ+IFQgcmV0cnlDb25mbGljdChpbnQgbWF4QXR0ZW1wdHMsIFN1cHBsaWVyPFQ+IGVudGlyZUF0dGVtcHQpIHsKICAgICAgICBpZiAobWF4QXR0ZW1wdHMgPCAxKSB0aHJvdyBuZXcgSWxsZWdhbEFyZ3VtZW50RXhjZXB0aW9uKCJtYXhBdHRlbXB0cyIpOwogICAgICAgIGZvciAoaW50IGF0dGVtcHQgPSAxOyA7IGF0dGVtcHQrKykgewogICAgICAgICAgICB0cnkgewogICAgICAgICAgICAgICAgcmV0dXJuIGVudGlyZUF0dGVtcHQuZ2V0KCk7CiAgICAgICAgICAgIH0gY2F0Y2ggKENvbmN1cnJlbnRPcmRlck1vZGlmaWNhdGlvbiBjb25mbGljdCkgewogICAgICAgICAgICAgICAgLy8gQSByZXNvdXJjZS1jbG9zZSBmYWlsdXJlIGNhbiBiZSBhdHRhY2hlZCBieSB0cnktd2l0aC1yZXNvdXJjZXMuCiAgICAgICAgICAgICAgICBpZiAoYXR0ZW1wdCA9PSBtYXhBdHRlbXB0cyB8fCBjb25mbGljdC5nZXRTdXBwcmVzc2VkKCkubGVuZ3RoICE9IDApIHsKICAgICAgICAgICAgICAgICAgICB0aHJvdyBjb25mbGljdDsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBzdGF0aWMgdm9pZCBkb21haW5TbW9rZVRlc3QoKSB7CiAgICAgICAgdmFyIG9yZGVyID0gbmV3IE9yZGVyKFVVSUQucmFuZG9tVVVJRCgpLCA3LCBTdGF0dXMuRFJBRlQsCiAgICAgICAgICAgICAgICBMaXN0Lm9mKG5ldyBMaW5lKFVVSUQucmFuZG9tVVVJRCgpLCBVVUlELnJhbmRvbVVVSUQoKSwgOTApKSk7CiAgICAgICAgb3JkZXIuYWRkTGluZShVVUlELnJhbmRvbVVVSUQoKSwgMTApOwogICAgICAgIGlmIChvcmRlci50b3RhbFVuaXRzKCkgIT0gMTAwKSB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIkV4cGVjdGVkIDEwMCIpOwogICAgICAgIHRyeSB7CiAgICAgICAgICAgIG9yZGVyLmFkZExpbmUoVVVJRC5yYW5kb21VVUlEKCksIDEpOwogICAgICAgICAgICB0aHJvdyBuZXcgQXNzZXJ0aW9uRXJyb3IoIkV4cGVjdGVkIGNhcGFjaXR5IHJlamVjdGlvbiIpOwogICAgICAgIH0gY2F0Y2ggKE9yZGVyQ2FwYWNpdHlFeGNlZWRlZCBleHBlY3RlZCkgewogICAgICAgICAgICBpZiAob3JkZXIudG90YWxVbml0cygpICE9IDEwMCkgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKCJNdXRhdGVkIik7CiAgICAgICAgfQogICAgICAgIG9yZGVyLmNvbmZpcm0oKTsKICAgICAgICBpZiAob3JkZXIuc3RhdHVzKCkgIT0gU3RhdHVzLkNPTkZJUk1FRCkgdGhyb3cgbmV3IEFzc2VydGlvbkVycm9yKCJTdGF0dXMiKTsKICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIkRvbWFpbiBzbW9rZSB0ZXN0IHBhc3NlZDsgbm8gZGF0YWJhc2Ugd2FzIHVzZWQuIik7CiAgICB9CgogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIGlmIChhcmdzLmxlbmd0aCA9PSAwKSB7CiAgICAgICAgICAgIGRvbWFpblNtb2tlVGVzdCgpOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQogICAgICAgIGlmIChhcmdzLmxlbmd0aCAhPSAzKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsQXJndW1lbnRFeGNlcHRpb24oIlVzYWdlOiBvcmRlci1pZCBwcm9kdWN0LWlkIHF1YW50aXR5Iik7CiAgICAgICAgfQogICAgICAgIFN0cmluZyB1cmwgPSBPYmplY3RzLnJlcXVpcmVOb25OdWxsKFN5c3RlbS5nZXRlbnYoIk9DQ19KREJDX1VSTCIpKTsKICAgICAgICBTdHJpbmcgdXNlciA9IE9iamVjdHMucmVxdWlyZU5vbk51bGwoU3lzdGVtLmdldGVudigiT0NDX0RCX1VTRVIiKSk7CiAgICAgICAgU3RyaW5nIHBhc3N3b3JkID0gT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChTeXN0ZW0uZ2V0ZW52KCJPQ0NfREJfUEFTU1dPUkQiKSk7CiAgICAgICAgVHJhbnNhY3Rpb25zIHR4ID0gbmV3IEpkYmNUcmFuc2FjdGlvbnMoCiAgICAgICAgICAgICAgICAoKSAtPiBEcml2ZXJNYW5hZ2VyLmdldENvbm5lY3Rpb24odXJsLCB1c2VyLCBwYXNzd29yZCkpOwogICAgICAgIFVVSUQgaWQgPSBVVUlELmZyb21TdHJpbmcoYXJnc1swXSk7CiAgICAgICAgVVVJRCBwcm9kdWN0SWQgPSBVVUlELmZyb21TdHJpbmcoYXJnc1sxXSk7CiAgICAgICAgaW50IHF1YW50aXR5ID0gSW50ZWdlci5wYXJzZUludChhcmdzWzJdKTsKICAgICAgICBsb25nIGNvbW1pdHRlZFZlcnNpb24gPSByZXRyeUNvbmZsaWN0KDMsCiAgICAgICAgICAgICAgICAoKSAtPiBhZGRMaW5lKHR4LCBpZCwgcHJvZHVjdElkLCBxdWFudGl0eSkpOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiQ29tbWl0dGVkIHZlcnNpb246ICIgKyBjb21taXR0ZWRWZXJzaW9uKTsKICAgIH0KfQo=">Download OrderOccExample.java</a></div>
+
+<div class="code-block long-code"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-17">Copy</button></div><pre><code id="code-17">import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+public final class OrderOccExample {
+    private OrderOccExample() {}
+
+    enum Status { DRAFT, CONFIRMED }
+
+    record Line(UUID id, UUID productId, int quantity) {
+        Line {
+            Objects.requireNonNull(id);
+            Objects.requireNonNull(productId);
+            if (quantity &lt;= 0) {
+                throw new IllegalArgumentException(&quot;Quantity must be positive&quot;);
+            }
+        }
+    }
+
+    static final class OrderCapacityExceeded extends RuntimeException {
+        OrderCapacityExceeded() { super(&quot;An order may contain at most 100 units&quot;); }
+    }
+
+    static final class ConcurrentOrderModification extends RuntimeException {
+        ConcurrentOrderModification(UUID id, long expectedVersion) {
+            super(&quot;Order &quot; + id + &quot; no longer matches v&quot; + expectedVersion);
+        }
+    }
+
+    static final class PersistenceFailure extends RuntimeException {
+        PersistenceFailure(Throwable cause) { super(cause); }
+    }
+
+    static final class Order {
+        private final UUID id;
+        private final long loadedVersion;
+        private Status status;
+        private final List&lt;Line&gt; lines;
+
+        Order(UUID id, long loadedVersion, Status status, List&lt;Line&gt; lines) {
+            this.id = Objects.requireNonNull(id);
+            if (loadedVersion &lt; 0) throw new IllegalArgumentException(&quot;Version&quot;);
+            this.loadedVersion = loadedVersion;
+            this.status = Objects.requireNonNull(status);
+            this.lines = new ArrayList&lt;&gt;(List.copyOf(lines));
+            if (this.lines.stream().mapToLong(Line::quantity).sum() &gt; 100) {
+                throw new OrderCapacityExceeded();
+            }
+            if (status == Status.CONFIRMED &amp;&amp; this.lines.isEmpty()) {
+                throw new IllegalArgumentException(&quot;Confirmed order is empty&quot;);
+            }
+        }
+
+        UUID id() { return id; }
+        long loadedVersion() { return loadedVersion; }
+        Status status() { return status; }
+        List&lt;Line&gt; lines() { return List.copyOf(lines); }
+        int totalUnits() { return lines.stream().mapToInt(Line::quantity).sum(); }
+
+        void addLine(UUID productId, int quantity) {
+            requireDraft();
+            Objects.requireNonNull(productId);
+            if (quantity &lt;= 0) throw new IllegalArgumentException(&quot;Quantity&quot;);
+            if (quantity &gt; 100 - totalUnits()) {
+                throw new OrderCapacityExceeded();
+            }
+            lines.add(new Line(UUID.randomUUID(), productId, quantity));
+        }
+
+        void confirm() {
+            requireDraft();
+            if (lines.isEmpty()) throw new IllegalStateException(&quot;Empty order&quot;);
+            status = Status.CONFIRMED;
+        }
+
+        private void requireDraft() {
+            if (status != Status.DRAFT) {
+                throw new IllegalStateException(&quot;Order is already confirmed&quot;);
+            }
+        }
+    }
+
+    interface OrderRepository {
+        Order get(UUID id);
+        long save(Order order); // New version is provisional until commit.
+    }
+
+    interface Outbox {
+        void append(UUID eventId, UUID orderId, long version, String type);
+    }
+
+    record Session(OrderRepository orders, Outbox outbox) {}
+
+    @FunctionalInterface
+    interface Work&lt;T&gt; { T run(Session session); }
+
+    interface Transactions {
+        &lt;T&gt; T execute(Work&lt;T&gt; work);
+    }
+
+    @FunctionalInterface
+    interface ConnectionFactory { Connection open() throws SQLException; }
+
+    static final class JdbcTransactions implements Transactions {
+        private final ConnectionFactory connections;
+
+        JdbcTransactions(ConnectionFactory connections) {
+            this.connections = Objects.requireNonNull(connections);
+        }
+
+        public &lt;T&gt; T execute(Work&lt;T&gt; work) {
+            try (Connection c = connections.open()) {
+                c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+                c.setAutoCommit(false);
+                try {
+                    var session = new Session(
+                            new JdbcOrders(c), new JdbcOutbox(c));
+                    T result = work.run(session);
+                    c.commit();
+                    return result;
+                } catch (SQLException | RuntimeException | Error failure) {
+                    try {
+                        c.rollback();
+                    } catch (SQLException rollbackFailure) {
+                        failure.addSuppressed(rollbackFailure);
+                        // Do not treat an uncertain rollback as retryable OCC.
+                        throw new PersistenceFailure(failure);
+                    }
+                    throw failure;
+                }
+            } catch (SQLException failure) {
+                throw new PersistenceFailure(failure);
+            }
+        }
+    }
+
+    static final class JdbcOrders implements OrderRepository {
+        private final Connection c;
+        private final Set&lt;UUID&gt; saved = new HashSet&lt;&gt;();
+
+        JdbcOrders(Connection c) { this.c = c; }
+
+        public Order get(UUID id) {
+            // One statement gives the root and children one read snapshot.
+            String sql = &quot;&quot;&quot;
+                SELECT o.status, o.version, l.id AS line_id,
+                       l.product_id, l.quantity
+                FROM orders o
+                LEFT JOIN order_line l ON l.order_id = o.id
+                WHERE o.id = ?
+                ORDER BY l.id
+                &quot;&quot;&quot;;
+            try (var p = c.prepareStatement(sql)) {
+                p.setObject(1, id);
+                try (var r = p.executeQuery()) {
+                    if (!r.next()) {
+                        throw new IllegalArgumentException(&quot;Order not found: &quot; + id);
+                    }
+                    Status status = Status.valueOf(r.getString(&quot;status&quot;));
+                    long version = r.getLong(&quot;version&quot;);
+                    var lines = new ArrayList&lt;Line&gt;();
+                    do {
+                        UUID lineId = r.getObject(&quot;line_id&quot;, UUID.class);
+                        if (lineId != null) {
+                            lines.add(new Line(lineId,
+                                    r.getObject(&quot;product_id&quot;, UUID.class),
+                                    r.getInt(&quot;quantity&quot;)));
+                        }
+                    } while (r.next());
+                    return new Order(id, version, status, lines);
+                }
+            } catch (SQLException failure) {
+                throw new PersistenceFailure(failure);
+            }
+        }
+
+        public long save(Order order) {
+            if (!saved.add(order.id())) {
+                throw new IllegalStateException(&quot;Save once per order per transaction&quot;);
+            }
+            long next = Math.incrementExact(order.loadedVersion());
+            String sql = &quot;&quot;&quot;
+                UPDATE orders SET status = ?, version = ?
+                WHERE id = ? AND version = ?
+                &quot;&quot;&quot;;
+            try (var p = c.prepareStatement(sql)) {
+                p.setString(1, order.status().name());
+                p.setLong(2, next);
+                p.setObject(3, order.id());
+                p.setLong(4, order.loadedVersion());
+                if (p.executeUpdate() != 1) {
+                    throw new ConcurrentOrderModification(
+                            order.id(), order.loadedVersion());
+                }
+                replaceLines(order);
+                return next;
+            } catch (SQLException failure) {
+                throw new PersistenceFailure(failure);
+            }
+        }
+
+        private void replaceLines(Order order) throws SQLException {
+            try (var p = c.prepareStatement(
+                    &quot;DELETE FROM order_line WHERE order_id = ?&quot;)) {
+                p.setObject(1, order.id());
+                p.executeUpdate();
+            }
+            String sql = &quot;&quot;&quot;
+                INSERT INTO order_line(id, order_id, product_id, quantity)
+                VALUES (?, ?, ?, ?)
+                &quot;&quot;&quot;;
+            try (var p = c.prepareStatement(sql)) {
+                for (Line line : order.lines()) {
+                    p.setObject(1, line.id());
+                    p.setObject(2, order.id());
+                    p.setObject(3, line.productId());
+                    p.setInt(4, line.quantity());
+                    p.addBatch();
+                }
+                p.executeBatch();
+            }
+        }
+    }
+
+    static final class JdbcOutbox implements Outbox {
+        private final Connection c;
+        JdbcOutbox(Connection c) { this.c = c; }
+
+        public void append(UUID eventId, UUID orderId, long version, String type) {
+            String sql = &quot;&quot;&quot;
+                INSERT INTO outbox_message
+                    (id, aggregate_id, aggregate_version, event_type)
+                VALUES (?, ?, ?, ?)
+                &quot;&quot;&quot;;
+            try (var p = c.prepareStatement(sql)) {
+                p.setObject(1, eventId);
+                p.setObject(2, orderId);
+                p.setLong(3, version);
+                p.setString(4, type);
+                p.executeUpdate();
+            } catch (SQLException failure) {
+                throw new PersistenceFailure(failure);
+            }
+        }
+    }
+
+    static long addLine(Transactions tx, UUID id, UUID productId, int quantity) {
+        return tx.execute(s -&gt; {
+            Order order = s.orders().get(id);
+            order.addLine(productId, quantity);
+            return s.orders().save(order);
+        });
+    }
+
+    static long confirm(Transactions tx, UUID id) {
+        return tx.execute(s -&gt; {
+            Order order = s.orders().get(id);
+            order.confirm();
+            long next = s.orders().save(order);
+            s.outbox().append(UUID.randomUUID(), id, next, &quot;OrderConfirmed&quot;);
+            return next;
+        });
+    }
+
+    static &lt;T&gt; T retryConflict(int maxAttempts, Supplier&lt;T&gt; entireAttempt) {
+        if (maxAttempts &lt; 1) throw new IllegalArgumentException(&quot;maxAttempts&quot;);
+        for (int attempt = 1; ; attempt++) {
+            try {
+                return entireAttempt.get();
+            } catch (ConcurrentOrderModification conflict) {
+                // A resource-close failure can be attached by try-with-resources.
+                if (attempt == maxAttempts || conflict.getSuppressed().length != 0) {
+                    throw conflict;
+                }
+            }
+        }
+    }
+
+    static void domainSmokeTest() {
+        var order = new Order(UUID.randomUUID(), 7, Status.DRAFT,
+                List.of(new Line(UUID.randomUUID(), UUID.randomUUID(), 90)));
+        order.addLine(UUID.randomUUID(), 10);
+        if (order.totalUnits() != 100) throw new AssertionError(&quot;Expected 100&quot;);
+        try {
+            order.addLine(UUID.randomUUID(), 1);
+            throw new AssertionError(&quot;Expected capacity rejection&quot;);
+        } catch (OrderCapacityExceeded expected) {
+            if (order.totalUnits() != 100) throw new AssertionError(&quot;Mutated&quot;);
+        }
+        order.confirm();
+        if (order.status() != Status.CONFIRMED) throw new AssertionError(&quot;Status&quot;);
+        System.out.println(&quot;Domain smoke test passed; no database was used.&quot;);
+    }
+
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            domainSmokeTest();
+            return;
+        }
+        if (args.length != 3) {
+            throw new IllegalArgumentException(&quot;Usage: order-id product-id quantity&quot;);
+        }
+        String url = Objects.requireNonNull(System.getenv(&quot;OCC_JDBC_URL&quot;));
+        String user = Objects.requireNonNull(System.getenv(&quot;OCC_DB_USER&quot;));
+        String password = Objects.requireNonNull(System.getenv(&quot;OCC_DB_PASSWORD&quot;));
+        Transactions tx = new JdbcTransactions(
+                () -&gt; DriverManager.getConnection(url, user, password));
+        UUID id = UUID.fromString(args[0]);
+        UUID productId = UUID.fromString(args[1]);
+        int quantity = Integer.parseInt(args[2]);
+        long committedVersion = retryConflict(3,
+                () -&gt; addLine(tx, id, productId, quantity));
+        System.out.println(&quot;Committed version: &quot; + committedVersion);
+    }
+}
+</code></pre></div>
+<h2 id="race-test">Appendix B. Real database race test</h2>
+
+<p>Run this against the freshly seeded 90-unit, v7 order, before the add-line command above. It changes that order. To repeat, use another fresh disposable database and rerun the schema. No destructive reset command is embedded.</p>
+<div class="code-block"><div class="code-label"><span>SH</span><button class="copy-btn" type="button" data-copy="code-18">Copy</button></div><pre><code id="code-18">javac --release 25 OrderOccExample.java OccRaceTest.java
+java -cp &quot;.:postgresql.jar&quot; OccRaceTest
+</code></pre></div>
+<p>Use the same three database environment variables as Appendix A. This test proves a specific race outcome; it does not replace the rollback, outbox, ORM, and event-contract tests described in steps 45–50.</p>
+<h4>OccRaceTest.java</h4>
+<div class="source-actions"><a download="OccRaceTest.java" href="data:text/plain;charset=utf-8;base64,aW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5Ecml2ZXJNYW5hZ2VyOwppbXBvcnQgamF2YS5zcWwuU1FMRXhjZXB0aW9uOwppbXBvcnQgamF2YS51dGlsLk9iamVjdHM7CmltcG9ydCBqYXZhLnV0aWwuVVVJRDsKaW1wb3J0IGphdmEudXRpbC5jb25jdXJyZW50LkN5Y2xpY0JhcnJpZXI7CmltcG9ydCBqYXZhLnV0aWwuY29uY3VycmVudC5FeGVjdXRvcnM7CmltcG9ydCBqYXZhLnV0aWwuY29uY3VycmVudC5UaW1lVW5pdDsKCnB1YmxpYyBmaW5hbCBjbGFzcyBPY2NSYWNlVGVzdCB7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBVVUlEIE9SREVSID0gVVVJRC5mcm9tU3RyaW5nKAogICAgICAgICAgICAiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMTIzIik7CiAgICByZWNvcmQgT3V0Y29tZShVVUlEIHByb2R1Y3QsIGJvb2xlYW4gY29tbWl0dGVkKSB7fQoKICAgIHByaXZhdGUgc3RhdGljIENvbm5lY3Rpb24gb3BlbigpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIENvbm5lY3Rpb24gYyA9IERyaXZlck1hbmFnZXIuZ2V0Q29ubmVjdGlvbigKICAgICAgICAgICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwoU3lzdGVtLmdldGVudigiT0NDX0pEQkNfVVJMIikpLAogICAgICAgICAgICAgICAgT2JqZWN0cy5yZXF1aXJlTm9uTnVsbChTeXN0ZW0uZ2V0ZW52KCJPQ0NfREJfVVNFUiIpKSwKICAgICAgICAgICAgICAgIE9iamVjdHMucmVxdWlyZU5vbk51bGwoU3lzdGVtLmdldGVudigiT0NDX0RCX1BBU1NXT1JEIikpKTsKICAgICAgICB0cnkgKHZhciBwID0gYy5jcmVhdGVTdGF0ZW1lbnQoKSkgewogICAgICAgICAgICBwLmV4ZWN1dGUoIlNFVCBsb2NrX3RpbWVvdXQgPSAnNXMnIik7CiAgICAgICAgICAgIHAuZXhlY3V0ZSgiU0VUIHN0YXRlbWVudF90aW1lb3V0ID0gJzEwcyciKTsKICAgICAgICAgICAgcmV0dXJuIGM7CiAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGZhaWx1cmUpIHsKICAgICAgICAgICAgdHJ5IHsgYy5jbG9zZSgpOyB9CiAgICAgICAgICAgIGNhdGNoIChTUUxFeGNlcHRpb24gY2xvc2luZykgeyBmYWlsdXJlLmFkZFN1cHByZXNzZWQoY2xvc2luZyk7IH0KICAgICAgICAgICAgdGhyb3cgZmFpbHVyZTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgT3V0Y29tZSBhdHRlbXB0KAogICAgICAgICAgICBPcmRlck9jY0V4YW1wbGUuVHJhbnNhY3Rpb25zIHR4LAogICAgICAgICAgICBDeWNsaWNCYXJyaWVyIGJvdGhMb2FkZWQsIFVVSUQgcHJvZHVjdCkgewogICAgICAgIHRyeSB7CiAgICAgICAgICAgIGxvbmcgdmVyc2lvbiA9IHR4LmV4ZWN1dGUocyAtPiB7CiAgICAgICAgICAgICAgICB2YXIgb3JkZXIgPSBzLm9yZGVycygpLmdldChPUkRFUik7CiAgICAgICAgICAgICAgICBjaGVjayhvcmRlci5sb2FkZWRWZXJzaW9uKCkgPT0gNywgIlVzZSBhIGZyZXNoIHY3IHNlZWQiKTsKICAgICAgICAgICAgICAgIGNoZWNrKG9yZGVyLnRvdGFsVW5pdHMoKSA9PSA5MCwgIlVzZSBhIGZyZXNoIDkwLXVuaXQgc2VlZCIpOwogICAgICAgICAgICAgICAgb3JkZXIuYWRkTGluZShwcm9kdWN0LCAxMCk7CiAgICAgICAgICAgICAgICB0cnkgewogICAgICAgICAgICAgICAgICAgIGJvdGhMb2FkZWQuYXdhaXQoNSwgVGltZVVuaXQuU0VDT05EUyk7CiAgICAgICAgICAgICAgICB9IGNhdGNoIChJbnRlcnJ1cHRlZEV4Y2VwdGlvbiBpbnRlcnJ1cHRlZCkgewogICAgICAgICAgICAgICAgICAgIFRocmVhZC5jdXJyZW50VGhyZWFkKCkuaW50ZXJydXB0KCk7CiAgICAgICAgICAgICAgICAgICAgdGhyb3cgbmV3IElsbGVnYWxTdGF0ZUV4Y2VwdGlvbihpbnRlcnJ1cHRlZCk7CiAgICAgICAgICAgICAgICB9IGNhdGNoIChFeGNlcHRpb24gZmFpbHVyZSkgewogICAgICAgICAgICAgICAgICAgIHRocm93IG5ldyBJbGxlZ2FsU3RhdGVFeGNlcHRpb24oIkxvYWQgYmFycmllciBmYWlsZWQiLCBmYWlsdXJlKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHJldHVybiBzLm9yZGVycygpLnNhdmUob3JkZXIpOwogICAgICAgICAgICB9KTsKICAgICAgICAgICAgY2hlY2sodmVyc2lvbiA9PSA4LCAiV2lubmVyIG11c3QgY29tbWl0IHY4Iik7CiAgICAgICAgICAgIHJldHVybiBuZXcgT3V0Y29tZShwcm9kdWN0LCB0cnVlKTsKICAgICAgICB9IGNhdGNoIChPcmRlck9jY0V4YW1wbGUuQ29uY3VycmVudE9yZGVyTW9kaWZpY2F0aW9uIGV4cGVjdGVkKSB7CiAgICAgICAgICAgIGNoZWNrKGV4cGVjdGVkLmdldFN1cHByZXNzZWQoKS5sZW5ndGggPT0gMCwgIlJlc291cmNlIGNsZWFudXAgZmFpbGVkIik7CiAgICAgICAgICAgIHJldHVybiBuZXcgT3V0Y29tZShwcm9kdWN0LCBmYWxzZSk7CiAgICAgICAgfQogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIHZvaWQgY2hlY2soYm9vbGVhbiBjb25kaXRpb24sIFN0cmluZyBtZXNzYWdlKSB7CiAgICAgICAgaWYgKCFjb25kaXRpb24pIHRocm93IG5ldyBBc3NlcnRpb25FcnJvcihtZXNzYWdlKTsKICAgIH0KCiAgICBwdWJsaWMgc3RhdGljIHZvaWQgbWFpbihTdHJpbmdbXSBhcmdzKSB0aHJvd3MgRXhjZXB0aW9uIHsKICAgICAgICB2YXIgdHggPSBuZXcgT3JkZXJPY2NFeGFtcGxlLkpkYmNUcmFuc2FjdGlvbnMoT2NjUmFjZVRlc3Q6Om9wZW4pOwogICAgICAgIHZhciBnYXRlID0gbmV3IEN5Y2xpY0JhcnJpZXIoMik7CiAgICAgICAgdmFyIHdvcmtlcnMgPSBFeGVjdXRvcnMubmV3Rml4ZWRUaHJlYWRQb29sKDIpOwogICAgICAgIHRyeSB7CiAgICAgICAgICAgIHZhciBhID0gd29ya2Vycy5zdWJtaXQoKCkgLT4gYXR0ZW1wdCh0eCwgZ2F0ZSwgVVVJRC5yYW5kb21VVUlEKCkpKTsKICAgICAgICAgICAgdmFyIGIgPSB3b3JrZXJzLnN1Ym1pdCgoKSAtPiBhdHRlbXB0KHR4LCBnYXRlLCBVVUlELnJhbmRvbVVVSUQoKSkpOwogICAgICAgICAgICBPdXRjb21lIGZpcnN0ID0gYS5nZXQoMjAsIFRpbWVVbml0LlNFQ09ORFMpOwogICAgICAgICAgICBPdXRjb21lIHNlY29uZCA9IGIuZ2V0KDIwLCBUaW1lVW5pdC5TRUNPTkRTKTsKICAgICAgICAgICAgY2hlY2soZmlyc3QuY29tbWl0dGVkKCkgIT0gc2Vjb25kLmNvbW1pdHRlZCgpLCAiTmVlZCBvbmUgd2lubmVyIik7CiAgICAgICAgICAgIE91dGNvbWUgbG9zZXIgPSBmaXJzdC5jb21taXR0ZWQoKSA/IHNlY29uZCA6IGZpcnN0OwogICAgICAgICAgICB0cnkgewogICAgICAgICAgICAgICAgT3JkZXJPY2NFeGFtcGxlLmFkZExpbmUodHgsIE9SREVSLCBsb3Nlci5wcm9kdWN0KCksIDEwKTsKICAgICAgICAgICAgICAgIHRocm93IG5ldyBBc3NlcnRpb25FcnJvcigiRnJlc2ggcmV0cnkgbXVzdCBleGNlZWQgY2FwYWNpdHkiKTsKICAgICAgICAgICAgfSBjYXRjaCAoT3JkZXJPY2NFeGFtcGxlLk9yZGVyQ2FwYWNpdHlFeGNlZWRlZCBleHBlY3RlZCkgewogICAgICAgICAgICAgICAgLy8gTmV3IHN0YXRlIGlzIGZ1bGw7IHRoZSBidXNpbmVzcyBydWxlIHJlamVjdHMgdGhlIGludGVudC4KICAgICAgICAgICAgfQogICAgICAgICAgICB0eC5leGVjdXRlKHMgLT4gewogICAgICAgICAgICAgICAgdmFyIGN1cnJlbnQgPSBzLm9yZGVycygpLmdldChPUkRFUik7CiAgICAgICAgICAgICAgICBjaGVjayhjdXJyZW50LnRvdGFsVW5pdHMoKSA9PSAxMDAsICJJbnZhcmlhbnQgdmlvbGF0ZWQiKTsKICAgICAgICAgICAgICAgIGNoZWNrKGN1cnJlbnQubG9hZGVkVmVyc2lvbigpID09IDgsICJVbmV4cGVjdGVkIHJldmlzaW9uIik7CiAgICAgICAgICAgICAgICBjaGVjayhjdXJyZW50LmxpbmVzKCkuc3RyZWFtKCkKICAgICAgICAgICAgICAgICAgICAgICAgLm5vbmVNYXRjaChsaW5lIC0+IGxpbmUucHJvZHVjdElkKCkuZXF1YWxzKGxvc2VyLnByb2R1Y3QoKSkpLAogICAgICAgICAgICAgICAgICAgICAgICAiTG9zaW5nIGxpbmUgcGVyc2lzdGVkIik7CiAgICAgICAgICAgICAgICByZXR1cm4gbnVsbDsKICAgICAgICAgICAgfSk7CiAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiUmFjZSBwYXNzZWQ6IG9uZSBjb21taXQsIG9uZSBjb25mbGljdCwgdG90YWwgMTAwLiIpOwogICAgICAgIH0gZmluYWxseSB7CiAgICAgICAgICAgIHdvcmtlcnMuc2h1dGRvd25Ob3coKTsKICAgICAgICB9CiAgICB9Cn0K">Download OccRaceTest.java</a></div>
+
+<div class="code-block long-code"><div class="code-label"><span>JAVA</span><button class="copy-btn" type="button" data-copy="code-19">Copy</button></div><pre><code id="code-19">import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+public final class OccRaceTest {
+    private static final UUID ORDER = UUID.fromString(
+            &quot;00000000-0000-0000-0000-000000000123&quot;);
+    record Outcome(UUID product, boolean committed) {}
+
+    private static Connection open() throws SQLException {
+        Connection c = DriverManager.getConnection(
+                Objects.requireNonNull(System.getenv(&quot;OCC_JDBC_URL&quot;)),
+                Objects.requireNonNull(System.getenv(&quot;OCC_DB_USER&quot;)),
+                Objects.requireNonNull(System.getenv(&quot;OCC_DB_PASSWORD&quot;)));
+        try (var p = c.createStatement()) {
+            p.execute(&quot;SET lock_timeout = &#39;5s&#39;&quot;);
+            p.execute(&quot;SET statement_timeout = &#39;10s&#39;&quot;);
+            return c;
+        } catch (SQLException failure) {
+            try { c.close(); }
+            catch (SQLException closing) { failure.addSuppressed(closing); }
+            throw failure;
+        }
+    }
+
+    private static Outcome attempt(
+            OrderOccExample.Transactions tx,
+            CyclicBarrier bothLoaded, UUID product) {
+        try {
+            long version = tx.execute(s -&gt; {
+                var order = s.orders().get(ORDER);
+                check(order.loadedVersion() == 7, &quot;Use a fresh v7 seed&quot;);
+                check(order.totalUnits() == 90, &quot;Use a fresh 90-unit seed&quot;);
+                order.addLine(product, 10);
+                try {
+                    bothLoaded.await(5, TimeUnit.SECONDS);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(interrupted);
+                } catch (Exception failure) {
+                    throw new IllegalStateException(&quot;Load barrier failed&quot;, failure);
+                }
+                return s.orders().save(order);
+            });
+            check(version == 8, &quot;Winner must commit v8&quot;);
+            return new Outcome(product, true);
+        } catch (OrderOccExample.ConcurrentOrderModification expected) {
+            check(expected.getSuppressed().length == 0, &quot;Resource cleanup failed&quot;);
+            return new Outcome(product, false);
+        }
+    }
+
+    private static void check(boolean condition, String message) {
+        if (!condition) throw new AssertionError(message);
+    }
+
+    public static void main(String[] args) throws Exception {
+        var tx = new OrderOccExample.JdbcTransactions(OccRaceTest::open);
+        var gate = new CyclicBarrier(2);
+        var workers = Executors.newFixedThreadPool(2);
+        try {
+            var a = workers.submit(() -&gt; attempt(tx, gate, UUID.randomUUID()));
+            var b = workers.submit(() -&gt; attempt(tx, gate, UUID.randomUUID()));
+            Outcome first = a.get(20, TimeUnit.SECONDS);
+            Outcome second = b.get(20, TimeUnit.SECONDS);
+            check(first.committed() != second.committed(), &quot;Need one winner&quot;);
+            Outcome loser = first.committed() ? second : first;
+            try {
+                OrderOccExample.addLine(tx, ORDER, loser.product(), 10);
+                throw new AssertionError(&quot;Fresh retry must exceed capacity&quot;);
+            } catch (OrderOccExample.OrderCapacityExceeded expected) {
+                // New state is full; the business rule rejects the intent.
+            }
+            tx.execute(s -&gt; {
+                var current = s.orders().get(ORDER);
+                check(current.totalUnits() == 100, &quot;Invariant violated&quot;);
+                check(current.loadedVersion() == 8, &quot;Unexpected revision&quot;);
+                check(current.lines().stream()
+                        .noneMatch(line -&gt; line.productId().equals(loser.product())),
+                        &quot;Losing line persisted&quot;);
+                return null;
+            });
+            System.out.println(&quot;Race passed: one commit, one conflict, total 100.&quot;);
+        } finally {
+            workers.shutdownNow();
+        }
+    }
+}
+</code></pre></div>
+<h2 id="sources">Official sources and scope</h2>
+
+<p>Technical behavior was checked against the following official documentation on 2 September 2026. The order, doctors, API payloads, and code are teaching examples derived from the supplied lesson. Recommendations about boundaries and recovery follow from those examples and the stated guarantees; they are design reasoning, not product SLAs.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Behavior checked</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://www.postgresql.org/docs/18/transaction-iso.html">PostgreSQL 18 — transaction isolation</a></td>
+<td>Statement snapshots, concurrent updates, stronger isolation</td>
+</tr>
+<tr>
+<td><a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 — explicit locking</a></td>
+<td>Row locks, waiting, deadlocks</td>
+</tr>
+<tr>
+<td><a href="https://www.postgresql.org/docs/18/mvcc-serialization-failure-handling.html">PostgreSQL 18 — serialization failure handling</a></td>
+<td>SQLSTATE 40001 and complete retries</td>
+</tr>
+<tr>
+<td><a href="https://www.postgresql.org/docs/18/ddl-constraints.html">PostgreSQL 18 — constraints</a></td>
+<td>Check constraints and cross-row limitations</td>
+</tr>
+<tr>
+<td><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html">Java 25 — Connection</a></td>
+<td>Explicit transactions, commit, rollback, close</td>
+</tr>
+<tr>
+<td><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Statement.html">Java 25 — Statement</a></td>
+<td>Update counts</td>
+</tr>
+<tr>
+<td><a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2">Jakarta Persistence 3.2 specification</a></td>
+<td>Version checks, entity scope, optimistic lock modes</td>
+</tr>
+<tr>
+<td><a href="https://docs.hibernate.org/orm/7.1/userguide/html_single/#locking-optimistic">Hibernate ORM 7.1 user guide</a></td>
+<td>Version and timestamp locking</td>
+</tr>
+<tr>
+<td><a href="https://www.rfc-editor.org/rfc/rfc9110.html">RFC 9110 — HTTP Semantics</a></td>
+<td>ETag / If-Match, 412 and 409</td>
+</tr>
+<tr>
+<td><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS — transactional outbox</a></td>
+<td>Atomic state/message writes, duplicate delivery</td>
+</tr>
+<tr>
+<td><a href="https://jdbc.postgresql.org/documentation/use/">pgJDBC — using the driver</a></td>
+<td>Driver loading and connection URL</td>
+</tr>
+</tbody></table>
+<p class="endnote">End of lesson 21 · Next design pressure: Saga and compensating transactions</p>
+</main></div><div id="toast" role="status" aria-live="polite"></div><script>document.documentElement.classList.add('js');
+document.getElementById('print-btn').addEventListener('click',()=>window.print());
+const toast=document.getElementById('toast');
+let toastTimer;
+function showToast(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2400);}
+for(const button of document.querySelectorAll('[data-copy]')){
+  button.addEventListener('click',async()=>{
+    const code=document.getElementById(button.dataset.copy);
+    try {
+      if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(code.textContent);}
+      else {const area=document.createElement('textarea');area.value=code.textContent;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();const ok=document.execCommand('copy');area.remove();if(!ok)throw new Error('copy');}
+      showToast('Code copied');
+    } catch {
+      const range=document.createRange();range.selectNodeContents(code);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);showToast('Code selected — use your copy shortcut');
+    }
+  });
+}
+const navLinks=[...document.querySelectorAll('nav a')];
+const sections=navLinks.map(a=>document.querySelector(a.getAttribute('href')));
+function updateReading(){
+  const max=document.documentElement.scrollHeight-window.innerHeight;
+  document.getElementById('progress-fill').style.width=(max>0?100*window.scrollY/max:100)+'%';
+  let active=0;sections.forEach((section,i)=>{if(section&&section.getBoundingClientRect().top<=150)active=i;});
+  navLinks.forEach((a,i)=>{a.classList.toggle('active',i===active);if(i===active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});
+}
+let scheduled=false;window.addEventListener('scroll',()=>{if(!scheduled){scheduled=true;requestAnimationFrame(()=>{updateReading();scheduled=false;});}},{passive:true});window.addEventListener('resize',updateReading);updateReading();
+</script></body></html>

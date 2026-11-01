@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 14: a first-principles Java guide to Dependency Inversion, Dependency Injection, Repository, and Composition Root, with complete code and print styling."><title>Lesson 14 — Dependency Inversion, Injection &amp; Repository | Java 25</title><style>
+:root{color-scheme:light;--paper:#fff;--canvas:#f5f5f0;--ink:#213332;--muted:#526360;--line:#d7e1da;--teal:#145e58;--mint:#eaf3ed;--orange:#8f4d24;--warm:#fff5e6;--code:#f2f5f3;--sidebar:248px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:var(--canvas);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.7}a{color:var(--teal);text-underline-offset:3px;text-decoration-thickness:1px}a:hover{text-decoration-thickness:2px}button{font:inherit;cursor:pointer;border:1px solid #aabeb2;border-radius:6px;background:#fff;color:var(--teal);padding:9px 16px;font-size:.88rem;font-weight:650}button:hover{background:var(--mint)}button:focus-visible,a:focus-visible{outline:3px solid #b46b22;outline-offset:3px}.primary{background:var(--teal);color:#fff;border-color:var(--teal)}.primary:hover{background:#0e4742}.skip{position:fixed;left:15px;top:-80px;z-index:10;background:white;padding:12px}.skip:focus{top:15px}.rail{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);padding:34px 24px;background:#eef2ed;border-right:1px solid var(--line);overflow-y:auto}.brand{display:block;font-size:.73rem;font-weight:750;letter-spacing:.13em;color:var(--teal);text-decoration:none}.rail-title{font-family:Georgia,serif;font-size:1.5rem;line-height:1.2;margin:15px 0 8px}.rail-subtitle{font-size:.8rem;color:var(--muted);margin:0 0 24px}.rail ol{padding:0;margin:0;list-style:none}.rail li{margin:4px 0}.rail nav a{display:block;text-decoration:none;font-size:.82rem;line-height:1.35;padding:8px 0;border-bottom:1px solid transparent}.rail nav a:hover{border-bottom-color:#a0b7a9}.rail nav span{display:inline-block;width:24px;color:#6c8076;font-size:.7rem}.rail .divider{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}.rail-footer{font-size:.72rem;color:var(--muted);margin-top:26px;line-height:1.6}main{margin-left:var(--sidebar);max-width:1190px;padding:48px 6vw 70px}.hero{position:relative;border-top:5px solid var(--teal);padding-top:24px;padding-bottom:34px}.eyebrow{text-transform:uppercase;font-size:.73rem;font-weight:800;letter-spacing:.14em;color:var(--teal)}.hero-top{display:flex;align-items:center;justify-content:space-between;gap:18px}.lesson-badge{font-family:Georgia,serif;font-size:5.2rem;line-height:1;color:var(--teal);font-weight:400}.hero h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.4rem,3.8vw,4rem);font-weight:400;letter-spacing:-.025em;line-height:1.09;max-width:850px;margin:24px 0 20px}.hero .dek{font-size:1.1rem;color:var(--muted);max-width:760px}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}.tag{font-size:.74rem;border:1px solid #bdcdc0;border-radius:30px;padding:3px 11px;background:#fff}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 10px}.print-help{font-size:.78rem;color:var(--muted);margin-top:10px}.concepts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:14px 0 28px}.concept{background:#fff;border:1px solid var(--line);border-top:3px solid #aac6b6;padding:19px 22px}.concept h2{font-size:.94rem;margin:0 0 7px;color:var(--teal)}.concept p{font-size:.88rem;margin:0;line-height:1.55}.reading-note{font-size:.9rem;color:var(--muted)}.part{margin:50px 0 0;padding-top:12px}.part-heading{border-top:1px solid #a8bcad;padding-top:24px;margin-bottom:30px}.part-heading h2{font-family:Georgia,serif;font-size:2.15rem;font-weight:400;line-height:1.2;letter-spacing:-.02em;margin:9px 0}.part-heading p{font-size:.9rem;color:var(--muted);margin:10px 0}.lesson-section{margin:0 0 35px}.lesson-section h3,.source-section h3{font-size:1.15rem;line-height:1.4;margin:0 0 14px;font-weight:700}.section-number{font-size:.76rem;display:inline-flex;align-items:center;justify-content:center;border:1px solid #b7cdbf;border-radius:50%;width:31px;height:31px;margin-right:11px;vertical-align:2px;color:var(--teal);font-variant-numeric:tabular-nums;background:#fff}p{margin:12px 0 16px}strong{font-weight:700}code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:.88em;overflow-wrap:anywhere;background:#eaf0eb;padding:1px 4px;border-radius:3px}pre code{background:none;border-radius:0;padding:0;font-size:inherit;overflow-wrap:normal}.code-block{margin:19px 0 21px;background:var(--code);border:1px solid #d5e0d7;border-radius:7px;overflow:hidden;break-inside:avoid}.code-label{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.69rem;font-weight:700;letter-spacing:.045em;color:#597165;border-bottom:1px solid #d5e0d7;padding:8px 15px;background:#e9efea}.code-block pre{margin:0;padding:17px 18px;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:.8rem;line-height:1.65;tab-size:4;white-space:pre-wrap;overflow-wrap:anywhere}.long-code{break-inside:auto}.long-code pre{break-inside:auto}.note,.caution{border-left:3px solid #72a189;background:var(--mint);padding:15px 19px;margin:22px 0;break-inside:avoid}.caution{background:var(--warm);border-left-color:#bd894d}.note>strong,.caution>strong{font-size:.85rem;color:var(--teal)}.caution>strong{color:var(--orange)}.note p,.caution p{font-size:.9rem;line-height:1.65;margin:5px 0 0}.cite{font-size:.73rem;vertical-align:super;white-space:nowrap;padding:0 1px}.table-wrap{margin:22px 0;overflow-x:auto}table{border-collapse:collapse;background:#fff;width:100%;font-size:.87rem;line-height:1.55}th{text-align:left;font-size:.74rem;letter-spacing:.025em;background:#e9efea;color:#285e4b;padding:11px 13px;border-bottom:1px solid #b9cdbd}td{padding:13px;border-bottom:1px solid var(--line);vertical-align:top}td:first-child{font-weight:600;width:28%}td code{font-weight:400;font-size:.94em}tr:last-child td{border-bottom:1px solid #b9cdbd}.steps,.checklist{padding-left:1.5rem}.steps li,.checklist li{margin:11px 0;padding-left:5px}.steps li::marker,.checklist li::marker{font-weight:700;color:var(--teal)}.source-section{margin-top:36px}.references{padding-left:24px;font-size:.87rem}.references li{padding-left:8px;margin:20px 0;break-inside:avoid}.references p{font-size:.81rem;color:var(--muted);margin:4px 0}.print-url{display:none}.page-end{border-top:2px solid var(--teal);margin-top:45px;padding-top:16px;display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted)}#status{position:fixed;bottom:20px;right:24px;max-width:390px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 24px #2335261a;padding:12px 20px;font-size:.85rem;z-index:20}#status:empty{display:none}.k,.kd,.kn,.kr,.kt{color:#70417a;font-weight:600}.s,.s1,.s2,.sa,.sb,.sc,.sd{color:#1b6753}.c,.c1,.cm{color:#61736d;font-style:italic}.nc,.nf{color:#145782}.m,.mi{color:#8d541f}.o{color:#465754}.nd{color:#946322}.print-only{display:none}
+@media(min-width:1600px){main{padding-left:100px;padding-right:100px}}@media(max-width:1000px){:root{--sidebar:208px}.rail{padding:25px 20px}main{padding:32px 4vw}.hero h1{font-size:2.8rem}.code-block pre{font-size:.75rem}}
+@media(max-width:720px){html{scroll-padding-top:15px}.rail{position:static;width:auto;max-height:none;border-right:0;border-bottom:1px solid var(--line);padding:22px}.rail-title,.rail-subtitle,.rail-footer{display:none}.rail nav{margin-top:15px}.rail ol{display:flex;gap:6px 18px;flex-wrap:wrap}.rail nav a{font-size:.74rem;padding:3px 0}.rail .divider{margin:0;padding:0;border:0}.rail nav span{width:18px}main{margin-left:0;padding:28px 22px 44px}.hero h1{font-size:2.55rem}.lesson-badge{font-size:3.8rem}.hero .dek{font-size:1rem}.concepts{grid-template-columns:1fr}.part-heading h2{font-size:1.85rem}body{font-size:15px}.table-wrap{overflow:visible}table{font-size:.8rem;table-layout:fixed}td,th{padding:9px 8px;overflow-wrap:anywhere}.code-block pre{font-size:.72rem;padding:14px}.page-end{display:block}.hero-top .eyebrow{max-width:190px}.lesson-section h3{font-size:1.06rem}}
+@media print{
+@page{size:A4;margin:17mm 16mm 18mm;@bottom-left{content:"DP · LESSON 14";font-family:Arial,sans-serif;font-size:8pt;color:#526360}@bottom-right{content:counter(page);font-family:Arial,sans-serif;font-size:8pt;color:#526360}}
+html{scroll-behavior:auto}body{background:white;color:#182724;font-size:10pt;line-height:1.5;print-color-adjust:exact;-webkit-print-color-adjust:exact}.rail,.no-print,.skip,#status{display:none!important}main{margin:0;max-width:none;padding:0}.hero{padding-top:5mm;padding-bottom:4mm}.hero h1{font-size:34pt;line-height:1.1;margin:7mm 0 5mm;max-width:165mm}.hero .dek{font-size:11.2pt;max-width:none}.lesson-badge{font-size:52pt}.eyebrow{font-size:8pt}.tags{display:block;margin-top:6mm}.tag{font-size:8pt;display:inline-block;margin-right:2mm}.concepts{gap:3mm;margin:5mm 0;grid-template-columns:1fr 1fr}.concept{padding:4mm 5mm;break-inside:avoid}.concept h2{font-size:10pt}.concept p{font-size:9pt}.reading-note{font-size:9pt}.part{margin:8mm 0 0;padding:0;break-before:auto}#pressure,#exercise,#runnable,#jdbc,#sources{break-before:page;margin-top:0}.part-heading{padding-top:4mm;margin-bottom:6mm}.part-heading h2{font-size:24pt;margin:2mm 0}.part-heading p{font-size:9pt}.lesson-section{margin-bottom:7mm}.lesson-section h3,.source-section h3{font-size:12pt;margin-bottom:3mm;break-after:avoid}.section-number{width:6mm;height:6mm;font-size:8pt;margin-right:2.5mm;vertical-align:1px}p{margin:2.5mm 0 3.5mm;orphans:3;widows:3}.code-block{margin:4mm 0;border-radius:1mm;break-inside:avoid;box-decoration-break:clone;overflow:visible}.code-label{font-size:7pt;padding:1.8mm 3mm;break-after:avoid}.code-block pre{font-size:8.1pt;line-height:1.45;padding:3mm;white-space:pre-wrap;overflow-wrap:anywhere;orphans:3;widows:3}.long-code{break-inside:auto}.long-code pre{break-inside:auto}.note,.caution{padding:3mm 4mm;margin:4mm 0}.note>strong,.caution>strong{font-size:9pt}.note p,.caution p{font-size:9pt;line-height:1.5}.cite{font-size:7pt}a{color:#154f40}table{font-size:9pt;line-height:1.45;table-layout:fixed}th{font-size:8pt}td,th{padding:2.5mm;overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}.table-wrap{overflow:visible;margin:4mm 0}code{font-size:.9em}.steps li,.checklist li{margin:2.5mm 0;break-inside:avoid}.source-section{margin-top:6mm}.references{font-size:9pt}.references p{font-size:8.5pt}.references li{margin:4mm 0}.print-url{display:block;font-size:7pt;line-height:1.3;overflow-wrap:anywhere;color:#526360}.print-only{display:block}.page-end{font-size:8pt;margin-top:8mm;padding-top:3mm}.hero-top{break-inside:avoid}h2,h3,h4{break-after:avoid}.source-section .long-code pre{border:0}.actions{display:none}
+}
+</style></head><body><a class="skip" href="#content">Skip to guide</a><aside class="rail"><a href="#top" class="brand">DP / JAVA ARCHITECTURE</a><p class="rail-title">Lesson 14</p><p class="rail-subtitle">From patterns to application architecture</p><nav aria-label="Guide contents"><ol><li class=""><a href="#pressure"><span>A</span>Derive the boundary</a></li><li class=""><a href="#injection"><span>B</span>Supply dependencies</a></li><li class=""><a href="#persistence"><span>C</span>Implement persistence</a></li><li class=""><a href="#contract"><span>D</span>Shape the contract</a></li><li class=""><a href="#composition"><span>E</span>Compose the graph</a></li><li class=""><a href="#dependencies"><span>F</span>Expose dependencies</a></li><li class=""><a href="#patterns"><span>G</span>Connect the patterns</a></li><li class=""><a href="#testing"><span>H</span>Test and simplify</a></li><li class="divider"><a href="#exercise"><span>→</span>CancelOrder exercise</a></li><li class=""><a href="#runnable"><span>A1</span>Runnable Java source</a></li><li class=""><a href="#jdbc"><span>B1</span>Database checks</a></li><li class=""><a href="#recap"><span>•</span>Four decisions</a></li><li class=""><a href="#sources"><span>↗</span>Official sources</a></li></ol></nav><p class="rail-footer">38 topics · Complete source<br>Offline HTML · Print-ready<br>Verified sources: 01 Sep 2026</p></aside><main id="content"><header class="hero" id="top"><div class="hero-top"><div><span class="eyebrow">DP / Architecture series</span><div class="tags"><span class="tag">Java 25 compatible</span><span class="tag">First principles</span></div></div><span class="lesson-badge" aria-label="Lesson 14">14</span></div><h1>Dependency Inversion,<br>Dependency Injection<br>&amp; Repository</h1><p class="dek">Start with a shipping use case. Let testing and persistence pressures reveal the boundary. Then supply the implementation and assemble the application.</p><div class="actions no-print"><button type="button" id="print-guide" class="primary">Print / Save as PDF</button><a class="text-action" href="#runnable">Run the complete Java example →</a></div><p class="print-help no-print">Print in portrait at 100%. A4 is the default; Letter also works. Disable browser headers and footers if they duplicate the guide’s page labels.</p></header>
+<div class="concepts"><article class="concept"><h2>01 / Dependency Inversion</h2><p>Which direction should source-code dependencies point?</p></article><article class="concept"><h2>02 / Dependency Injection</h2><p>Who supplies the collaborators an object needs?</p></article><article class="concept"><h2>03 / Repository</h2><p>How does application code access persistent domain objects?</p></article><article class="concept"><h2>04 / Composition root</h2><p>Where are implementations chosen and wired together?</p></article></div>
+<p class="reading-note"><strong>How to use this guide.</strong> Read Parts A–H in order: they preserve the original lesson’s 38-step progression. Short snippets explain one idea at a time; Appendix A is the complete source of truth. The exercise comes before its reference solution. All content, styling, and controls are contained in this file.</p><section class="part" id="pressure"><header class="part-heading"><span class="eyebrow">PART A</span><h2>Derive the boundary</h2><p>Original sections 1–4 · Let a concrete problem earn the abstraction.</p></header><section class="lesson-section" id="s1"><h3><span class="section-number">01</span>Start with working code</h3><p>A command asks us to ship an order. The use case must load it, apply the shipping rule, and persist the result. Start with those three actions; architecture comes from the pressures around them.</p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>public void handle(ShipOrderCommand command) {
+    Order order = repository.findById(command.orderId());
+    order.ship();
+    repository.save(order);
+}</code></pre></div><p>The simplest handler might create its own <code>PostgresOrderRepository</code>. For a tiny program, that may be sufficient. The question is whether the coupling becomes costly.</p><div class="code-block"><div class="code-label">Java • initial design sketch; not part of the runnable file</div><pre><code>// Initial design sketch: concrete construction inside the handler.
+private final PostgresOrderRepository repository =
+    new PostgresOrderRepository();</code></pre></div></section><section class="lesson-section" id="s2"><h3><span class="section-number">02</span>Introduce the first pressure: testing</h3><p>We want to test the shipping rule without starting a database, preparing tables, or cleaning up rows. But a handler that constructs the concrete repository also chooses the storage implementation. The test has no ordinary constructor seam for substituting a fake.</p><aside class="note"><strong>Separate two decisions</strong><p>The handler can know <em>what capability it requires</em> without deciding <em>which implementation supplies it</em>.</p></aside></section><section class="lesson-section" id="s3"><h3><span class="section-number">03</span>Add pressure from implementation changes</h3><p>A test may need in-memory storage while deployment uses PostgreSQL. A later adapter could use another database. If the handler branches on the environment to select storage, persistence configuration has entered the shipping use case.</p><p>Move that choice outside the handler. An interface does not make a database migration free: adapters must still agree on behavior, errors, and consistency.</p></section><section class="lesson-section" id="s4"><h3><span class="section-number">04</span>Ask what the handler actually needs</h3><p>It needs to load an <code>Order</code> and save its changed state. Name that capability without naming the database.</p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>public interface OrderRepository {
+    Order findById(String id);
+    void save(Order order);
+}</code></pre></div><p>For this guide, <code>findById</code> returns a detached order or throws <code>OrderNotFoundException</code>. <code>save</code> updates an existing order and throws the same exception if it is absent. The fake and JDBC adapter follow this contract.</p><div class="table-wrap"><table><thead><tr><th scope="col">Source-code dependency</th><th scope="col">Why it exists</th></tr></thead><tbody><tr><td>ShipOrderHandler → OrderRepository</td><td>The application requires a persistence capability.</td></tr><tr><td>JdbcOrderRepository → OrderRepository</td><td>Infrastructure implements that capability.</td></tr><tr><td>Both → Order</td><td>The contract speaks in domain objects.</td></tr></tbody></table></div><p>The abstraction is controlled by the application/domain side. High-level policy no longer names the database implementation. That is the dependency inversion in this design. <a class="cite" href="#ref-1" aria-label="Source 1">[1]</a></p></section></section><section class="part" id="injection"><header class="part-heading"><span class="eyebrow">PART B</span><h2>Supply the dependency</h2><p>Original sections 5–9 · Make construction explicit, then test the use case.</p></header><section class="lesson-section" id="s5"><h3><span class="section-number">05</span>Distinguish inversion from injection</h3><p><strong>Dependency inversion</strong> is about source dependencies and ownership of the abstraction. <strong>Dependency injection</strong> is about supplying a collaborator from outside.</p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>public ShipOrderHandler(OrderRepository repository) {
+    this.repository = Objects.requireNonNull(repository, &quot;repository&quot;);
+}</code></pre></div><p>The constructor is an injection point. This call supplies the dependency:</p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>OrderRepository repository = new JdbcOrderRepository(dataSource);
+ShipOrderHandler handler = new ShipOrderHandler(repository);</code></pre></div><aside class="note"><strong>Precision matters</strong><p>A field whose type is an interface is not, by itself, proof of dependency inversion. Check which layer owns the contract and whether its methods still expose infrastructure types.</p></aside></section><section class="lesson-section" id="s6"><h3><span class="section-number">06</span>Dependency injection is plain Java</h3><p>The <code>new ShipOrderHandler(repository)</code> call already performs constructor injection. A container can automate assembly, but annotations and a framework are not prerequisites. The collaborator is received instead of constructed or looked up inside the handler. <a class="cite" href="#ref-2" aria-label="Source 2">[2]</a></p></section><section class="lesson-section" id="s7"><h3><span class="section-number">07</span>Make mandatory dependencies constructor arguments</h3><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>public final class ShipOrderHandler {
+    private final OrderRepository repository;
+
+    public ShipOrderHandler(OrderRepository repository) {
+        this.repository = Objects.requireNonNull(
+            repository, &quot;repository&quot;);
+    }
+
+    public void handle(ShipOrderCommand command) {
+        Objects.requireNonNull(command, &quot;command&quot;);
+        Order order = repository.findById(command.orderId());
+        order.ship();
+        repository.save(order);
+    }
+}</code></pre></div><p>Ordinary construction either supplies a non-null repository or fails immediately. <code>final</code> prevents reassignment of the reference; it does not make the repository object immutable or thread-safe. Oracle documents <code>requireNonNull</code> specifically for checks such as constructor parameter validation. <a class="cite" href="#ref-3" aria-label="Source 3">[3]</a></p></section><section class="lesson-section" id="s8"><h3><span class="section-number">08</span>Compare setter and field injection</h3><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>// Illustrative alternative: a mandatory dependency can be missing.
+private OrderRepository repository;
+
+public void setRepository(OrderRepository repository) {
+    this.repository = repository;
+}</code></pre></div><p>Now construction and configuration happen separately. A caller can invoke the handler before assigning the repository. Field injection similarly hides required collaborators from ordinary constructor calls. Use constructor injection for mandatory collaborators; setters can be useful for genuinely optional, safely defaulted or reconfigurable dependencies. <a class="cite" href="#ref-2" aria-label="Source 2">[2]</a></p></section><section class="lesson-section" id="s9"><h3><span class="section-number">09</span>Use a fake that can catch a missing save</h3><p>An in-memory adapter lets us test orchestration and real domain behavior together. But storing and returning the same mutable <code>Order</code> reference is misleading: <code>order.ship()</code> could change the stored object even if the handler forgets <code>save()</code>.</p><p>The complete example stores immutable snapshots and restores a new <code>Order</code> on each read. Changing that order does not change storage until an explicit save.</p><div class="code-block"><div class="code-label">Java • executable-check excerpt; helpers in Appendix A</div><pre><code>var repository = new InMemoryOrderRepository();
+repository.seed(Order.packed(&quot;O-123&quot;));
+var handler = new ShipOrderHandler(repository);
+
+handler.handle(new ShipOrderCommand(&quot;O-123&quot;));
+
+equal(OrderStatus.SHIPPED,
+      repository.findById(&quot;O-123&quot;).status());
+equal(1, repository.saveCalls());</code></pre></div><aside class="note"><strong>What this test establishes</strong><p>The handler applies the shipping rule and asks the repository to persist it. It does not establish that SQL, a JDBC driver, or a real transaction works.</p></aside></section></section><section class="part" id="persistence"><header class="part-heading"><span class="eyebrow">PART C</span><h2>Implement the persistence boundary</h2><p>Original sections 10–15 · Keep the contract stable while the adapter handles SQL.</p></header><section class="lesson-section" id="s10"><h3><span class="section-number">10</span>Understand what Repository represents</h3><p>A repository offers an application-facing view of persisted domain objects. The use case asks for an order; it does not navigate a result set. The adapter handles retrieval and mapping at the persistence boundary. <a class="cite" href="#ref-4" aria-label="Source 4">[4]</a></p><div class="table-wrap"><table><thead><tr><th scope="col">Application vocabulary</th><th scope="col">Infrastructure vocabulary</th></tr></thead><tbody><tr><td>Find an Order</td><td>SELECT, parameters, ResultSet</td></tr><tr><td>Save changed Order state</td><td>UPDATE, row counts, driver errors</td></tr><tr><td>OrderStatus.SHIPPED</td><td>A stored status value</td></tr></tbody></table></div><p>For a rich domain model, a repository usually centers on an aggregate root: the object through which a related set of business invariants is enforced. It need not mirror one database table. <a class="cite" href="#ref-4" aria-label="Source 4">[4]</a></p></section><section class="lesson-section" id="s11"><h3><span class="section-number">11</span>Place SQL in infrastructure</h3><div class="table-wrap"><table><thead><tr><th scope="col">Package</th><th scope="col">Contents</th><th scope="col">Allowed direction in this example</th></tr></thead><tbody><tr><td>domain</td><td>Order, OrderStatus, OrderRepository, OrderNotFoundException, RepositoryException</td><td>JDK and domain types</td></tr><tr><td>application</td><td>ShipOrderCommand, ShipOrderHandler</td><td>Domain and its repository contract</td></tr><tr><td>infrastructure</td><td>JdbcOrderRepository</td><td>Domain contract plus JDBC</td></tr><tr><td>web</td><td>OrderController</td><td>Application entry point plus HTTP framework</td></tr><tr><td>bootstrap</td><td>Application or OrdersConfiguration</td><td>Concrete implementations needed for assembly</td></tr></tbody></table></div><p>This is one deliberate package layout. If a persistence port is specific to an application use case, an <code>application.port</code> package can own it instead. Preserve inward dependency direction; do not turn a folder convention into a universal law.</p><aside class="note"><strong>About the downloadable example</strong><p>All declarations are nested in one class so one source file is easy to run. That packaging is for the lesson. Split the declarations into the packages above when practicing compile-time boundaries.</p></aside></section><section class="lesson-section" id="s12"><h3><span class="section-number">12</span>Implement the JDBC boundary</h3><p>Inject <code>javax.sql.DataSource</code> into the JDBC adapter. Despite the <code>javax</code> name, it is a Java 25 API. It is a factory for database connections; a concrete driver or pool supplies the implementation. <a class="cite" href="#ref-5" aria-label="Source 5">[5]</a></p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>private final DataSource dataSource;
+
+public JdbcOrderRepository(DataSource dataSource) {
+    this.dataSource = Objects.requireNonNull(dataSource, &quot;dataSource&quot;);
+}</code></pre></div><p>The load path prepares SQL, binds an ID, executes the query, handles absence, and maps the row. The full implementation in Appendix A closes the connection, statement, and result set with try-with-resources.</p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>String sql = &quot;&quot;&quot;
+    SELECT id, status FROM orders WHERE id = ?
+    &quot;&quot;&quot;;
+// Inside the resource scopes shown in Appendix A:
+statement.setString(1, id);
+try (ResultSet result = statement.executeQuery()) {
+    if (!result.next()) {
+        throw new OrderNotFoundException(id);
+    }
+    return mapOrder(result);
+}</code></pre></div><p>SQL exceptions are translated to <code>RepositoryException</code> with the original cause retained. Application signatures contain no <code>Connection</code>, <code>ResultSet</code>, or checked <code>SQLException</code>. Parameter binding and result access follow the Java 25 JDBC APIs. <a class="cite" href="#ref-6" aria-label="Source 6">[6]</a><a class="cite" href="#ref-7" aria-label="Source 7">[7]</a></p></section><section class="lesson-section" id="s13"><h3><span class="section-number">13</span>Map representations at the boundary</h3><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>private Order mapOrder(ResultSet result) throws SQLException {
+    String id = result.getString(&quot;id&quot;);
+    String status = result.getString(&quot;status&quot;);
+    try {
+        return Order.restore(id, OrderStatus.valueOf(status));
+    } catch (IllegalArgumentException | NullPointerException ex) {
+        throw new RepositoryException(&quot;Invalid stored order&quot;, ex);
+    }
+}</code></pre></div><p><code>restore</code> reconstructs an existing state; it does not replay a shipping operation. Persisted status strings must match the enum mapping. If that representation changes, update the adapter and migration deliberately.</p></section><section class="lesson-section" id="s14"><h3><span class="section-number">14</span>Keep business rules in the domain object</h3><div class="code-block"><div class="code-label">Java • simplified Order method; full version in Appendix A</div><pre><code>public void ship() {
+    if (status != OrderStatus.PACKED) {
+        throw new IllegalStateException(&quot;Only packed orders can ship&quot;);
+    }
+    status = OrderStatus.SHIPPED;
+}</code></pre></div><p>For this lesson, only a packed order may ship. The entity enforces that rule; the handler sequences load, ship, and save; the repository persists. Keeping those responsibilities separate lets the shipping rule run without a database.</p><aside class="note"><strong>A scoped design choice</strong><p>An entity with persistence methods is a different style, often called Active Record. This guide deliberately uses a persistence-independent domain model; it is not claiming that every CRUD application needs the same structure.</p></aside></section><section class="lesson-section" id="s15"><h3><span class="section-number">15</span>Save explicitly—and notice what it does not guarantee</h3><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>String sql = &quot;&quot;&quot;
+    UPDATE orders SET status = ? WHERE id = ?
+    &quot;&quot;&quot;;
+statement.setString(1, order.status().name());
+statement.setString(2, order.id());
+int updated = statement.executeUpdate();
+if (updated == 0) {
+    throw new OrderNotFoundException(order.id());
+}
+if (updated != 1) {
+    throw new RepositoryException(&quot;Expected exactly one updated row&quot;);
+}</code></pre></div><p>This is an <strong>update-only contract</strong>, not an insert or upsert. Fixtures use <code>seed</code>; order creation would require a separate, explicitly designed operation.</p><aside class="caution"><strong>Transaction and concurrency boundary</strong><p>The teaching adapter opens a connection per method and requires auto-commit. Loading and saving therefore do not form one transaction. JDBC connections default to auto-commit, but a configured data source can change that setting. <a class="cite" href="#ref-8" aria-label="Source 8">[8]</a></p></aside><p>A second request can change an order between the read and write. An unconditional update can overwrite that change. A production design must choose a consistency strategy, such as a version column with a conditional update, or appropriate locking within a use-case transaction. Merely adding the word “Repository” provides neither.</p><p>If multiple writes must succeed together, define the transaction around the use case and make every participating adapter use that transaction. A transaction alone at the default isolation level is not automatically protection against every lost update.</p></section></section><section class="part" id="contract"><header class="part-heading"><span class="eyebrow">PART D</span><h2>Keep the abstraction useful</h2><p>Original sections 16–19 · A good boundary expresses a need, not a checklist of methods.</p></header><section class="lesson-section" id="s16"><h3><span class="section-number">16</span>Let repository methods express actual needs</h3><p>Do not start by giving every entity a generic API with <code>findAll</code>, <code>query</code>, <code>delete</code>, <code>update</code>, and <code>save</code>. First ask which operations this use case needs. Here, load and save are enough.</p><p>Generics are useful when they capture repeated semantics. They add little when they merely rename a database API or force unrelated aggregates into one contract.</p></section><section class="lesson-section" id="s17"><h3><span class="section-number">17</span>Avoid leaking a query engine upward</h3><div class="table-wrap"><table><thead><tr><th scope="col">Leaky contract</th><th scope="col">Application-facing contract</th></tr></thead><tbody><tr><td><code>ResultSet executeQuery(String sql)</code></td><td><code>Order findById(String id)</code></td></tr><tr><td><code>EntityManager entityManager()</code></td><td><code>List&lt;Order&gt; findReadyToShip()</code></td></tr><tr><td><code>JdbcTemplate jdbcTemplate()</code></td><td>A named operation with defined results and errors</td></tr></tbody></table></div><p>The latter query is an example of how to name a capability, not part of this guide’s minimal interface. If absence is ordinary, an <code>Optional&lt;Order&gt;</code> return can be appropriate. Choose and document one absence contract; this guide consistently throws for a missing order.</p></section><section class="lesson-section" id="s18"><h3><span class="section-number">18</span>Treat DAO versus Repository as an intent distinction</h3><div class="table-wrap"><table><thead><tr><th scope="col">Term</th><th scope="col">Typical emphasis</th><th scope="col">Illustrative operation</th></tr></thead><tbody><tr><td>DAO</td><td>Persistence and data access operations</td><td><code>updateStatus(id, statusText)</code></td></tr><tr><td>Repository</td><td>Domain objects and aggregate-oriented access</td><td><code>save(order)</code></td></tr></tbody></table></div><p>These names overlap in real frameworks. Spring even describes <code>@Repository</code> in terms that include DAO. Use this distinction to discuss the boundary, not to infer behavior from a class name. <a class="cite" href="#ref-9" aria-label="Source 9">[9]</a></p></section><section class="lesson-section" id="s19"><h3><span class="section-number">19</span>Know when another layer is unnecessary</h3><p>If an existing persistence abstraction already meets a small CRUD application’s needs, adding a repository interface, implementation, adapter, and mapper may create maintenance work without isolating a meaningful concern.</p><p>Add a boundary when it protects business rules, separates a volatile technology, gives useful substitution, or expresses domain-oriented operations. Do not add it just to complete a diagram.</p></section></section><section class="part" id="composition"><header class="part-heading"><span class="eyebrow">PART E</span><h2>Assemble the object graph</h2><p>Original sections 20–24 · Plain Java first; framework automation second.</p></header><section class="lesson-section" id="s20"><h3><span class="section-number">20</span>Find the place that chooses implementations</h3><p>The concrete repository still has to be created. Put assembly near the entry point: the <strong>composition root</strong>. It chooses implementations, supplies configuration, and constructs the object graph.</p><div class="code-block"><div class="code-label">Java • excerpt</div><pre><code>OrderRepository repository = new JdbcOrderRepository(dataSource);
+ShipOrderHandler handler = new ShipOrderHandler(repository);</code></pre></div><p>The composition root is allowed to know the concrete classes. The shipping handler is not responsible for that choice.</p></section><section class="lesson-section" id="s21"><h3><span class="section-number">21</span>Write a plain Java composition root</h3><div class="code-block"><div class="code-label">Java • runnable composition excerpt from Lesson14</div><pre><code>public static void main(String[] args) {
+    var repository = new InMemoryOrderRepository();
+    repository.seed(Order.packed(&quot;O-123&quot;));
+
+    var handler = new ShipOrderHandler(repository);
+    handler.handle(new ShipOrderCommand(&quot;O-123&quot;));
+
+    System.out.println(repository.findById(&quot;O-123&quot;).status());
+}</code></pre></div><p>This graph is complete without a server. For a database deployment, the root supplies a configured <code>DataSource</code>, constructs <code>JdbcOrderRepository</code>, and passes it to the same handler. Driver settings, pool lifetime, and server startup belong to deployment wiring.</p></section><section class="lesson-section" id="s22"><h3><span class="section-number">22</span>Separate runtime calls from source dependencies</h3><div class="table-wrap"><table><thead><tr><th scope="col">View</th><th scope="col">Relationship</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td>Runtime call</td><td>Handler → JDBC repository object</td><td>The selected implementation executes the call.</td></tr><tr><td>Source dependency</td><td>Handler → OrderRepository</td><td>The handler compiles against the contract.</td></tr><tr><td>Implementation dependency</td><td>JdbcOrderRepository → OrderRepository</td><td>The adapter implements that contract.</td></tr><tr><td>Assembly</td><td>Composition root → both concrete classes</td><td>The entry point chooses and connects the objects.</td></tr></tbody></table></div><p>Runtime control still reaches the database. What changed is which source types the high-level code needs to name. <a class="cite" href="#ref-1" aria-label="Source 1">[1]</a></p></section><section class="lesson-section" id="s23"><h3><span class="section-number">23</span>Introduce Spring after the design works</h3><p>Spring can perform the assembly we just wrote by hand. Explicit <code>@Bean</code> methods keep the relationship visible and let the domain and handler stay free of Spring annotations. <a class="cite" href="#ref-10" aria-label="Source 10">[10]</a></p><div class="code-block"><div class="code-label">Java • optional Spring configuration; assumes split top-level lesson classes</div><pre><code>import javax.sql.DataSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration(proxyBeanMethods = false)
+public class OrdersConfiguration {
+    @Bean
+    OrderRepository orderRepository(DataSource dataSource) {
+        return new JdbcOrderRepository(dataSource);
+    }
+
+    @Bean
+    ShipOrderHandler shipOrderHandler(OrderRepository repository) {
+        return new ShipOrderHandler(repository);
+    }
+}</code></pre></div><p>This configuration assumes a <code>DataSource</code> bean and the application classes already exist. It is not a standalone Spring project. Component scanning with <code>@Repository</code>, <code>@Service</code>, and controller annotations is another registration style. Neither style changes what dependency inversion means. <a class="cite" href="#ref-9" aria-label="Source 9">[9]</a></p><aside class="note"><strong>Keep the two examples separate</strong><p>The complete downloadable Java file uses only JDK APIs. This optional snippet requires Spring dependencies. If you later add transaction or other AOP advice, review proxy requirements: class-based proxies cannot subclass final classes. The plain Java handler needs no proxy. <a class="cite" href="#ref-11" aria-label="Source 11">[11]</a></p></aside></section><section class="lesson-section" id="s24"><h3><span class="section-number">24</span>Distinguish the annotation from the pattern</h3><div class="table-wrap"><table><thead><tr><th scope="col">Name</th><th scope="col">What it is</th></tr></thead><tbody><tr><td><code>OrderRepository</code></td><td>Our application/domain contract for persistence.</td></tr><tr><td><code>@Repository</code></td><td>A Spring stereotype for a persistence component; it also participates in exception-translation infrastructure when that support is configured.</td></tr></tbody></table></div><p>The pattern can exist with no Spring annotation. The annotation alone does not prove that a class presents a useful domain boundary. <a class="cite" href="#ref-9" aria-label="Source 9">[9]</a></p></section></section><section class="part" id="dependencies"><header class="part-heading"><span class="eyebrow">PART F</span><h2>Make dependencies honest</h2><p>Original sections 25–29 · Visibility and ownership matter more than annotation count.</p></header><section class="lesson-section" id="s25"><h3><span class="section-number">25</span>Prefer visible dependencies to Service Locator</h3><div class="table-wrap"><table><thead><tr><th scope="col">Constructor injection</th><th scope="col">Service Locator</th></tr></thead><tbody><tr><td><code>new ShipOrderHandler(repository)</code></td><td>The handler calls <code>ServiceLocator.get(...)</code> internally.</td></tr><tr><td>Requirements are visible at construction.</td><td>Requirements are discovered by reading implementation or running code.</td></tr><tr><td>Each test supplies its collaborator directly.</td><td>Tests may need locator configuration and cleanup.</td></tr></tbody></table></div><p>A service locator can be an intentional framework mechanism. Reaching into it from business code hides that code’s needs and couples it to the locating environment. Prefer the explicit constructor boundary here. <a class="cite" href="#ref-2" aria-label="Source 2">[2]</a></p></section><section class="lesson-section" id="s26"><h3><span class="section-number">26</span>Recognize the same issue in static globals</h3><p>A call such as <code>Database.getInstance()</code> inside the handler hides a collaborator just as a locator does. Replacing that global access with a constructor argument makes the requirement visible and individually substitutable.</p><p>The issue is hidden access to external state. A pure static helper for deterministic string validation is not the same architectural problem.</p></section><section class="lesson-section" id="s27"><h3><span class="section-number">27</span>Read a large constructor as design feedback</h3><p>A constructor with many collaborators may expose an overloaded responsibility. Review whether the class is mixing several use cases or concerns. Hiding them through field injection removes the signal while keeping the coupling. Spring’s DI guidance also identifies excessive constructor arguments as a possible responsibility problem. <a class="cite" href="#ref-2" aria-label="Source 2">[2]</a></p><p>There is no magic maximum. Group collaborators only when they form a coherent capability; an arbitrary “Dependencies” bag just hides the original list.</p></section><section class="lesson-section" id="s28"><h3><span class="section-number">28</span>Keep inversion and injection separate in your vocabulary</h3><div class="table-wrap"><table><thead><tr><th scope="col">Example</th><th scope="col">Injection?</th><th scope="col">Inversion at the persistence boundary?</th></tr></thead><tbody><tr><td><code>ShipOrderHandler(JdbcOrderRepository r)</code></td><td>Yes: receives a collaborator.</td><td>No: names the infrastructure class.</td></tr><tr><td><code>ShipOrderHandler(OrderRepository r)</code> with an inward-owned, persistence-neutral port</td><td>Yes.</td><td>Yes, for this boundary.</td></tr><tr><td>Interface-typed field initialized with <code>new JdbcOrderRepository(...)</code> inside the handler</td><td>No external supply for that dependency.</td><td>The handler still names infrastructure.</td></tr></tbody></table></div><p>DI is a construction technique. DIP is a dependency-direction principle. They work together, but neither term is a synonym for the other.</p></section><section class="lesson-section" id="s29"><h3><span class="section-number">29</span>Let the consumer’s need shape the interface</h3><p>The application says, “I need to retrieve and persist Orders.” Infrastructure answers, “I can provide that using JDBC.” If the database layer dictates a contract full of its own types, the high-level code remains shaped by the detail.</p><p>Place the interface where its meaning belongs: in the domain for a domain-level repository, or with an application port for a use-case-specific need. The adapter depends on that owned contract.</p></section></section><section class="part" id="patterns"><header class="part-heading"><span class="eyebrow">PART G</span><h2>Connect patterns into architecture</h2><p>Original sections 30–34 · Each pattern solves a different part of the same use case.</p></header><section class="lesson-section" id="s30"><h3><span class="section-number">30</span>Connect Repository to Adapter</h3><p><code>JdbcOrderRepository</code> adapts JDBC’s connection/row vocabulary to the <code>OrderRepository</code> vocabulary the use case wants. That relationship extends naturally to payment, email, and storage adapters in Ports and Adapters architecture.</p></section><section class="lesson-section" id="s31"><h3><span class="section-number">31</span>Connect assembly to Factory</h3><div class="code-block"><div class="code-label">Java • composition sketch; factory and config are illustrative</div><pre><code>OrderRepository repository = repositoryFactory.create(config);
+ShipOrderHandler handler = new ShipOrderHandler(repository);</code></pre></div><p>The factory chooses or creates an implementation. Dependency injection supplies that implementation to its consumer. A small composition root may need no factory at all.</p></section><section class="lesson-section" id="s32"><h3><span class="section-number">32</span>Connect the port to Proxy and Decorator</h3><div class="code-block"><div class="code-label">Java • wrapper composition sketch; wrapper classes are not implemented here</div><pre><code>OrderRepository repository = new AuditingOrderRepository(
+    new CachingOrderRepository(
+        new JdbcOrderRepository(dataSource)));</code></pre></div><p>A wrapper can preserve the repository interface while adding behavior. Decide what a cache returns, how saves invalidate it, and whether auditing runs before or after delegation. Sharing cached mutable Orders can recreate the same aliasing bug as a weak fake.</p><p>The interface makes composition possible; it does not guarantee that a wrapper preserves persistence semantics.</p></section><section class="lesson-section" id="s33"><h3><span class="section-number">33</span>Connect the use case to Command</h3><div class="table-wrap"><table><thead><tr><th scope="col">Element</th><th scope="col">Owns this responsibility</th></tr></thead><tbody><tr><td>Controller / incoming adapter</td><td>Translate the transport request into an application call.</td></tr><tr><td>ShipOrderCommand</td><td>Carry the requested order ID.</td></tr><tr><td>ShipOrderHandler</td><td>Load, invoke the domain behavior, then save.</td></tr><tr><td>Order</td><td>Enforce the packed-to-shipped rule.</td></tr><tr><td>OrderRepository</td><td>Declare the persistence capability.</td></tr><tr><td>JdbcOrderRepository</td><td>Execute SQL and map persisted data.</td></tr></tbody></table></div><p>A Java record is suitable for the command’s small data payload. Its generated constructor, accessors, and value methods avoid routine boilerplate. Records are supported in Java 25; they do not require preview features. <a class="cite" href="#ref-12" aria-label="Source 12">[12]</a></p></section><section class="lesson-section" id="s34"><h3><span class="section-number">34</span>See the minimal architecture as boundaries</h3><div class="table-wrap"><table><thead><tr><th scope="col">Boundary</th><th scope="col">Incoming knowledge</th><th scope="col">Outgoing knowledge</th></tr></thead><tbody><tr><td>Domain</td><td>Business inputs and existing state</td><td>Its own invariants and owned contracts</td></tr><tr><td>Application</td><td>Commands from any entry point</td><td>Domain objects and required ports</td></tr><tr><td>Infrastructure</td><td>Calls through the port</td><td>JDBC, schemas, driver behavior</td></tr><tr><td>Web / CLI</td><td>HTTP or command-line input</td><td>Application handler</td></tr><tr><td>Composition root</td><td>Deployment choices</td><td>All pieces needed for assembly</td></tr></tbody></table></div><p>In this example, <code>Order</code> never calls the repository itself. The handler coordinates both. This avoids a misleading graph in which the entity appears to depend on SQL or perform persistence.</p></section></section><section class="part" id="testing"><header class="part-heading"><span class="eyebrow">PART H</span><h2>Test the design and keep it small</h2><p>Original sections 35–38 · Prove behavior at the boundary where it lives.</p></header><section class="lesson-section" id="s35"><h3><span class="section-number">35</span>Test each boundary at the right level</h3><div class="table-wrap"><table><thead><tr><th scope="col">Test level</th><th scope="col">Use real objects for</th><th scope="col">What the test proves</th></tr></thead><tbody><tr><td>Domain unit</td><td>Order</td><td>Packed can ship; cancelled or shipped cannot ship again.</td></tr><tr><td>Application unit</td><td>Handler + Order + detached-state fake</td><td>Correct orchestration, explicit save, and no save after rejection.</td></tr><tr><td>Infrastructure integration</td><td>JDBC repository + actual database/driver</td><td>SQL syntax, mapping, absent rows, constraints, and chosen transaction/concurrency behavior.</td></tr></tbody></table></div><p>Run integration tests against isolated test data. A fake is useful for application logic; it cannot prove database behavior. <a class="cite" href="#ref-4" aria-label="Source 4">[4]</a></p><div class="code-block"><div class="code-label">Java • failure-path check; helpers in Appendix A</div><pre><code>var repository = new InMemoryOrderRepository();
+repository.seed(Order.restore(&quot;R1&quot;, OrderStatus.CANCELLED));
+var handler = new ShipOrderHandler(repository);
+
+expectThrows(IllegalStateException.class,
+    () -&gt; handler.handle(new ShipOrderCommand(&quot;R1&quot;)));
+equal(0, repository.saveCalls());</code></pre></div></section><section class="lesson-section" id="s36"><h3><span class="section-number">36</span>Do not mock everything</h3><p>Use the real domain object when its logic is fast and deterministic. Substitute the persistence boundary when that removes infrastructure from the test. Use a mock or spy when a particular interaction is the behavior you need to observe.</p><p>The in-memory adapter here deliberately stores snapshots. That extra care makes it a useful fake for this contract, but it still does not model database concurrency.</p></section><section class="lesson-section" id="s37"><h3><span class="section-number">37</span>Do not create an interface for every class</h3><p>An interface earns its place when it separates policy from detail, isolates an external system, represents real variation, or establishes a valuable test boundary. <code>ShipOrderHandlerInterface</code> would add little here. The handler can stay a concrete application class.</p><p>Start with the pressure. Count meaningful boundaries, not interface files.</p></section><section class="lesson-section" id="s38"><h3><span class="section-number">38</span>Repeat the first-principles process</h3><ol class="steps"><li><strong>Name the job.</strong> What must this class accomplish?</li><li><strong>Identify the capability.</strong> What does it need from another object?</li><li><strong>Question concrete knowledge.</strong> Would naming the implementation couple policy to a volatile detail?</li><li><strong>Define the boundary.</strong> If useful, express a small, consumer-shaped contract.</li><li><strong>Supply the implementation.</strong> Make required collaborators constructor arguments.</li><li><strong>Assemble at the entry point.</strong> Choose implementations in the composition root.</li><li><strong>Test the contracts.</strong> Separate domain, orchestration, and infrastructure evidence.</li></ol><aside class="note"><strong>The question to carry forward</strong><p>Which layer should own each dependency? Framework configuration cannot repair an abstraction that points in the wrong direction.</p></aside></section></section><section class="part" id="exercise"><header class="part-heading"><span class="eyebrow">PART PRACTICE</span><h2>Build CancelOrder</h2><p>Apply the boundary, injection, and ownership decisions yourself.</p></header><p>Build a <code>CancelOrder</code> use case by applying the same reasoning. Start with a handler that creates a concrete JDBC repository or reaches into a global database object. Refactor it so the application expresses its need and receives an implementation.</p><aside class="note"><strong>Rules for this exercise</strong><p>Only a <code>PACKED</code> order may be cancelled. A <code>SHIPPED</code> or already <code>CANCELLED</code> order is rejected with <code>IllegalStateException</code>. Missing orders raise <code>OrderNotFoundException</code>. These are lesson rules, not universal commerce policy.</p></aside><ol class="checklist"><li><code>CancelOrderHandler</code> contains no <code>new Jdbc…</code> and no global database lookup.</li><li>The handler contains no JDBC imports or types.</li><li><code>Order</code> owns the cancellation rule and contains no persistence code.</li><li><code>OrderRepository</code> expresses the operations and errors the application needs.</li><li>Unit checks use an in-memory repository and prove that a successful cancellation was saved.</li><li>JDBC behavior has separate integration tests against a database.</li><li>Constructor parameters expose all mandatory handler collaborators.</li><li>One composition location chooses and wires the concrete implementation.</li><li>Rejected cancellation never calls <code>save</code> and leaves stored state unchanged.</li></ol><p><strong>Explain your design:</strong> who owns the repository interface, where does the real implementation get selected, and which test would fail if <code>save()</code> were deleted?</p><p>The runnable source includes a cancellation reference in Appendix A5. Try the design first, then compare responsibilities—not just class names.</p></section><section class="part" id="runnable"><header class="part-heading"><span class="eyebrow">PART APPENDIX A</span><h2>Run the complete example</h2><p>One source file · Stable Java syntax · No preview features.</p></header><p>Save the complete source as <code>Lesson14.java</code>. The button downloads exactly the source blocks in this appendix, in order. They include every required type, the JDBC adapter, a cancellation reference, and a small check harness. No build tool or third-party library is needed to compile the core file.</p><div class="actions no-print"><button type="button" class="primary" id="download-java">Download Lesson14.java</button><button type="button" id="copy-java">Copy complete Java source</button></div><div class="code-block"><div class="code-label">Terminal • run with a JDK 25 installation</div><pre><code>javac --release 25 Lesson14.java
+java Lesson14</code></pre></div><p><code>--release 25</code> checks language rules and APIs for Java 25. <a class="cite" href="#ref-13" aria-label="Source 13">[13]</a></p><div class="code-block"><div class="code-label">Expected output</div><pre><code>All 9 checks passed.
+O-123: SHIPPED</code></pre></div><aside class="note"><strong>Validation record</strong><p>The full source compiled with <code>-Xlint:all</code> and all nine checks passed on the available JDK 17.0.20. It uses stable Java features and APIs checked against the Java 25 documentation. ⚠️ A JDK 25 runtime was not available for a direct execution check. The JDBC adapter was compiled; no PostgreSQL integration test was run.</p></aside><p>The explicit check helpers throw <code>AssertionError</code> on failure, so these checks do not depend on enabling JVM <code>assert</code> statements. The main method runs the checks and then assembles the small demonstration graph.</p><section class="source-section" id="a1"><h3>A1 · Imports and domain model</h3><div class="code-block long-code"><div class="code-label">Lesson14.java • continuous source, part 1 of 6</div><pre><code data-source-part="true">import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import javax.sql.DataSource;
+
+public final class Lesson14 {
+    private Lesson14() {}
+
+    // A1: DOMAIN. No SQL or framework types in these declarations.
+    public enum OrderStatus { PACKED, SHIPPED, CANCELLED }
+
+    public static final class Order {
+        private final String id;
+        private OrderStatus status;
+
+        private Order(String id, OrderStatus status) {
+            this.id = requireId(id);
+            this.status = Objects.requireNonNull(status, &quot;status&quot;);
+        }
+
+        public static Order packed(String id) {
+            return new Order(id, OrderStatus.PACKED);
+        }
+
+        public static Order restore(String id, OrderStatus status) {
+            return new Order(id, status);
+        }
+
+        public String id() { return id; }
+        public OrderStatus status() { return status; }
+
+        public void ship() {
+            requirePacked(&quot;ship&quot;);
+            status = OrderStatus.SHIPPED;
+        }
+
+        public void cancel() {
+            requirePacked(&quot;cancel&quot;);
+            status = OrderStatus.CANCELLED;
+        }
+
+        private void requirePacked(String action) {
+            if (status != OrderStatus.PACKED) {
+                throw new IllegalStateException(
+                    &quot;Cannot &quot; + action + &quot; order in state &quot; + status);
+            }
+        }
+    }
+
+    private static String requireId(String id) {
+        Objects.requireNonNull(id, &quot;orderId&quot;);
+        if (id.isBlank() || id.length() &gt; 64) {
+            throw new IllegalArgumentException(
+                &quot;orderId must contain 1 to 64 characters, not all blank&quot;);
+        }
+        return id;
+    }</code></pre></div></section><section class="source-section" id="a2"><h3>A2 · Repository port, command, handler, and errors</h3><div class="code-block long-code"><div class="code-label">Lesson14.java • continuous source, part 2 of 6</div><pre><code data-source-part="true">    // A2: PORT AND APPLICATION. Save updates an existing order only.
+    public interface OrderRepository {
+        // Returns a detached order; throws OrderNotFoundException if absent.
+        Order findById(String id);
+        // Throws OrderNotFoundException if the order is absent.
+        void save(Order order);
+    }
+
+    public record ShipOrderCommand(String orderId) {
+        public ShipOrderCommand { requireId(orderId); }
+    }
+
+    public static final class ShipOrderHandler {
+        private final OrderRepository repository;
+
+        public ShipOrderHandler(OrderRepository repository) {
+            this.repository = Objects.requireNonNull(
+                repository, &quot;repository&quot;);
+        }
+
+        public void handle(ShipOrderCommand command) {
+            Objects.requireNonNull(command, &quot;command&quot;);
+            Order order = repository.findById(command.orderId());
+            order.ship();
+            repository.save(order);
+        }
+    }
+
+    public static final class OrderNotFoundException
+            extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public OrderNotFoundException(String id) {
+            super(&quot;Order not found: &quot; + id);
+        }
+    }
+
+    public static final class RepositoryException
+            extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public RepositoryException(String message) { super(message); }
+        public RepositoryException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }</code></pre></div></section><section class="source-section" id="a3"><h3>A3 · In-memory repository with detached reads</h3><div class="code-block long-code"><div class="code-label">Lesson14.java • continuous source, part 3 of 6</div><pre><code data-source-part="true">    // A3: TEST ADAPTER. Snapshots prevent shared-mutation false positives.
+    public static final class InMemoryOrderRepository
+            implements OrderRepository {
+        private record Snapshot(String id, OrderStatus status) {}
+        private final Map&lt;String, Snapshot&gt; orders = new HashMap&lt;&gt;();
+        private int saveCalls;
+
+        public void seed(Order order) {
+            Objects.requireNonNull(order, &quot;order&quot;);
+            Snapshot snapshot = new Snapshot(order.id(), order.status());
+            if (orders.putIfAbsent(order.id(), snapshot) != null) {
+                throw new IllegalArgumentException(&quot;Duplicate fixture id&quot;);
+            }
+        }
+
+        @Override
+        public Order findById(String id) {
+            Snapshot snapshot = orders.get(requireId(id));
+            if (snapshot == null) {
+                throw new OrderNotFoundException(id);
+            }
+            return Order.restore(snapshot.id(), snapshot.status());
+        }
+
+        @Override
+        public void save(Order order) {
+            Objects.requireNonNull(order, &quot;order&quot;);
+            saveCalls++;
+            if (!orders.containsKey(order.id())) {
+                throw new OrderNotFoundException(order.id());
+            }
+            orders.put(order.id(), new Snapshot(order.id(), order.status()));
+        }
+
+        public int saveCalls() { return saveCalls; }
+    }</code></pre></div></section><section class="source-section" id="a4"><h3>A4 · Complete JDBC repository</h3><p>This adapter intentionally requires auto-commit and opens one connection per operation. It demonstrates mapping and dependency boundaries; it does not implement a transaction spanning the use case or concurrent-update protection.</p><div class="code-block long-code"><div class="code-label">Lesson14.java • continuous source, part 4 of 6</div><pre><code data-source-part="true">    // A4: JDBC ADAPTER. Requires auto-commit connections, by design.
+    // Each operation is independent; this is NOT a use-case transaction.
+    public static final class JdbcOrderRepository
+            implements OrderRepository {
+        private final DataSource dataSource;
+
+        public JdbcOrderRepository(DataSource dataSource) {
+            this.dataSource = Objects.requireNonNull(
+                dataSource, &quot;dataSource&quot;);
+        }
+
+        @Override
+        public Order findById(String id) {
+            requireId(id);
+            String sql = &quot;&quot;&quot;
+                SELECT id, status FROM orders WHERE id = ?
+                &quot;&quot;&quot;;
+            try (Connection connection = dataSource.getConnection()) {
+                requireAutoCommit(connection);
+                try (PreparedStatement statement =
+                        connection.prepareStatement(sql)) {
+                    statement.setString(1, id);
+                    try (ResultSet result = statement.executeQuery()) {
+                        if (!result.next()) {
+                            throw new OrderNotFoundException(id);
+                        }
+                        return mapOrder(result);
+                    }
+                }
+            } catch (SQLException exception) {
+                throw new RepositoryException(&quot;Load failed&quot;, exception);
+            }
+        }
+
+        private Order mapOrder(ResultSet result) throws SQLException {
+            String id = result.getString(&quot;id&quot;);
+            String status = result.getString(&quot;status&quot;);
+            try {
+                return Order.restore(id, OrderStatus.valueOf(status));
+            } catch (IllegalArgumentException | NullPointerException ex) {
+                throw new RepositoryException(&quot;Invalid stored order&quot;, ex);
+            }
+        }
+
+        @Override
+        public void save(Order order) {
+            Objects.requireNonNull(order, &quot;order&quot;);
+            String sql = &quot;&quot;&quot;
+                UPDATE orders SET status = ? WHERE id = ?
+                &quot;&quot;&quot;;
+            try (Connection connection = dataSource.getConnection()) {
+                requireAutoCommit(connection);
+                try (PreparedStatement statement =
+                        connection.prepareStatement(sql)) {
+                    statement.setString(1, order.status().name());
+                    statement.setString(2, order.id());
+                    int updated = statement.executeUpdate();
+                    if (updated == 0) {
+                        throw new OrderNotFoundException(order.id());
+                    }
+                    if (updated != 1) {
+                        throw new RepositoryException(
+                            &quot;Expected exactly one updated row&quot;);
+                    }
+                }
+            } catch (SQLException exception) {
+                throw new RepositoryException(&quot;Save failed&quot;, exception);
+            }
+        }
+
+        private void requireAutoCommit(Connection connection)
+                throws SQLException {
+            if (!connection.getAutoCommit()) {
+                throw new RepositoryException(
+                    &quot;This teaching adapter requires auto-commit&quot;);
+            }
+        }
+    }</code></pre></div></section><section class="source-section" id="a5"><h3>A5 · CancelOrder reference solution</h3><div class="code-block"><div class="code-label">Lesson14.java • continuous source, part 5 of 6</div><pre><code data-source-part="true">    // A5: EXERCISE REFERENCE. Try the exercise before reading this part.
+    public record CancelOrderCommand(String orderId) {
+        public CancelOrderCommand { requireId(orderId); }
+    }
+
+    public static final class CancelOrderHandler {
+        private final OrderRepository repository;
+
+        public CancelOrderHandler(OrderRepository repository) {
+            this.repository = Objects.requireNonNull(
+                repository, &quot;repository&quot;);
+        }
+
+        public void handle(CancelOrderCommand command) {
+            Objects.requireNonNull(command, &quot;command&quot;);
+            Order order = repository.findById(command.orderId());
+            order.cancel();
+            repository.save(order);
+        }
+    }</code></pre></div></section><section class="source-section" id="a6"><h3>A6 · Composition root and executable checks</h3><div class="code-block long-code"><div class="code-label">Lesson14.java • continuous source, part 6 of 6</div><pre><code data-source-part="true">    // A6: COMPOSITION ROOT AND EXECUTABLE CHECKS. No testing library needed.
+    public static void main(String[] args) {
+        domainRule();
+        savesShippedOrder();
+        mutationNeedsSave();
+        rejectedShipDoesNotSave();
+        missingOrderDoesNotSave();
+        dependencyIsRequired();
+        cancelsPackedOrder();
+        shippedOrderCannotBeCancelled();
+        saveIsUpdateOnly();
+        System.out.println(&quot;All 9 checks passed.&quot;);
+
+        var repository = new InMemoryOrderRepository();
+        repository.seed(Order.packed(&quot;O-123&quot;));
+        var handler = new ShipOrderHandler(repository);
+        handler.handle(new ShipOrderCommand(&quot;O-123&quot;));
+        System.out.println(&quot;O-123: &quot; + repository.findById(&quot;O-123&quot;).status());
+    }
+
+    private static void domainRule() {
+        Order order = Order.packed(&quot;D1&quot;);
+        order.ship();
+        equal(OrderStatus.SHIPPED, order.status());
+        expectThrows(IllegalStateException.class, order::ship);
+    }
+
+    private static void savesShippedOrder() {
+        var repository = new InMemoryOrderRepository();
+        repository.seed(Order.packed(&quot;S1&quot;));
+        new ShipOrderHandler(repository).handle(new ShipOrderCommand(&quot;S1&quot;));
+        equal(OrderStatus.SHIPPED, repository.findById(&quot;S1&quot;).status());
+        equal(1, repository.saveCalls());
+    }
+
+    private static void mutationNeedsSave() {
+        var repository = new InMemoryOrderRepository();
+        repository.seed(Order.packed(&quot;M1&quot;));
+        Order loaded = repository.findById(&quot;M1&quot;);
+        loaded.ship();
+        equal(OrderStatus.PACKED, repository.findById(&quot;M1&quot;).status());
+        repository.save(loaded);
+        equal(OrderStatus.SHIPPED, repository.findById(&quot;M1&quot;).status());
+        loaded = repository.findById(&quot;M1&quot;);
+        equal(OrderStatus.SHIPPED, loaded.status());
+    }
+
+    private static void rejectedShipDoesNotSave() {
+        var repository = new InMemoryOrderRepository();
+        repository.seed(Order.restore(&quot;R1&quot;, OrderStatus.CANCELLED));
+        var handler = new ShipOrderHandler(repository);
+        expectThrows(IllegalStateException.class,
+            () -&gt; handler.handle(new ShipOrderCommand(&quot;R1&quot;)));
+        equal(0, repository.saveCalls());
+        equal(OrderStatus.CANCELLED, repository.findById(&quot;R1&quot;).status());
+    }
+
+    private static void missingOrderDoesNotSave() {
+        var repository = new InMemoryOrderRepository();
+        var handler = new ShipOrderHandler(repository);
+        expectThrows(OrderNotFoundException.class,
+            () -&gt; handler.handle(new ShipOrderCommand(&quot;missing&quot;)));
+        equal(0, repository.saveCalls());
+    }
+
+    private static void dependencyIsRequired() {
+        expectThrows(NullPointerException.class,
+            () -&gt; new ShipOrderHandler(null));
+    }
+
+    private static void cancelsPackedOrder() {
+        var repository = new InMemoryOrderRepository();
+        repository.seed(Order.packed(&quot;C1&quot;));
+        new CancelOrderHandler(repository)
+            .handle(new CancelOrderCommand(&quot;C1&quot;));
+        equal(OrderStatus.CANCELLED, repository.findById(&quot;C1&quot;).status());
+        equal(1, repository.saveCalls());
+    }
+
+    private static void shippedOrderCannotBeCancelled() {
+        var repository = new InMemoryOrderRepository();
+        repository.seed(Order.restore(&quot;C2&quot;, OrderStatus.SHIPPED));
+        var handler = new CancelOrderHandler(repository);
+        expectThrows(IllegalStateException.class,
+            () -&gt; handler.handle(new CancelOrderCommand(&quot;C2&quot;)));
+        equal(0, repository.saveCalls());
+        equal(OrderStatus.SHIPPED, repository.findById(&quot;C2&quot;).status());
+    }
+
+    private static void saveIsUpdateOnly() {
+        var repository = new InMemoryOrderRepository();
+        expectThrows(OrderNotFoundException.class,
+            () -&gt; repository.save(Order.packed(&quot;absent&quot;)));
+    }
+
+    private static void equal(Object expected, Object actual) {
+        if (!Objects.equals(expected, actual)) {
+            throw new AssertionError(
+                &quot;Expected &quot; + expected + &quot;, got &quot; + actual);
+        }
+    }
+
+    private static &lt;T extends Throwable&gt; void expectThrows(
+            Class&lt;T&gt; expected, Runnable action) {
+        try {
+            action.run();
+        } catch (Throwable actual) {
+            if (expected.isInstance(actual)) {
+                return;
+            }
+            throw new AssertionError(&quot;Unexpected exception&quot;, actual);
+        }
+        throw new AssertionError(&quot;Expected &quot; + expected.getSimpleName());
+    }
+}</code></pre></div></section></section><section class="part" id="jdbc"><header class="part-heading"><span class="eyebrow">PART APPENDIX B</span><h2>Verify the database adapter</h2><p>Make the persistence contract observable against the real technology.</p></header><p>The JDBC adapter compiles using JDK APIs. Running it also needs a PostgreSQL JDBC driver, a configured <code>DataSource</code>, and a database. Those external services are not embedded in the HTML. The in-memory path above is the complete standalone execution path.</p><div class="code-block"><div class="code-label">SQL • minimal PostgreSQL schema and fixture</div><pre><code>CREATE TABLE orders (
+    id VARCHAR(64) PRIMARY KEY,
+    status VARCHAR(16) NOT NULL
+        CHECK (status IN (&#x27;PACKED&#x27;, &#x27;SHIPPED&#x27;, &#x27;CANCELLED&#x27;))
+);
+
+INSERT INTO orders (id, status) VALUES (&#x27;O-123&#x27;, &#x27;PACKED&#x27;);</code></pre></div><p>The primary key makes the ID unique and non-null; the status constraint limits stored values. <a class="cite" href="#ref-14" aria-label="Source 14">[14]</a> The application validates IDs before it calls persistence. The schema is intentionally minimal; it does not model all of the Java ID-validation rules.</p><div class="table-wrap"><table><thead><tr><th scope="col">Integration case</th><th scope="col">Required observation</th></tr></thead><tbody><tr><td>Load seeded order</td><td>Correct ID and PACKED state are restored.</td></tr><tr><td>Save shipped order</td><td>A new connection reads SHIPPED from the database.</td></tr><tr><td>Load missing order</td><td>OrderNotFoundException is thrown.</td></tr><tr><td>Save absent order</td><td>No row is inserted; OrderNotFoundException is thrown.</td></tr><tr><td>Driver / SQL failure</td><td>RepositoryException retains the SQLException cause.</td></tr><tr><td>Concurrent commands</td><td>The intended lost-update strategy is verified once implemented.</td></tr><tr><td>Multi-write use case</td><td>Rollback is verified once a use-case transaction is implemented.</td></tr></tbody></table></div><aside class="caution"><strong>When adding Spring transactions</strong><p>Do not assume <code>@Transactional</code> makes this raw adapter participate in a managed transaction. Its direct per-method connection acquisition and auto-commit requirement are deliberate teaching constraints. Refactor to transaction-aware access, such as Spring’s documented <code>DataSourceUtils</code>/<code>JdbcTemplate</code> approach, with a transaction manager and a defined use-case boundary. <a class="cite" href="#ref-15" aria-label="Source 15">[15]</a></p></aside></section><section class="part" id="recap"><header class="part-heading"><span class="eyebrow">PART REFERENCE</span><h2>Keep the four decisions separate</h2><p>Return to these questions when the implementation starts to feel complicated.</p></header><div class="table-wrap"><table><thead><tr><th scope="col">Idea</th><th scope="col">Question it answers</th><th scope="col">In this guide</th></tr></thead><tbody><tr><td>Dependency Inversion</td><td>Which direction should source dependencies point?</td><td>The handler and JDBC adapter depend on an inward-owned repository contract.</td></tr><tr><td>Dependency Injection</td><td>Who supplies the collaborator?</td><td>The composition root passes a repository to the handler constructor.</td></tr><tr><td>Repository</td><td>How does the use case access persistent domain objects?</td><td>Load and save Orders through an explicit contract.</td></tr><tr><td>Composition root</td><td>Where are implementations chosen and connected?</td><td>main, or optional Spring configuration at startup.</td></tr></tbody></table></div><p><strong>Next: Ports &amp; Adapters / Hexagonal Architecture.</strong> Extend the same reasoning from persistence to payment providers, email, clocks, and messaging—and from HTTP to CLI commands, scheduled jobs, and message consumers. Keep each external boundary explicit while the domain retains its rules.</p></section><section class="part" id="sources"><header class="part-heading"><span class="eyebrow">PART SOURCES</span><h2>Documentation and verification</h2><p>Java references are pinned to Java 25; framework guidance is linked to official documentation.</p></header><p>Official sources checked on 1 September 2026. Architecture guidance is adapted to this Java example; the business rules and design choices are defined explicitly in the guide.</p><ol class="references"><li id="ref-1"><a href="https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/architectural-principles">Microsoft Learn — Architectural principles</a><p>Dependency inversion and the distinction between compile-time dependencies and runtime flow.</p><span class="print-url">https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/architectural-principles</span></li><li id="ref-2"><a href="https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-collaborators.html">Spring Framework — Dependency Injection</a><p>Constructor and setter injection, explicit dependencies, and constructor-size guidance.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-collaborators.html</span></li><li id="ref-3"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Objects.html">Oracle Java SE 25 — Objects</a><p>requireNonNull constructor and method-argument validation.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Objects.html</span></li><li id="ref-4"><a href="https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design">Microsoft Learn — Infrastructure persistence layer</a><p>Repositories, aggregates, adapters, and separation of application tests from persistence tests.</p><span class="print-url">https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design</span></li><li id="ref-5"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/javax/sql/DataSource.html">Oracle Java SE 25 — DataSource</a><p>The standard connection-factory interface in javax.sql.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/javax/sql/DataSource.html</span></li><li id="ref-6"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/PreparedStatement.html">Oracle Java SE 25 — PreparedStatement</a><p>Parameter binding, query execution, and update counts.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/PreparedStatement.html</span></li><li id="ref-7"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/ResultSet.html">Oracle Java SE 25 — ResultSet</a><p>Row navigation, typed access, and closeable result resources.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/ResultSet.html</span></li><li id="ref-8"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html">Oracle Java SE 25 — Connection</a><p>Auto-commit, commit/rollback, isolation, and connection semantics.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html</span></li><li id="ref-9"><a href="https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html">Spring Framework — Classpath scanning and components</a><p>Repository, service, and controller stereotypes and component registration.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html</span></li><li id="ref-10"><a href="https://docs.spring.io/spring-framework/reference/core/beans/java/basic-concepts.html">Spring Framework — @Bean and @Configuration</a><p>Explicit Java-based container configuration.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/core/beans/java/basic-concepts.html</span></li><li id="ref-11"><a href="https://docs.spring.io/spring-framework/reference/core/aop/proxying.html">Spring Framework — Proxying mechanisms</a><p>JDK proxies and the limitations of class-based proxying.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/core/aop/proxying.html</span></li><li id="ref-12"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle Java SE 25 — Record classes</a><p>Records, generated members, and compact constructors.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/language/records.html</span></li><li id="ref-13"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Oracle JDK 25 — javac command</a><p>The --release compiler option and target-platform checks.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li><li id="ref-14"><a href="https://www.postgresql.org/docs/current/ddl-constraints.html">PostgreSQL — Constraints</a><p>Primary keys, not-null constraints, and check constraints.</p><span class="print-url">https://www.postgresql.org/docs/current/ddl-constraints.html</span></li><li id="ref-15"><a href="https://docs.spring.io/spring-framework/reference/data-access/jdbc/connections.html">Spring Framework — Controlling database connections</a><p>Transaction-aware connection access and JDBC transaction integration.</p><span class="print-url">https://docs.spring.io/spring-framework/reference/data-access/jdbc/connections.html</span></li></ol></section><footer class="page-end"><span>DP · Lesson 14 · Java architecture</span><span>Problem → capability → boundary → construction</span></footer></main><div id="status" role="status" aria-live="polite"></div><script>
+(()=>{
+const status=document.getElementById('status');let timer;
+function announce(message){status.textContent=message;clearTimeout(timer);timer=setTimeout(()=>{status.textContent='';},5000);}
+function source(){return Array.from(document.querySelectorAll('code[data-source-part]')).map(el=>el.textContent.replace(/\n+$/,'')).join('\n\n')+'\n';}
+document.getElementById('print-guide').addEventListener('click',()=>window.print());
+document.getElementById('download-java').addEventListener('click',()=>{
+const blob=new Blob([source()],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='Lesson14.java';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);announce('Lesson14.java is ready to save.');
+});
+document.getElementById('copy-java').addEventListener('click',async()=>{
+try{if(!navigator.clipboard)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(source());announce('Complete Java source copied.');}catch{announce('Clipboard access is unavailable here. Use Download Lesson14.java.');}
+});
+})();
+</script></body></html>

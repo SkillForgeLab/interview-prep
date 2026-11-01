@@ -1,0 +1,617 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Lesson 23: derive timeouts, safe retries, exponential backoff and jitter from first principles. Includes Java 25-compatible examples, complete source, deterministic tests and a printable retry timing explorer."><title>23. Timeout → Retry → Exponential Backoff → Jitter</title><style>
+:root{color-scheme:light;--ink:#172b36;--muted:#4f626b;--blue:#16606c;--accent:#bc672d;--line:#d8e2e4;--paper:#fff;--wash:#f0f5f5;--warm:#fbf7ef;--code:#f3f6f8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;color:var(--ink);background:#edf2f3}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:25px}body{margin:0;line-height:1.65}a{color:#075c79;text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:#934310}button,input,select{font:inherit}button{cursor:pointer;border:1px solid #b6cbd0;background:#fff;color:#164b59;border-radius:6px;padding:7px 12px}button:hover{background:#edf5f5}:focus-visible{outline:3px solid #bd672d;outline-offset:3px}p{margin:0 0 1em}strong{font-weight:650}.skip{position:absolute;left:16px;top:-90px;z-index:5;background:#fff;padding:10px}.skip:focus{top:10px}
+.shell{display:grid;grid-template-columns:235px minmax(0,920px);gap:32px;max-width:1240px;margin:0 auto;padding:38px 26px 80px}.sidebar{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;padding:8px 0 20px}.brand{font-size:.76rem;font-weight:750;letter-spacing:.16em;text-transform:uppercase;color:#236776;margin-bottom:22px}.sidebar nav a{display:block;text-decoration:none;color:#344f5a;font-size:.88rem;line-height:1.45;padding:8px 9px;border-left:2px solid transparent}.sidebar nav a:hover{background:#e1ebed;border-left-color:#216a78}.sidebar nav small{display:block;color:#61717a;font-size:.72rem}.sidebar hr{border:0;border-top:1px solid #cad7da;margin:18px 0}.sidebar .small{font-size:.77rem;margin:12px 9px}.sidebar button{margin:8px 9px}main{min-width:0;background:#fff;border:1px solid var(--line);box-shadow:0 5px 24px #1b4b5908;padding:0 58px 54px}.hero{padding:51px 0 38px;border-bottom:2px solid #205b68}.eyebrow{font-size:.73rem;font-weight:750;letter-spacing:.15em;text-transform:uppercase;color:#376672;margin:0 0 12px}.hero h1{font-family:Georgia,"Times New Roman",serif;font-size:3.2rem;line-height:1.09;font-weight:500;letter-spacing:-.04em;margin:0 0 25px}.hero h1 .arrow{color:#a9babc;font-family:system-ui;font-weight:400}.lede{font-size:1.13rem;line-height:1.6;max-width:660px;color:#395760}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.tag{font-size:.73rem;border:1px solid #ccdcdf;background:#f3f7f7;border-radius:4px;padding:3px 9px;color:#365763}.hero-rule{background:var(--warm);border-left:3px solid var(--accent);padding:14px 18px;font-family:Georgia,serif;font-size:1.16rem}.intro{padding:30px 0 0}.small{font-size:.83rem;color:var(--muted)}.quick-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin:20px 0 12px}.quick-nav a{display:block;font-size:.84rem}.part{margin:54px 0 28px;padding-top:25px;border-top:1px solid var(--line);break-before:page}.part h2{font-family:Georgia,serif;font-size:2rem;font-weight:500;line-height:1.2;letter-spacing:-.025em;margin:0 0 13px}.part>p:last-child{color:var(--muted);font-size:.94rem;margin:0}.lesson-section{margin:0 0 35px}.lesson-section h3{display:flex;align-items:baseline;gap:13px;font-size:1.2rem;line-height:1.35;margin:0 0 15px;font-weight:680}.step{font-size:.77rem;font-variant-numeric:tabular-nums;color:#5e858e;min-width:23px;font-weight:750}.lesson-section h4,.appendix h4{font-size:1rem;margin:24px 0 12px}.callout{padding:16px 20px;margin:21px 0;background:#edf5f3;border-left:3px solid #3a7c71;break-inside:avoid}.callout strong{display:block;color:#205b52;margin-bottom:5px}.callout p{font-size:.94rem;margin:0}.callout.warning{background:#fcf4e8;border-color:#b9682b}.callout.warning strong{color:#884810}.cite{font-size:.76em;font-weight:650;margin-left:.35em;text-decoration:none;white-space:nowrap}code{font-family:"DejaVu Sans Mono","SFMono-Regular",Consolas,monospace;font-size:.85em;background:#f0f4f6;padding:.06em .25em;border-radius:3px;overflow-wrap:anywhere}.code-block{margin:19px 0 24px;background:var(--code);border:1px solid #dce5e8;border-radius:5px;overflow:hidden;min-width:0;break-inside:avoid}.code-block figcaption{font-size:.72rem;letter-spacing:.025em;line-height:1.5;color:#4a646f;border-bottom:1px solid #dce5e8;background:#eaf0f3;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}.code-block pre{margin:0;padding:17px 18px;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;font-size:.77rem;line-height:1.65}.code-block code{font-size:1em;padding:0;background:transparent;border-radius:0}.code-block button{font-size:.7rem;line-height:1;padding:5px 8px;background:transparent;border-color:#b8cbd1;border-radius:4px}.full-source{break-inside:auto}.full-source pre{font-size:.73rem;line-height:1.65}.table-wrap{margin:19px 0 24px}table{width:100%;border-collapse:collapse;font-size:.85rem;line-height:1.5;table-layout:fixed}th{text-align:left;padding:10px 11px;background:#eaf1f3;color:#294d58;border-bottom:2px solid #b8d0d5;font-size:.78rem;font-weight:700}td{vertical-align:top;padding:11px;border-bottom:1px solid #dce5e8;overflow-wrap:anywhere}tr:nth-child(even) td{background:#f9fbfb}tr{break-inside:avoid}thead{display:table-header-group}ul,ol{padding-left:23px;margin:12px 0 20px}li{margin:7px 0;padding-left:2px}.lab{margin:28px 0;background:#fafcfc;border:1px solid #cbdde0;border-radius:7px;padding:21px;break-inside:avoid}.lab h4{margin:0 0 10px;font-size:1.15rem}.lab p{font-size:.85rem}.lab-controls{display:grid;grid-template-columns:1.5fr 1fr;gap:12px;margin:16px 0 20px}.lab-controls label{font-size:.72rem;color:#415f69;font-weight:650}.lab-controls input,.lab-controls select{display:block;width:100%;min-width:0;padding:7px 9px;border:1px solid #b6ccd1;background:#fff;border-radius:5px;color:#183e4a;font-size:.85rem;margin-top:4px}.lab-summary{font-weight:600;color:#205767}#lab-error{color:#8d3e14;background:#fff0e4;padding:8px}.lane{display:flex;align-items:center;gap:10px;height:26px}.lane-label{font-size:.68rem;min-width:37px;color:#607780}.track{height:22px;position:relative;width:100%;border-bottom:1px solid #dce7e8}.dot{position:absolute;top:6px;width:8px;height:8px;background:#257283;border-radius:50%;transform:translateX(-50%)}.axis{margin:10px 0 14px 47px;display:flex;justify-content:space-between;font-size:.68rem;color:#506c76;font-variant-numeric:tabular-nums}.lab .table-wrap{margin-bottom:0}.lab table{font-size:.75rem}.appendix{margin-top:50px;break-before:page}.appendix h2{font-family:Georgia,serif;font-size:2rem;font-weight:500;line-height:1.25;letter-spacing:-.02em}.file-actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.file-actions button{font-size:.84rem}.verification{background:#f4f7f8;border:1px solid #d6e1e5;padding:17px 20px;margin:24px 0;font-size:.88rem}.sources{font-size:.84rem}.sources li{margin-bottom:17px}.sources li>span{display:block;color:#526a74;font-size:.81rem;margin-top:2px}.footer{border-top:1px solid var(--line);margin-top:40px;padding-top:20px;font-size:.76rem;color:#4f6b75}.print-only{display:none}
+@media(max-width:1080px){.shell{grid-template-columns:190px minmax(0,1fr);gap:22px;padding:25px 20px}main{padding:0 32px 40px}.hero h1{font-size:2.65rem}.sidebar nav a{font-size:.81rem}}
+@media(max-width:780px){.shell{display:block;padding:0}.sidebar{display:none}main{border:0;box-shadow:none;padding:0 24px 40px}.hero{padding-top:35px}.hero h1{font-size:2.7rem}.quick-nav{font-size:.8rem}.mobile-actions{display:flex;gap:10px;margin-top:20px}.code-block pre{font-size:.72rem}.part h2{font-size:1.7rem}}
+@media(min-width:781px){.mobile-actions{display:none}}
+@media(max-width:430px){main{padding-left:18px;padding-right:18px}.hero h1{font-size:2.22rem}.lede{font-size:1rem}.quick-nav{grid-template-columns:1fr}.lesson-section h3{font-size:1.1rem;gap:8px}table{font-size:.77rem}th,td{padding:8px 6px}th{font-size:.71rem}.lab{padding:14px}.lab-controls{grid-template-columns:1fr 1fr}.lab-controls input,.lab-controls select{font-size:16px}.code-block pre{padding:13px 11px;font-size:.66rem}}
+@page{size:A4;margin:17mm 17mm 18mm}
+@media print{html{scroll-behavior:auto}body{font-size:10pt;line-height:1.55;background:white;color:#142b34}.shell{display:block;margin:0;padding:0;max-width:none}.sidebar,.mobile-actions,.file-actions,.code-block button,.lab-controls,#lab-error,.skip{display:none!important}main{border:0;box-shadow:none;padding:0;max-width:none}.hero{padding:8mm 0 8mm}.hero h1{font-size:34pt}.hero .lede{font-size:12pt}.meta{margin:6mm 0}.tag{font-size:8pt}.hero-rule{font-size:13pt}.eyebrow{font-size:8pt}.intro{padding-top:7mm}.quick-nav{gap:3mm 8mm}.quick-nav a{font-size:9pt}.part{margin:0 0 7mm;padding-top:6mm;break-before:page}.part h2,.appendix h2{font-size:23pt}.part p:last-child{font-size:10pt}.lesson-section{margin-bottom:7mm}.lesson-section h3{font-size:13pt;margin-bottom:3mm}.step{font-size:9pt}h2,h3,h4,figcaption{break-after:avoid}p{orphans:3;widows:3}.callout{padding:3mm 4mm;margin:4mm 0}.callout p{font-size:9.5pt}.table-wrap{overflow:visible;margin:4mm 0 5mm}table{font-size:9pt}th{font-size:8.5pt}th,td{padding:2.5mm 3mm}.code-block{margin:4mm 0 5mm;border-radius:0;box-decoration-break:clone}.code-block figcaption{font-size:8pt;padding:2mm 3mm}.code-block pre{font-size:8pt;line-height:1.48;padding:3mm 4mm;white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere}.full-source{break-inside:auto}.full-source pre{font-size:7.4pt;line-height:1.45;orphans:4;widows:4}.lab{padding:4mm;margin:5mm 0;break-inside:avoid}.lab h4{font-size:12pt}.lab p{font-size:9pt}.lane{height:5mm}.track{height:4.5mm}.dot{width:1.6mm;height:1.6mm;top:1.6mm}.lane-label{font-size:7pt}.axis{font-size:7pt}.lab table{font-size:8pt}.small{font-size:8.5pt}.appendix{margin-top:0}.verification{font-size:9pt;break-inside:avoid}.sources{font-size:9pt;break-before:auto;margin-top:7mm}.sources li>span{font-size:8pt}.sources a{overflow-wrap:anywhere}.footer{font-size:8pt}.print-only{display:block}.screen-only{display:none!important}a{color:#125267;text-decoration:none}.cite{font-size:7pt}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body><a class="skip" href="#guide">Skip to guide</a><div class="shell"><aside class="sidebar"><div class="brand">DP / Lesson 23</div><nav aria-label="Guide navigation"><a href="#waiting"><small>Steps 1–5</small>First, bound the waiting</a><a href="#repetition"><small>Steps 6–9</small>Then, make repetition safe</a><a href="#spacing"><small>Steps 10–17</small>Reduce pressure, then break synchronization</a><a href="#policy"><small>Steps 18–23</small>Turn the mechanism into a policy</a><a href="#ownership"><small>Steps 24–30</small>Give retry a clear owner</a><a href="#workflow"><small>Steps 31–35</small>Reconnect retry to the workflow</a><a href="#testing"><small>Steps 36–44</small>Test the semantics, not the waiting</a><a href="#operation"><small>Steps 45–48</small>Operate the policy and know when it stops helping</a><hr><a href="#implementation">Appendix A · Java implementation</a><a href="#tests">Appendix B · Tests</a><a href="#sources">Official sources</a></nav><button type="button" data-print>Print / Save as PDF</button><p class="small">One file. Works offline.<br>Light theme. A4 &amp; Letter friendly.</p></aside><main id="guide"><header class="hero"><p class="eyebrow">23 / Distributed interaction patterns</p><h1>Timeout <span class="arrow">→</span> Retry<br><span class="arrow">→</span> Exponential Backoff<br><span class="arrow">→</span> Jitter</h1><p class="lede">Recover from a temporary failure without repeating a business effect or turning a small outage into a larger one.</p><div class="meta"><span class="tag">First principles</span><span class="tag">Java 25 compatible</span><span class="tag">48-step progression</span><span class="tag">Complete runnable examples</span></div><div class="hero-rule">How long should we wait, when is another attempt safe, and how do we keep many callers from retrying together?</div><div class="mobile-actions"><button type="button" data-print>Print / Save as PDF</button><a href="#implementation">Jump to Java code</a></div></header><div class="intro"><p>We left the Saga lesson with Checkout calling Payment. Now we follow one unreliable call from the first timeout through safe repetition, controlled waiting and randomized timing. Each mechanism appears only after the previous one leaves a problem unsolved.</p><p class="small">Read in order for the derivation. Use the navigation for review. Small code blocks are labeled fragments; the appendices contain complete source files. This document needs no external scripts, fonts or services. Source links open official documentation.</p><div class="quick-nav"><a href="#waiting">Steps 1–5: First, bound the waiting</a><a href="#repetition">Steps 6–9: Then, make repetition safe</a><a href="#spacing">Steps 10–17: Reduce pressure, then break synchronization</a><a href="#policy">Steps 18–23: Turn the mechanism into a policy</a><a href="#ownership">Steps 24–30: Give retry a clear owner</a><a href="#workflow">Steps 31–35: Reconnect retry to the workflow</a><a href="#testing">Steps 36–44: Test the semantics, not the waiting</a><a href="#operation">Steps 45–48: Operate the policy and know when it stops helping</a></div><p class="small">For PDF: use Print / Save as PDF, portrait, A4 or Letter, and disable the browser’s extra headers and footers. The print stylesheet hides controls and includes the complete code and source references.</p></div><div class="part" id="waiting"><p class="eyebrow">Steps 1–5</p><h2>First, bound the waiting</h2><p>Pressure: one slow remote call can occupy resources long after it is useful.</p></div><section id="s1" class="lesson-section"><h3><span class="step">01</span>The simplest working implementation</h3><p>Our Checkout Saga calls Payment to authorize a purchase. In this <em>illustrative scenario</em>, Payment usually responds in 100–300 ms. Today it is slow. Before deciding how often to retry, ask: <strong>how long can one attempt wait?</strong></p><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>HttpRequest request = HttpRequest.newBuilder(paymentUri)
+        .POST(HttpRequest.BodyPublishers.ofString(paymentJson))
+        .build();
+HttpResponse&lt;String&gt; response = client.send(
+        request, HttpResponse.BodyHandlers.ofString());</code></pre></figure><p>This code sends one request. It does not define a useful waiting limit. While the caller waits, memory, connections and worker capacity may remain occupied. Enough slow calls can exhaust a bounded pool.</p></section><section id="s2" class="lesson-section"><h3><span class="step">02</span>Derive a timeout</h3><p>A timeout is a local boundary: after this duration, the caller stops waiting for this attempt. Set a connection timeout on the client and a request timeout on each request. An unset Java request timeout is effectively infinite. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html#timeout(java.time.Duration)" title="Oracle · HttpRequest.Builder">[1]</a><a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.Builder.html#connectTimeout(java.time.Duration)" title="Oracle · HttpClient.Builder">[2]</a></p><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>HttpClient client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(2))
+        .build();
+
+HttpRequest request = HttpRequest.newBuilder(paymentUri)
+        .timeout(Duration.ofSeconds(3))
+        .POST(HttpRequest.BodyPublishers.ofString(paymentJson))
+        .build();</code></pre></figure><aside class="callout principle"><strong>Example values, not production defaults</strong><p>The durations in this guide illustrate behavior. Choose actual limits from measured latency and the caller’s deadline.</p></aside></section><section id="s3" class="lesson-section"><h3><span class="step">03</span>Connection timeout, request timeout, total budget</h3><div class="table-wrap"><table><thead><tr><th scope="col">Limit</th><th scope="col">Question it answers</th><th scope="col">Scope</th></tr></thead><tbody><tr><td>Connection timeout</td><td>How long can establishing a new connection take?</td><td>Applies when a new connection is needed; has no effect on a reused connection. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.Builder.html#connectTimeout(java.time.Duration)" title="Oracle · HttpClient.Builder">[2]</a></td></tr><tr><td>Request timeout</td><td>How long will this request wait for a response?</td><td>Configured on each HttpRequest. It is not a budget for the entire retry sequence. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html#timeout(java.time.Duration)" title="Oracle · HttpRequest.Builder">[1]</a></td></tr><tr><td>Overall deadline</td><td>How long is the logical call useful?</td><td>Includes attempts, backoff and local overhead; supplied by the caller.</td></tr></tbody></table></div><p>Do not model these as three durations that must simply be added. Connection establishment is part of an attempt, and attempts must fit inside the overall budget. For a full response-body wait, the adapter in Appendix A also bounds the asynchronous future. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html#get(long,java.util.concurrent.TimeUnit)" title="Oracle · Future">[11]</a><a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpResponse.BodySubscribers.html#ofString(java.nio.charset.Charset)" title="Oracle · HttpResponse.BodySubscribers">[12]</a></p></section><section id="s4" class="lesson-section"><h3><span class="step">04</span>A timeout is a client decision</h3><p>Payment might complete just before the connection fails. Or it might still be processing after the caller times out. The observation is <strong>“I did not receive a result in time.”</strong> It does not establish whether the business operation happened.</p><aside class="callout warning"><strong>Stopping the wait does not undo the effect</strong><p>Java HTTP cancellation is best effort. The request may still reach the server, and resource release may happen later. A timeout or cancellation cannot provide a remote rollback. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html" title="Oracle · HttpClient">[3]</a></p></aside></section><section id="s5" class="lesson-section"><h3><span class="step">05</span>The outcome is ambiguous</h3><div class="table-wrap"><table><thead><tr><th scope="col">What happened remotely?</th><th scope="col">What the caller sees</th></tr></thead><tbody><tr><td>Request never arrived.</td><td>Timeout.</td></tr><tr><td>Request arrived and is still running.</td><td>Timeout.</td></tr><tr><td>Authorization committed, but its response was lost.</td><td>Timeout.</td></tr></tbody></table></div><p>All three histories can produce the same local observation. The correct business state may be <strong>outcome unknown</strong>. That state must survive into retry, reconciliation and Saga decisions.</p></section><div class="part" id="repetition"><p class="eyebrow">Steps 6–9</p><h2>Then, make repetition safe</h2><p>Pressure: the next attempt may succeed, but the previous attempt may already have succeeded.</p></div><section id="s6" class="lesson-section"><h3><span class="step">06</span>First response: retry</h3><p>A temporary connection failure, brief restart or short overload may disappear. A retry repeats the operation in the hope that the transient condition has changed. It is a response to a classified failure, not a default response to every exception. <a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/patterns/retry" title="Microsoft · Retry pattern">[4]</a></p><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>// Teaching fragment: adds a limit, but still retries immediately.
+for (int attempt = 1; attempt &lt;= 3; attempt++) {
+    try {
+        return payment.authorizeOnce(command, attemptTimeout);
+    } catch (RetryGuide.RetryableFailure failure) {
+        if (attempt == 3) {
+            throw failure;
+        }
+    }
+}</code></pre></figure><p><strong>Three maximum attempts means one initial call and at most two retries.</strong> The first attempt does not need a retry delay.</p></section><section id="s7" class="lesson-section"><h3><span class="step">07</span>Problem one: is the operation safe to repeat?</h3><p>If attempt 1 charges the customer and only its response disappears, attempt 2 can charge the customer again. A retry has improved the chance of receiving a response while breaking business correctness. <a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/patterns/retry" title="Microsoft · Retry pattern">[4]</a></p><p>Before retrying, establish whether repetition is safe: the operation is inherently idempotent, the service deduplicates a stable operation identity, or you have reliable evidence that no effect occurred. A timeout alone supplies no such evidence.</p></section><section id="s8" class="lesson-section"><h3><span class="step">08</span>Idempotency changes retry semantics</h3><p>Create the operation identity once, when the logical authorization is created. Persist it with the command or Saga state, and reuse it across transport retries and restarts. Keep the payload unchanged.</p><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>var command = new RetryGuide.PaymentCommand(
+        persistedPaymentAttemptId,
+        serializedAuthorization);
+
+String result = retrier.execute(remainingBudget,
+        timeout -&gt; payment.authorizeOnce(command, timeout));</code></pre></figure><p>A header is only an identifier. The server must atomically coordinate deduplication with the effect, detect incompatible payload reuse, and define behavior for concurrent attempts and retention expiry. Provider contracts differ; Stripe’s API is one documented example. <a class="cite" href="https://docs.stripe.com/api/idempotent_requests" title="Stripe · Idempotent requests">[8]</a></p><aside class="callout principle"><strong>Identity belongs to the operation</strong><p>An order can have several legitimate payment operations. Give each one its own identity. Generating a new UUID inside the retry loop makes every attempt look like a new operation.</p></aside></section><section id="s9" class="lesson-section"><h3><span class="step">09</span>Problem two: immediate retry increases load</h3><p>An overloaded Payment service times out. Callers retry immediately. Payment receives the original work plus the retries while capacity is already scarce. The feedback loop is overload → timeouts → retries → more overload. <a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/" title="Microsoft · Retry storm antipattern">[5]</a></p><p>If 100 logical calls each make three attempts, they can produce up to 300 application-level invocations. Idempotency protects effects, but duplicate requests can still consume CPU, network, locks and deduplication capacity.</p></section><div class="part" id="spacing"><p class="eyebrow">Steps 10–17</p><h2>Reduce pressure, then break synchronization</h2><p>Pressure: a delayed retry can still arrive in a synchronized crowd.</p></div><section id="s10" class="lesson-section"><h3><span class="step">10</span>Wait before retrying</h3><p>Add a delay between a failed attempt and the next one. That gives a transient condition time to recover and lowers the rate at which one caller repeats work.</p><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>// Modern Java supports Duration-based sleep.
+Thread.sleep(Duration.ofMillis(500));</code></pre></figure><p>The reusable engine delegates waiting to an injected Sleeper. Its production implementation uses TimeUnit so the complete example also compiles on the available Java 17 validation runtime. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html" title="Oracle · Thread">[10]</a></p></section><section id="s11" class="lesson-section"><h3><span class="step">11</span>Fixed delays synchronize clients</h3><p>Imagine many clients fail at approximately the same time. Each waits 500 ms. They retry together 500 ms later. Fixed waiting has shifted the burst in time, while preserving its shape.</p><div class="table-wrap"><table><thead><tr><th scope="col">Client</th><th scope="col">Failure time</th><th scope="col">Fixed wait</th><th scope="col">Next attempt</th></tr></thead><tbody><tr><td>A</td><td>0 ms</td><td>500 ms</td><td>500 ms</td></tr><tr><td>B</td><td>0 ms</td><td>500 ms</td><td>500 ms</td></tr><tr><td>C</td><td>0 ms</td><td>500 ms</td><td>500 ms</td></tr></tbody></table></div></section><section id="s12" class="lesson-section"><h3><span class="step">12</span>Increase the delay after each failure</h3><p>Repeated failure is evidence that immediate recovery is less likely. A widening waiting window lets the caller back away progressively. A common choice doubles the window after each failure. <a class="cite" href="https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html" title="AWS · Retry behavior">[6]</a></p><aside class="callout principle"><strong>Exponential backoff</strong><p>With failed-attempt number <code>a</code> starting at 1: <code>window(a) = min(cap, base × 2^(a − 1))</code>. The first retry uses the base window.</p></aside></section><section id="s13" class="lesson-section"><h3><span class="step">13</span>Make backoff arithmetic safe</h3><p>The convenient expression <code>base * (1L &lt;&lt; retryNumber)</code> is a trap for unconstrained inputs: a shift or multiplication can produce the wrong value before the cap is applied. Saturate while doubling instead.</p><figure class="code-block"><figcaption>Java · excerpt from Retrier.windowNanos</figcaption><pre><code>long window = config.baseDelay().toNanos();
+long cap = config.maxDelay().toNanos();
+for (int i = 1; i &lt; failedAttempt &amp;&amp; window &lt; cap; i++) {
+    window = window &gt; cap / 2 ? cap : window * 2;
+}
+return window;</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">Failed attempt</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th><th scope="col">6+</th></tr></thead><tbody><tr><td>Window, base 200 ms / cap 5 s</td><td>200 ms</td><td>400 ms</td><td>800 ms</td><td>1,600 ms</td><td>3,200 ms</td><td>5,000 ms</td></tr></tbody></table></div></section><section id="s14" class="lesson-section"><h3><span class="step">14</span>Cap delay, attempts and total time</h3><p>A delay can grow beyond the remaining useful lifetime of a checkout. A cap prevents an individual backoff window from growing indefinitely. It does not bound the number of attempts or the total call duration.</p><div class="table-wrap"><table><thead><tr><th scope="col">Boundary</th><th scope="col">What it limits</th></tr></thead><tbody><tr><td>maxDelay</td><td>One locally generated backoff window.</td></tr><tr><td>maxAttempts</td><td>Total application-level invocations, including the first.</td></tr><tr><td>totalBudget</td><td>Elapsed time available for attempts and waiting.</td></tr><tr><td>minAttemptBudget</td><td>The minimum remaining time this use case considers useful for starting an attempt.</td></tr></tbody></table></div><p>The minimum is an admission rule, not a promise that the next attempt will finish.</p></section><section id="s15" class="lesson-section"><h3><span class="step">15</span>Exponential backoff can still synchronize clients</h3><p>If every caller uses exactly 200, 400, 800 and 1,600 ms, callers that fail together can keep retrying together. Exponential backoff reduces frequency. It does not, by itself, remove coordinated timing.</p></section><section id="s16" class="lesson-section"><h3><span class="step">16</span>Add randomness: jitter</h3><p>At a window of 800 ms, one caller might wait 117 ms, another 683 ms, and a third 401 ms. These are illustrative draws. Random delays spread retry arrivals across time instead of scheduling a common instant. <a class="cite" href="https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html" title="AWS · Retry behavior">[6]</a></p><p>Jitter reduces synchronization statistically. It does not guarantee that two clients will never collide, nor does it guarantee that the next sampled delay is larger than the last.</p></section><section id="s17" class="lesson-section"><h3><span class="step">17</span>Full jitter</h3><aside class="callout principle"><strong>The algorithm</strong><p>First compute the capped exponential window. Then sample uniformly between zero and that window. The window increases; each actual delay is a fresh draw.</p></aside><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>long window = windowNanos(failedAttempt);
+long delayNanos = ThreadLocalRandom.current()
+        .nextLong(window + 1);
+return Duration.ofNanos(delayNanos);</code></pre></figure><p>The inclusive endpoint comes from passing <code>window + 1</code> to an API with an exclusive upper bound. Appendix A validates duration ranges so this addition is safe. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ThreadLocalRandom.html#nextLong(long)" title="Oracle · ThreadLocalRandom">[13]</a></p><p>Full jitter permits a zero-length wait. For a continuous uniform window W, the expected delay is W/2. This means jitter also changes average waiting time compared with always waiting the full window.</p><div class="lab" id="timing-lab"><h4>Explore the retry timing</h4><p>12 callers fail together at t = 0. Marks show subsequent attempt start times. Attempt durations are omitted to isolate the effect of waiting. This is an illustrative simulation, not measured traffic.</p><form id="lab-form" class="lab-controls"><label>Delay policy<select id="mode"><option value="fixed">Fixed delay</option><option value="exponential">Exponential backoff</option><option value="jitter" selected>Full jitter</option></select></label><label>Base delay (ms)<input id="base" type="number" min="20" max="1000" step="20" value="200"></label><label>Delay cap (ms)<input id="cap" type="number" min="20" max="10000" step="100" value="2000"></label><label>Total attempts<input id="attempts" type="number" min="2" max="7" step="1" value="4"></label></form><p id="lab-error" role="alert" hidden></p><p id="lab-summary" class="lab-summary" aria-live="polite">Full jitter · 4 total attempts · base 200 ms · cap 2,000 ms.</p><div id="lanes" class="lanes" role="img" aria-label="Retry start times for twelve simulated callers"><div class="lane"><span class="lane-label">C1</span><div class="track"><span class="dot" style="left:4.357142857142857%"></span><span class="dot" style="left:20.428571428571427%"></span><span class="dot" style="left:21.785714285714285%"></span></div></div><div class="lane"><span class="lane-label">C2</span><div class="track"><span class="dot" style="left:12.785714285714286%"></span><span class="dot" style="left:37.857142857142854%"></span><span class="dot" style="left:85.71428571428571%"></span></div></div><div class="lane"><span class="lane-label">C3</span><div class="track"><span class="dot" style="left:6.857142857142857%"></span><span class="dot" style="left:12.285714285714286%"></span><span class="dot" style="left:49.42857142857143%"></span></div></div><div class="lane"><span class="lane-label">C4</span><div class="track"><span class="dot" style="left:0.9285714285714286%"></span><span class="dot" style="left:15.357142857142858%"></span><span class="dot" style="left:41.785714285714285%"></span></div></div><div class="lane"><span class="lane-label">C5</span><div class="track"><span class="dot" style="left:9.428571428571429%"></span><span class="dot" style="left:32.857142857142854%"></span><span class="dot" style="left:48.57142857142857%"></span></div></div><div class="lane"><span class="lane-label">C6</span><div class="track"><span class="dot" style="left:3.5%"></span><span class="dot" style="left:7.357142857142857%"></span><span class="dot" style="left:12.357142857142858%"></span></div></div><div class="lane"><span class="lane-label">C7</span><div class="track"><span class="dot" style="left:11.928571428571429%"></span><span class="dot" style="left:24.785714285714285%"></span><span class="dot" style="left:76.28571428571429%"></span></div></div><div class="lane"><span class="lane-label">C8</span><div class="track"><span class="dot" style="left:6.0%"></span><span class="dot" style="left:27.857142857142858%"></span><span class="dot" style="left:68.64285714285714%"></span></div></div><div class="lane"><span class="lane-label">C9</span><div class="track"><span class="dot" style="left:0.07142857142857142%"></span><span class="dot" style="left:2.2857142857142856%"></span><span class="dot" style="left:32.285714285714285%"></span></div></div><div class="lane"><span class="lane-label">C10</span><div class="track"><span class="dot" style="left:8.5%"></span><span class="dot" style="left:19.714285714285715%"></span><span class="dot" style="left:39.0%"></span></div></div><div class="lane"><span class="lane-label">C11</span><div class="track"><span class="dot" style="left:2.642857142857143%"></span><span class="dot" style="left:22.857142857142858%"></span><span class="dot" style="left:31.428571428571427%"></span></div></div><div class="lane"><span class="lane-label">C12</span><div class="track"><span class="dot" style="left:11.071428571428571%"></span><span class="dot" style="left:11.714285714285714%"></span><span class="dot" style="left:66.78571428571429%"></span></div></div></div><div class="axis"><span>0 ms</span><span id="axis-mid">700 ms</span><span id="axis-max">1,400 ms</span></div><p class="small">Each dot is one retry. A common scale compares all policies. The reproducible sample is held fixed when you change policies.</p><div id="lab-table"><div class="table-wrap"><table><caption class="small">Retry start times after the initial failure (ms)</caption><thead><tr><th scope="col">Caller</th><th scope="col">Attempt 2</th><th scope="col">Attempt 3</th><th scope="col">Attempt 4</th></tr></thead><tbody><tr><td>C1</td><td>61</td><td>286</td><td>305</td></tr><tr><td>C2</td><td>179</td><td>530</td><td>1200</td></tr><tr><td>C3</td><td>96</td><td>172</td><td>692</td></tr><tr><td>C4</td><td>13</td><td>215</td><td>585</td></tr><tr><td>C5</td><td>132</td><td>460</td><td>680</td></tr><tr><td>C6</td><td>49</td><td>103</td><td>173</td></tr><tr><td>C7</td><td>167</td><td>347</td><td>1068</td></tr><tr><td>C8</td><td>84</td><td>390</td><td>961</td></tr><tr><td>C9</td><td>1</td><td>32</td><td>452</td></tr><tr><td>C10</td><td>119</td><td>276</td><td>546</td></tr><tr><td>C11</td><td>37</td><td>320</td><td>440</td></tr><tr><td>C12</td><td>155</td><td>164</td><td>935</td></tr></tbody></table></div></div><noscript><p>The explorer requires JavaScript; all explanations, code and the static worked examples remain available without it.</p></noscript></div></section><div class="part" id="policy"><p class="eyebrow">Steps 18–23</p><h2>Turn the mechanism into a policy</h2><p>Pressure: safe repetition still needs failure classification, server guidance and a caller-owned budget.</p></div><section id="s18" class="lesson-section"><h3><span class="step">18</span>Put the decisions in the right order</h3><ul><li>Start with one persisted operation identity and the caller’s remaining budget.</li><li>Before each attempt, check cancellation and remaining time.</li><li>Clip the attempt timeout to the time still available.</li><li>Classify failure using the dependency contract.</li><li>Stop on a permanent failure or the final allowed attempt.</li><li>Compute capped exponential backoff with jitter; apply any server delay floor.</li><li>Wait only if a useful attempt can still fit, then recheck the budget.</li></ul><p>Appendix A contains the complete engine. It retries only <code>RetryableFailure</code>. Other I/O failures, runtime failures and interruption escape instead of accidentally entering the retry path.</p></section><section id="s19" class="lesson-section"><h3><span class="step">19</span>Do not retry every failure</h3><div class="table-wrap"><table><thead><tr><th scope="col">Failure</th><th scope="col">Default decision for this example</th><th scope="col">Reason</th></tr></thead><tbody><tr><td>Payment declined</td><td>Do not retry unchanged.</td><td>Business rejection.</td></tr><tr><td>Invalid card or request</td><td>Do not retry unchanged.</td><td>Waiting does not repair the input.</td></tr><tr><td>Authentication/configuration failure</td><td>Stop; correct credentials or configuration.</td><td>Blind repetition cannot fix configuration.</td></tr><tr><td>Temporary unavailable</td><td>Potentially retry.</td><td>Only if the contract and budget permit it.</td></tr><tr><td>Rate limited</td><td>Potentially retry after delay.</td><td>Honor the dependency’s backpressure.</td></tr><tr><td>Timeout / lost response</td><td>Reconcile or retry with a stable identity.</td><td>Completion is uncertain.</td></tr></tbody></table></div><p>Status codes and exception classes are evidence, not a universal policy. Some APIs put important error classifications inside the response body. <a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/patterns/retry" title="Microsoft · Retry pattern">[4]</a></p></section><section id="s20" class="lesson-section"><h3><span class="step">20</span>Retryability belongs to the dependency contract</h3><p>A dependency adapter should translate transport details into outcomes the use case understands. Avoid a catch-all rule such as “retry every 4xx” or “retry every IOException.”</p><figure class="code-block"><figcaption>Java · alternative domain model, independent of Appendix A</figcaption><pre><code>public sealed interface PaymentFailure {
+    record Declined(String reason) implements PaymentFailure {}
+    record InvalidRequest(String reason) implements PaymentFailure {}
+    record TemporaryUnavailable() implements PaymentFailure {}
+    record RateLimited(Duration retryAfter) implements PaymentFailure {}
+    record UnknownOutcome() implements PaymentFailure {}
+}</code></pre></figure><p>An <code>UnknownOutcome</code> needs the additional question: is repetition safe? The sample adapter explicitly assumes a server that deduplicates the supplied payment identity. Without that contract, its timeout retry path is inappropriate.</p></section><section id="s21" class="lesson-section"><h3><span class="step">21</span>Honor server backpressure</h3><p>HTTP <code>Retry-After</code> can contain an integer delay in seconds or an HTTP date. It can accompany responses such as 503; throttling APIs can also supply retry guidance. <a class="cite" href="https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after" title="RFC 9110 · HTTP Semantics">[7]</a><a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/" title="Microsoft · Retry storm antipattern">[5]</a></p><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>Duration delay = localFullJitter;
+if (serverRetryAfter.compareTo(delay) &gt; 0) {
+    delay = serverRetryAfter;
+}</code></pre></figure><p>This guide treats a valid hint as a lower bound. Never randomize below that floor. If it cannot fit the caller’s deadline, stop synchronous retry or durably defer; do not shorten it to the local cap. A shared floor can still align callers, so extra positive jitter may be appropriate when the service contract permits it.</p><p>The example parser accepts seconds and the modern HTTP-date form. Invalid hints fall back to local backoff; enormous numeric delays end the synchronous retry. A fully general HTTP parser also needs the legacy date forms described by the RFC.</p></section><section id="s22" class="lesson-section"><h3><span class="step">22</span>One overall deadline</h3><p>Suppose Checkout has 5 seconds remaining. Three attempts with 3-second timeouts could consume 9 seconds before any waits. A per-attempt timeout alone cannot implement the caller’s budget.</p><aside class="callout principle"><strong>Budget accounting</strong><p><code>remaining = totalBudget − elapsed</code><br><code>attemptTimeout = min(configuredTimeout, remaining)</code><br><code>delay + minAttemptBudget ≤ remaining</code></p></aside><p>Use a monotonic clock for elapsed time within a process. <code>System.nanoTime()</code> supports duration measurement; its value is not a timestamp to send to another machine. Use wall-clock time only when interpreting an absolute HTTP date, then convert it to a duration. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()" title="Oracle · System.nanoTime">[9]</a></p><p>The engine starts its stopwatch when execute begins. Pass the budget <em>remaining at that point</em>, not a new full checkout allowance. This is cooperative deadline enforcement: the adapter must honor the supplied allowance, and scheduling or cancellation can complete late. It is not a hard real-time guarantee.</p></section><section id="s23" class="lesson-section"><h3><span class="step">23</span>Timeout selection is a trade-off</h3><div class="table-wrap"><table><thead><tr><th scope="col">If the timeout is…</th><th scope="col">Likely pressure</th></tr></thead><tbody><tr><td>Too long</td><td>Resources remain occupied; queues and upstream latency can grow.</td></tr><tr><td>Too short</td><td>Slow-but-successful work is mistaken for failure; false timeouts can add retries.</td></tr></tbody></table></div><p>Use measured latency distributions, cold connection behavior, the caller’s remaining budget and the cost of false timeouts. Include realistic failure tests. The tutorial’s 700 ms attempt timeout and 3-second example budget are chosen to demonstrate the mechanics, not to prescribe checkout settings.</p></section><div class="part" id="ownership"><p class="eyebrow">Steps 24–30</p><h2>Give retry a clear owner</h2><p>Pressure: resilience scattered across layers compounds traffic and makes changes hard to reason about.</p></div><section id="s24" class="lesson-section"><h3><span class="step">24</span>Nested retries multiply work</h3><p>Assume three layers each make up to three attempts for the same failing call. A worst-case path can reach <strong>3 × 3 × 3 = 27</strong> leaf invocations. That arithmetic assumes every layer exhausts its attempts; it is not an observed benchmark.</p><p>Choose an owner that understands safe repetition and the useful lifetime of the call. Inventory retry behavior in SDKs, HTTP clients, proxies and queues; configure the combined behavior deliberately. Uncoordinated nested policies compound work and latency. <a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/patterns/retry" title="Microsoft · Retry pattern">[4]</a></p><aside class="callout principle"><strong>A per-call limit is not a fleet-wide limit</strong><p>Even one well-bounded loop per request can flood a dependency during a broad outage. A shared retry budget, rate limiter or concurrency limit may also be needed. AWS documents retry quotas as one implementation. <a class="cite" href="https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html" title="AWS · Retry behavior">[6]</a></p></aside></section><section id="s25" class="lesson-section"><h3><span class="step">25</span>The lowest layer lacks business context</h3><p>An HTTP client may know that it saw 503. It may not know whether this is a charge, whether the command expired, or whether the Saga has already begun compensation. The layer that decides to retry must receive enough context to answer those questions.</p><p>Keep low-level transport recovery consistent with application retry ownership. The engine’s attempt counter counts adapter invocations; it does not promise an exact count of packets or internal transport attempts.</p></section><section id="s26" class="lesson-section"><h3><span class="step">26</span>Separate the source of change</h3><p>Copying a slightly different retry loop into Payment, Inventory, Shipping and Tax makes one policy fix spread across many clients. Separate <strong>how retry executes</strong> from <strong>which failures and limits a dependency permits</strong>.</p><div class="table-wrap"><table><thead><tr><th scope="col">Responsibility</th><th scope="col">Natural owner</th></tr></thead><tbody><tr><td>Serialize, send, decode, classify</td><td>Dependency adapter.</td></tr><tr><td>Count attempts, track elapsed time, wait</td><td>Reusable execution mechanism.</td></tr><tr><td>Choose limits and repeat-safety rules</td><td>Dependency/use-case policy.</td></tr><tr><td>Persist delayed recovery and operation identity</td><td>Workflow owner.</td></tr></tbody></table></div></section><section id="s27" class="lesson-section"><h3><span class="step">27</span>A reusable retry mechanism</h3><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>var config = new RetryGuide.Config(
+        3,                          // total attempts
+        Duration.ofMillis(700),      // maximum per attempt
+        Duration.ofMillis(50),       // minimum useful allowance
+        Duration.ofMillis(200),      // first backoff window
+        Duration.ofSeconds(2));      // local backoff cap
+
+var retrier = RetryGuide.Retrier.production(config);
+String result = retrier.execute(remainingBudget,
+        timeout -&gt; payment.authorizeOnce(command, timeout));</code></pre></figure><p>The mechanism accepts an operation and passes it the allowed attempt time. The adapter marks only known retryable failures. Clocks, waiting and randomness are injected so tests can control time without sleeping.</p></section><section id="s28" class="lesson-section"><h3><span class="step">28</span>Different dependencies need different policies</h3><div class="table-wrap"><table><thead><tr><th scope="col">Dependency</th><th scope="col">Questions its policy must answer</th></tr></thead><tbody><tr><td>Payment</td><td>What does an unknown outcome mean? What identity deduplicates it?</td></tr><tr><td>Search</td><td>How much does a retry cost? Is a degraded result preferable?</td></tr><tr><td>Inventory</td><td>Is this still the same reservation command? Has it expired?</td></tr></tbody></table></div><p>Share the retry engine. Keep error classification, timing and fallback decisions specific to the dependency and use case. Read-only calls can still be expensive enough that retries are harmful.</p></section><section id="s29" class="lesson-section"><h3><span class="step">29</span>Proxy and Decorator provide a natural shape</h3><p>An application can depend on a PaymentGateway port while a RetryingPaymentGateway wraps the HTTP adapter. The wrapper implements the same capability and adds an interaction policy.</p><div class="table-wrap"><table><thead><tr><th scope="col">Layer, outside to inside</th><th scope="col">Job</th></tr></thead><tbody><tr><td>Application / Saga</td><td>Supplies command identity and remaining budget.</td></tr><tr><td>RetryingPaymentGateway</td><td>Applies policy and delegates each attempt.</td></tr><tr><td>HttpPaymentGateway</td><td>Sends the request and maps its outcome.</td></tr><tr><td>Remote Payment service</td><td>Owns the authorization and deduplication.</td></tr></tbody></table></div><p>The wrapper must preserve observable semantics: business rejection, technical failure and unknown outcome remain distinguishable.</p></section><section id="s30" class="lesson-section"><h3><span class="step">30</span>Wrapper ordering is behavior</h3><div class="table-wrap"><table><thead><tr><th scope="col">Composition</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td>Retry around per-attempt timeout</td><td>Each invocation has its own bounded wait.</td></tr><tr><td>Overall deadline around retry</td><td>The sequence shares one budget across calls and delays.</td></tr><tr><td>Circuit breaker inside retry</td><td>The breaker can observe individual attempts, depending on its configuration.</td></tr><tr><td>Circuit breaker outside retry</td><td>The breaker can observe the final logical-call result instead.</td></tr></tbody></table></div><p>Often you need both attempt and overall limits. Metrics need the same distinction: per-attempt latency is different from total logical-call latency. Be explicit about what each wrapper observes.</p></section><div class="part" id="workflow"><p class="eyebrow">Steps 31–35</p><h2>Reconnect retry to the workflow</h2><p>Pressure: a local retry outcome influences durable business recovery.</p></div><section id="s31" class="lesson-section"><h3><span class="step">31</span>Saga interaction</h3><div class="table-wrap"><table><thead><tr><th scope="col">Payment outcome</th><th scope="col">Saga response to design</th></tr></thead><tbody><tr><td>Declined</td><td>A business rejection may trigger compensation.</td></tr><tr><td>Temporarily unavailable</td><td>Retry forward within business and operational limits.</td></tr><tr><td>Outcome unknown</td><td>Query status or retry with the same identity; reconcile before assuming failure.</td></tr></tbody></table></div><p>A timeout does not justify pretending no authorization exists. If the Saga moves on while Payment completes late, it needs a rule for that late result: accept it, void it, compensate it or reconcile it. Persist the decision and keep recovery idempotent.</p></section><section id="s32" class="lesson-section"><h3><span class="step">32</span>Retry and Outbox solve different boundaries</h3><p>An outbox relay repeats delivery when publication is uncertain. A remote-call retrier repeats invocation when a response is unavailable. Both need stable identities, but successful delivery and successful business execution are different facts.</p><div class="table-wrap"><table><thead><tr><th scope="col">Boundary</th><th scope="col">Stable identity</th></tr></thead><tbody><tr><td>Outbox delivery</td><td>Message ID.</td></tr><tr><td>Saga participant command</td><td>Command / operation ID.</td></tr><tr><td>HTTP authorization</td><td>Payment idempotency key.</td></tr></tbody></table></div><p>Do not replace a command identity just because the delivery mechanism retries. The same logical action may cross several at-least-once boundaries.</p></section><section id="s33" class="lesson-section"><h3><span class="step">33</span>Do not keep a database transaction open during backoff</h3><p>Loading an order, calling Payment, sleeping and retrying before commit can retain a database connection and possibly locks throughout the remote wait. That enlarges the failure boundary.</p><p>For a durable workflow, commit the local state and outbox decision first. Perform remote processing separately, then persist the outcome in another local transaction. A remote timeout cannot roll back an already committed authorization.</p></section><section id="s34" class="lesson-section"><h3><span class="step">34</span>Short retry versus durable retry</h3><div class="table-wrap"><table><thead><tr><th scope="col">Short in-process retry</th><th scope="col">Durable workflow retry</th></tr></thead><tbody><tr><td>Milliseconds or a few seconds inside a useful call budget.</td><td>Work resumed later, potentially after a process restart.</td></tr><tr><td>A short blocking wait can be acceptable.</td><td>Persist next_attempt_at and workflow state.</td></tr><tr><td>Process failure loses in-memory progress.</td><td>A scheduler or queue resumes the durable command.</td></tr></tbody></table></div><p>Persist the attempt count, next eligible time, operation identity, business expiry and ownership of the retry. Avoid letting both the in-process layer and a workflow worker independently exhaust large retry budgets.</p><p>Virtual threads can reduce the cost of blocking, but they do not make a sleeping workflow durable or create downstream capacity. Choose a scheduling model based on ownership and recovery, not only thread cost.</p></section><section id="s35" class="lesson-section"><h3><span class="step">35</span>Define failure semantics before the loop</h3><div class="table-wrap"><table><thead><tr><th scope="col">Outcome</th><th scope="col">Meaning</th><th scope="col">Typical action</th></tr></thead><tbody><tr><td>Success</td><td>Confirmed completion.</td><td>Continue.</td></tr><tr><td>Business rejection</td><td>Processed but refused.</td><td>Apply business policy; do not repeat unchanged.</td></tr><tr><td>Permanent technical failure</td><td>Configuration or protocol needs attention.</td><td>Fail / repair / escalate.</td></tr><tr><td>Transient failure</td><td>May recover soon.</td><td>Retry if safe and budgeted.</td></tr><tr><td>Throttled</td><td>Traffic is being limited.</td><td>Honor delay and reduce pressure.</td></tr><tr><td>Unknown outcome</td><td>Effect may have happened.</td><td>Reconcile or retry with safe identity.</td></tr><tr><td>Budget exhausted / cancelled</td><td>Caller stops spending time.</td><td>Stop local attempts; preserve any unresolved outcome.</td></tr></tbody></table></div><p>These outcomes determine the behavior of the workflow. A generic “failed” result is too weak for a side-effecting operation.</p></section><div class="part" id="testing"><p class="eyebrow">Steps 36–44</p><h2>Test the semantics, not the waiting</h2><p>Pressure: real sleeps hide edge cases and make failure tests slow and flaky.</p></div><section id="s36" class="lesson-section"><h3><span class="step">36</span>Inject time, waiting and randomness</h3><figure class="code-block"><figcaption>Java · fragment</figcaption><pre><code>@FunctionalInterface
+public interface Sleeper {
+    void sleep(Duration delay) throws InterruptedException;
+}
+
+@FunctionalInterface
+public interface NanoClock {
+    long now();
+}
+
+@FunctionalInterface
+public interface Jitter {
+    long nextLong(long upperExclusive);
+}</code></pre></figure><p>A recording sleeper should also advance the fake clock. Otherwise a test can record delays while incorrectly believing the total deadline never moves. Appendix B uses this approach and requires no test framework.</p></section><section id="s37" class="lesson-section"><h3><span class="step">37</span>Transient failure recovers</h3><p>Have the fake fail once with a retryable outcome, then succeed. Assert the returned result, two calls and one delay. Check that the first retry uses the base window; off-by-one errors commonly double it accidentally.</p></section><section id="s38" class="lesson-section"><h3><span class="step">38</span>Permanent failures stop immediately</h3><p>Return a business rejection or unclassified permanent exception. Assert one call, no sleeps and the original failure. This catches an overbroad catch-and-retry loop even if its maximum-attempt test passes.</p></section><section id="s39" class="lesson-section"><h3><span class="step">39</span>The attempt limit includes the initial call</h3><p>Make every attempt fail transiently. With maxAttempts = 3, assert exactly three calls and two waits. The final failure propagates immediately; there is no reason to sleep after the last allowed attempt.</p></section><section id="s40" class="lesson-section"><h3><span class="step">40</span>The identity stays stable</h3><p>Record the operation identity and payload on every outgoing attempt. Assert they remain identical. Repeat this test across workflow recovery after a restart if the identity is meant to survive that boundary.</p></section><section id="s41" class="lesson-section"><h3><span class="step">41</span>Lose the response after the effect commits</h3><p>The fake server stores the authorization result, then throws a timeout before returning it. The next call uses the same key and receives the stored result. Assert one effect and two invocations.</p><aside class="callout principle"><strong>Test the server contract too</strong><p>An in-memory fake only proves the client uses the contract correctly. Integration tests must exercise atomic deduplication, concurrent duplicates, payload mismatch and retention behavior in the real participant.</p></aside></section><section id="s42" class="lesson-section"><h3><span class="step">42</span>Test windows and samples separately</h3><p>Assert that the backoff <em>window</em> grows and saturates. Inject samples at zero and at the upper endpoint. Do not assert that actual random waits always increase. Include a huge attempt index to prove the arithmetic cannot wrap.</p><p>Appendix B checks first-window indexing and saturation. The full-jitter API uses nanoseconds; the timing explorer uses integer milliseconds for readable values.</p></section><section id="s43" class="lesson-section"><h3><span class="step">43</span>The deadline prevents useless work</h3><ul><li>The initial budget is below the minimum: no attempt starts.</li><li>The next delay leaves too little time: no sleep or retry starts.</li><li>The server hint exceeds the budget: it is not shortened.</li><li>Remaining time is below the configured attempt timeout: pass the smaller allowance.</li><li>A sleeper overshoots: recheck the clock before sending again.</li></ul><p>Also test a slow response body at the transport boundary. A fake that immediately returns cannot prove the real HTTP adapter’s waiting behavior.</p></section><section id="s44" class="lesson-section"><h3><span class="step">44</span>Interruption is cancellation information</h3><p>If a method can declare InterruptedException, propagate it. If you must translate it to an unchecked or domain exception, restore the interrupt status first. Do not turn it into a transient dependency error. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html" title="Oracle · Thread">[10]</a></p><figure class="code-block"><figcaption>Java · boundary translation example; the engine propagates directly</figcaption><pre><code>try {
+    sleeper.sleep(delay);
+} catch (InterruptedException interrupted) {
+    Thread.currentThread().interrupt();
+    throw new IllegalStateException(&quot;Retry cancelled&quot;, interrupted);
+}</code></pre></figure><p>The test suite covers interruption during an attempt, during waiting and before the first attempt. The HTTP adapter requests cancellation of its in-flight future when interrupted.</p></section><div class="part" id="operation"><p class="eyebrow">Steps 45–48</p><h2>Operate the policy and know when it stops helping</h2><p>Pressure: retries can hide deterioration until the system runs out of capacity.</p></div><section id="s45" class="lesson-section"><h3><span class="step">45</span>Observe both attempts and logical calls</h3><div class="table-wrap"><table><thead><tr><th scope="col">Measure</th><th scope="col">What it exposes</th></tr></thead><tbody><tr><td>First-attempt success rate</td><td>Dependency health before retries hide failures.</td></tr><tr><td>Attempts per logical call</td><td>Load amplification.</td></tr><tr><td>Attempt and total latency</td><td>Remote waiting versus total user cost.</td></tr><tr><td>Retry reason and status category</td><td>Which failures consume the retry budget.</td></tr><tr><td>Delay / server hint / budget stop</td><td>Why work waits or stops.</td></tr><tr><td>Unknown outcomes and reconciliation age</td><td>Business operations still unresolved.</td></tr></tbody></table></div><p>Use correlation, command and Saga identifiers in structured logs and traces. Keep metric labels low in cardinality; do not make order IDs or payment keys metric dimensions. Avoid logging sensitive payment payloads.</p><aside class="callout principle"><strong>A useful operational question</strong><p>If final success is steady but attempts per call and total latency keep rising, is resilience concealing a dependency outage?</p></aside></section><section id="s46" class="lesson-section"><h3><span class="step">46</span>When not to retry</h3><ul><li>The failure is a business rejection or unchanged invalid input.</li><li>The operation can duplicate effects and has no repeat-safety contract.</li><li>The caller has no useful time remaining or has cancelled.</li><li>Another layer already owns the same retry policy.</li><li>The expected cost or additional load outweighs likely recovery.</li><li>The dependency is persistently failing and attempts are not helping.</li></ul><p>A lower retry count can improve overall availability during overload. Backoff and jitter shape retry traffic; they do not substitute for capacity limits or admission control.</p></section><section id="s47" class="lesson-section"><h3><span class="step">47</span>The architecture we derived</h3><div class="table-wrap"><table><thead><tr><th scope="col">Boundary</th><th scope="col">Decision</th></tr></thead><tbody><tr><td>Caller budget</td><td>Is the whole interaction still useful?</td></tr><tr><td>Repeat-safety contract</td><td>May the same operation be attempted again?</td></tr><tr><td>Retry policy</td><td>Is this failure worth another attempt, and how many remain?</td></tr><tr><td>Backoff and jitter</td><td>When should that attempt begin?</td></tr><tr><td>Per-attempt adapter</td><td>How long can it wait, and how does it cancel?</td></tr><tr><td>Workflow recovery</td><td>What happens if the result remains unresolved?</td></tr></tbody></table></div><p>The strongest part of this design is the contract between boundaries. A polished sleep loop cannot supply missing idempotency, durable state or business failure semantics.</p></section><section id="s48" class="lesson-section"><h3><span class="step">48</span>Derive the next pattern</h3><div class="table-wrap"><table><thead><tr><th scope="col">Observed pressure</th><th scope="col">Design response</th></tr></thead><tbody><tr><td>Remote waiting can exceed usefulness.</td><td>Timeout.</td></tr><tr><td>Some failures disappear.</td><td>Retry.</td></tr><tr><td>A previous attempt may already have committed.</td><td>Stable identity and idempotency.</td></tr><tr><td>Immediate retries add load during failure.</td><td>Backoff.</td></tr><tr><td>Callers retry together.</td><td>Jitter.</td></tr><tr><td>The sequence can consume unlimited resources.</td><td>Attempt limits, deadlines and retry budgets.</td></tr><tr><td>Recent attempts show persistent failure.</td><td>Consider temporarily rejecting new calls.</td></tr></tbody></table></div><p>That final pressure leads to <strong>Circuit Breaker</strong>. Retry spends a limited amount of additional effort because another attempt might succeed. A circuit breaker uses recent failure evidence to temporarily suppress calls. The two policies must agree on what an attempt means and where failure is counted.</p></section><section class="appendix" id="implementation"><p class="eyebrow">Appendix A · complete source</p><h2>A bounded retry engine and HTTP adapter</h2><p>One file, standard JDK APIs, no dependencies and no preview features. The <code>main</code> method runs an offline demonstration. The HTTP adapter is an illustrative integration for an explicitly defined server contract.</p><aside class="callout warning"><strong>Sample contract and practical boundaries</strong><p>This example assumes HTTP 200 means a completed authorization, 429/503 can be retried with the same key, and the server atomically deduplicates that key. Other I/O failures stop conservatively. Add the actual API’s business-error decoding, authentication, response-size limits and observability before integration. The example buffers a small response body; streaming needs its own consumption and cancellation policy.</p></aside><p>Reuse an application-owned HttpClient across calls. Close it at application shutdown according to the application lifecycle. Do not put a fresh client in a per-attempt try-with-resources block: its close can wait for outstanding work. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html" title="Oracle · HttpClient">[3]</a></p><figure class="code-block"><figcaption>Java · integration fragment; example domain, no live endpoint</figcaption><pre><code>// At application wiring time:
+HttpClient client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofMillis(300))
+        .build();
+var payment = new RetryGuide.PaymentHttp(
+        client, URI.create(&quot;https://payment.example/authorize&quot;),
+        Clock.systemUTC());
+
+// During the logical call: command is loaded with its persisted identity.
+String responseJson = retrier.execute(remainingBudget,
+        timeout -&gt; payment.authorizeOnce(command, timeout));</code></pre></figure><p>The future wait covers completion of the String response body. On timeout or interruption, cancellation is requested. That bounds the local wait as scheduling permits; it does not prove the remote operation stopped. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html#get(long,java.util.concurrent.TimeUnit)" title="Oracle · Future">[11]</a><a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpResponse.BodySubscribers.html#ofString(java.nio.charset.Charset)" title="Oracle · HttpResponse.BodySubscribers">[12]</a></p><div class="file-actions"><button type="button" data-download="engine-source" data-filename="RetryGuide.java">Download RetryGuide.java</button></div><figure class="code-block full-source"><figcaption>RetryGuide.java · complete, copyable source</figcaption><pre><code id="engine-source">import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+public final class RetryGuide {
+    private RetryGuide() {}
+
+    // A short, in-process retry policy; longer work belongs in a scheduler.
+    public record Config(
+            int maxAttempts,
+            Duration attemptTimeout,
+            Duration minAttemptBudget,
+            Duration baseDelay,
+            Duration maxDelay) {
+        public Config {
+            if (maxAttempts &lt; 1) {
+                throw new IllegalArgumentException(&quot;maxAttempts &lt; 1&quot;);
+            }
+            checkDuration(attemptTimeout);
+            checkDuration(minAttemptBudget);
+            checkDuration(baseDelay);
+            checkDuration(maxDelay);
+            if (minAttemptBudget.compareTo(attemptTimeout) &gt; 0
+                    || baseDelay.compareTo(maxDelay) &gt; 0) {
+                throw new IllegalArgumentException(&quot;inconsistent limits&quot;);
+            }
+        }
+    }
+
+    // Keep durations &lt;= 1 day so nanosecond arithmetic stays far from overflow.
+    private static void checkDuration(Duration value) {
+        Objects.requireNonNull(value);
+        if (value.isNegative() || value.isZero()
+                || value.compareTo(Duration.ofDays(1)) &gt; 0) {
+            throw new IllegalArgumentException(&quot;duration outside (0, 1 day]&quot;);
+        }
+    }
+
+    @FunctionalInterface
+    public interface NanoClock {
+        long now(); // monotonic elapsed-time source, e.g. System.nanoTime
+    }
+
+    @FunctionalInterface
+    public interface Sleeper {
+        void sleep(Duration delay) throws InterruptedException;
+    }
+
+    @FunctionalInterface
+    public interface Jitter {
+        long nextLong(long upperExclusive);
+    }
+
+    @FunctionalInterface
+    public interface Attempt&lt;T&gt; {
+        // The adapter must honor this budget and propagate cancellation.
+        T call(Duration timeout) throws IOException, InterruptedException;
+    }
+
+    // Only the dependency adapter may label a failure as retryable.
+    public static final class RetryableFailure extends IOException {
+        private static final long serialVersionUID = 1L;
+        private final Optional&lt;Duration&gt; retryAfter;
+
+        public RetryableFailure(String reason, Throwable cause,
+                                Optional&lt;Duration&gt; retryAfter) {
+            super(reason, cause);
+            this.retryAfter = Objects.requireNonNull(retryAfter);
+            retryAfter.ifPresent(delay -&gt; {
+                if (delay.isNegative()) {
+                    throw new IllegalArgumentException(&quot;negative retryAfter&quot;);
+                }
+            });
+        }
+
+        public Optional&lt;Duration&gt; retryAfter() {
+            return retryAfter;
+        }
+    }
+
+    public static final class BudgetExceeded extends IOException {
+        private static final long serialVersionUID = 1L;
+
+        public BudgetExceeded(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    public static final class Retrier {
+        private final Config config;
+        private final NanoClock clock;
+        private final Sleeper sleeper;
+        private final Jitter random;
+
+        public Retrier(Config config, NanoClock clock,
+                       Sleeper sleeper, Jitter random) {
+            this.config = Objects.requireNonNull(config);
+            this.clock = Objects.requireNonNull(clock);
+            this.sleeper = Objects.requireNonNull(sleeper);
+            this.random = Objects.requireNonNull(random);
+        }
+
+        public static Retrier production(Config config) {
+            return new Retrier(config, System::nanoTime,
+                    delay -&gt; TimeUnit.NANOSECONDS.sleep(delay.toNanos()),
+                    bound -&gt; ThreadLocalRandom.current().nextLong(bound));
+        }
+
+        // failedAttempt=1 is the first failure; the first window is baseDelay.
+        public long windowNanos(int failedAttempt) {
+            if (failedAttempt &lt; 1) {
+                throw new IllegalArgumentException(&quot;failedAttempt &lt; 1&quot;);
+            }
+            long window = config.baseDelay().toNanos();
+            long cap = config.maxDelay().toNanos();
+            for (int i = 1; i &lt; failedAttempt &amp;&amp; window &lt; cap; i++) {
+                window = window &gt; cap / 2 ? cap : window * 2;
+            }
+            return window;
+        }
+
+        public &lt;T&gt; T execute(Duration totalBudget, Attempt&lt;T&gt; operation)
+                throws IOException, InterruptedException {
+            checkDuration(totalBudget);
+            Objects.requireNonNull(operation);
+            long started = clock.now();
+            long total = totalBudget.toNanos();
+            RetryableFailure last = null;
+
+            for (int attempt = 1; ; attempt++) {
+                // Preserve an existing interrupt flag while stopping work.
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException(&quot;caller cancelled&quot;);
+                }
+                long remaining = total - (clock.now() - started);
+                if (remaining &lt; config.minAttemptBudget().toNanos()) {
+                    throw new BudgetExceeded(&quot;no useful attempt budget&quot;, last);
+                }
+                Duration timeout = Duration.ofNanos(Math.min(
+                        config.attemptTimeout().toNanos(), remaining));
+                try {
+                    return operation.call(timeout);
+                } catch (RetryableFailure failure) {
+                    last = failure;
+                    if (attempt == config.maxAttempts()) {
+                        throw failure;
+                    }
+                    long window = windowNanos(attempt);
+                    long sample = random.nextLong(window + 1);
+                    if (sample &lt; 0 || sample &gt; window) {
+                        throw new IllegalArgumentException(&quot;invalid jitter&quot;);
+                    }
+                    Duration delay = Duration.ofNanos(sample);
+                    // Treat the server hint as a floor, never jitter below it.
+                    if (failure.retryAfter().isPresent()
+                            &amp;&amp; failure.retryAfter().get().compareTo(delay) &gt; 0) {
+                        delay = failure.retryAfter().get();
+                    }
+                    remaining = total - (clock.now() - started);
+                    long reserve = config.minAttemptBudget().toNanos();
+                    if (remaining &lt; reserve || delay.compareTo(
+                            Duration.ofNanos(remaining - reserve)) &gt; 0) {
+                        throw new BudgetExceeded(
+                                &quot;retry delay leaves no useful attempt budget&quot;,
+                                failure);
+                    }
+                    if (!delay.isZero()) {
+                        sleeper.sleep(delay);
+                    }
+                    // Recheck after sleeping: scheduling may overshoot.
+                }
+                // Other IOException, RuntimeException and interruption escape.
+            }
+        }
+    }
+
+    // Illustration: an already-serialized, immutable, repeatable request body.
+    public record PaymentCommand(String idempotencyKey, String json) {
+        public PaymentCommand {
+            Objects.requireNonNull(idempotencyKey);
+            Objects.requireNonNull(json);
+            if (idempotencyKey.isBlank()) {
+                throw new IllegalArgumentException(&quot;empty idempotency key&quot;);
+            }
+        }
+    }
+
+    // Example contract, NOT a universal mapping for arbitrary payment APIs:
+    // 200 = final authorization response; 429/503 = retryable with same key.
+    // The server must implement atomic deduplication for this command identity.
+    public static final class PaymentHttp {
+        private final HttpClient client;
+        private final URI endpoint;
+        private final Clock wallClock;
+
+        public PaymentHttp(HttpClient client, URI endpoint, Clock wallClock) {
+            this.client = Objects.requireNonNull(client);
+            this.endpoint = Objects.requireNonNull(endpoint);
+            this.wallClock = Objects.requireNonNull(wallClock);
+        }
+
+        public String authorizeOnce(PaymentCommand command, Duration timeout)
+                throws IOException, InterruptedException {
+            long started = System.nanoTime();
+            long allowance = timeout.toNanos();
+            var request = HttpRequest.newBuilder(endpoint)
+                    .timeout(timeout)
+                    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+                    .header(&quot;Idempotency-Key&quot;, command.idempotencyKey())
+                    .POST(HttpRequest.BodyPublishers.ofString(
+                            command.json(), StandardCharsets.UTF_8))
+                    .build();
+            var future = client.sendAsync(request,
+                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpResponse&lt;String&gt; response;
+            try {
+                long left = allowance - (System.nanoTime() - started);
+                if (left &lt;= 0) {
+                    throw new TimeoutException(&quot;attempt budget elapsed&quot;);
+                }
+                // ofString completes after the whole body is read.
+                response = future.get(left, TimeUnit.NANOSECONDS);
+            } catch (TimeoutException failure) {
+                future.cancel(true); // best effort; never a server rollback
+                throw retryable(&quot;payment outcome unknown&quot;, failure);
+            } catch (InterruptedException failure) {
+                future.cancel(true);
+                throw failure; // do not turn cancellation into retry
+            } catch (ExecutionException failure) {
+                Throwable cause = failure.getCause();
+                if (cause instanceof HttpTimeoutException timeoutFailure) {
+                    throw retryable(&quot;payment outcome unknown&quot;, timeoutFailure);
+                }
+                // Conservative: unclassified transport failures are not retried.
+                if (cause instanceof IOException io) {
+                    throw io;
+                }
+                if (cause instanceof RuntimeException runtime) {
+                    throw runtime;
+                }
+                if (cause instanceof Error error) {
+                    throw error;
+                }
+                throw new IOException(&quot;unexpected transport failure&quot;, cause);
+            }
+            int status = response.statusCode();
+            if (status == 200) {
+                return response.body(); // decode using the actual API contract
+            }
+            if (status == 429 || status == 503) {
+                Optional&lt;Duration&gt; hint = response.headers()
+                        .firstValue(&quot;Retry-After&quot;)
+                        .flatMap(value -&gt; retryAfter(value, wallClock));
+                throw new RetryableFailure(&quot;HTTP &quot; + status, null, hint);
+            }
+            throw new IOException(&quot;non-retryable HTTP status &quot; + status);
+        }
+    }
+
+    public static RetryableFailure retryable(String reason, Throwable cause) {
+        return new RetryableFailure(reason, cause, Optional.empty());
+    }
+
+    // Supports delay-seconds and the modern IMF-fixdate HTTP-date form.
+    // Legacy HTTP-date formats require a fuller parser at an HTTP boundary.
+    public static Optional&lt;Duration&gt; retryAfter(String raw, Clock clock) {
+        String value = raw.trim();
+        if (value.matches(&quot;[0-9]+&quot;)) {
+            try {
+                return Optional.of(Duration.ofSeconds(Long.parseLong(value)));
+            } catch (NumberFormatException tooLarge) {
+                // Valid, enormous delay: stop this short synchronous retry.
+                return Optional.of(Duration.ofSeconds(Long.MAX_VALUE));
+            }
+        }
+        try {
+            var instant = ZonedDateTime.parse(value,
+                    DateTimeFormatter.RFC_1123_DATE_TIME).toInstant();
+            Duration delay = Duration.between(clock.instant(), instant);
+            return Optional.of(delay.isNegative() ? Duration.ZERO : delay);
+        } catch (DateTimeParseException invalid) {
+            return Optional.empty(); // fall back to local backoff
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        var config = new Config(3, Duration.ofMillis(700),
+                Duration.ofMillis(50), Duration.ofMillis(200),
+                Duration.ofSeconds(2));
+        int[] calls = {0};
+        // Deterministic demonstration: no network and no real sleeping.
+        long[] now = {0};
+        var retrier = new Retrier(config, () -&gt; now[0],
+                delay -&gt; now[0] += delay.toNanos(), bound -&gt; bound / 2);
+        String result = retrier.execute(Duration.ofSeconds(3), timeout -&gt; {
+            calls[0]++;
+            if (calls[0] == 1) {
+                throw retryable(&quot;temporary failure&quot;, null);
+            }
+            return &quot;authorized&quot;;
+        });
+        System.out.println(result + &quot;; attempts=&quot; + calls[0]);
+    }
+}</code></pre></figure><figure class="code-block"><figcaption>Run with JDK 25</figcaption><pre><code>javac --release 25 RetryGuide.java
+java RetryGuide
+# Expected: authorized; attempts=2</code></pre></figure></section><section class="appendix" id="tests"><p class="eyebrow">Appendix B · deterministic checks</p><h2>Executable checks without real sleeping</h2><p>Save both Java files in the same directory. The tests exercise the retry mechanism and a simulated idempotency contract. They do not call a payment service.</p><div class="file-actions"><button type="button" data-download="test-source" data-filename="RetryGuideTest.java">Download RetryGuideTest.java</button></div><figure class="code-block full-source"><figcaption>RetryGuideTest.java · complete, copyable source</figcaption><pre><code id="test-source">import java.io.IOException;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public final class RetryGuideTest {
+    static int checks;
+    static final Duration TOTAL = Duration.ofSeconds(3);
+    static RetryGuide.Config config() {
+        return new RetryGuide.Config(3, Duration.ofMillis(700),
+                Duration.ofMillis(50), Duration.ofMillis(200),
+                Duration.ofSeconds(2));
+    }
+    static final class Rig {
+        long now;
+        final List&lt;Duration&gt; sleeps = new ArrayList&lt;&gt;();
+        final RetryGuide.Retrier retry = new RetryGuide.Retrier(config(),
+                () -&gt; now, d -&gt; { sleeps.add(d); now += d.toNanos(); },
+                bound -&gt; bound - 1);
+    }
+    static void check(boolean condition) {
+        if (!condition) throw new AssertionError(&quot;check &quot; + (checks + 1));
+        checks++;
+    }
+    @FunctionalInterface interface Checked { void run() throws Exception; }
+    static &lt;T extends Throwable&gt; T expect(Class&lt;T&gt; type, Checked action)
+            throws Exception {
+        try { action.run(); }
+        catch (Throwable failure) {
+            if (!type.isInstance(failure)) throw new AssertionError(failure);
+            checks++;
+            return type.cast(failure);
+        }
+        throw new AssertionError(&quot;expected &quot; + type.getSimpleName());
+    }
+    public static void main(String[] args) throws Exception {
+        // Transient failure, one delay, then success.
+        var recover = new Rig();
+        int[] calls = {0};
+        String value = recover.retry.execute(TOTAL, timeout -&gt; {
+            if (++calls[0] == 1) throw RetryGuide.retryable(&quot;temporary&quot;, null);
+            return &quot;ok&quot;;
+        });
+        check(value.equals(&quot;ok&quot;) &amp;&amp; calls[0] == 2);
+        check(recover.sleeps.equals(List.of(Duration.ofMillis(200))));
+
+        // Permanent failures escape unchanged and do not sleep.
+        var permanent = new Rig();
+        var rejected = new IOException(&quot;declined&quot;);
+        check(expect(IOException.class, () -&gt; permanent.retry.execute(TOTAL,
+                t -&gt; { throw rejected; })) == rejected);
+        check(permanent.sleeps.isEmpty());
+
+        // Three total attempts, only two waits, final cause retained.
+        var exhausted = new Rig();
+        calls[0] = 0;
+        var unavailable = RetryGuide.retryable(&quot;unavailable&quot;, null);
+        check(expect(RetryGuide.RetryableFailure.class,
+                () -&gt; exhausted.retry.execute(TOTAL, timeout -&gt; {
+                    calls[0]++;
+                    throw unavailable;
+                })) == unavailable);
+        check(calls[0] == 3 &amp;&amp; exhausted.sleeps.size() == 2);
+
+        // A response is lost AFTER the simulated server commits.
+        var ambiguous = new Rig();
+        var command = new RetryGuide.PaymentCommand(&quot;payment-123&quot;, &quot;{}&quot;);
+        List&lt;String&gt; keys = new ArrayList&lt;&gt;();
+        Map&lt;String, String&gt; storedResults = new HashMap&lt;&gt;();
+        int[] effects = {0};
+        String authorization = ambiguous.retry.execute(TOTAL, timeout -&gt; {
+            keys.add(command.idempotencyKey());
+            String cached = storedResults.get(command.idempotencyKey());
+            if (cached != null) return cached;
+            effects[0]++;
+            storedResults.put(command.idempotencyKey(), &quot;auth-7&quot;);
+            throw RetryGuide.retryable(&quot;lost response&quot;, null);
+        });
+        check(authorization.equals(&quot;auth-7&quot;) &amp;&amp; effects[0] == 1);
+        check(keys.equals(List.of(&quot;payment-123&quot;, &quot;payment-123&quot;)));
+
+        // Window grows, caps and cannot wrap around for a huge attempt index.
+        var backoff = new Rig();
+        check(backoff.retry.windowNanos(1) == Duration.ofMillis(200).toNanos());
+        check(backoff.retry.windowNanos(2) == Duration.ofMillis(400).toNanos());
+        check(backoff.retry.windowNanos(Integer.MAX_VALUE)
+                == Duration.ofSeconds(2).toNanos());
+
+        // A server floor that cannot fit must not be shortened.
+        var floor = new Rig();
+        expect(RetryGuide.BudgetExceeded.class, () -&gt; floor.retry.execute(
+                Duration.ofSeconds(1), timeout -&gt; {
+                    throw new RetryGuide.RetryableFailure(&quot;throttled&quot;, null,
+                            Optional.of(Duration.ofSeconds(2)));
+                }));
+        check(floor.sleeps.isEmpty());
+        var honored = new Rig();
+        calls[0] = 0;
+        honored.retry.execute(TOTAL, timeout -&gt; {
+            if (++calls[0] == 1) {
+                throw new RetryGuide.RetryableFailure(&quot;throttled&quot;, null,
+                        Optional.of(Duration.ofSeconds(1)));
+            }
+            return &quot;ok&quot;;
+        });
+        check(honored.sleeps.equals(List.of(Duration.ofSeconds(1))));
+
+        // Per-attempt allowance shrinks to the remaining overall budget.
+        var clipped = new Rig();
+        clipped.retry.execute(Duration.ofMillis(500), timeout -&gt; {
+            check(timeout.equals(Duration.ofMillis(500)));
+            return &quot;ok&quot;;
+        });
+        calls[0] = 0;
+        expect(RetryGuide.BudgetExceeded.class, () -&gt; clipped.retry.execute(
+                Duration.ofMillis(49), timeout -&gt; { calls[0]++; return &quot;bad&quot;; }));
+        check(calls[0] == 0);
+
+        // A sleeper can overshoot; recheck before sending another request.
+        long[] now = {0};
+        var overshoot = new RetryGuide.Retrier(config(), () -&gt; now[0],
+                delay -&gt; now[0] += TOTAL.toNanos(), bound -&gt; bound - 1);
+        calls[0] = 0;
+        expect(RetryGuide.BudgetExceeded.class, () -&gt; overshoot.execute(
+                TOTAL, timeout -&gt; { calls[0]++;
+                    throw RetryGuide.retryable(&quot;temporary&quot;, null); }));
+        check(calls[0] == 1);
+
+        // Interruption during an attempt or a wait ends the sequence.
+        var interrupted = new Rig();
+        expect(InterruptedException.class, () -&gt; interrupted.retry.execute(
+                TOTAL, timeout -&gt; { throw new InterruptedException(); }));
+        check(interrupted.sleeps.isEmpty());
+        var interruptedSleep = new RetryGuide.Retrier(config(), () -&gt; 0,
+                delay -&gt; { throw new InterruptedException(); }, b -&gt; b - 1);
+        expect(InterruptedException.class, () -&gt; interruptedSleep.execute(
+                TOTAL, t -&gt; { throw RetryGuide.retryable(&quot;temporary&quot;, null); }));
+        Thread.currentThread().interrupt();
+        try {
+            expect(InterruptedException.class, () -&gt; new Rig().retry.execute(
+                    TOTAL, timeout -&gt; { throw new AssertionError(&quot;called&quot;); }));
+            check(Thread.currentThread().isInterrupted());
+        } finally { Thread.interrupted(); }
+
+        // Retry-After seconds, date, past date, invalid value and huge integer.
+        Clock clock = Clock.fixed(Instant.parse(&quot;2026-09-02T12:00:00Z&quot;),
+                ZoneOffset.UTC);
+        check(RetryGuide.retryAfter(&quot;2&quot;, clock).orElseThrow()
+                .equals(Duration.ofSeconds(2)));
+        check(RetryGuide.retryAfter(&quot;Wed, 02 Sep 2026 12:00:03 GMT&quot;, clock)
+                .orElseThrow().equals(Duration.ofSeconds(3)));
+        check(RetryGuide.retryAfter(&quot;Wed, 02 Sep 2026 11:59:00 GMT&quot;, clock)
+                .orElseThrow().isZero());
+        check(RetryGuide.retryAfter(&quot;garbage&quot;, clock).isEmpty());
+        var huge = RetryGuide.retryAfter(&quot;99999999999999999999999&quot;, clock);
+        expect(RetryGuide.BudgetExceeded.class, () -&gt; new Rig().retry.execute(
+                TOTAL, t -&gt; { throw new RetryGuide.RetryableFailure(
+                        &quot;long server delay&quot;, null, huge); }));
+        System.out.println(&quot;Passed &quot; + checks + &quot; deterministic checks&quot;);
+    }
+}</code></pre></figure><figure class="code-block"><figcaption>Run with JDK 25</figcaption><pre><code>javac --release 25 RetryGuide.java RetryGuideTest.java
+java RetryGuideTest
+# Expected: Passed 31 deterministic checks</code></pre></figure><div class="verification"><strong>Validation scope</strong><p>Both complete source files compiled with <code>--release 17 -Xlint:all</code> on the available OpenJDK 17 runtime. The demo ran, and all 31 deterministic checks passed. The used APIs were checked against Oracle’s Java 25 documentation. ⚠️ A Java 25 runtime was not available here, so execution on Java 25 has not been directly verified.</p><p>These checks validate the tutorial engine. They do not establish real payment-provider semantics, production timing guarantees or server-side idempotency.</p></div></section><section class="appendix sources" id="sources"><p class="eyebrow">Reference notes</p><h2>Official sources</h2><p>Verified 2 September 2026. The first-principles progression follows the supplied lesson. The code and worked scenarios are original teaching examples; numerical settings are illustrative.</p><ol><li id="ref1"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html#timeout(java.time.Duration)">Oracle · HttpRequest.Builder</a><span>Request timeout and its unset behavior.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html#timeout(java.time.Duration)</span></li><li id="ref2"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.Builder.html#connectTimeout(java.time.Duration)">Oracle · HttpClient.Builder</a><span>Connection timeout and connection reuse.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.Builder.html#connectTimeout(java.time.Duration)</span></li><li id="ref3"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html">Oracle · HttpClient</a><span>Asynchronous responses, best-effort cancellation and lifecycle.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html</span></li><li id="ref4"><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/retry">Microsoft · Retry pattern</a><span>Transient faults, idempotency, nested retries and policy ownership.</span><span class="print-only">https://learn.microsoft.com/en-us/azure/architecture/patterns/retry</span></li><li id="ref5"><a href="https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/">Microsoft · Retry storm antipattern</a><span>Load amplification, backoff and server retry guidance.</span><span class="print-only">https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/</span></li><li id="ref6"><a href="https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html">AWS · Retry behavior</a><span>Bounded exponential backoff, full jitter, attempt counts and retry quotas.</span><span class="print-only">https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html</span></li><li id="ref7"><a href="https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after">RFC 9110 · HTTP Semantics</a><span>Retry-After syntax and HTTP idempotency semantics.</span><span class="print-only">https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after</span></li><li id="ref8"><a href="https://docs.stripe.com/api/idempotent_requests">Stripe · Idempotent requests</a><span>A concrete provider example of idempotency keys; verify your own provider contract.</span><span class="print-only">https://docs.stripe.com/api/idempotent_requests</span></li><li id="ref9"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()">Oracle · System.nanoTime</a><span>Elapsed-time measurement and subtraction-based comparisons.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()</span></li><li id="ref10"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html">Oracle · Thread</a><span>Sleep and interruption semantics.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html</span></li><li id="ref11"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html#get(long,java.util.concurrent.TimeUnit)">Oracle · Future</a><span>Timed waits and interruption.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html#get(long,java.util.concurrent.TimeUnit)</span></li><li id="ref12"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpResponse.BodySubscribers.html#ofString(java.nio.charset.Charset)">Oracle · HttpResponse.BodySubscribers</a><span>String body completion after the whole response has been read.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpResponse.BodySubscribers.html#ofString(java.nio.charset.Charset)</span></li><li id="ref13"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ThreadLocalRandom.html#nextLong(long)">Oracle · ThreadLocalRandom</a><span>Exclusive upper bound for random long values.</span><span class="print-only">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ThreadLocalRandom.html#nextLong(long)</span></li></ol></section><footer class="footer">DP · Lesson 23 · Timeout → Retry → Exponential Backoff → Jitter<br>Next pressure: persistent failure → Circuit Breaker.</footer></main></div><script>
+(function(){
+'use strict';
+function sample(seed){let state=seed>>>0;return function(){state=(Math.imul(1664525,state)+1013904223)>>>0;return state/4294967296;};}
+function model(mode,base,cap,totalAttempts){
+ const windows=Array.from({length:totalAttempts-1},(_,i)=>Math.min(cap,base*2**i));
+ const end=windows.reduce((a,b)=>a+b,0);
+ const clients=Array.from({length:12},(_,i)=>{const random=sample(7919+i*104729);let t=0;return windows.map(w=>{t+=mode==='fixed'?base:mode==='exponential'?w:Math.floor(random()*(w+1));return t;});});
+ return {windows,end,clients};
+}
+const $=id=>document.getElementById(id);
+function render(){
+ const mode=$('mode').value,base=Number($('base').value),cap=Number($('cap').value),attempts=Number($('attempts').value);
+ if(!Number.isInteger(base)||base<20||base>1000||!Number.isInteger(cap)||cap<base||cap>10000||!Number.isInteger(attempts)||attempts<2||attempts>7){$('lab-error').hidden=false;$('lab-error').textContent='Use base 20–1,000 ms, cap between base and 10,000 ms, and 2–7 total attempts.';return;}
+ $('lab-error').hidden=true;
+ const {windows,end,clients}=model(mode,base,cap,attempts);
+ const names={fixed:'Fixed delay',exponential:'Exponential backoff',jitter:'Full jitter'};
+ $('lab-summary').textContent=`${names[mode]} · ${attempts} total attempts · base ${base.toLocaleString('en-US')} ms · cap ${cap.toLocaleString('en-US')} ms. Windows: ${windows.join(', ')} ms.`;
+ $('lanes').innerHTML=clients.map((times,i)=>`<div class="lane"><span class="lane-label">C${i+1}</span><div class="track">${times.map((t,j)=>`<span class="dot" style="left:${100*t/end}%" title="Client ${i+1}, attempt ${j+2}: ${t} ms"></span>`).join('')}</div></div>`).join('');
+ $('lanes').setAttribute('aria-label',`${names[mode]}: retry start times for twelve callers. Exact times are in the following table.`);
+ $('axis-mid').textContent=(end/2).toLocaleString('en-US')+' ms';$('axis-max').textContent=end.toLocaleString('en-US')+' ms';
+ $('lab-table').innerHTML='<div class="table-wrap"><table><caption class="small">Retry start times after the initial failure (ms)</caption><thead><tr><th scope="col">Caller</th>'+windows.map((_,j)=>`<th scope="col">Attempt ${j+2}</th>`).join('')+'</tr></thead><tbody>'+clients.map((times,i)=>`<tr><td>C${i+1}</td>${times.map(t=>`<td>${t.toLocaleString('en-US')}</td>`).join('')}</tr>`).join('')+'</tbody></table></div>';
+}
+$('lab-form').addEventListener('input',render);$('lab-form').addEventListener('submit',e=>e.preventDefault());render();
+document.querySelectorAll('[data-print]').forEach(button=>button.addEventListener('click',()=>window.print()));
+document.querySelectorAll('[data-download]').forEach(button=>button.addEventListener('click',()=>{
+ const contents=$(button.dataset.download).textContent+'\n';
+ const url=URL.createObjectURL(new Blob([contents],{type:'text/plain;charset=utf-8'}));
+ const link=document.createElement('a');link.href=url;link.download=button.dataset.filename;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}));
+document.querySelectorAll('.code-block').forEach(block=>{
+ const button=document.createElement('button');button.type='button';button.textContent='Copy';button.setAttribute('aria-label','Copy '+block.querySelector('figcaption').textContent);
+ button.addEventListener('click',async()=>{try{if(!navigator.clipboard)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(block.querySelector('code').textContent);button.textContent='Copied';}catch(e){const selection=window.getSelection();const range=document.createRange();range.selectNodeContents(block.querySelector('code'));selection.removeAllRanges();selection.addRange(range);button.textContent='Selected — copy manually';}setTimeout(()=>button.textContent='Copy',1800);});
+ block.querySelector('figcaption').appendChild(button);
+});
+// Pure function exposed for offline validation of the illustrative explorer.
+window.retryTimingModel=model;
+})();
+</script></body></html>

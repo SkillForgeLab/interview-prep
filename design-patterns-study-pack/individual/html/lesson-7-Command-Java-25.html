@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 7: the Command pattern, derived from first principles, with Java 25-compatible examples, safe retry reasoning, and a complete runnable program."><title>Lesson 7 · Command · Java 25 Guide</title><style>
+:root{color-scheme:light;--paper:#fff;--canvas:#f3f5f4;--ink:#203341;--muted:#586874;--line:#d9e1df;--teal:#08695d;--soft:#edf6f2;--gold:#9a671e;--code:#f4f6f8}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.7 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--teal);text-underline-offset:3px}a:hover{text-decoration-thickness:2px}button{font:600 13px/1.3 system-ui,sans-serif;border:1px solid var(--teal);background:var(--teal);color:white;border-radius:6px;padding:10px 14px;cursor:pointer}button:hover{filter:brightness(.94)}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #c29438;outline-offset:4px}button.secondary{color:var(--teal);background:white}button:disabled{opacity:.55;cursor:default}.skip{position:absolute;left:12px;top:-100px;background:white;padding:10px;z-index:5}.skip:focus{top:12px}.layout{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:238px minmax(0,1fr);gap:30px;padding:30px 24px 70px}.sidebar{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow-y:auto;padding:14px 5px}.brand{font-size:12px;letter-spacing:.16em;font-weight:800;text-transform:uppercase;color:var(--teal)}.sidebar-title{font:700 26px/1.2 Georgia,serif;margin:12px 0 8px}.sidebar-subtitle{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 24px}.side-nav{display:grid;gap:3px}.side-nav a{display:flex;gap:10px;text-decoration:none;color:var(--muted);font-size:13px;line-height:1.4;padding:8px 9px;border-radius:5px}.side-nav a span{font-weight:750;color:var(--teal);min-width:20px}.side-nav a[aria-current=true],.side-nav a:hover{background:#e3eee9;color:var(--ink)}.sidebar-footer{border-top:1px solid var(--line);margin-top:20px;padding-top:16px;font-size:12px;line-height:1.5;color:var(--muted)}.sidebar-footer button{display:block;width:100%;margin-top:12px}.main{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px #1d493709;overflow:hidden}.hero{padding:52px 56px 38px;background:linear-gradient(125deg,#f0f7f2,#fffaf0);border-bottom:1px solid var(--line);position:relative}.eyebrow{font-size:11px;line-height:1.4;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}.edition{display:inline-block;margin-top:17px;border:1px solid #c7d9ce;background:#fff9;border-radius:100px;padding:3px 10px;font-size:11px;letter-spacing:.04em;font-weight:650;color:#33554b}.hero h1{font:700 clamp(38px,4vw,58px)/1.04 Georgia,"Times New Roman",serif;letter-spacing:-.045em;margin:20px 0 20px;max-width:650px}.hero h1 span{display:block;color:var(--teal)}.hero .dek{font-size:18px;line-height:1.6;max-width:640px;margin:0;color:#415650}.hero-footer{margin-top:28px;border-top:1px solid #ccdbd2;padding-top:18px;display:flex;flex-wrap:wrap;gap:9px 20px;font-size:12px;color:var(--muted)}.intro,.chapter{padding:32px 56px}.intro{background:#fcfdfc;border-bottom:1px solid var(--line)}.intro p{margin:8px 0 16px}.intro h2{font-size:18px;line-height:1.4;margin:0 0 12px}.reading-map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 22px;font-size:13px;margin:20px 0 10px}.reading-map a{display:flex;gap:9px;text-decoration:none;color:var(--ink)}.reading-map b{color:var(--teal);min-width:20px}.code-contract{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}.chapter{border-bottom:1px solid var(--line)}.chapter-header{margin-bottom:26px;padding-bottom:22px;border-bottom:2px solid var(--teal)}.chapter-kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}h2{font:700 31px/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.02em;margin:8px 0 10px}.premise{font-size:16px;color:var(--muted);margin:0}.lesson-section{padding:6px 0 24px}.lesson-section+.lesson-section{border-top:1px solid #e8edeb;padding-top:27px}h3{font-size:21px;line-height:1.4;letter-spacing:-.02em;margin:0 0 15px;display:block}h4{font-size:18px;margin:8px 0}.section-number{display:inline-block;margin-right:11px;font:700 12px/1.5 system-ui,sans-serif;letter-spacing:.05em;color:var(--teal);vertical-align:middle;border-bottom:2px solid #b4d2c3;padding-bottom:3px}p{margin:13px 0}ul,ol{margin:14px 0;padding-left:24px}li{padding-left:3px;margin:6px 0}strong{font-weight:700}code{font: .89em/1.6 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;background:#eff3f3;border-radius:3px;padding:.12em .24em;overflow-wrap:anywhere}.codebox{margin:20px 0;background:var(--code);border:1px solid #dce3e7;border-radius:7px;overflow:hidden}.codebox figcaption{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:38px;background:#eaf0f2;border-bottom:1px solid #dce3e7;padding:7px 15px;font:600 11px/1.45 system-ui,sans-serif;letter-spacing:.015em;color:#526472}.codebox .copy{font-size:11px;line-height:1.2;padding:4px 8px;color:#365663;background:white;border-color:#bdccd2;border-radius:4px}pre{margin:0;padding:18px 20px;overflow-x:auto;tab-size:4;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;white-space:pre-wrap;overflow-wrap:anywhere}pre code{font:inherit;color:#243d50;display:block;padding:0;border:0;border-radius:0;background:none;overflow-wrap:inherit}.note{border:1px solid #cee3d8;border-left:4px solid var(--teal);border-radius:0 6px 6px 0;background:var(--soft);margin:21px 0;padding:15px 18px;font-size:14px;line-height:1.65}.note strong{display:block;color:#175c4c;font-size:13px;letter-spacing:.01em}.note p{margin:6px 0 0}.note.caution{border-color:#e7d9ba;border-left-color:var(--gold);background:#fffbf1}.note.caution strong{color:#7c561b}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.55;table-layout:fixed}th{background:#eaf3ef;text-align:left;color:#255346;font-weight:700;border-bottom:1px solid #c4d6cc}th,td{padding:11px 13px;border:1px solid #d7e2dc;vertical-align:top;overflow-wrap:anywhere}tr:nth-child(even) td{background:#fafcfb}td:first-child{font-weight:600}td code{font-size:.91em}.cite{font-size:11px;white-space:nowrap;text-decoration:none;font-weight:700;vertical-align:super}.lab{padding:22px;margin:22px 0;border:1px solid #bacfd2;border-radius:8px;background:#f7fafb}.lab p{font-size:13px;margin:8px 0 17px}.lab-controls,.action-row{display:flex;gap:8px;flex-wrap:wrap}.lab-controls button{font-size:11px;padding:9px 10px}.lab-readout{margin-top:18px;padding:14px;background:white;border:1px solid #dce6e5;border-radius:5px}.lab-readout strong{display:block;font-size:24px;color:var(--teal)}.lab-readout span{font-size:13px;color:var(--muted)}details.answer{margin:23px 0;border:1px solid var(--line);border-radius:6px;padding:16px 18px;font-size:14px;background:#fafcfb}summary{cursor:pointer;font-weight:700;color:#285747}details.answer>div{padding-top:8px}.next{background:#f7f7ef;border:1px solid #e2e2cf;padding:24px;margin-top:35px}.next h3{margin:9px 0}.next p{font-size:14px;margin:0}.action-row{margin:20px 0}.sources{font-size:13px}.sources li{padding-bottom:13px;break-inside:avoid}.source-url{display:block;font:10px/1.5 ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere;margin-top:4px}.colophon{border-top:1px solid var(--line);padding-top:20px;margin-top:25px;font-size:11px;color:var(--muted)}.progress{position:fixed;top:0;left:0;width:0;height:3px;background:var(--teal);z-index:4}.status-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:white;border:1px solid #abc8ba;box-shadow:0 3px 20px #16352a19;border-radius:6px;padding:9px 16px;font-size:13px;z-index:6}.status-toast:empty{display:none}.print-only{display:none}.full-source pre{font-size:11px}
+@media(max-width:1000px){.layout{grid-template-columns:190px minmax(0,1fr);gap:18px;padding:20px 16px}.hero,.intro,.chapter{padding-left:34px;padding-right:34px}.side-nav a{font-size:12px}.hero h1{font-size:45px}}
+@media(max-width:740px){body{font-size:15px}.layout{display:block;padding:0}.sidebar{display:none}.main{border:0;border-radius:0}.hero,.intro,.chapter{padding:27px 22px}.hero h1{font-size:42px}.hero .dek{font-size:17px}.chapter h2{font-size:28px}h3{font-size:20px}.reading-map{grid-template-columns:1fr}pre{font-size:11px;padding:14px 12px}th,td{padding:8px;font-size:12px}.full-source pre{font-size:10.5px}.hero-footer{gap:7px 14px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A4;margin:16mm 16mm 18mm;@bottom-left{content:"DP / LESSON 7 / COMMAND";font:8pt sans-serif;color:#5c6b66}@bottom-right{content:counter(page);font:8pt sans-serif;color:#5c6b66}}
+@media print{
+html{scroll-behavior:auto}body{background:#fff;color:#172b36;font:10pt/1.48 Arial,Helvetica,sans-serif}.no-print,.sidebar,.progress,.status-toast,.skip{display:none!important}.print-only{display:block}.layout{display:block;padding:0;margin:0;max-width:none}.main{border:0;box-shadow:none;border-radius:0;overflow:visible}.hero{padding:9mm 0 7mm;background:#fff;border-bottom:2pt solid #176953}.hero h1{font-size:36pt;max-width:none;margin:12pt 0}.hero .dek{font-size:13pt;line-height:1.5}.hero-footer{font-size:8pt;margin-top:15pt;padding-top:10pt}.edition{font-size:8pt}.eyebrow,.brand,.chapter-kicker{font-size:8pt}.intro{padding:18pt 0;background:#fff;border:0}.intro h2{font-family:Arial,sans-serif;font-size:13pt}.intro p{margin:7pt 0}.reading-map{display:grid;grid-template-columns:1fr 1fr;gap:5pt 16pt;font-size:9pt;margin:10pt 0}.code-contract{font-size:8.5pt}.chapter{padding:20pt 0 0;border:0;break-before:auto}#derive,#runnable,#references{break-before:page;padding-top:0}.chapter-header{break-inside:avoid;break-after:avoid;margin:0 0 15pt;padding:0 0 11pt;border-bottom:1.5pt solid #176953}.chapter h2{font-size:24pt;margin:5pt 0 7pt}.premise{font-size:11pt}.lesson-section{padding:3pt 0 14pt}.lesson-section+.lesson-section{padding-top:15pt}h3{font-size:14pt;line-height:1.3;margin:0 0 9pt;break-after:avoid}h4{break-after:avoid}.section-number{font-size:9pt;margin-right:7pt}p{margin:8pt 0;orphans:3;widows:3}ul,ol{margin:8pt 0;padding-left:18pt}li{margin:4pt 0}a{color:#1b574d;text-decoration:none}.cite{font-size:7pt}.codebox{border:1px solid #cbd5d9;border-radius:0;margin:11pt 0;overflow:visible;break-inside:avoid}.codebox figcaption{display:block;padding:5pt 9pt;font-size:8pt;min-height:0;background:#edf1f3}.codebox pre{padding:9pt 10pt;font:8.2pt/1.45 "DejaVu Sans Mono","Liberation Mono",monospace;white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere}.full-source{break-inside:auto}.full-source pre{font-size:8pt;widows:4;orphans:4}.note{break-inside:avoid;font-size:9pt;line-height:1.5;margin:11pt 0;padding:10pt 12pt;border-radius:0}.note strong{font-size:9pt}.table-wrap{overflow:visible;margin:11pt 0}table{font-size:8.8pt;line-height:1.4}th,td{padding:7pt 8pt}thead{display:table-header-group}tr{break-inside:avoid}code{font-size:.88em}details.answer{font-size:9pt;border-radius:0;break-inside:avoid}details.answer>div{display:block!important}details::details-content{content-visibility:visible!important;height:auto!important}.next{padding:14pt;margin-top:17pt;break-inside:avoid}.next h3{font-size:13pt}.next p{font-size:10pt}.sources{font-size:9pt}.source-url{font-size:7.4pt}.sources li{padding-bottom:7pt}.colophon{font-size:8pt}.chapter-header,h2,figcaption{break-after:avoid}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style></head>
+<body><a class="skip" href="#guide">Skip to guide</a><div class="progress no-print" id="progress" aria-hidden="true"></div><div class="layout"><aside class="sidebar no-print"><div class="brand">DP / Field guide</div><div class="sidebar-title">07. Command</div><p class="sidebar-subtitle">Design patterns<br>from first principles</p><nav class="side-nav" aria-label="Guide contents"><a href="#derive"><span>01</span>Derive the need</a><a href="#forms"><span>02</span>Choose a representation</a><a href="#dispatch"><span>03</span>Build the execution boundary</a><a href="#ownership"><span>04</span>Protect domain ownership</a><a href="#time"><span>05</span>Separate execution in time</a><a href="#policies"><span>06</span>Add policies and reversibility</a><a href="#compare"><span>07</span>Distinguish the nearby patterns</a><a href="#assemble"><span>08</span>Assemble the design</a><a href="#exercise"><span>09</span>Practice: transfer money</a><a href="#runnable"><span>A</span>Complete runnable Java example</a><a href="#references"><span>B</span>Official references and quick recall</a></nav><div class="sidebar-footer">Self-contained · Light theme<br>Java 25-compatible<button class="print-button" type="button">Print / Save as PDF</button></div></aside>
+<main class="main" id="guide"><header class="hero"><div class="eyebrow">Lesson 7 / Behavioral patterns</div><div class="edition">JAVA 25-COMPATIBLE EDITION</div><h1>Command<span>Give a request a life<br>of its own.</span></h1><p class="dek">Start with a method call. Discover why an intention needs a representation. Then reason about execution, ownership, retries, and undo.</p><div class="hero-footer"><span>32 teaching steps</span><span>Complete Java program</span><span>Transfer exercise</span><span>Official references</span></div></header>
+<section class="intro" aria-labelledby="read-heading"><h2 id="read-heading">Read in order. Add structure when the pressure appears.</h2><p>The central question: <strong>must this request exist independently of its execution?</strong> Keep that question in view as the design grows from a direct call to an explicit application boundary.</p><div class="reading-map"><a href="#derive"><b>01</b>Derive the need</a><a href="#forms"><b>02</b>Choose a representation</a><a href="#dispatch"><b>03</b>Build the execution boundary</a><a href="#ownership"><b>04</b>Protect domain ownership</a><a href="#time"><b>05</b>Separate execution in time</a><a href="#policies"><b>06</b>Add policies and reversibility</a><a href="#compare"><b>07</b>Distinguish the nearby patterns</a><a href="#assemble"><b>08</b>Assemble the design</a><a href="#exercise"><b>09</b>Practice: transfer money</a><a href="#runnable"><b>A</b>Complete runnable Java example</a><a href="#references"><b>B</b>Official references and quick recall</a></div><p class="code-contract"><strong>How to use the code:</strong> early excerpts evolve the same idea and are not meant to be pasted together. The appendix is one complete, consistent source file. Every dependency it needs is included or comes from the Java standard library.</p><div class="action-row no-print"><button class="print-button" type="button">Print / Save as PDF</button><button class="download-java secondary" type="button">Download Java example</button></div><p class="code-contract">For PDF: use A4, portrait, normal scale, and turn off the browser’s own headers and footers. Navigation and controls disappear; code and exercise guidance remain. The guide needs no network connection. Source links are optional further reading.</p><noscript><p>JavaScript is optional. All lesson content and source code are visible. Use your browser’s Print command and copy code manually.</p></noscript></section><article class="chapter" id="derive" aria-labelledby="h-derive"><header class="chapter-header"><span class="chapter-kicker">Part 01</span><h2 id="h-derive">Derive the need</h2><p class="premise">When does a method call stop being enough?</p></header><section class="lesson-section" id="s1"><h3><span class="section-number">01</span>Start without a pattern</h3><p>An admin asks to ship an order. A controller calls a service. If execution is immediate and there are no extra requirements, this is a reasonable design.</p><figure class="codebox "><figcaption><span>Java · starting point, independent example</span><button class="copy no-print" data-copy="code-1" type="button">Copy</button></figcaption><pre><code id="code-1" class="language-java">class OrderService {
+    public void ship(String orderId) {
+        System.out.println(&quot;Shipping &quot; + orderId);
+    }
+}
+
+class OrderController {
+    private final OrderService orders;
+
+    OrderController(OrderService orders) {
+        this.orders = orders;
+    }
+
+    public void ship(String orderId) {
+        orders.ship(orderId);
+    }
+}</code></pre></figure><p>The controller knows whom to call, and the service does the work now. No command object is needed yet.</p></section><section class="lesson-section" id="s2"><h3><span class="section-number">02</span>Pressure appears</h3><p>Now the shipment request must be authorized, logged, retried after a temporary failure, handled by a background worker, or scheduled for tomorrow.</p><p>A direct call represents an invocation that is happening now. It gives us no separate application value meaning <em>“ship order O123 later.”</em> We can add wrappers around calls, but storing or transporting the request requires a representation of its own.</p><aside class="note insight"><strong>The design pressure</strong><p>The request needs to survive beyond the moment at which the caller creates it.</p></aside></section><section class="lesson-section" id="s3"><h3><span class="section-number">03</span>Separate intention from execution</h3><p>There are two different moments: deciding what should happen, and attempting to make it happen. Give the first moment a value.</p><div class="table-wrap"><table><thead><tr><th scope="col">Moment</th><th scope="col">Representation</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td>Create</td><td><code>new ShipOrderCommand("O123")</code></td><td>A request exists; shipping has not run.</td></tr><tr><td>Keep or pass</td><td>A variable, queue entry, or persisted message</td><td>The request can wait or move elsewhere.</td></tr><tr><td>Execute</td><td><code>handler.handle(command)</code></td><td>The system now attempts the operation.</td></tr></tbody></table></div><p><strong>Command encapsulates a request as an object.</strong> Once the request has an identity and a representation, other code can decide when and how to execute it. <a class="cite" href="https://learn.microsoft.com/en-us/archive/msdn-magazine/2004/september/distributed-system-design-using-command-pattern-msmq-and-net" title="Microsoft Learn: Command pattern structure and undo">[1]</a></p></section><section class="lesson-section" id="s4"><h3><span class="section-number">04</span>Make the request explicit</h3><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-2" type="button">Copy</button></figcaption><pre><code id="code-2" class="language-java">record ShipOrderCommand(String orderId) {}
+
+// Inside a method:
+var command = new ShipOrderCommand(&quot;O123&quot;);</code></pre></figure><p>A Java record supplies a constructor, component accessors such as <code>orderId()</code>, and value-oriented <code>equals</code>, <code>hashCode</code>, and <code>toString</code> methods. Its component fields are final. Records are suitable for simple command data. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/language/records.html" title="Oracle Java 25: Record classes">[2]</a></p><aside class="note insight"><strong>Construction is not execution</strong><p>This record has no shipping side effect. Records can have methods, but this design deliberately gives execution to a separate handler.</p></aside><p>A record is only shallowly immutable: a final reference can still point to mutable data. These examples use <code>String</code> and <code>UUID</code>; copy mutable collections when a command contains them.</p></section><section class="lesson-section" id="s5"><h3><span class="section-number">05</span>Give execution to a handler</h3><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-3" type="button">Copy</button></figcaption><pre><code id="code-3" class="language-java">class ShipOrderHandler {
+    private final OrderService orders;
+
+    ShipOrderHandler(OrderService orders) {
+        this.orders = orders;
+    }
+
+    public void handle(ShipOrderCommand command) {
+        orders.ship(command.orderId());
+    }
+}</code></pre></figure><p>The command says <strong>what is requested</strong>. The handler coordinates <strong>how to attempt it</strong>. The service performs the work. You can still call the handler immediately; Command does not require a queue.</p></section></article><article class="chapter" id="forms" aria-labelledby="h-forms"><header class="chapter-header"><span class="chapter-kicker">Part 02</span><h2 id="h-forms">Choose a representation</h2><p class="premise">Should the request carry execution behavior or only data?</p></header><section class="lesson-section" id="s6"><h3><span class="section-number">06</span>Understand classic GoF Command</h3><p>The classic form exposes an execution operation. The concrete command holds the receiver and the arguments it needs. An invoker calls the command without knowing the receiver’s specific operation. <a class="cite" href="https://learn.microsoft.com/en-us/archive/msdn-magazine/2004/september/distributed-system-design-using-command-pattern-msmq-and-net" title="Microsoft Learn: Command pattern structure and undo">[1]</a></p><figure class="codebox "><figcaption><span>Java · classic form; separate from the data-command model</span><button class="copy no-print" data-copy="code-4" type="button">Copy</button></figcaption><pre><code id="code-4" class="language-java">interface ExecutableCommand {
+    void execute();
+}
+
+record ShipOrderAction(String orderId, OrderService orders)
+        implements ExecutableCommand {
+    @Override
+    public void execute() {
+        orders.ship(orderId);
+    }
+}
+
+// Inside a method, with an OrderService named orders:
+ExecutableCommand action = new ShipOrderAction(&quot;O123&quot;, orders);
+action.execute();</code></pre></figure><div class="table-wrap"><table><thead><tr><th scope="col">Role</th><th scope="col">In this example</th></tr></thead><tbody><tr><td>Client</td><td>Creates <code>ShipOrderAction</code>.</td></tr><tr><td>Invoker</td><td>Calls <code>execute()</code>.</td></tr><tr><td>Concrete command</td><td><code>ShipOrderAction</code> stores the request.</td></tr><tr><td>Receiver</td><td><code>OrderService</code> performs shipping.</td></tr></tbody></table></div></section><section class="lesson-section" id="s7"><h3><span class="section-number">07</span>Separate data from runtime dependencies</h3><p>A live service reference is useful inside a process. It is a poor wire contract for another process. A remote worker needs command data and its own configured dependencies.</p><div class="table-wrap"><table><thead><tr><th scope="col">Form</th><th scope="col">Carries</th><th scope="col">A useful fit</th></tr></thead><tbody><tr><td>Classic command</td><td>Arguments + receiver + execution method</td><td>Local invokers, menus, reversible editor actions</td></tr><tr><td>Command + handler</td><td>Data in the command; dependencies in the handler</td><td>Application boundaries, queues, durable requests</td></tr></tbody></table></div><p>This guide uses command data plus handlers for the backend example. That is a design choice, not a requirement of the pattern. A record is not automatically JSON, and it does not automatically implement <code>Serializable</code>. A transport still needs a codec and a defined schema. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/language/records.html" title="Oracle Java 25: Record classes">[2]</a></p></section><section class="lesson-section" id="s8"><h3><span class="section-number">08</span>Model commands and results</h3><p>Once several operations share an execution boundary, describe the result type with <code>Command&lt;R&gt;</code>. We now add a stable command ID for the retry discussion later. These definitions replace the small record in section 4.</p><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-5" type="button">Copy</button></figcaption><pre><code id="code-5" class="language-java">interface Command&lt;R&gt; {}
+
+record ShipmentReceipt(String orderId, String shipmentId) {}
+
+record ShipOrderCommand(UUID commandId, String orderId)
+        implements Command&lt;ShipmentReceipt&gt; {}
+
+record CancelOrderCommand(UUID commandId, String orderId,
+                          String reason) implements Command&lt;Void&gt; {}
+
+record RefundPaymentCommand(UUID commandId, String paymentId,
+                            long amountInCents)
+        implements Command&lt;String&gt; {}</code></pre></figure><p>Here shipping returns a receipt, cancellation returns no useful value, and refund returns an ID. <code>Void</code> is a reference type used as a generic placeholder; a handler using it returns <code>null</code>. A domain result record is often more useful than that convention.</p><p>Imports for snippets: <code>java.util.UUID</code> and, where used, <code>java.util.Objects</code>. The complete program includes all imports and constructor validation.</p></section><section class="lesson-section" id="s9"><h3><span class="section-number">09</span>Tie each handler to one command type</h3><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-6" type="button">Copy</button></figcaption><pre><code id="code-6" class="language-java">interface CommandHandler&lt;C extends Command&lt;R&gt;, R&gt; {
+    R handle(C command);
+}</code></pre></figure><figure class="codebox "><figcaption><span>Java · excerpt from the complete program</span><button class="copy no-print" data-copy="code-7" type="button">Copy</button></figcaption><pre><code id="code-7" class="language-java">static final class ShipOrderHandler
+        implements CommandHandler&lt;ShipOrderCommand, ShipmentReceipt&gt; {
+    private final ShippingUnitOfWork shipping;
+
+    ShipOrderHandler(ShippingUnitOfWork shipping) {
+        this.shipping = Objects.requireNonNull(shipping);
+    }
+
+    @Override
+    public ShipmentReceipt handle(ShipOrderCommand command) {
+        return shipping.shipOnce(command);
+    }
+}</code></pre></figure><p><code>C</code> names the command the handler accepts; <code>R</code> names the result it returns. In the full example, <code>ShippingUnitOfWork</code> coordinates the order update and the stored retry result. The domain object still decides whether shipping is legal.</p></section><section class="lesson-section" id="s10"><h3><span class="section-number">10</span>See what the new boundary buys you</h3><p>The request is now something you can inspect before executing it. You can validate its shape, check permissions, log selected metadata, serialize it, schedule it, or send it to a worker.</p><aside class="note insight"><strong>Capability is not a guarantee</strong><p>A command object makes these behaviors possible. It does not provide durable storage, safe retries, authorization, or reliable event delivery by itself.</p></aside><p>Each additional requirement needs an explicit owner and a failure policy. The next step is to give execution one boundary where such policies can compose.</p></section></article><article class="chapter" id="dispatch" aria-labelledby="h-dispatch"><header class="chapter-header"><span class="chapter-kicker">Part 03</span><h2 id="h-dispatch">Build the execution boundary</h2><p class="premise">Where should routing and shared policies live?</p></header><section class="lesson-section" id="s11"><h3><span class="section-number">11</span>Add logging with a decorator</h3><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-8" type="button">Copy</button></figcaption><pre><code id="code-8" class="language-java">interface CommandBus {
+    &lt;R&gt; R send(Command&lt;R&gt; command);
+}</code></pre></figure><p>This bus is synchronous: it returns the handler’s result or propagates a failure. A wrapper can preserve this interface while adding behavior.</p><figure class="codebox "><figcaption><span>Java · logging decorator from the complete program</span><button class="copy no-print" data-copy="code-9" type="button">Copy</button></figcaption><pre><code id="code-9" class="language-java">static final class LoggingCommandBus implements CommandBus {
+    private final CommandBus inner;
+
+    LoggingCommandBus(CommandBus inner) {
+        this.inner = Objects.requireNonNull(inner);
+    }
+
+    @Override
+    public &lt;R&gt; R send(Command&lt;R&gt; command) {
+        String type = command.getClass().getSimpleName();
+        System.out.println(&quot;START &quot; + type);
+        try {
+            R result = inner.send(command);
+            System.out.println(&quot;OK &quot; + type);
+            return result;
+        } catch (RuntimeException failure) {
+            System.out.println(&quot;FAIL &quot; + type);
+            throw failure;
+        }
+    }
+}</code></pre></figure><p>The wrapper forwards to another bus, so logging can change without changing handlers. This is the Decorator idea applied to execution. The demo logs the command type, not its full payload; choose log fields deliberately.</p></section><section class="lesson-section" id="s12"><h3><span class="section-number">12</span>Keep routing knowledge in one place</h3><p>A few commands can use explicit overloads or a small dispatcher. A dispatcher returning <code>Object</code> is also possible, but it does not satisfy the typed <code>CommandBus</code> interface above. Our complete example uses a registry that preserves the typed caller API.</p><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-10" type="button">Copy</button></figcaption><pre><code id="code-10" class="language-java">var routes = new SimpleCommandBus();
+routes.register(ShipOrderCommand.class, new ShipOrderHandler(store));
+
+CommandBus bus = new LoggingCommandBus(routes);
+ShipmentReceipt receipt = bus.send(
+    new ShipOrderCommand(commandId, &quot;O123&quot;)
+);</code></pre></figure><p>Registration binds a concrete command class to a compatible handler. Lookup selects it by the command’s exact runtime class. Missing and duplicate registrations fail explicitly.</p><aside class="note insight"><strong>One contained type cast</strong><p>A heterogeneous map cannot retain every command/result pair in its map type. The complete bus contains one documented unchecked result cast. The generic registration method maintains the relationship; raw types, parameterized command classes, and unchecked registrations are outside this example’s contract.</p></aside><p>The input uses <code>Class.cast</code> for a runtime type check. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html#cast(java.lang.Object)" title="Oracle Java 25 API: Class.cast">[8]</a> Configure the registry before use and treat it as fixed; the example does not implement concurrent registration.</p></section><section class="lesson-section" id="s13"><h3><span class="section-number">13</span>Keep the controller thin</h3><figure class="codebox "><figcaption><span>Java · controller from the complete program</span><button class="copy no-print" data-copy="code-11" type="button">Copy</button></figcaption><pre><code id="code-11" class="language-java">static final class OrderController {
+    private final CommandBus bus;
+
+    OrderController(CommandBus bus) {
+        this.bus = Objects.requireNonNull(bus);
+    }
+
+    ShipmentReceipt ship(UUID commandId, String orderId) {
+        return bus.send(new ShipOrderCommand(commandId, orderId));
+    }
+}</code></pre></figure><p>The controller translates input into an application command and submits it. It does not implement shipping rules or select domain states.</p><aside class="note insight"><strong>Retry identity starts at the boundary</strong><p>Generate a command ID once per intended operation and preserve it for retries. Creating a new random ID on every repeat HTTP request defeats deduplication by command ID. In a real API, validate the retry key and scope it to the authenticated tenant or operation.</p></aside></section></article><article class="chapter" id="ownership" aria-labelledby="h-ownership"><header class="chapter-header"><span class="chapter-kicker">Part 04</span><h2 id="h-ownership">Protect domain ownership</h2><p class="premise">A request, a rule, and a fact are different things.</p></header><section class="lesson-section" id="s14"><h3><span class="section-number">14</span>Distinguish commands from events</h3><div class="table-wrap"><table><thead><tr><th scope="col"></th><th scope="col">Command</th><th scope="col">Event</th></tr></thead><tbody><tr><td>Meaning</td><td>Please attempt an operation.</td><td>A named fact occurred.</td></tr><tr><td>Example</td><td><code>ShipOrderCommand</code></td><td><code>OrderShipped</code></td></tr><tr><td>Timing</td><td>Before execution; may be rejected</td><td>After the defined change succeeds</td></tr><tr><td>Default ownership</td><td>One logical responsible handler</td><td>Zero or more interested subscribers</td></tr></tbody></table></div><p>“One handler” means one logical owner, not one worker instance. Several workers may compete to process requests. An event consumer may still fail even though the event describes a completed change.</p><aside class="note insight"><strong>Name the fact precisely</strong><p>This lesson models SHIPPED as a domain status. A database update does not prove physical carrier pickup. In a real system, use a more precise event such as ShipmentRequested or ShipmentBooked when that is the fact you can establish.</p></aside></section><section class="lesson-section" id="s15"><h3><span class="section-number">15</span>Connect Command to State</h3><p>State governs what an order can legally do at its current lifecycle stage. Command represents the attempt to do it. The handler loads the order, asks it to ship, and saves the outcome within the chosen unit of work.</p><figure class="codebox "><figcaption><span>Java · workflow excerpt; repository supplied by the application</span><button class="copy no-print" data-copy="code-12" type="button">Copy</button></figcaption><pre><code id="code-12" class="language-java">Order order = orders.findById(command.orderId());
+Order shipped = order.ship();
+orders.save(shipped);</code></pre></figure><p>This three-line workflow does not yet supply transactions, duplicate detection, or concurrency control. Those belong to its surrounding execution boundary.</p><div class="table-wrap"><table><thead><tr><th scope="col">Owner</th><th scope="col">Responsibility</th></tr></thead><tbody><tr><td>Command</td><td>Requested operation and its input data</td></tr><tr><td>Handler</td><td>Coordinates the application use case</td></tr><tr><td>Order</td><td>Enforces legal domain transitions</td></tr><tr><td>Repository / unit of work</td><td>Loads and persists the changes consistently</td></tr></tbody></table></div></section><section class="lesson-section" id="s16"><h3><span class="section-number">16</span>Keep business invariants in the domain</h3><figure class="codebox "><figcaption><span>Java · domain excerpt from the complete program</span><button class="copy no-print" data-copy="code-13" type="button">Copy</button></figcaption><pre><code id="code-13" class="language-java">enum Status { PACKED, SHIPPED, CANCELLED }
+
+// Immutable aggregate: ship() enforces the rule and returns a new value.
+record Order(String id, Status status) {
+    Order ship() {
+        if (status != Status.PACKED) {
+            throw new IllegalStateException(&quot;Only packed orders can ship&quot;);
+        }
+        return new Order(id, Status.SHIPPED);
+    }
+}</code></pre></figure><p>The handler calls <code>ship()</code> instead of assigning a new status itself. Here the immutable aggregate returns a new order, so the caller must use that return value.</p><p>An enum and a small condition are enough for this reduced model. Full State objects become useful when state-specific behavior grows. Encapsulation has a concrete purpose: make the transition rule hard to bypass through the application’s normal API.</p></section></article><article class="chapter" id="time" aria-labelledby="h-time"><header class="chapter-header"><span class="chapter-kicker">Part 05</span><h2 id="h-time">Separate execution in time</h2><p class="premise">What changes when a request waits, fails, or arrives twice?</p></header><section class="lesson-section" id="s17"><h3><span class="section-number">17</span>Put data on a queue</h3><p>A producer can encode the command, hand it to a queue, and let a worker decode it and call the handler later. The producer and worker no longer have to execute in the same call stack.</p><figure class="codebox "><figcaption><span>JSON · illustrative transport envelope</span><button class="copy no-print" data-copy="code-14" type="button">Copy</button></figcaption><pre><code id="code-14" class="language-json">{
+  &quot;type&quot;: &quot;ShipOrder&quot;,
+  &quot;schemaVersion&quot;: 1,
+  &quot;commandId&quot;: &quot;00000000-0000-0000-0000-000000000001&quot;,
+  &quot;orderId&quot;: &quot;O123&quot;
+}</code></pre></figure><p>The envelope identifies the message type and schema version. The handler’s service or repository dependencies are created by the receiving application. The JSON shown is a contract illustration; no JSON library or broker is required by the runnable program.</p><ol><li>Producer validates and submits the request.</li><li>Queue retains a message according to its delivery contract.</li><li>Worker decodes it and attempts the use case.</li><li>Worker acknowledges after the required durable work succeeds.</li></ol></section><section class="lesson-section" id="s18"><h3><span class="section-number">18</span>Change the promise made to the caller</h3><div class="table-wrap"><table><thead><tr><th scope="col">Synchronous completion</th><th scope="col">Asynchronous acceptance</th></tr></thead><tbody><tr><td>The call waits for a result or failure.</td><td>The caller receives confirmation of acceptance.</td></tr><tr><td>A successful response can describe the completed work.</td><td>Later execution may succeed, fail, or be rejected.</td></tr><tr><td><code>ShipmentReceipt</code> is a possible result.</td><td>Return a request ID and a way to inspect its status.</td></tr></tbody></table></div><p>HTTP <code>202 Accepted</code> means processing has been accepted but is not complete; it does not guarantee eventual execution. The response should describe the current status and provide a way to monitor it. <a class="cite" href="https://www.rfc-editor.org/rfc/rfc9110.html#section-15.3.3" title="RFC 9110, section 15.3.3: 202 Accepted">[4]</a></p><aside class="note insight"><strong>Accepted and completed are separate states</strong><p>Do not label the order “shipped” merely because its command entered a queue. Also define what happens if the producer cannot tell whether submission succeeded.</p></aside></section><section class="lesson-section" id="s19"><h3><span class="section-number">19</span>Derive the retry problem</h3><p>Imagine a worker creates a shipment successfully, then crashes before acknowledging the message. A delivery system that redelivers unacknowledged work may send that command again.</p><div class="table-wrap"><table><thead><tr><th scope="col">Step</th><th scope="col">Business effect</th><th scope="col">Queue knowledge</th></tr></thead><tbody><tr><td>First execution succeeds</td><td>Shipment exists.</td><td>Message is still unacknowledged.</td></tr><tr><td>Worker crashes</td><td>Shipment still exists.</td><td>Completion was not confirmed.</td></tr><tr><td>Message is retried</td><td>A second effect is possible.</td><td>Worker must decide how to handle a repeat.</td></tr></tbody></table></div><p>The problem is uncertainty at a boundary. Retrying can recover missing work or repeat work that already happened. Know the broker’s delivery contract, and design the handler for the repeats it permits.</p></section><section class="lesson-section" id="s20"><h3><span class="section-number">20</span>Give repeated delivery one business effect</h3><p>For this use case, idempotent handling means repeating the same logical request does not create an additional shipment. The command carries a stable ID; the handler can return the previously stored result.</p><figure class="codebox "><figcaption><span>Java · deduplication lookup excerpt</span><button class="copy no-print" data-copy="code-15" type="button">Copy</button></figcaption><pre><code id="code-15" class="language-java">Completed prior = completed.get(command.commandId());
+if (prior != null) {
+    if (!prior.command().equals(command)) {
+        throw new IllegalArgumentException(
+            &quot;commandId reused with different payload&quot;);
+    }
+    return prior.receipt();
+}</code></pre></figure><p>Reuse the ID for a retry of the same intention. Reject an ID reused with different input. Persist the result when callers need the same answer again. A new ID means a new request, even if its payload happens to match.</p><aside class="note insight"><strong>The key is only an identifier</strong><p>A command ID does not make the work atomic. Two workers can both see “not processed”; a crash can occur after the effect but before the ID is recorded.</p></aside></section><section class="lesson-section" id="s21"><h3><span class="section-number">21</span>Choose a reliable atomic boundary</h3><p>The sequence “check, perform work, mark processed” has both a race window and a crash window. For updates in one database, a possible design is:</p><ol><li>Begin a transaction and claim a command key protected by a unique constraint, scoped to the application or tenant as needed.</li><li>Verify the stored payload matches any repeated request. Return the stored result for a completed repeat.</li><li>Apply the business update with appropriate concurrency control, and persist the result and an outbox event in the same transaction.</li><li>Commit. Acknowledge the message only after the durable work succeeds. Publish outbox events separately; their consumers must also tolerate duplicates.</li></ol><p>The outbox pattern addresses the database-update/message-publish gap by recording pending events with the business change. It still requires duplicate-aware consumption. <a class="cite" href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html" title="AWS Prescriptive Guidance: Transactional outbox">[5]</a></p><aside class="note caution"><strong>External effects need their own design</strong><p>A local transaction cannot atomically include an arbitrary carrier API call. If a provider supports idempotency keys, preserve the same key across attempts and verify its scope and retention contract. Otherwise use reconciliation or a workflow that can resolve uncertain outcomes.</p></aside><p>Deduplication and lifecycle rules answer different questions. Deduplication asks “did this same request already finish?” State asks “is this new request legal now?” Both can be necessary.</p><div class="lab no-print" id="retry-lab"><div class="lab-heading"><span class="eyebrow">Small experiment</span><h4>Replay one command</h4></div><p>This local simulation mirrors the stored-result idea, not a broker or a database transaction.</p><div class="lab-controls"><button type="button" id="lab-send">Execute C1 / O123</button><button type="button" id="lab-retry" disabled>Retry C1 / O123</button><button type="button" id="lab-conflict" disabled>Reuse C1 / O456</button><button type="button" class="secondary" id="lab-reset">Reset</button></div><div class="lab-readout" role="status" aria-live="polite"><strong id="lab-count">0 shipments</strong><span id="lab-message">No command has executed.</span></div></div><p><strong>Expected replay:</strong> first C1/O123 creates one result; another C1/O123 returns it; C1/O456 is rejected. The Java checks in the appendix exercise these cases.</p></section></article><article class="chapter" id="policies" aria-labelledby="h-policies"><header class="chapter-header"><span class="chapter-kicker">Part 06</span><h2 id="h-policies">Add policies and reversibility</h2><p class="premise">Which concerns surround execution, and which actions can be reversed?</p></header><section class="lesson-section" id="s22"><h3><span class="section-number">22</span>Authorize using trusted context</h3><p>A command tells you what someone wants. It does not prove they may do it. Authorize the operation and target resource using identity established by the application’s trusted authentication boundary. <a class="cite" href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html" title="OWASP: Authorization Cheat Sheet">[6]</a></p><figure class="codebox "><figcaption><span>Java · synchronous, request-scoped decorator</span><button class="copy no-print" data-copy="code-16" type="button">Copy</button></figcaption><pre><code id="code-16" class="language-java">record AuthenticatedActor(String id) {}
+
+interface AuthorizationService {
+    void check(AuthenticatedActor actor, Command&lt;?&gt; command);
+}
+
+final class AuthorizationCommandBus implements CommandBus {
+    private final CommandBus inner;
+    private final AuthorizationService auth;
+    private final AuthenticatedActor actor;
+
+    AuthorizationCommandBus(CommandBus inner,
+            AuthorizationService auth, AuthenticatedActor actor) {
+        this.inner = inner;
+        this.auth = auth;
+        this.actor = actor;
+    }
+
+    @Override
+    public &lt;R&gt; R send(Command&lt;R&gt; command) {
+        auth.check(actor, command);
+        return inner.send(command);
+    }
+}</code></pre></figure><aside class="note insight"><strong>A userId field is not authentication</strong><p>Do not trust a client-supplied actor or permission flag. The wrapper above must receive its actor from trusted server code and must not be reused across different users. For queued work, define how trusted identity is conveyed and whether authorization is checked again at execution.</p></aside></section><section class="lesson-section" id="s23"><h3><span class="section-number">23</span>Validate at the right layer</h3><p>Validation is not one undifferentiated check. Different owners know different facts.</p><div class="table-wrap"><table><thead><tr><th scope="col">Check</th><th scope="col">Example</th><th scope="col">Owner</th></tr></thead><tbody><tr><td>Input shape</td><td>Required ID; amount is positive</td><td>Decoder / command constructor</td></tr><tr><td>Permission</td><td>Actor may ship this order</td><td>Authorization policy with trusted context</td></tr><tr><td>Business invariant</td><td>Only a packed order can ship</td><td>Domain model</td></tr><tr><td>Concurrent consistency</td><td>Order did not change before the write</td><td>Transaction / persistence mechanism</td></tr></tbody></table></div><p>A possible pipeline validates input, authorizes the target, logs selected metadata, starts a transaction, invokes the handler, and commits. An outer observation layer may record rejected attempts too. Choose ordering based on what each step must know.</p><p>Log “completed” only at the boundary that knows the required commit succeeded. In the runnable example, the logging wrapper observes an in-memory operation, not a database commit.</p></section><section class="lesson-section" id="s24"><h3><span class="section-number">24</span>Use undo when you can restore the relevant state</h3><p>Classic Command can expose undo behavior. <a class="cite" href="https://learn.microsoft.com/en-us/archive/msdn-magazine/2004/september/distributed-system-design-using-command-pattern-msmq-and-net" title="Microsoft Learn: Command pattern structure and undo">[1]</a> A small editor example makes the contract clearer than pretending every external action has an inverse.</p><figure class="codebox "><figcaption><span>Java · independent undo example</span><button class="copy no-print" data-copy="code-17" type="button">Copy</button></figcaption><pre><code id="code-17" class="language-java">interface UndoableCommand {
+    void execute();
+    void undo();
+}
+
+final class SetTextCommand implements UndoableCommand {
+    private final StringBuilder target;
+    private final String after;
+    private String before;
+    private boolean executed;
+
+    SetTextCommand(StringBuilder target, String after) {
+        this.target = java.util.Objects.requireNonNull(target);
+        this.after = java.util.Objects.requireNonNull(after);
+    }
+
+    public void execute() {
+        if (executed) throw new IllegalStateException(&quot;Already executed&quot;);
+        before = target.toString();
+        target.replace(0, target.length(), after);
+        executed = true;
+    }
+
+    public void undo() {
+        if (!executed) throw new IllegalStateException(&quot;Nothing to undo&quot;);
+        target.replace(0, target.length(), before);
+        executed = false;
+    }
+}</code></pre></figure><p>This assumes one editor owns the buffer and commands are undone in reverse execution order. Otherwise restoring an old snapshot may overwrite intervening edits. The captured <code>before</code> value plays the role of a small memento.</p></section><section class="lesson-section" id="s25"><h3><span class="section-number">25</span>Distinguish undo from compensation</h3><div class="table-wrap"><table><thead><tr><th scope="col">Operation</th><th scope="col">Possible response</th><th scope="col">What it means</th></tr></thead><tbody><tr><td>Local text replacement</td><td>Restore the previous buffer</td><td>Undo, under the editor’s ownership rules</td></tr><tr><td>Payment charge</td><td>Issue a refund</td><td>A new business operation compensates for the charge</td></tr><tr><td>Email already delivered</td><td>Send a correction</td><td>The original external observation remains</td></tr></tbody></table></div><p>Compensation is application-specific work and can itself fail. It may need retries and does not necessarily restore the exact original state. <a class="cite" href="https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction" title="Microsoft Learn: Compensating transaction">[7]</a></p><aside class="note insight"><strong>Command does not imply reversibility</strong><p>An explicit request helps store and execute actions. Whether a particular action can be undone depends on its domain and on what the outside world has already observed.</p></aside></section></article><article class="chapter" id="compare" aria-labelledby="h-compare"><header class="chapter-header"><span class="chapter-kicker">Part 07</span><h2 id="h-compare">Distinguish the nearby patterns</h2><p class="premise">Identify the design pressure, not just the interface shape.</p></header><section class="lesson-section" id="s26"><h3><span class="section-number">26</span>Command versus Strategy</h3><div class="table-wrap"><table><thead><tr><th scope="col">Question</th><th scope="col">Strategy</th><th scope="col">Command</th></tr></thead><tbody><tr><td>What varies?</td><td>The algorithm used for an operation</td><td>The requested operation and its arguments</td></tr><tr><td>Example</td><td>Standard or express pricing calculation</td><td>Ship order O123</td></tr><tr><td>What does the caller choose?</td><td>How to calculate a shipping price</td><td>Which action to request</td></tr><tr><td>Can they compose?</td><td>A handler may use a pricing strategy.</td><td>The command remains the requested action.</td></tr></tbody></table></div><p>A method named <code>execute()</code> is not enough to identify Command. Ask whether the object represents a request that can be passed around independently of its execution.</p></section><section class="lesson-section" id="s27"><h3><span class="section-number">27</span>Command versus Observer</h3><p>Command asks a responsible component to attempt work. Observer arranges for interested objects to receive notifications. A command may produce an event, and several observers may react to that event.</p><div class="table-wrap"><table><thead><tr><th scope="col">Command</th><th scope="col">Observer / event notification</th></tr></thead><tbody><tr><td><code>ShipOrderCommand</code> requests work.</td><td><code>OrderShipped</code> reports a defined completed change.</td></tr><tr><td>One logical handler owns the use case.</td><td>Email, analytics, and tracking consumers own their reactions.</td></tr></tbody></table></div><p>Classic Observer is often local object notification. A durable event broker adds transport, persistence, retries, and delivery semantics. The same conceptual distinction applies, but those reliability properties do not come from Observer itself.</p></section><section class="lesson-section" id="s28"><h3><span class="section-number">28</span>Command versus Factory</h3><p>Factory answers a construction question: which object should be created and how should it be configured? Command answers a request question: what operation has been asked for?</p><p>A factory or dependency-injection setup might construct a <code>ShipOrderHandler</code> with the right repository. A controller constructs a <code>ShipOrderCommand</code> containing the input for one use case. Creation and execution remain different responsibilities.</p></section></article><article class="chapter" id="assemble" aria-labelledby="h-assemble"><header class="chapter-header"><span class="chapter-kicker">Part 08</span><h2 id="h-assemble">Assemble the design</h2><p class="premise">Use only the structure justified by the requirements.</p></header><section class="lesson-section" id="s29"><h3><span class="section-number">29</span>Trace a realistic application flow</h3><div class="table-wrap"><table><thead><tr><th scope="col">Order</th><th scope="col">Owner</th><th scope="col">What happens</th></tr></thead><tbody><tr><td>1</td><td>API adapter</td><td>Reads input and obtains trusted caller context.</td></tr><tr><td>2</td><td>Command</td><td>Represents ShipOrder with a stable request ID.</td></tr><tr><td>3</td><td>Execution policies</td><td>Validate, authorize, and record appropriate metadata.</td></tr><tr><td>4</td><td>Handler / unit of work</td><td>Coordinates duplicate checks and loads the order.</td></tr><tr><td>5</td><td>Domain</td><td>Enforces the lifecycle transition.</td></tr><tr><td>6</td><td>Transaction</td><td>Persists state, result, and pending event together.</td></tr><tr><td>7</td><td>Event delivery</td><td>Publishes the event for interested consumers.</td></tr></tbody></table></div><p>Validation and authorization are ordered checks, not parallel branches that later merge. A queue may sit between request submission and worker execution; if it does, the API response describes acceptance and the worker owns eventual execution.</p></section><section class="lesson-section" id="s30"><h3><span class="section-number">30</span>Make one coherent implementation</h3><p>The <a href="#runnable">complete program</a> assembles the command, typed registry, logging decorator, controller, handler, domain rule, and stored-result behavior. Save the embedded source as <code>CommandLesson.java</code>.</p><aside class="note insight"><strong>What the program proves</strong><p>It checks successful shipping, repeat delivery, payload mismatch for a reused key, an illegal lifecycle transition, a missing order, invalid input, missing routing, and duplicate registration.</p></aside><p>The store builds a new immutable snapshot containing the order, result, and event, then replaces one reference inside a synchronized method. That keeps this small in-process model consistent for callers of that store.</p><aside class="note caution"><strong>Scope of the runnable model</strong><p>It has no durable database, broker, external carrier, authentication system, or cross-process lock. Restarting loses its data. Its list of events is not a durable outbox. The constructors represent trusted setup or rehydration; a production API must not expose arbitrary status construction.</p></aside><p>The lesson’s production discussion is therefore a design checklist, not a claim that this in-memory example implements distributed exactly-once effects.</p></section><section class="lesson-section" id="s31"><h3><span class="section-number">31</span>Recognize overengineering</h3><p>An ordinary <code>calculator.add(2, 3)</code> does not need a command, handler, registry, and pipeline merely because those abstractions are available. A direct call can already be validated, logged, or authorized when that is all you need.</p><p>Use Command when giving the <strong>request itself a lifecycle</strong> makes the system clearer: passing it around, queuing it, storing it, scheduling it, replaying it deliberately, or separating its caller from its executor.</p><p>A useful progression is a direct call, then an explicit command with one handler, then an execution boundary when shared policies justify it. A bus is optional. A distributed queue is a separate decision.</p></section><section class="lesson-section" id="s32"><h3><span class="section-number">32</span>Apply the first-principles decision process</h3><ol><li>What concrete requirement is hard with a direct call?</li><li>Must the request exist independently of execution?</li><li>What data identifies the requested action, its input, and a repeat?</li><li>Who decides when it runs, and who owns the business rules?</li><li>What does the caller learn: accepted, completed, or failed?</li><li>If delivery repeats or the process crashes, which effect must remain singular?</li><li>Does an explicit command type make these decisions easier to understand?</li></ol><aside class="note insight"><strong>The lesson to retain</strong><p>Command gives an intention a representation. The hard design work is assigning ownership, defining execution timing, preserving business invariants, and deciding what a retry means.</p></aside></section></article><article class="chapter" id="exercise" aria-labelledby="h-exercise"><header class="chapter-header"><span class="chapter-kicker">Part 09</span><h2 id="h-exercise">Practice: transfer money</h2><p class="premise">Build the boundary before adding a queue.</p></header><p>This is a software-design exercise with an in-memory, single-currency model. Start with <code>BankService.transfer(from, to, cents)</code>, then introduce a command and handler only as the requirements demand.</p><figure class="codebox "><figcaption><span>Java · teaching excerpt</span><button class="copy no-print" data-copy="code-18" type="button">Copy</button></figcaption><pre><code id="code-18" class="language-java">record TransferMoneyCommand(
+    UUID commandId,
+    String fromAccount,
+    String toAccount,
+    long amountInCents
+) implements Command&lt;TransferReceipt&gt; {}
+
+record TransferReceipt(UUID commandId, long amountInCents) {}
+record MoneyTransferred(UUID commandId, String fromAccount,
+                        String toAccount, long amountInCents) {}</code></pre></figure><h3>Your design decisions</h3><div class="table-wrap"><table><thead><tr><th scope="col">Decision</th><th scope="col">Define before implementation</th></tr></thead><tbody><tr><td>Input</td><td>Positive amount, required account IDs, distinct source and destination</td></tr><tr><td>Domain</td><td>No overdraft; checked arithmetic; both accounts use the modeled currency</td></tr><tr><td>Atomicity</td><td>Debit, credit, command result, and event succeed together</td></tr><tr><td>Retry</td><td>Same key + same payload returns one result; changed payload is rejected</td></tr><tr><td>Concurrency</td><td>Competing transfers cannot both spend the same available balance</td></tr><tr><td>API</td><td>Explicitly choose synchronous completion or asynchronous acceptance</td></tr></tbody></table></div><h3>Acceptance criteria</h3><ol><li>The command contains data, with no live service dependencies.</li><li>The handler coordinates the use case; account behavior owns balance invariants.</li><li>A failed debit or credit leaves both balances unchanged.</li><li>A repeated command ID cannot transfer money twice, including concurrent delivery.</li><li>Reusing a command ID with different input fails explicitly.</li><li>Define an explicit message schema and round-trip it through your chosen codec.</li><li><code>MoneyTransferred</code> describes committed success and is emitted once in the local model; distributed consumers tolerate redelivery.</li><li>If you add a queue, make acceptance and completion separately observable.</li></ol><h3>Test cases to write</h3><div class="table-wrap"><table><thead><tr><th scope="col">Case</th><th scope="col">Expected outcome</th></tr></thead><tbody><tr><td>Transfer 250 from balances 1,000 and 100</td><td>Balances 750 and 350; one result and one logical event</td></tr><tr><td>Repeat the same command</td><td>Balances unchanged; original result returned</td></tr><tr><td>Same key, different amount</td><td>Rejected; balances unchanged</td></tr><tr><td>Insufficient funds or overflow</td><td>Rejected; neither account is modified</td></tr><tr><td>Two competing debits exceed the balance</td><td>At most the affordable work succeeds; balance stays valid</td></tr><tr><td>Crash before durable commit / after commit before acknowledgement</td><td>Rollback / retry returns the committed result</td></tr></tbody></table></div><details class="answer"><summary>Reasoning guide · open after designing your solution</summary><div><p>Use one unit of work spanning both accounts and the command result. Inside it, enforce the command key’s uniqueness, compare repeated input, invoke domain operations, and commit a consistent result. Give the accounts private state or immutable values so callers cannot silently skip the balance rules.</p><p>An in-memory lock can model concurrency only within one process. A durable implementation needs database transactions and appropriate locking or conflict detection. External payment networks introduce another boundary; this exercise does not implement those integrations.</p><p>Start by testing the handler and domain synchronously. Add serialization, queue submission, worker acknowledgement, and recovery behavior only after the local contract is clear.</p></div></details><aside class="next"><span class="eyebrow">Next · Builder</span><h3>What if construction becomes the problem?</h3><p>Many optional arguments, order-sensitive setup, and invalid combinations put pressure on object creation. Builder addresses that construction problem; Command addresses the representation of a requested action.</p></aside></article><article class="chapter" id="runnable" aria-labelledby="h-runnable"><header class="chapter-header"><span class="chapter-kicker">Appendix A</span><h2 id="h-runnable">Complete runnable Java example</h2><p class="premise">One source file. Standard library only. No preview features.</p></header><p>Save the source below as <code>CommandLesson.java</code>. Use a JDK 25 installation to compile and run it:</p><figure class="codebox "><figcaption><span>Terminal · run from the directory containing the file</span><button class="copy no-print" data-copy="code-19" type="button">Copy</button></figcaption><pre><code id="code-19" class="language-text">javac --release 25 -Xlint:all -Werror CommandLesson.java
+java CommandLesson</code></pre></figure><p>The <code>--release</code> option selects the target platform API and language level. <a class="cite" href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html" title="Oracle JDK 25: javac options">[3]</a></p><div class="action-row no-print"><button class="download-java" type="button">Download CommandLesson.java</button><button type="button" class="secondary copy-all">Copy complete source</button></div><aside class="note insight"><strong>Verification record</strong><p>The source compiled with all lint checks enabled and warnings treated as errors, and its built-in checks passed on OpenJDK 17.0.20 in the authoring environment. It uses standard features supported by Java 25 and was checked against Oracle’s Java 25 documentation. A Java 25 runtime execution was not available here.</p></aside><p>The program prints START/OK for the first request and its retry, START/FAIL for intentionally rejected controller requests, and ends with <code>All checks passed.</code> The failed requests are expected test cases.</p><figure class="codebox full-source"><figcaption><span>CommandLesson.java · complete source, continues across printed pages</span><button class="copy no-print" data-copy="code-20" type="button">Copy</button></figcaption><pre><code id="code-20" class="language-java">import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Function;
+
+public final class CommandLesson {
+    interface Command&lt;R&gt; {}
+
+    interface CommandHandler&lt;C extends Command&lt;R&gt;, R&gt; {
+        R handle(C command);
+    }
+
+    interface CommandBus {
+        &lt;R&gt; R send(Command&lt;R&gt; command);
+    }
+
+    record ShipmentReceipt(String orderId, String shipmentId) {}
+
+    record ShipOrderCommand(UUID commandId, String orderId)
+            implements Command&lt;ShipmentReceipt&gt; {
+        ShipOrderCommand {
+            Objects.requireNonNull(commandId, &quot;commandId&quot;);
+            if (orderId == null || orderId.isBlank()) {
+                throw new IllegalArgumentException(&quot;orderId is required&quot;);
+            }
+        }
+    }
+
+    static final class SimpleCommandBus implements CommandBus {
+        private final Map&lt;Class&lt;?&gt;, Function&lt;Command&lt;?&gt;, ?&gt;&gt; routes =
+                new HashMap&lt;&gt;();
+
+        &lt;R, C extends Command&lt;R&gt;&gt; void register(
+                Class&lt;C&gt; type, CommandHandler&lt;C, R&gt; handler) {
+            Objects.requireNonNull(type);
+            Objects.requireNonNull(handler);
+            Function&lt;Command&lt;?&gt;, ?&gt; route =
+                    command -&gt; handler.handle(type.cast(command));
+            if (routes.putIfAbsent(type, route) != null) {
+                throw new IllegalStateException(&quot;Handler already registered&quot;);
+            }
+        }
+
+        @Override
+        public &lt;R&gt; R send(Command&lt;R&gt; command) {
+            Objects.requireNonNull(command);
+            var route = routes.get(command.getClass());
+            if (route == null) {
+                throw new IllegalArgumentException(&quot;No handler registered&quot;);
+            }
+            // register() ties each concrete command type to its result type.
+            // The heterogeneous map erases that relationship at lookup.
+            @SuppressWarnings(&quot;unchecked&quot;)
+            R result = (R) route.apply(command);
+            return result;
+        }
+    }
+
+    static final class LoggingCommandBus implements CommandBus {
+        private final CommandBus inner;
+
+        LoggingCommandBus(CommandBus inner) {
+            this.inner = Objects.requireNonNull(inner);
+        }
+
+        @Override
+        public &lt;R&gt; R send(Command&lt;R&gt; command) {
+            String type = command.getClass().getSimpleName();
+            System.out.println(&quot;START &quot; + type);
+            try {
+                R result = inner.send(command);
+                System.out.println(&quot;OK &quot; + type);
+                return result;
+            } catch (RuntimeException failure) {
+                System.out.println(&quot;FAIL &quot; + type);
+                throw failure;
+            }
+        }
+    }
+
+    enum Status { PACKED, SHIPPED, CANCELLED }
+
+    // Immutable aggregate: ship() enforces the rule and returns a new value.
+    record Order(String id, Status status) {
+        Order ship() {
+            if (status != Status.PACKED) {
+                throw new IllegalStateException(&quot;Only packed orders can ship&quot;);
+            }
+            return new Order(id, Status.SHIPPED);
+        }
+    }
+
+    record OrderShipped(UUID commandId, String orderId,
+                        String shipmentId) {}
+    record Completed(ShipOrderCommand command, ShipmentReceipt receipt) {}
+
+    interface ShippingUnitOfWork {
+        ShipmentReceipt shipOnce(ShipOrderCommand command);
+    }
+
+    // Local teaching model: one JVM, no database or carrier API.
+    // Each snapshot holds the domain update, deduplication result and event.
+    static final class InMemoryShipping implements ShippingUnitOfWork {
+        record Snapshot(Map&lt;String, Order&gt; orders,
+                        Map&lt;UUID, Completed&gt; completed,
+                        List&lt;OrderShipped&gt; events) {}
+
+        private Snapshot snapshot;
+
+        InMemoryShipping(Order... initialOrders) {
+            Map&lt;String, Order&gt; orders = new HashMap&lt;&gt;();
+            for (Order order : initialOrders) {
+                if (orders.putIfAbsent(order.id(), order) != null) {
+                    throw new IllegalArgumentException(&quot;Duplicate order&quot;);
+                }
+            }
+            snapshot = new Snapshot(Map.copyOf(orders), Map.of(), List.of());
+        }
+
+        @Override
+        public synchronized ShipmentReceipt shipOnce(ShipOrderCommand command) {
+            Completed prior = snapshot.completed().get(command.commandId());
+            if (prior != null) {
+                if (!prior.command().equals(command)) {
+                    throw new IllegalArgumentException(
+                            &quot;commandId reused with different payload&quot;);
+                }
+                return prior.receipt();
+            }
+
+            Order order = snapshot.orders().get(command.orderId());
+            if (order == null) {
+                throw new IllegalArgumentException(&quot;Order not found&quot;);
+            }
+            Order shipped = order.ship();
+            var receipt = new ShipmentReceipt(order.id(),
+                    &quot;SHIP-&quot; + command.commandId());
+            var event = new OrderShipped(command.commandId(),
+                    order.id(), receipt.shipmentId());
+
+            var orders = new HashMap&lt;&gt;(snapshot.orders());
+            var completed = new HashMap&lt;&gt;(snapshot.completed());
+            var events = new ArrayList&lt;&gt;(snapshot.events());
+            orders.put(order.id(), shipped);
+            completed.put(command.commandId(), new Completed(command, receipt));
+            events.add(event);
+
+            // Prepare everything first; publish one immutable snapshot.
+            snapshot = new Snapshot(Map.copyOf(orders),
+                    Map.copyOf(completed), List.copyOf(events));
+            return receipt;
+        }
+
+        synchronized Status status(String orderId) {
+            return snapshot.orders().get(orderId).status();
+        }
+
+        synchronized int eventCount() {
+            return snapshot.events().size();
+        }
+    }
+
+    static final class ShipOrderHandler
+            implements CommandHandler&lt;ShipOrderCommand, ShipmentReceipt&gt; {
+        private final ShippingUnitOfWork shipping;
+
+        ShipOrderHandler(ShippingUnitOfWork shipping) {
+            this.shipping = Objects.requireNonNull(shipping);
+        }
+
+        @Override
+        public ShipmentReceipt handle(ShipOrderCommand command) {
+            return shipping.shipOnce(command);
+        }
+    }
+
+    static final class OrderController {
+        private final CommandBus bus;
+
+        OrderController(CommandBus bus) {
+            this.bus = Objects.requireNonNull(bus);
+        }
+
+        ShipmentReceipt ship(UUID commandId, String orderId) {
+            return bus.send(new ShipOrderCommand(commandId, orderId));
+        }
+    }
+
+    static void check(boolean condition, String description) {
+        if (!condition) {
+            throw new AssertionError(description);
+        }
+    }
+
+    static void rejects(Class&lt;? extends RuntimeException&gt; expected,
+                        Runnable action) {
+        try {
+            action.run();
+        } catch (RuntimeException failure) {
+            if (expected.isInstance(failure)) {
+                return;
+            }
+            throw new AssertionError(&quot;Wrong exception&quot;, failure);
+        }
+        throw new AssertionError(&quot;Expected &quot; + expected.getSimpleName());
+    }
+
+    record Unregistered() implements Command&lt;String&gt; {}
+
+    public static void main(String[] args) {
+        var store = new InMemoryShipping(
+                new Order(&quot;O123&quot;, Status.PACKED),
+                new Order(&quot;O456&quot;, Status.PACKED),
+                new Order(&quot;O999&quot;, Status.CANCELLED));
+        var handler = new ShipOrderHandler(store);
+        var routes = new SimpleCommandBus();
+        routes.register(ShipOrderCommand.class, handler);
+        var controller = new OrderController(new LoggingCommandBus(routes));
+
+        UUID id = UUID.fromString(&quot;00000000-0000-0000-0000-000000000001&quot;);
+        ShipmentReceipt first = controller.ship(id, &quot;O123&quot;);
+        ShipmentReceipt retry = controller.ship(id, &quot;O123&quot;);
+        check(first.equals(retry), &quot;Retry returns the stored result&quot;);
+        check(store.status(&quot;O123&quot;) == Status.SHIPPED, &quot;Order shipped&quot;);
+        check(store.eventCount() == 1, &quot;Retry adds no second event&quot;);
+
+        rejects(IllegalArgumentException.class,
+                () -&gt; controller.ship(id, &quot;O456&quot;));
+        check(store.status(&quot;O456&quot;) == Status.PACKED, &quot;No payload substitution&quot;);
+        rejects(IllegalStateException.class,
+                () -&gt; controller.ship(UUID.randomUUID(), &quot;O999&quot;));
+        rejects(IllegalStateException.class,
+                () -&gt; controller.ship(UUID.randomUUID(), &quot;O123&quot;));
+        rejects(IllegalArgumentException.class,
+                () -&gt; controller.ship(UUID.randomUUID(), &quot;MISSING&quot;));
+        check(store.eventCount() == 1, &quot;Rejected requests add no event&quot;);
+        rejects(IllegalArgumentException.class,
+                () -&gt; new ShipOrderCommand(id, &quot; &quot;));
+        rejects(NullPointerException.class,
+                () -&gt; new ShipOrderCommand(null, &quot;O123&quot;));
+        rejects(IllegalArgumentException.class,
+                () -&gt; routes.send(new Unregistered()));
+        rejects(IllegalStateException.class,
+                () -&gt; routes.register(ShipOrderCommand.class, handler));
+        System.out.println(&quot;All checks passed.&quot;);
+    }
+}</code></pre></figure></article><article class="chapter" id="references" aria-labelledby="h-references"><header class="chapter-header"><span class="chapter-kicker">Appendix B</span><h2 id="h-references">Official references and quick recall</h2><p class="premise">Sources are optional reading; the guide itself works offline.</p></header><div class="table-wrap"><table><thead><tr><th scope="col">Term</th><th scope="col">Keep this meaning</th></tr></thead><tbody><tr><td>Command</td><td>An explicit request to attempt an operation</td></tr><tr><td>Handler</td><td>The component coordinating that use case</td></tr><tr><td>Receiver / domain</td><td>The object that performs work or enforces its rules</td></tr><tr><td>Bus</td><td>An optional execution and routing boundary</td></tr><tr><td>Event</td><td>A fact about a defined completed change</td></tr><tr><td>Idempotent handling</td><td>Repeating the same request adds no extra business effect</td></tr><tr><td>Compensation</td><td>A new business action addressing an earlier effect</td></tr></tbody></table></div><ol class="sources"><li id="ref1"><a href="https://learn.microsoft.com/en-us/archive/msdn-magazine/2004/september/distributed-system-design-using-command-pattern-msmq-and-net">Microsoft Learn: Command pattern structure and undo</a><span class="source-url">https://learn.microsoft.com/en-us/archive/msdn-magazine/2004/september/distributed-system-design-using-command-pattern-msmq-and-net</span></li><li id="ref2"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle Java 25: Record classes</a><span class="source-url">https://docs.oracle.com/en/java/javase/25/language/records.html</span></li><li id="ref3"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Oracle JDK 25: javac options</a><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li><li id="ref4"><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-15.3.3">RFC 9110, section 15.3.3: 202 Accepted</a><span class="source-url">https://www.rfc-editor.org/rfc/rfc9110.html#section-15.3.3</span></li><li id="ref5"><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS Prescriptive Guidance: Transactional outbox</a><span class="source-url">https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html</span></li><li id="ref6"><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html">OWASP: Authorization Cheat Sheet</a><span class="source-url">https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html</span></li><li id="ref7"><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction">Microsoft Learn: Compensating transaction</a><span class="source-url">https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction</span></li><li id="ref8"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html#cast(java.lang.Object)">Oracle Java 25 API: Class.cast</a><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html#cast(java.lang.Object)</span></li></ol><p>Adapted from the supplied Lesson 7. The 32-step progression, shipping example, pattern comparisons, transfer exercise, and transition to Builder are retained. Java examples are original adaptations; infrastructure guarantees are explicitly separated from the teaching model.</p><p class="colophon">DP · Design patterns from first principles · Lesson 7 · Java 25-compatible edition · 1 September 2026</p></article></main></div><div class="status-toast no-print" id="toast" role="status" aria-live="polite"></div><script id="java-source" type="text/plain">import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Function;
+
+public final class CommandLesson {
+    interface Command<R> {}
+
+    interface CommandHandler<C extends Command<R>, R> {
+        R handle(C command);
+    }
+
+    interface CommandBus {
+        <R> R send(Command<R> command);
+    }
+
+    record ShipmentReceipt(String orderId, String shipmentId) {}
+
+    record ShipOrderCommand(UUID commandId, String orderId)
+            implements Command<ShipmentReceipt> {
+        ShipOrderCommand {
+            Objects.requireNonNull(commandId, "commandId");
+            if (orderId == null || orderId.isBlank()) {
+                throw new IllegalArgumentException("orderId is required");
+            }
+        }
+    }
+
+    static final class SimpleCommandBus implements CommandBus {
+        private final Map<Class<?>, Function<Command<?>, ?>> routes =
+                new HashMap<>();
+
+        <R, C extends Command<R>> void register(
+                Class<C> type, CommandHandler<C, R> handler) {
+            Objects.requireNonNull(type);
+            Objects.requireNonNull(handler);
+            Function<Command<?>, ?> route =
+                    command -> handler.handle(type.cast(command));
+            if (routes.putIfAbsent(type, route) != null) {
+                throw new IllegalStateException("Handler already registered");
+            }
+        }
+
+        @Override
+        public <R> R send(Command<R> command) {
+            Objects.requireNonNull(command);
+            var route = routes.get(command.getClass());
+            if (route == null) {
+                throw new IllegalArgumentException("No handler registered");
+            }
+            // register() ties each concrete command type to its result type.
+            // The heterogeneous map erases that relationship at lookup.
+            @SuppressWarnings("unchecked")
+            R result = (R) route.apply(command);
+            return result;
+        }
+    }
+
+    static final class LoggingCommandBus implements CommandBus {
+        private final CommandBus inner;
+
+        LoggingCommandBus(CommandBus inner) {
+            this.inner = Objects.requireNonNull(inner);
+        }
+
+        @Override
+        public <R> R send(Command<R> command) {
+            String type = command.getClass().getSimpleName();
+            System.out.println("START " + type);
+            try {
+                R result = inner.send(command);
+                System.out.println("OK " + type);
+                return result;
+            } catch (RuntimeException failure) {
+                System.out.println("FAIL " + type);
+                throw failure;
+            }
+        }
+    }
+
+    enum Status { PACKED, SHIPPED, CANCELLED }
+
+    // Immutable aggregate: ship() enforces the rule and returns a new value.
+    record Order(String id, Status status) {
+        Order ship() {
+            if (status != Status.PACKED) {
+                throw new IllegalStateException("Only packed orders can ship");
+            }
+            return new Order(id, Status.SHIPPED);
+        }
+    }
+
+    record OrderShipped(UUID commandId, String orderId,
+                        String shipmentId) {}
+    record Completed(ShipOrderCommand command, ShipmentReceipt receipt) {}
+
+    interface ShippingUnitOfWork {
+        ShipmentReceipt shipOnce(ShipOrderCommand command);
+    }
+
+    // Local teaching model: one JVM, no database or carrier API.
+    // Each snapshot holds the domain update, deduplication result and event.
+    static final class InMemoryShipping implements ShippingUnitOfWork {
+        record Snapshot(Map<String, Order> orders,
+                        Map<UUID, Completed> completed,
+                        List<OrderShipped> events) {}
+
+        private Snapshot snapshot;
+
+        InMemoryShipping(Order... initialOrders) {
+            Map<String, Order> orders = new HashMap<>();
+            for (Order order : initialOrders) {
+                if (orders.putIfAbsent(order.id(), order) != null) {
+                    throw new IllegalArgumentException("Duplicate order");
+                }
+            }
+            snapshot = new Snapshot(Map.copyOf(orders), Map.of(), List.of());
+        }
+
+        @Override
+        public synchronized ShipmentReceipt shipOnce(ShipOrderCommand command) {
+            Completed prior = snapshot.completed().get(command.commandId());
+            if (prior != null) {
+                if (!prior.command().equals(command)) {
+                    throw new IllegalArgumentException(
+                            "commandId reused with different payload");
+                }
+                return prior.receipt();
+            }
+
+            Order order = snapshot.orders().get(command.orderId());
+            if (order == null) {
+                throw new IllegalArgumentException("Order not found");
+            }
+            Order shipped = order.ship();
+            var receipt = new ShipmentReceipt(order.id(),
+                    "SHIP-" + command.commandId());
+            var event = new OrderShipped(command.commandId(),
+                    order.id(), receipt.shipmentId());
+
+            var orders = new HashMap<>(snapshot.orders());
+            var completed = new HashMap<>(snapshot.completed());
+            var events = new ArrayList<>(snapshot.events());
+            orders.put(order.id(), shipped);
+            completed.put(command.commandId(), new Completed(command, receipt));
+            events.add(event);
+
+            // Prepare everything first; publish one immutable snapshot.
+            snapshot = new Snapshot(Map.copyOf(orders),
+                    Map.copyOf(completed), List.copyOf(events));
+            return receipt;
+        }
+
+        synchronized Status status(String orderId) {
+            return snapshot.orders().get(orderId).status();
+        }
+
+        synchronized int eventCount() {
+            return snapshot.events().size();
+        }
+    }
+
+    static final class ShipOrderHandler
+            implements CommandHandler<ShipOrderCommand, ShipmentReceipt> {
+        private final ShippingUnitOfWork shipping;
+
+        ShipOrderHandler(ShippingUnitOfWork shipping) {
+            this.shipping = Objects.requireNonNull(shipping);
+        }
+
+        @Override
+        public ShipmentReceipt handle(ShipOrderCommand command) {
+            return shipping.shipOnce(command);
+        }
+    }
+
+    static final class OrderController {
+        private final CommandBus bus;
+
+        OrderController(CommandBus bus) {
+            this.bus = Objects.requireNonNull(bus);
+        }
+
+        ShipmentReceipt ship(UUID commandId, String orderId) {
+            return bus.send(new ShipOrderCommand(commandId, orderId));
+        }
+    }
+
+    static void check(boolean condition, String description) {
+        if (!condition) {
+            throw new AssertionError(description);
+        }
+    }
+
+    static void rejects(Class<? extends RuntimeException> expected,
+                        Runnable action) {
+        try {
+            action.run();
+        } catch (RuntimeException failure) {
+            if (expected.isInstance(failure)) {
+                return;
+            }
+            throw new AssertionError("Wrong exception", failure);
+        }
+        throw new AssertionError("Expected " + expected.getSimpleName());
+    }
+
+    record Unregistered() implements Command<String> {}
+
+    public static void main(String[] args) {
+        var store = new InMemoryShipping(
+                new Order("O123", Status.PACKED),
+                new Order("O456", Status.PACKED),
+                new Order("O999", Status.CANCELLED));
+        var handler = new ShipOrderHandler(store);
+        var routes = new SimpleCommandBus();
+        routes.register(ShipOrderCommand.class, handler);
+        var controller = new OrderController(new LoggingCommandBus(routes));
+
+        UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        ShipmentReceipt first = controller.ship(id, "O123");
+        ShipmentReceipt retry = controller.ship(id, "O123");
+        check(first.equals(retry), "Retry returns the stored result");
+        check(store.status("O123") == Status.SHIPPED, "Order shipped");
+        check(store.eventCount() == 1, "Retry adds no second event");
+
+        rejects(IllegalArgumentException.class,
+                () -> controller.ship(id, "O456"));
+        check(store.status("O456") == Status.PACKED, "No payload substitution");
+        rejects(IllegalStateException.class,
+                () -> controller.ship(UUID.randomUUID(), "O999"));
+        rejects(IllegalStateException.class,
+                () -> controller.ship(UUID.randomUUID(), "O123"));
+        rejects(IllegalArgumentException.class,
+                () -> controller.ship(UUID.randomUUID(), "MISSING"));
+        check(store.eventCount() == 1, "Rejected requests add no event");
+        rejects(IllegalArgumentException.class,
+                () -> new ShipOrderCommand(id, " "));
+        rejects(NullPointerException.class,
+                () -> new ShipOrderCommand(null, "O123"));
+        rejects(IllegalArgumentException.class,
+                () -> routes.send(new Unregistered()));
+        rejects(IllegalStateException.class,
+                () -> routes.register(ShipOrderCommand.class, handler));
+        System.out.println("All checks passed.");
+    }
+}
+</script><script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  let toastTimer;
+  function tell(message) {
+    $('toast').textContent = message;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $('toast').textContent = ''; }, 3000);
+  }
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.style.cssText = 'position:fixed;left:-10000px;top:0';
+        document.body.appendChild(area);
+        area.select();
+        const copied = document.execCommand('copy');
+        area.remove();
+        if (!copied) throw new Error('Clipboard unavailable');
+      }
+      tell('Code copied.');
+    } catch (_) { tell('Clipboard unavailable. Select the code and copy it manually.'); }
+  }
+  document.querySelectorAll('[data-copy]').forEach(button => {
+    button.addEventListener('click', () => copyText($(button.dataset.copy).textContent));
+  });
+  document.querySelectorAll('.copy-all').forEach(button => {
+    button.addEventListener('click', () => copyText($('java-source').textContent.trim() + '\n'));
+  });
+  document.querySelectorAll('.download-java').forEach(button => {
+    button.addEventListener('click', () => {
+      const blob = new Blob([$('java-source').textContent.trim() + '\n'], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'CommandLesson.java';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    });
+  });
+  const opened = [];
+  window.addEventListener('beforeprint', () => {
+    document.querySelectorAll('details').forEach(details => {
+      if (!details.open) { opened.push(details); details.open = true; }
+    });
+  });
+  window.addEventListener('afterprint', () => { while(opened.length) opened.pop().open = false; });
+  document.querySelectorAll('.print-button').forEach(button => button.addEventListener('click', () => window.print()));
+  const chapterNodes = [...document.querySelectorAll('.chapter')];
+  const navLinks = [...document.querySelectorAll('.side-nav a')];
+  function updateProgress() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    $('progress').style.width = (max > 0 ? Math.min(100, window.scrollY/max*100) : 100) + '%';
+    let active = '';
+    chapterNodes.forEach(chapter => { if(chapter.getBoundingClientRect().top < 180) active = chapter.id; });
+    navLinks.forEach(link => link.setAttribute('aria-current', String(link.hash === '#' + active)));
+  }
+  window.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+  let storedOrder = null;
+  function submit(orderId) {
+    $('lab-retry').disabled = false;
+    $('lab-conflict').disabled = false;
+    if(storedOrder === null) {
+      storedOrder = orderId;
+      $('lab-count').textContent = '1 shipment';
+      $('lab-message').textContent = 'C1 / ' + orderId + ' completed. Its result is stored.';
+    } else if(storedOrder === orderId) {
+      $('lab-message').textContent = 'Same ID and payload: stored result returned. No additional shipment.';
+    } else {
+      $('lab-message').textContent = 'Rejected: C1 is already bound to ' + storedOrder + '. No additional shipment.';
+    }
+  }
+  $('lab-send').addEventListener('click', () => submit('O123'));
+  $('lab-retry').addEventListener('click', () => submit('O123'));
+  $('lab-conflict').addEventListener('click', () => submit('O456'));
+  $('lab-reset').addEventListener('click', () => {
+    storedOrder = null;
+    $('lab-retry').disabled = true;
+    $('lab-conflict').disabled = true;
+    $('lab-count').textContent = '0 shipments';
+    $('lab-message').textContent = 'No command has executed.';
+  });
+})();
+</script></body></html>

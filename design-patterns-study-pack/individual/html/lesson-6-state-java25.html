@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 6: State, from first principles to Java 25-compatible implementations, transition tests, persistence, concurrency, and events."><title>Lesson 6 — State | Java 25 guide</title><style>
+:root { color-scheme: light; --ink:#1d2b34; --muted:#50616a; --accent:#166b63; --line:#d9e2df; --paper:#ffffff; --wash:#f3f7f5; --code:#f4f6f8; --warn:#865d16; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:24px; }
+body { margin:0; color:var(--ink); background:#edf2f0; font:17px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+main { max-width:1040px; margin:32px auto; background:var(--paper); padding:64px 76px; box-shadow:0 12px 50px #273b3210; }
+a { color:#115f6e; text-underline-offset:3px; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+button { font:inherit; border:1px solid #8eaaa5; background:white; color:#1f4f49; padding:8px 16px; border-radius:5px; cursor:pointer; }
+button:hover { background:#edf5f2; }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline:3px solid #31897e; outline-offset:4px; }
+[hidden] { display:none !important; }
+.skip { position:absolute; left:12px; top:-70px; padding:12px; background:white; }
+.skip:focus { top:12px; }
+.eyebrow { font-size:12px; letter-spacing:.15em; text-transform:uppercase; font-weight:750; color:var(--accent); margin:0 0 16px; }
+h1,h2,h3,h4 { line-height:1.22; color:#193a3c; }
+h1 { font-family:Georgia,"Times New Roman",serif; font-size:76px; font-weight:400; letter-spacing:-.055em; margin:16px 0 4px; }
+.subtitle { font-family:Georgia,"Times New Roman",serif; font-size:35px; line-height:1.24; max-width:640px; margin:0 0 24px; color:#2b4d4e; }
+.lede { font-size:20px; max-width:730px; margin:0 0 26px; }
+.hero { border-top:5px solid var(--accent); padding-top:28px; }
+.meta { display:flex; flex-wrap:wrap; gap:8px 20px; font-size:13px; color:var(--muted); margin:20px 0; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 6px; }
+.toolbar button { background:var(--accent); color:white; border-color:var(--accent); }
+.small { font-size:13px; color:var(--muted); }
+.keyline { margin:30px 0; padding:20px 24px; border-left:4px solid var(--accent); background:var(--wash); font:22px/1.45 Georgia,serif; }
+nav { border-block:1px solid var(--line); padding:24px 0; margin:32px 0 52px; }
+nav h2 { font-size:18px; margin:0 0 14px; }
+.contents { display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; margin:0; padding:0; list-style:none; }
+.contents a { text-decoration:none; display:block; font-size:15px; }
+.contents span { color:var(--muted); display:block; font-size:12px; margin-top:2px; }
+.chapter { margin-top:60px; }
+.chapter-heading { border-top:2px solid var(--line); padding-top:24px; margin-bottom:30px; }
+.chapter-heading .eyebrow { margin-bottom:8px; }
+h2 { font:400 37px/1.2 Georgia,serif; margin:0 0 12px; letter-spacing:-.025em; }
+.lesson-section { margin:38px 0 48px; }
+h3 { display:flex; align-items:baseline; gap:13px; font-size:22px; font-weight:650; margin:30px 0 18px; }
+.number { flex-shrink:0; color:var(--accent); font:500 14px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace; }
+h4 { font-size:19px; margin:0 0 10px; }
+p { margin:12px 0 18px; }
+strong { font-weight:700; }
+code { font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace; font-size:.87em; overflow-wrap:anywhere; }
+p code,td code,li code { background:#eef3f3; padding:1px 4px; border-radius:3px; }
+.code { margin:22px 0; border:1px solid #dce3e6; border-radius:5px; overflow:clip; }
+figcaption { background:#eaf0f2; border-bottom:1px solid #dce3e6; color:#41585f; padding:7px 16px; font-size:11px; letter-spacing:.035em; }
+pre { background:var(--code); margin:0; padding:18px; font-size:13px; line-height:1.6; tab-size:4; white-space:pre-wrap; overflow-wrap:anywhere; }
+pre code { font-size:inherit; background:none; padding:0; border:0; }
+.kw { color:#315c93; font-weight:600; }
+.str { color:#795228; }
+.comment { color:#596c64; }
+.table-wrap { margin:22px 0; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:14px; line-height:1.5; }
+caption { text-align:left; color:var(--muted); font-size:12px; padding-bottom:10px; }
+th,td { padding:11px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+thead th { color:#255652; background:#eff5f2; font-weight:650; }
+tbody th { font-weight:600; }
+.matrix th,.matrix td { font-size:12px; padding:10px 7px; }
+.matrix tr[data-active="true"] { background:#e7f3ef; }
+.callout { background:var(--wash); border-left:3px solid var(--accent); padding:18px 22px; margin:24px 0; }
+.callout>strong { color:#245951; display:block; font-size:15px; }
+.callout p { margin:7px 0 0; font-size:15px; }
+.callout.caution { background:#fff8eb; border-color:#b28a3b; }
+.callout.caution>strong { color:#705119; }
+.ref { white-space:nowrap; font-size:.82em; text-decoration:none; font-weight:600; }
+.checklist { padding-left:24px; }
+.checklist li { padding-left:6px; margin:12px 0; }
+.explorer { padding:22px; margin:24px 0; border:1px solid #b8d3ca; border-radius:7px; background:#f7fbf8; }
+.explorer .current { font-size:20px; }
+.actions { display:flex; gap:8px; flex-wrap:wrap; }
+.actions button { font-size:14px; padding:7px 13px; }
+.actions .quiet { border-color:transparent; text-decoration:underline; background:transparent; }
+#transition-result { font-size:15px; font-weight:550; min-height:2em; }
+#transition-result.rejected { color:#88422f; }
+#history { font-size:13px; padding-left:20px; }
+.answer { border-block:1px solid var(--line); margin:30px 0; padding:15px 0; }
+summary { cursor:pointer; color:var(--accent); font-weight:650; }
+.answer-content { margin-top:18px; }
+.next-lesson { padding:28px; background:var(--wash); margin:50px 0; }
+.next-lesson h2 { font-size:29px; }
+.references ol { padding-left:24px; }
+.references li { margin:22px 0; padding-left:7px; font-size:14px; }
+.references li>a { font-weight:650; }
+.references li p { font-size:13px; margin:4px 0; }
+.print-url { display:block; font:11px/1.5 ui-monospace,monospace; color:var(--muted); overflow-wrap:anywhere; }
+.download { margin:5px 0; }
+footer { border-top:1px solid var(--line); padding-top:20px; margin-top:45px; color:var(--muted); font-size:12px; }
+@media(max-width:800px) {
+ body { font-size:16px; background:white; }
+ main { padding:32px 28px; margin:0; box-shadow:none; }
+ h1 { font-size:64px; } h2 { font-size:32px; } h3 { font-size:20px; }
+ .subtitle { font-size:29px; }
+ .contents { grid-template-columns:1fr; }
+ pre { font-size:12px; padding:14px; }
+}
+@media(max-width:450px) {
+ main { padding:24px 18px; }
+ h1 { font-size:56px; } h2 { font-size:29px; }
+ .subtitle { font-size:27px; } .lede { font-size:18px; }
+ .chapter { margin-top:44px; }
+ th,td { padding:9px 8px; }
+ .matrix { min-width:570px; }
+ .callout,.explorer,.next-lesson { padding:16px; }
+}
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@page { size:A4; margin:16mm 15mm 18mm; @bottom-left { content:"DP / Lesson 6 / State"; font:8pt sans-serif; color:#56686a; } @bottom-right { content:counter(page); font:8pt sans-serif; color:#56686a; } }
+@media print {
+ html { scroll-behavior:auto; }
+ body { background:white; font:10.2pt/1.5 Arial,sans-serif; color:#162a30; }
+ main { margin:0; padding:0; width:auto; max-width:none; box-shadow:none; }
+ .screen-only,.skip { display:none !important; }
+ .hero { padding-top:7mm; border-top-width:1.1mm; }
+ h1 { font-size:55pt; margin:3mm 0 1mm; }
+ .subtitle { font-size:25pt; margin:0 0 5mm; }
+ .lede { font-size:13pt; }
+ .eyebrow { font-size:8pt; margin-bottom:3mm; }
+ .meta { font-size:8.5pt; gap:5mm; }
+ .keyline { font-size:15pt; padding:5mm; margin:6mm 0; }
+ nav { margin:7mm 0 0; padding:5mm 0; }
+ nav h2 { font:600 11pt Arial,sans-serif; }
+ .contents { display:grid; grid-template-columns:1fr 1fr; gap:3mm 6mm; }
+ .contents a { font-size:9pt; } .contents span { font-size:8pt; }
+ .chapter { break-before:auto; margin:7mm 0 0; }
+ #part-1,#references { break-before:page; margin:0; }
+ .chapter-heading { padding-top:3mm; margin-bottom:6mm; break-inside:avoid; break-after:avoid; }
+ h2 { font-size:24pt; }
+ h3 { font-size:14pt; margin:7mm 0 3mm; gap:3mm; }
+ h4 { font-size:12pt; }
+ .number { font-size:9pt; }
+ .lesson-section { margin:0 0 7mm; }
+ p { margin:2.5mm 0 4mm; orphans:3; widows:3; }
+ h1,h2,h3,h4,figcaption,caption,summary { break-after:avoid; }
+ .code { border-radius:0; overflow:visible; margin:4mm 0; break-inside:avoid; }
+ .code.source-part { break-inside:auto; }
+ .source-part pre { line-height:1.35; padding:3mm; }
+ pre { font-size:8.3pt; line-height:1.42; padding:3.5mm; white-space:pre-wrap; overflow-wrap:anywhere; }
+ figcaption { padding:1.5mm 3.5mm; font-size:7.2pt; }
+ .kw { font-weight:600; }
+ .table-wrap { overflow:visible; margin:4mm 0; break-inside:avoid; }
+ table { font-size:9pt; }
+ .matrix { min-width:0; }
+ .matrix th,.matrix td { font-size:8pt; padding:2.1mm 1.6mm; }
+ th,td { padding:2.4mm; }
+ caption { font-size:8pt; }
+ thead { display:table-header-group; }
+ tr { break-inside:avoid; }
+ .callout { padding:3.5mm 4mm; margin:4mm 0; break-inside:avoid; }
+ .callout>strong,.callout p { font-size:9.2pt; }
+ .checklist li { margin:2.5mm 0; }
+ .answer { break-inside:avoid; margin:3mm 0; padding:2mm 0; }
+ details::details-content { display:block !important; content-visibility:visible !important; height:auto !important; }
+ details>* { display:block; }
+ summary { list-style:none; }
+ .next-lesson { margin:3mm 0 0; padding:3.5mm; break-inside:avoid; }
+ .next-lesson p { margin:2mm 0; font-size:9.5pt; }
+ .next-lesson h2 { font-size:19pt; }
+ .references li { font-size:9.5pt; margin:2mm 0; break-inside:avoid; }
+ .references .verification { margin:3mm 0; padding:2.5mm 3mm; }
+ .references li p { font-size:8.7pt; }
+ .print-url { font-size:7.2pt; }
+ .small,footer { font-size:8.5pt; }
+ footer { display:none; }
+ a { color:#174f5c; text-decoration:none; }
+ * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style></head><body><a href="#part-1" class="skip">Skip to the lesson</a><main>
+<header class="hero"><p class="eyebrow">DP / Design patterns / Lesson 06</p><h1>State</h1><p class="subtitle">Behavior follows the lifecycle.</p><p class="lede">The same object receives the same operation. What it may do depends on its current state.</p><div class="meta"><span>Java 25-compatible</span><span>No external dependencies</span><span>Self-contained / light theme</span></div><div class="keyline">Start with an invalid transition. Discover the rules. Introduce state objects only when the behavior needs them.</div><div class="toolbar screen-only"><button id="print-guide" type="button" hidden>Print / Save as PDF</button></div><p class="small">Read in order, or use the section links below. For PDF: print in portrait at 100% scale; turn off browser headers and footers. All lesson text and Java listings are included in this file.</p></header>
+<nav aria-label="Contents"><h2>Inside the guide</h2><ol class="contents"><li><a href="#part-1">1. Find the modeling problem<span>Sections 01–05 · status, rules, pressure</span></a></li><li><a href="#part-2">2. Build State in Java<span>Sections 06–10 · context and six states</span></a></li><li><a href="#part-3">3. Understand the alternatives<span>Sections 11–15 · intent, matrix, enum switch</span></a></li><li><a href="#part-4">4. Model data and verify behavior<span>Sections 16–20 · sealed records, tests, persistence</span></a></li><li><a href="#part-5">5. Cross the production boundary<span>Sections 21–27 · conflicts, effects, events</span></a></li><li><a href="#exercise">6. Practice with a ticket lifecycle<span>Worksheet, acceptance criteria, answer table</span></a></li><li><a href="#appendix">Appendix A · runnable Java<span>Complete source and transition tests</span></a></li><li><a href="#references">Official references<span>Language rules and architecture sources</span></a></li></ol></nav><section class="chapter" id="part-1"><div class="chapter-heading"><p class="eyebrow">Part 1</p><h2>Find the modeling problem</h2></div><section class="lesson-section" id="s1"><h3><span class="number">01</span>Start with the simplest implementation</h3><p>An order has a status. The first version treats operations as assignments:</p><figure class="code "><figcaption>Java • deliberately unsafe starting point</figcaption><pre><code><span class="kw">enum</span> Status {
+    CREATED, PAID, PACKED, SHIPPED, DELIVERED, CANCELLED
+}
+
+<span class="kw">final</span> <span class="kw">class</span> NaiveOrder {
+    Status status = Status.CREATED;
+
+    <span class="kw">void</span> pay() { status = Status.PAID; }
+    <span class="kw">void</span> ship() { status = Status.SHIPPED; }
+    <span class="kw">void</span> cancel() { status = Status.CANCELLED; }
+}</code></pre></figure><figure class="code "><figcaption>Java • excerpt</figcaption><pre><code>NaiveOrder order = <span class="kw">new</span> NaiveOrder();
+order.ship(); <span class="comment">// CREATED becomes SHIPPED without payment or packing.</span></code></pre></figure><p>The code compiles, but the business rule is broken. A status label tells us where the object is. It does not say how the object may get there.</p></section><section class="lesson-section" id="s2"><h3><span class="number">02</span>Ask what defines the lifecycle</h3><p>A lifecycle needs <strong>states and legal transitions</strong>. For this lesson, the order follows the rules below. They are teaching rules, not universal commerce rules.</p><div class="table-wrap"><table class=""><caption>The lifecycle contract</caption><thead><tr><th scope="col">Current state</th><th scope="col">Operation</th><th scope="col">Next state</th></tr></thead><tbody><tr><th scope="row">Created</th><td><code>pay()</code></td><td>Paid</td></tr><tr><th scope="row">Paid</th><td><code>pack()</code></td><td>Packed</td></tr><tr><th scope="row">Packed</th><td><code>ship()</code></td><td>Shipped</td></tr><tr><th scope="row">Shipped</th><td><code>deliver()</code></td><td>Delivered</td></tr><tr><th scope="row">Created, Paid, or Packed</th><td><code>cancel()</code></td><td>Cancelled</td></tr></tbody></table></div><p>Delivered and Cancelled are terminal states in this model. All unlisted operations, including repeated operations, fail explicitly. Cancellation after shipment is prohibited; a returns process would be a separate model.</p><aside class="callout principle"><strong>First principle</strong><p>The important object is the state machine: a set of states plus the rules that connect them.</p></aside></section><section class="lesson-section" id="s3"><h3><span class="number">03</span>Protect the rules with simple checks</h3><figure class="code "><figcaption>Java • partial lifecycle, using the Status enum above</figcaption><pre><code><span class="kw">final</span> <span class="kw">class</span> GuardedOrder {
+    <span class="kw">private</span> Status status = Status.CREATED;
+
+    Status status() { <span class="kw">return</span> status; }
+
+    <span class="kw">void</span> pay() {
+        require(Status.CREATED, <span class="str">&quot;pay&quot;</span>);
+        status = Status.PAID;
+    }
+
+    <span class="kw">void</span> pack() {
+        require(Status.PAID, <span class="str">&quot;pack&quot;</span>);
+        status = Status.PACKED;
+    }
+
+    <span class="kw">void</span> ship() {
+        require(Status.PACKED, <span class="str">&quot;ship&quot;</span>);
+        status = Status.SHIPPED;
+    }
+
+    <span class="kw">private</span> <span class="kw">void</span> require(Status expected, String operation) {
+        <span class="kw">if</span> (status != expected) {
+            <span class="kw">throw</span> <span class="kw">new</span> IllegalStateException(
+                <span class="str">&quot;Cannot &quot;</span> + operation + <span class="str">&quot; order in &quot;</span> + status);
+        }
+    }
+}</code></pre></figure><p>Now an unpaid order cannot ship, and callers cannot directly assign its status. This is already a useful design.</p><aside class="callout principle"><strong>Do not introduce State objects yet</strong><p>A few explicit checks can be clearer than a class hierarchy. Keep the smallest representation that makes the rules easy to see.</p></aside></section><section class="lesson-section" id="s4"><h3><span class="number">04</span>Wait for real pressure</h3><p>Cancellation starts to vary by state. Created orders need no refund. Paid orders need a refund. Packed orders need inventory released before the refund. We assume packing reserves inventory in this teaching model.</p><figure class="code "><figcaption>Java • method sketch; effects is a collaborator</figcaption><pre><code><span class="kw">void</span> cancel() {
+    <span class="kw">switch</span> (status) {
+        <span class="kw">case</span> CREATED -&gt; status = Status.CANCELLED;
+        <span class="kw">case</span> PAID -&gt; {
+            effects.refund();
+            status = Status.CANCELLED;
+        }
+        <span class="kw">case</span> PACKED -&gt; {
+            effects.release();
+            effects.refund();
+            status = Status.CANCELLED;
+        }
+        <span class="kw">case</span> SHIPPED, DELIVERED, CANCELLED -&gt;
+            <span class="kw">throw</span> <span class="kw">new</span> IllegalStateException(
+                <span class="str">&quot;Cannot cancel order in &quot;</span> + status);
+    }
+}</code></pre></figure><p>One switch is not a problem by itself. Pressure appears when <code>pay()</code>, <code>pack()</code>, <code>ship()</code>, <code>cancel()</code>, and future refund or return operations each carry their own state logic.</p></section><section class="lesson-section" id="s5"><h3><span class="number">05</span>Diagnose the axis of change</h3><p>Suppose the rules for Packed change. If you must inspect many operations to find every Packed branch, related behavior is spread across the class.</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">Organization</th><th scope="col">Where a Packed rule lives</th><th scope="col">What a change touches</th></tr></thead><tbody><tr><th scope="row">By operation</th><td>A branch in each relevant method</td><td>Several methods</td></tr><tr><th scope="row">By state</th><td>The Packed state object</td><td>Primarily one state implementation</td></tr></tbody></table></div><p>This is the pressure behind the State pattern: <strong>group behavior that changes together</strong>. The order keeps its identity while its current state object determines the legal response to an operation. Microsoft’s pattern explanation describes this delegation and localization. <a class="ref" href="#ref-state">[1]</a></p></section></section><section class="chapter" id="part-2"><div class="chapter-heading"><p class="eyebrow">Part 2</p><h2>Build State in Java</h2><p>Use the current state to decide behavior, and keep state replacement inside the model.</p></div><section class="lesson-section" id="s6"><h3><span class="number">06</span>Define the state capability and context</h3><p>The context is <code>Order</code>. Its state interface describes the same operations. Rejection is the default, so each concrete state only overrides the operations it permits.</p><figure class="code "><figcaption>Java • nested inside StateDemo</figcaption><pre><code><span class="kw">private</span> <span class="kw">interface</span> OrderState {
+    Status status();
+
+    <span class="kw">default</span> <span class="kw">void</span> pay(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;pay&quot;</span>); }
+    <span class="kw">default</span> <span class="kw">void</span> pack(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;pack&quot;</span>); }
+    <span class="kw">default</span> <span class="kw">void</span> ship(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;ship&quot;</span>); }
+    <span class="kw">default</span> <span class="kw">void</span> deliver(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;deliver&quot;</span>); }
+    <span class="kw">default</span> <span class="kw">void</span> cancel(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;cancel&quot;</span>); }
+
+    <span class="kw">private</span> IllegalStateException invalid(String operation) {
+        <span class="kw">return</span> <span class="kw">new</span> IllegalStateException(
+            <span class="str">&quot;Cannot &quot;</span> + operation + <span class="str">&quot; order in &quot;</span> + status());
+    }
+}</code></pre></figure><figure class="code "><figcaption>Java • context, nested inside StateDemo</figcaption><pre><code><span class="kw">public</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> Order {
+    <span class="kw">private</span> OrderState state = <span class="kw">new</span> CreatedState();
+    <span class="kw">private</span> <span class="kw">final</span> Effects effects;
+
+    <span class="kw">public</span> Order(Effects effects) {
+        <span class="kw">this</span>.effects = Objects.requireNonNull(effects);
+    }
+
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> state.status(); }
+    <span class="kw">public</span> <span class="kw">void</span> pay() { state.pay(<span class="kw">this</span>); }
+    <span class="kw">public</span> <span class="kw">void</span> pack() { state.pack(<span class="kw">this</span>); }
+    <span class="kw">public</span> <span class="kw">void</span> ship() { state.ship(<span class="kw">this</span>); }
+    <span class="kw">public</span> <span class="kw">void</span> deliver() { state.deliver(<span class="kw">this</span>); }
+    <span class="kw">public</span> <span class="kw">void</span> cancel() { state.cancel(<span class="kw">this</span>); }
+
+    <span class="kw">private</span> <span class="kw">void</span> transitionTo(OrderState next) {
+        state = Objects.requireNonNull(next);
+    }
+}</code></pre></figure><p>The complete source in <a href="#appendix">Appendix A</a> places the context and private state types in one enclosing class. This lets the nested state implementations use private transition machinery while ordinary callers only see business operations. There is no public state setter or public <code>transitionTo()</code>. Java access control permits this enclosing-class arrangement. <a class="ref" href="#ref-access">[2]</a></p><p><code>Effects</code> is a small interface for <code>charge()</code>, <code>refund()</code>, <code>reserve()</code>, and <code>release()</code>. The runnable example supplies a recording fake, so no payment or inventory system is needed.</p></section><section class="lesson-section" id="s7"><h3><span class="number">07</span>Created owns the Created rules</h3><figure class="code "><figcaption>Java • excerpt</figcaption><pre><code><span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> CreatedState <span class="kw">implements</span> OrderState {
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.CREATED; }
+
+    <span class="kw">public</span> <span class="kw">void</span> pay(Order order) {
+        order.effects.charge();
+        order.transitionTo(<span class="kw">new</span> PaidState());
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> cancel(Order order) {
+        order.transitionTo(<span class="kw">new</span> CancelledState());
+    }
+}</code></pre></figure><p><code>pay()</code> charges first, then advances. <code>cancel()</code> needs no refund. Packing, shipping, and delivery inherit explicit rejection. If <code>charge()</code> throws, the next-state assignment is not reached.</p></section><section class="lesson-section" id="s8"><h3><span class="number">08</span>Paid owns the Paid rules</h3><figure class="code "><figcaption>Java • excerpt</figcaption><pre><code><span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> PaidState <span class="kw">implements</span> OrderState {
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.PAID; }
+
+    <span class="kw">public</span> <span class="kw">void</span> pack(Order order) {
+        order.effects.reserve();
+        order.transitionTo(<span class="kw">new</span> PackedState());
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> cancel(Order order) {
+        order.effects.refund();
+        order.transitionTo(<span class="kw">new</span> CancelledState());
+    }
+}</code></pre></figure><p>A Paid order may be packed or cancelled. It cannot be paid again or shipped before packing. Inventory reservation belongs to <code>pack()</code> in this example; that rule should be explicit rather than silently assumed.</p></section><section class="lesson-section" id="s9"><h3><span class="number">09</span>Packed owns the Packed rules</h3><figure class="code "><figcaption>Java • excerpt</figcaption><pre><code><span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> PackedState <span class="kw">implements</span> OrderState {
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.PACKED; }
+
+    <span class="kw">public</span> <span class="kw">void</span> ship(Order order) {
+        order.transitionTo(<span class="kw">new</span> ShippedState());
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> cancel(Order order) {
+        order.effects.release();
+        order.effects.refund();
+        order.transitionTo(<span class="kw">new</span> CancelledState());
+    }
+}</code></pre></figure><p>All Packed behavior is now together. A change to cancellation from Packed has a clear home.</p><aside class="callout caution"><strong>A state assignment is not a transaction</strong><p>If release succeeds and refund throws, the object remains Packed, but inventory was already released. The sample deliberately tests this case. A stable status does not mean earlier external effects were undone. See <a href="#s21">section 21</a> for the boundary.</p></aside></section><section class="lesson-section" id="s10"><h3><span class="number">10</span>Complete the structure, including delivery</h3><figure class="code "><figcaption>Java • excerpt</figcaption><pre><code><span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> ShippedState <span class="kw">implements</span> OrderState {
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.SHIPPED; }
+
+    <span class="kw">public</span> <span class="kw">void</span> deliver(Order order) {
+        order.transitionTo(<span class="kw">new</span> DeliveredState());
+    }
+}
+
+<span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> DeliveredState <span class="kw">implements</span> OrderState {
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.DELIVERED; }
+}
+
+<span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> CancelledState <span class="kw">implements</span> OrderState {
+    <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.CANCELLED; }
+}</code></pre></figure><div class="table-wrap"><table class=""><thead><tr><th scope="col">Participant</th><th scope="col">Responsibility</th></tr></thead><tbody><tr><th scope="row">Client</th><td>Requests an operation such as <code>order.ship()</code>.</td></tr><tr><th scope="row">Order</th><td>Delegates to its current state and owns the state reference.</td></tr><tr><th scope="row">OrderState</th><td>Defines the protocol and explicit default rejection.</td></tr><tr><th scope="row">Concrete state</th><td>Performs allowed behavior and chooses a legal next state.</td></tr></tbody></table></div><p>The state objects do not store mutable per-order fields here. Two orders hold independent state references. The example is single-threaded; sharing a context across threads requires additional coordination.</p></section></section><section class="chapter" id="part-3"><div class="chapter-heading"><p class="eyebrow">Part 3</p><h2>Understand the alternatives</h2></div><section class="lesson-section" id="s11"><h3><span class="number">11</span>Separate State from Strategy</h3><p>Both patterns can hold an interface and delegate through it. The difference is the reason for variation.</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">Question</th><th scope="col">Strategy</th><th scope="col">State</th></tr></thead><tbody><tr><th scope="row">What varies?</th><td>The algorithm used for a task.</td><td>The legal behavior at a lifecycle stage.</td></tr><tr><th scope="row">Typical selection</th><td>Caller or configuration chooses a policy.</td><td>An accepted operation changes the current state.</td></tr><tr><th scope="row">Example</th><td>Express versus standard shipping calculation.</td><td>Paid versus Packed behavior.</td></tr></tbody></table></div><p>A shipping strategy answers “How should I calculate shipping?” A state answers “May this order ship now, and what must happen if it does?” External selection is common for Strategy, but it is not a universal rule; intent is the useful distinction.</p></section><section class="lesson-section" id="s12"><h3><span class="number">12</span>Treat transitions as the actual model</h3><p>For each pair of <strong>current state and operation</strong>, define the behavior and the next state, or define rejection. A transition table exposes gaps before you write classes.</p><div class="table-wrap"><table class="matrix"><caption>Complete order transition matrix • 6 states × 5 operations</caption><thead><tr><th scope="col">Current</th><th scope="col">pay</th><th scope="col">pack</th><th scope="col">ship</th><th scope="col">deliver</th><th scope="col">cancel</th></tr></thead><tbody><tr><th scope="row">Created</th><td>Paid</td><td>Reject</td><td>Reject</td><td>Reject</td><td>Cancelled</td></tr><tr><th scope="row">Paid</th><td>Reject</td><td>Packed</td><td>Reject</td><td>Reject</td><td>Cancelled</td></tr><tr><th scope="row">Packed</th><td>Reject</td><td>Reject</td><td>Shipped</td><td>Reject</td><td>Cancelled</td></tr><tr><th scope="row">Shipped</th><td>Reject</td><td>Reject</td><td>Reject</td><td>Delivered</td><td>Reject</td></tr><tr><th scope="row">Delivered</th><td>Reject</td><td>Reject</td><td>Reject</td><td>Reject</td><td>Reject</td></tr><tr><th scope="row">Cancelled</th><td>Reject</td><td>Reject</td><td>Reject</td><td>Reject</td><td>Reject</td></tr></tbody></table></div><p>Every cell is intentional: 7 accepted transitions and 23 rejections. Successful payment charges; successful packing reserves inventory; cancellation refunds from Paid and releases then refunds from Packed. Shipping and delivery only change local status in the runnable teaching example.</p><div class="explorer screen-only" id="explorer" hidden>
+<h4>Try the lifecycle</h4><p class="small">Attempt any operation. Rejection leaves the state unchanged.</p>
+<p class="current">Current state: <strong id="current-state">Created</strong></p>
+<div class="actions"><button type="button" data-action="pay">Pay</button><button type="button" data-action="pack">Pack</button><button type="button" data-action="ship">Ship</button><button type="button" data-action="deliver">Deliver</button><button type="button" data-action="cancel">Cancel</button><button type="button" id="reset-order" class="quiet">Reset order</button></div>
+<p id="transition-result" aria-live="polite">Start with Ship to see an invalid transition.</p>
+<ol id="history" aria-label="Recent transition attempts"></ol>
+<p class="small">This browser illustration mirrors the transition table. It does not execute Java or call external systems.</p></div></section><section class="lesson-section" id="s13"><h3><span class="number">13</span>Protect invariants, not just fields</h3><p>The invariant is “an order can ship only after it is packed.” A private field helps only if the public API protects that rule.</p><figure class="code "><figcaption>Java • excerpt</figcaption><pre><code>order.ship(); <span class="comment">// The current state decides whether this is legal.</span>
+
+<span class="comment">// These are unavailable to an ordinary caller:</span>
+<span class="comment">// order.status = Status.DELIVERED;</span>
+<span class="comment">// order.transitionTo(new DeliveredState());</span></code></pre></figure><p>Exposing a general state-changing method would let clients bypass the machine. Construction starts at Created. Rehydration, discussed later, is a separate trusted persistence operation.</p><aside class="callout principle"><strong>Encapsulation</strong><p>Expose intentions as operations. Keep arbitrary state replacement inside the model.</p></aside></section><section class="lesson-section" id="s14"><h3><span class="number">14</span>An enum and a switch can be enough</h3><p>A state machine is a model. The classic object-oriented State pattern is one way to implement it. For small machines, an enum plus a transition function can be the clearest representation.</p><figure class="code "><figcaption>Java • members of a class, using the six-value Status enum</figcaption><pre><code><span class="kw">enum</span> Action { PAY, PACK, SHIP, DELIVER, CANCEL }
+
+<span class="kw">static</span> Status next(Status state, Action action) {
+    java.util.Objects.requireNonNull(state);
+    java.util.Objects.requireNonNull(action);
+    <span class="kw">return</span> <span class="kw">switch</span> (state) {
+        <span class="kw">case</span> CREATED -&gt; <span class="kw">switch</span> (action) {
+            <span class="kw">case</span> PAY -&gt; Status.PAID;
+            <span class="kw">case</span> CANCEL -&gt; Status.CANCELLED;
+            <span class="kw">default</span> -&gt; <span class="kw">throw</span> invalid(state, action);
+        };
+        <span class="kw">case</span> PAID -&gt; <span class="kw">switch</span> (action) {
+            <span class="kw">case</span> PACK -&gt; Status.PACKED;
+            <span class="kw">case</span> CANCEL -&gt; Status.CANCELLED;
+            <span class="kw">default</span> -&gt; <span class="kw">throw</span> invalid(state, action);
+        };
+        <span class="kw">case</span> PACKED -&gt; <span class="kw">switch</span> (action) {
+            <span class="kw">case</span> SHIP -&gt; Status.SHIPPED;
+            <span class="kw">case</span> CANCEL -&gt; Status.CANCELLED;
+            <span class="kw">default</span> -&gt; <span class="kw">throw</span> invalid(state, action);
+        };
+        <span class="kw">case</span> SHIPPED -&gt; <span class="kw">switch</span> (action) {
+            <span class="kw">case</span> DELIVER -&gt; Status.DELIVERED;
+            <span class="kw">default</span> -&gt; <span class="kw">throw</span> invalid(state, action);
+        };
+        <span class="kw">case</span> DELIVERED, CANCELLED -&gt; <span class="kw">throw</span> invalid(state, action);
+    };
+}
+
+<span class="kw">static</span> IllegalStateException invalid(Status state, Action action) {
+    <span class="kw">return</span> <span class="kw">new</span> IllegalStateException(action + <span class="str">&quot; is invalid in &quot;</span> + state);
+}</code></pre></figure><p>This pure function determines the next status. It does not charge, refund, reserve, or release anything. If effects are required, represent the decision separately or orchestrate those effects explicitly.</p><p>Java 25 supports enum switch expressions. A switch expression must cover its possible inputs. The outer switch lists every status; its exhaustiveness helps surface a newly added enum constant when this code is recompiled. Explicit null checks keep null outside the model. <a class="ref" href="#ref-switch">[3]</a></p></section><section class="lesson-section" id="s15"><h3><span class="number">15</span>Graduate only when behavior justifies it</h3><div class="table-wrap"><table class=""><thead><tr><th scope="col">Pressure</th><th scope="col">A useful starting point</th></tr></thead><tbody><tr><th scope="row">Few rules, little behavior</th><td>Private enum and small guarded methods.</td></tr><tr><th scope="row">Many transitions, mostly data</th><td>Transition table or a pure transition function.</td></tr><tr><th scope="row">Substantial behavior differs by state</th><td>State objects with rules localized by state.</td></tr><tr><th scope="row">Long-running, retrying, distributed work</th><td>A workflow design; State may be one part of it.</td></tr></tbody></table></div><p>There is no threshold such as “six states means six classes.” Ask how often the rules change, how much behavior belongs to each state, and whether the new organization makes those changes more local. A table can remain the best choice.</p></section></section><section class="chapter" id="part-4"><div class="chapter-heading"><p class="eyebrow">Part 4</p><h2>Model data and verify behavior</h2></div><section class="lesson-section" id="s16"><h3><span class="number">16</span>Notice when the data also changes</h3><figure class="code "><figcaption>Java • weak data model, for diagnosis</figcaption><pre><code><span class="kw">final</span> <span class="kw">class</span> WeakOrderData {
+    Status status;
+    String paymentId;
+    String trackingNumber;
+    java.time.Instant shippedAt;
+    java.time.Instant deliveredAt;
+    String cancellationReason;
+}</code></pre></figure><p>This shape allows a Created order with a tracking number and a delivery timestamp. Many optional fields make the intended combinations hard to see. Behavior and data are two related modeling problems: State objects organize behavior; different data variants can express what exists at each stage.</p></section><section class="lesson-section" id="s17"><h3><span class="number">17</span>Use sealed types and records for data variants</h3><p>Java’s counterpart to the lesson’s discriminated union is a sealed interface with record implementations. This deliberately reduced <em>snapshot</em> example shows only three variants to isolate the data idea; it does not redefine the six-state transition contract or permit skipping Packed.</p><figure class="code "><figcaption>Java • nested members of SnapshotDemo; data illustration</figcaption><pre><code><span class="kw">sealed</span> <span class="kw">interface</span> OrderSnapshot <span class="kw">permits</span> Created, Paid, Shipped {
+    String orderId();
+}
+
+<span class="kw">record</span> Created(String orderId) <span class="kw">implements</span> OrderSnapshot {
+    Created { orderId = required(orderId); }
+}
+
+<span class="kw">record</span> Paid(String orderId, String paymentId) <span class="kw">implements</span> OrderSnapshot {
+    Paid {
+        orderId = required(orderId);
+        paymentId = required(paymentId);
+    }
+}
+
+<span class="kw">record</span> Shipped(String orderId, String paymentId, String trackingNumber)
+        <span class="kw">implements</span> OrderSnapshot {
+    Shipped {
+        orderId = required(orderId);
+        paymentId = required(paymentId);
+        trackingNumber = required(trackingNumber);
+    }
+}
+
+<span class="kw">static</span> String required(String value) {
+    <span class="kw">if</span> (value == <span class="kw">null</span> || value.isBlank()) {
+        <span class="kw">throw</span> <span class="kw">new</span> IllegalArgumentException(<span class="str">&quot;Required value is blank&quot;</span>);
+    }
+    <span class="kw">return</span> value;
+}</code></pre></figure><p>A <code>Created</code> value has no <code>trackingNumber()</code> method. A <code>Shipped</code> value requires a nonblank tracking number. A sealed interface restricts its permitted implementations, and records supply component accessors and value-based equality. <a class="ref" href="#ref-sealed">[4]</a> <a class="ref" href="#ref-records">[5]</a></p><figure class="code "><figcaption>Java 25 • exhaustive pattern switch; no preview required</figcaption><pre><code><span class="kw">static</span> String shippingLabel(OrderSnapshot snapshot) {
+    java.util.Objects.requireNonNull(snapshot);
+    <span class="kw">return</span> <span class="kw">switch</span> (snapshot) {
+        <span class="kw">case</span> Created c -&gt; <span class="str">&quot;Not shipped: &quot;</span> + c.orderId();
+        <span class="kw">case</span> Paid p -&gt; <span class="str">&quot;Awaiting fulfilment: &quot;</span> + p.orderId();
+        <span class="kw">case</span> Shipped s -&gt; <span class="str">&quot;Tracking: &quot;</span> + s.trackingNumber();
+    };
+}</code></pre></figure><p>The pattern switch can handle every permitted variant without a catch-all default. Recompile after changing a sealed hierarchy so missing cases are checked. These reference-type patterns are permanent Java language features supported in Java 25. <a class="ref" href="#ref-patterns">[6]</a></p><aside class="callout principle"><strong>What the types do and do not prove</strong><p>They constrain the shape of each value. They do not prove that payment happened or that every earlier transition occurred. Constructors or factories still need validation and trusted inputs. Record component fields are final, but referenced mutable objects are not made deeply immutable. <a class="ref" href="#ref-record-api">[7]</a></p></aside></section><section class="lesson-section" id="s18"><h3><span class="number">18</span>Choose between behavior objects and data variants</h3><div class="table-wrap"><table class=""><thead><tr><th scope="col">Approach</th><th scope="col">Best fit</th><th scope="col">Main tradeoff</th></tr></thead><tbody><tr><th scope="row">Classic OO State</th><td>Rich behavior and collaborators vary by state.</td><td>More types; changes to the operation protocol affect many states.</td></tr><tr><th scope="row">Sealed records and functions</th><td>Data differs strongly by stage; closed variants are useful.</td><td>Functions must account for variants; transitions remain explicit.</td></tr><tr><th scope="row">Enum and transition table</th><td>The graph is the main complexity; behavior is small.</td><td>State-specific data and effects need a separate design.</td></tr></tbody></table></div><p>These approaches can coexist. An application may use a mutable context internally and immutable records for persistence or events. The goal is a clear lifecycle contract, not a particular class diagram.</p></section><section class="lesson-section" id="s19"><h3><span class="number">19</span>Test the matrix, failures, and effects</h3><p>Test legal transitions and prohibited transitions separately. On rejection, also verify that the original state remains intact and no effect was invoked.</p><figure class="code "><figcaption>Java • test excerpt from the same enclosing test context</figcaption><pre><code>RecordingEffects effects = <span class="kw">new</span> RecordingEffects();
+Order order = <span class="kw">new</span> Order(effects);
+
+mustFail(order::ship);
+equal(order.status(), Status.CREATED);
+equal(effects.calls, List.of());
+
+order.pay();
+equal(order.status(), Status.PAID);
+equal(effects.calls, List.of(<span class="str">&quot;charge&quot;</span>));</code></pre></figure><p>Appendix A exercises all 30 cells of the section 12 matrix with a fresh order per cell. Additional tests check cancellation effects, failed charge and reserve calls, a partial cancellation failure, and independence of two orders.</p><aside class="callout principle"><strong>Test the contract</strong><p>An exception is only part of the assertion. Check the status and effects after the attempt. The test helpers throw <code>AssertionError</code> directly, so no <code>-ea</code> flag or external test library is required.</p></aside><p>For a production system, add tests for input guards, persisted data validation, conflicting updates, retried commands, and emitted events. The right coverage follows the actual business contract.</p></section><section class="lesson-section" id="s20"><h3><span class="number">20</span>Rehydrate state at a trusted boundary</h3><p>Persistence should store stable domain values, not Java state-class names. A factory can translate a validated stored status into its runtime representation:</p><figure class="code "><figcaption>Java • persistence extension inside the enclosing model</figcaption><pre><code><span class="kw">private</span> <span class="kw">static</span> OrderState stateFrom(Status status) {
+    java.util.Objects.requireNonNull(status);
+    <span class="kw">return</span> <span class="kw">switch</span> (status) {
+        <span class="kw">case</span> CREATED -&gt; <span class="kw">new</span> CreatedState();
+        <span class="kw">case</span> PAID -&gt; <span class="kw">new</span> PaidState();
+        <span class="kw">case</span> PACKED -&gt; <span class="kw">new</span> PackedState();
+        <span class="kw">case</span> SHIPPED -&gt; <span class="kw">new</span> ShippedState();
+        <span class="kw">case</span> DELIVERED -&gt; <span class="kw">new</span> DeliveredState();
+        <span class="kw">case</span> CANCELLED -&gt; <span class="kw">new</span> CancelledState();
+    };
+}</code></pre></figure><p>This factory restores a snapshot; it must not replay <code>pay()</code> or other effects. A repository should validate the stored status and all required accompanying fields before calling a restricted restoration path. Unknown values should be rejected or deliberately migrated, not silently mapped to Created.</p><p>The Factory idea returns here: creation and reconstruction have a clear home. A public “set any state” endpoint is still inappropriate.</p></section></section><section class="chapter" id="part-5"><div class="chapter-heading"><p class="eyebrow">Part 5</p><h2>Cross the production boundary</h2></div><section class="lesson-section" id="s21"><h3><span class="number">21</span>Handle concurrency and transaction boundaries separately</h3><p>Two requests can both read Packed. One cancels; the other ships. Each transition is legal against its own snapshot, but both must not independently take effect as though nothing else changed.</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">Step</th><th scope="col">Cancel request</th><th scope="col">Ship request</th></tr></thead><tbody><tr><th scope="row">Read</th><td>Packed, version 7</td><td>Packed, version 7</td></tr><tr><th scope="row">Decide</th><td>Cancel is legal.</td><td>Ship is legal.</td></tr><tr><th scope="row">Persist with version check</th><td>One request updates version 7 to 8.</td><td>The other must detect a stale version.</td></tr></tbody></table></div><figure class="code "><figcaption>SQL • optimistic update sketch</figcaption><pre><code>UPDATE orders
+SET status = &#x27;shipped&#x27;, version = version + 1
+WHERE id = ? AND status = &#x27;packed&#x27; AND version = ?;</code></pre></figure><p>With a unique order ID, expect one affected row. Zero rows means the expected record did not match: it may have changed or been deleted. Treat that as a conflict or missing record, then reload and re-evaluate the command; do not blindly repeat external effects. Version-based updates are a standard optimistic concurrency technique. <a class="ref" href="#ref-concurrency">[8]</a></p><aside class="callout caution"><strong>Two different problems</strong><p>The version check protects a persisted update. It does not roll back a payment, an inventory call, or a shipment already sent to a carrier. Choose transaction boundaries, idempotency, and recovery steps explicitly. The State pattern supplies none of those mechanisms by itself.</p></aside><p>Moving <code>transitionTo()</code> after an effect only avoids advancing when the call throws. A timeout can occur after the remote system succeeds. Multi-step cancellation can also partially succeed. A real workflow may need intermediate states, durable work records, retries with stable idempotency keys, and compensation. The exact design depends on the business process.</p></section><section class="lesson-section" id="s22"><h3><span class="number">22</span>Let accepted transitions produce events</h3><p>After a transition into Shipped, other components may need to notify the customer or update tracking. A dedicated event can carry the fact they need.</p><figure class="code "><figcaption>Java • illustrative event payload; validate at creation</figcaption><pre><code><span class="kw">record</span> OrderShipped(
+    java.util.UUID eventId,
+    String orderId,
+    String trackingNumber,
+    java.time.Instant occurredAt
+) { }</code></pre></figure><p>Record the event only after the transition’s guards and required work succeed. If the order is persisted, a change in memory is not yet proof of a committed database fact.</p><p>For reliable external publication, one option is to save the order update and an outbox record in the same database transaction. A relay publishes committed outbox records later. Delivery may still be repeated, so consumers need duplicate-safe handling. This addresses the dual-write gap; it does not make remote effects atomic. <a class="ref" href="#ref-outbox">[9]</a></p></section><section class="lesson-section" id="s23"><h3><span class="number">23</span>Keep commands and events distinct</h3><div class="table-wrap"><table class=""><thead><tr><th scope="col">Message</th><th scope="col">Meaning</th><th scope="col">Can it be rejected?</th></tr></thead><tbody><tr><th scope="row"><code>ShipOrder</code></th><td>Please attempt shipping.</td><td>Yes: the current state or another guard may prohibit it.</td></tr><tr><th scope="row"><code>OrderShipped</code></th><td>Shipping has happened under the defined business contract.</td><td>It is a reported fact; consumers may still fail to process it.</td></tr></tbody></table></div><p>A command enters the model, the model validates the current state and other guards, required work is performed, and an accepted transition can yield an event. An illegal command must not produce a success event.</p><p>Define what “shipped” actually means in your domain: a label printed, a carrier handoff, or something else. Naming an event does not settle that business definition. The runnable example only demonstrates local lifecycle rules.</p></section><section class="lesson-section" id="s24"><h3><span class="number">24</span>Combine State and Observer deliberately</h3><div class="table-wrap"><table class=""><thead><tr><th scope="col">Concern</th><th scope="col">State</th><th scope="col">Observer</th></tr></thead><tbody><tr><th scope="row">Core question</th><td>What may this object do now?</td><td>Who reacts to a fact that happened?</td></tr><tr><th scope="row">Scope</th><td>The object’s lifecycle and invariants.</td><td>Independent reactions to a notification.</td></tr><tr><th scope="row">Example</th><td>Only Packed may accept ship.</td><td>Email and analytics react to OrderShipped.</td></tr></tbody></table></div><p>State decides whether a transition is legal. Observer distributes its consequences. Do not put mandatory ordered steps into independent observers merely to reduce direct references; an explicit workflow is clearer when one step must succeed before another.</p></section><section class="lesson-section" id="s25"><h3><span class="number">25</span>Recognize the pressure, not the diagram</h3><p>The same delegation structure can solve very different problems. Use intent to identify the pattern:</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">Situation</th><th scope="col">Pattern or design pressure</th></tr></thead><tbody><tr><th scope="row">Choose standard or express pricing.</th><td>Strategy: interchangeable algorithms.</td></tr><tr><th scope="row">Rebuild the current state from stored data.</th><td>Factory: controlled creation.</td></tr><tr><th scope="row">Translate a legacy carrier interface.</th><td>Adapter: interface mismatch.</td></tr><tr><th scope="row">Layer logging around one service call.</th><td>Decorator: added behavior along a call path.</td></tr><tr><th scope="row">Several independent parties react to OrderShipped.</th><td>Observer: notification.</td></tr><tr><th scope="row">An order’s legal operations depend on Paid versus Packed.</th><td>State: lifecycle-dependent behavior.</td></tr></tbody></table></div><p>State may be implemented with polymorphism, but polymorphism alone does not tell you that a design is State.</p></section><section class="lesson-section" id="s26"><h3><span class="number">26</span>Avoid a forest of empty state classes</h3><p>Separate classes become a poor bargain when most methods only reject and very little behavior varies. Default rejection reduces repetition, but it does not justify an unnecessary hierarchy.</p><p>If you keep adding states such as RefundRequested, RefundApproved, RefundProcessing, and RefundCompleted, ask whether you are modeling an order, a payment workflow, or several lifecycles forced into one enum. Independent dimensions may deserve separate models; splitting them still requires explicit cross-model invariants.</p><aside class="callout principle"><strong>The cost to watch</strong><p>State objects localize behavior, but spread the transition graph across types. Keep the transition table beside the code so reviewers can still see the whole lifecycle.</p></aside></section><section class="lesson-section" id="s27"><h3><span class="number">27</span>Use the first-principles checklist</h3><ol class="checklist"><li>Does the same operation behave differently because of the object’s lifecycle?</li><li>Have you defined every legal transition and explicit rejection?</li><li>Which invariants must the public API protect?</li><li>Is logic for one state scattered across many operations?</li><li>Would grouping by state make changes easier to review?</li><li>Would a small switch or transition table remain clearer?</li><li>Where do side effects, persistence, conflicts, and retries belong?</li></ol><p>Introduce State objects when that organization helps the behavior stay coherent. A guarded enum is a sound answer when it makes the same rules easier to understand.</p></section></section><section class="chapter" id="exercise"><div class="chapter-heading"><p class="eyebrow">Practice</p><h2>Build a support ticket lifecycle</h2><p>Write the transition table first. Then choose the representation.</p></div><p>The normal path is Open, Assigned, Resolved, then Closed. Additional rules allow unassignment, reopening, and cancellation before assignment.</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">Current</th><th scope="col">Operation</th><th scope="col">Next</th></tr></thead><tbody><tr><th scope="row">Open</th><td>assign</td><td>Assigned</td></tr><tr><th scope="row">Assigned</th><td>unassign</td><td>Open</td></tr><tr><th scope="row">Assigned</th><td>resolve</td><td>Resolved</td></tr><tr><th scope="row">Resolved</th><td>reopen</td><td>Assigned</td></tr><tr><th scope="row">Resolved</th><td>close</td><td>Closed</td></tr><tr><th scope="row">Open</th><td>close (cancel)</td><td>Closed</td></tr></tbody></table></div><aside class="callout principle"><strong>Resolve the command name</strong><p>This exercise uses <code>close()</code> for both cancellation from Open and normal closure from Resolved. There is no separate <code>cancel()</code> method. Closed is terminal; all unlisted operations reject.</p></aside><figure class="code "><figcaption>Java • design sketch; implement Ticket as the context</figcaption><pre><code><span class="kw">enum</span> TicketStatus { OPEN, ASSIGNED, RESOLVED, CLOSED }
+
+<span class="kw">interface</span> TicketState {
+    TicketStatus status();
+    <span class="kw">void</span> assign(Ticket ticket);
+    <span class="kw">void</span> unassign(Ticket ticket);
+    <span class="kw">void</span> resolve(Ticket ticket);
+    <span class="kw">void</span> reopen(Ticket ticket);
+    <span class="kw">void</span> close(Ticket ticket);
+}</code></pre></figure><p>First fill this table. Write the target state or “Reject” in every cell:</p><div class="table-wrap"><table class="matrix"><caption>Worksheet • 20 decisions</caption><thead><tr><th scope="col">Current</th><th scope="col">assign</th><th scope="col">unassign</th><th scope="col">resolve</th><th scope="col">reopen</th><th scope="col">close</th></tr></thead><tbody><tr><th scope="row">Open</th><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr><tr><th scope="row">Assigned</th><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr><tr><th scope="row">Resolved</th><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr><tr><th scope="row">Closed</th><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr></tbody></table></div><h3>Acceptance criteria</h3><ol class="checklist"><li>Illegal transitions fail explicitly and leave the current state intact.</li><li>The Ticket context delegates instead of accumulating status branches.</li><li>Rules for each state are localized.</li><li>Tests cover all 20 state/action pairs, including all illegal paths.</li><li>External callers cannot directly assign the status or replace the state.</li><li>The meaning of close from Open is documented as cancellation.</li></ol>
+<details class="answer"><summary>Check the transition table</summary><div class="answer-content"><div class="table-wrap"><table class="matrix"><caption>Answer • 6 legal transitions, 14 rejections</caption><thead><tr><th scope="col">Current</th><th scope="col">assign</th><th scope="col">unassign</th><th scope="col">resolve</th><th scope="col">reopen</th><th scope="col">close</th></tr></thead><tbody><tr><th scope="row">Open</th><td>Assigned</td><td>Reject</td><td>Reject</td><td>Reject</td><td>Closed</td></tr><tr><th scope="row">Assigned</th><td>Reject</td><td>Open</td><td>Resolved</td><td>Reject</td><td>Reject</td></tr><tr><th scope="row">Resolved</th><td>Reject</td><td>Reject</td><td>Reject</td><td>Assigned</td><td>Closed</td></tr><tr><th scope="row">Closed</th><td>Reject</td><td>Reject</td><td>Reject</td><td>Reject</td><td>Reject</td></tr></tbody></table></div><p>A useful path test is assign, resolve, reopen, unassign, close. Also verify that Closed rejects every operation, Assigned cannot close directly, and Open cannot resolve.</p><p>If tickets carry an assignee, reopening needs another explicit rule: restore the previous assignee, require a new assignee, or reopen into Open. The exercise above tests only the status lifecycle; do not silently invent that data rule.</p></div></details></section><section class="next-lesson" id="next"><p class="eyebrow">Next • Lesson 7</p><h2>Command: represent an action as a value</h2><p>State answered “What is legal now?” The next pressure is different: you need to queue, log, authorize, retry, schedule, or sometimes undo an action.</p><p>The next design question is whether a request such as ShipOrder can become an object or value that is stored, passed around, and executed later. Making a command retryable or undoable still requires explicit business semantics.</p></section><section class="chapter appendix" id="appendix"><div class="chapter-heading"><p class="eyebrow">Appendix A</p><h2>Complete runnable Java example</h2><p>Save the following complete listing as StateDemo.java. The nested types keep the example in one file while protecting state replacement from ordinary callers.</p></div><figure class="code "><figcaption>Terminal • use a JDK 25 installation</figcaption><pre><code>javac --release 25 -Xlint:all StateDemo.java
+java StateDemo</code></pre></figure><p>No external libraries and no preview flags are required. The file includes the model, recording effects, and test harness. The Java 25 <code>javac</code> manual documents <code>--release</code>. <a class="ref" href="#ref-javac">[10]</a></p><button class="screen-only download" type="button" id="download-java" hidden>Download StateDemo.java</button><p class="small screen-only" id="download-status" aria-live="polite"></p><figure class="code source-part"><figcaption>StateDemo.java • part 1 of 6</figcaption><pre><code><span class="kw">import</span> java.util.ArrayList;
+<span class="kw">import</span> java.util.List;
+<span class="kw">import</span> java.util.Objects;
+
+<span class="kw">public</span> <span class="kw">final</span> <span class="kw">class</span> StateDemo {
+    <span class="kw">public</span> <span class="kw">enum</span> Status {
+        CREATED, PAID, PACKED, SHIPPED, DELIVERED, CANCELLED
+    }
+
+    <span class="kw">public</span> <span class="kw">interface</span> Effects {
+        <span class="kw">void</span> charge();
+        <span class="kw">void</span> refund();
+        <span class="kw">void</span> reserve();
+        <span class="kw">void</span> release();
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> Order {
+        <span class="kw">private</span> OrderState state = <span class="kw">new</span> CreatedState();
+        <span class="kw">private</span> <span class="kw">final</span> Effects effects;
+
+        <span class="kw">public</span> Order(Effects effects) {
+            <span class="kw">this</span>.effects = Objects.requireNonNull(effects);
+        }
+
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> state.status(); }
+        <span class="kw">public</span> <span class="kw">void</span> pay() { state.pay(<span class="kw">this</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> pack() { state.pack(<span class="kw">this</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> ship() { state.ship(<span class="kw">this</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> deliver() { state.deliver(<span class="kw">this</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> cancel() { state.cancel(<span class="kw">this</span>); }
+
+        <span class="kw">private</span> <span class="kw">void</span> transitionTo(OrderState next) {
+            state = Objects.requireNonNull(next);
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">interface</span> OrderState {
+        Status status();
+
+        <span class="kw">default</span> <span class="kw">void</span> pay(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;pay&quot;</span>); }
+        <span class="kw">default</span> <span class="kw">void</span> pack(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;pack&quot;</span>); }
+        <span class="kw">default</span> <span class="kw">void</span> ship(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;ship&quot;</span>); }
+        <span class="kw">default</span> <span class="kw">void</span> deliver(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;deliver&quot;</span>); }
+        <span class="kw">default</span> <span class="kw">void</span> cancel(Order order) { <span class="kw">throw</span> invalid(<span class="str">&quot;cancel&quot;</span>); }</code></pre></figure><figure class="code source-part"><figcaption>StateDemo.java • part 2 of 6</figcaption><pre><code>        <span class="kw">private</span> IllegalStateException invalid(String operation) {
+            <span class="kw">return</span> <span class="kw">new</span> IllegalStateException(
+                <span class="str">&quot;Cannot &quot;</span> + operation + <span class="str">&quot; order in &quot;</span> + status());
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> CreatedState <span class="kw">implements</span> OrderState {
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.CREATED; }
+
+        <span class="kw">public</span> <span class="kw">void</span> pay(Order order) {
+            order.effects.charge();
+            order.transitionTo(<span class="kw">new</span> PaidState());
+        }
+
+        <span class="kw">public</span> <span class="kw">void</span> cancel(Order order) {
+            order.transitionTo(<span class="kw">new</span> CancelledState());
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> PaidState <span class="kw">implements</span> OrderState {
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.PAID; }
+
+        <span class="kw">public</span> <span class="kw">void</span> pack(Order order) {
+            order.effects.reserve();
+            order.transitionTo(<span class="kw">new</span> PackedState());
+        }
+
+        <span class="kw">public</span> <span class="kw">void</span> cancel(Order order) {
+            order.effects.refund();
+            order.transitionTo(<span class="kw">new</span> CancelledState());
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> PackedState <span class="kw">implements</span> OrderState {
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.PACKED; }
+
+        <span class="kw">public</span> <span class="kw">void</span> ship(Order order) {
+            order.transitionTo(<span class="kw">new</span> ShippedState());
+        }
+
+        <span class="kw">public</span> <span class="kw">void</span> cancel(Order order) {
+            order.effects.release();
+            order.effects.refund();
+            order.transitionTo(<span class="kw">new</span> CancelledState());
+        }
+    }</code></pre></figure><figure class="code source-part"><figcaption>StateDemo.java • part 3 of 6</figcaption><pre><code>    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> ShippedState <span class="kw">implements</span> OrderState {
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.SHIPPED; }
+
+        <span class="kw">public</span> <span class="kw">void</span> deliver(Order order) {
+            order.transitionTo(<span class="kw">new</span> DeliveredState());
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> DeliveredState <span class="kw">implements</span> OrderState {
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.DELIVERED; }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> CancelledState <span class="kw">implements</span> OrderState {
+        <span class="kw">public</span> Status status() { <span class="kw">return</span> Status.CANCELLED; }
+    }
+
+    <span class="comment">// Everything below is a dependency-free test harness.</span>
+    <span class="kw">private</span> <span class="kw">enum</span> Action {
+        PAY, PACK, SHIP, DELIVER, CANCEL;
+
+        <span class="kw">void</span> apply(Order order) {
+            <span class="kw">switch</span> (<span class="kw">this</span>) {
+                <span class="kw">case</span> PAY -&gt; order.pay();
+                <span class="kw">case</span> PACK -&gt; order.pack();
+                <span class="kw">case</span> SHIP -&gt; order.ship();
+                <span class="kw">case</span> DELIVER -&gt; order.deliver();
+                <span class="kw">case</span> CANCEL -&gt; order.cancel();
+            }
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">final</span> <span class="kw">class</span> RecordingEffects <span class="kw">implements</span> Effects {
+        <span class="kw">final</span> List&lt;String&gt; calls = <span class="kw">new</span> ArrayList&lt;&gt;();
+        String failOn;
+
+        <span class="kw">private</span> <span class="kw">void</span> <span class="kw">record</span>(String effect) {
+            <span class="kw">if</span> (effect.equals(failOn)) {
+                <span class="kw">throw</span> <span class="kw">new</span> IllegalStateException(<span class="str">&quot;Failed: &quot;</span> + effect);
+            }
+            calls.add(effect);
+        }
+
+        <span class="kw">public</span> <span class="kw">void</span> charge() { <span class="kw">record</span>(<span class="str">&quot;charge&quot;</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> refund() { <span class="kw">record</span>(<span class="str">&quot;refund&quot;</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> reserve() { <span class="kw">record</span>(<span class="str">&quot;reserve&quot;</span>); }
+        <span class="kw">public</span> <span class="kw">void</span> release() { <span class="kw">record</span>(<span class="str">&quot;release&quot;</span>); }
+    }</code></pre></figure><figure class="code source-part"><figcaption>StateDemo.java • part 4 of 6</figcaption><pre><code>    <span class="kw">private</span> <span class="kw">static</span> Order orderAt(Status target, RecordingEffects effects) {
+        Order order = <span class="kw">new</span> Order(effects);
+        <span class="kw">switch</span> (target) {
+            <span class="kw">case</span> CREATED -&gt; { }
+            <span class="kw">case</span> PAID -&gt; order.pay();
+            <span class="kw">case</span> PACKED -&gt; { order.pay(); order.pack(); }
+            <span class="kw">case</span> SHIPPED -&gt; {
+                order.pay(); order.pack(); order.ship();
+            }
+            <span class="kw">case</span> DELIVERED -&gt; {
+                order.pay(); order.pack(); order.ship(); order.deliver();
+            }
+            <span class="kw">case</span> CANCELLED -&gt; order.cancel();
+        }
+        effects.calls.clear();
+        <span class="kw">return</span> order;
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">void</span> equal(Object actual, Object expected) {
+        <span class="kw">if</span> (!Objects.equals(actual, expected)) {
+            <span class="kw">throw</span> <span class="kw">new</span> AssertionError(
+                <span class="str">&quot;Expected &quot;</span> + expected + <span class="str">&quot;, got &quot;</span> + actual);
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">void</span> mustFail(Runnable operation) {
+        <span class="kw">try</span> {
+            operation.run();
+        } <span class="kw">catch</span> (IllegalStateException expected) {
+            <span class="kw">return</span>;
+        }
+        <span class="kw">throw</span> <span class="kw">new</span> AssertionError(<span class="str">&quot;Expected IllegalStateException&quot;</span>);
+    }</code></pre></figure><figure class="code source-part"><figcaption>StateDemo.java • part 5 of 6</figcaption><pre><code>    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">void</span> testTransitionMatrix() {
+        <span class="comment">// Columns: PAY, PACK, SHIP, DELIVER, CANCEL.</span>
+        <span class="comment">// Rows: CREATED, PAID, PACKED, SHIPPED, DELIVERED, CANCELLED.</span>
+        <span class="comment">// null means rejection with the original state unchanged.</span>
+        Status[][] expected = {
+            {Status.PAID, <span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>, Status.CANCELLED},
+            {<span class="kw">null</span>, Status.PACKED, <span class="kw">null</span>, <span class="kw">null</span>, Status.CANCELLED},
+            {<span class="kw">null</span>, <span class="kw">null</span>, Status.SHIPPED, <span class="kw">null</span>, Status.CANCELLED},
+            {<span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>, Status.DELIVERED, <span class="kw">null</span>},
+            {<span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>},
+            {<span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>, <span class="kw">null</span>}
+        };
+        <span class="kw">for</span> (Status from : Status.values()) {
+            <span class="kw">for</span> (Action action : Action.values()) {
+                RecordingEffects effects = <span class="kw">new</span> RecordingEffects();
+                Order order = orderAt(from, effects);
+                Status next = expected[from.ordinal()][action.ordinal()];
+                <span class="kw">if</span> (next == <span class="kw">null</span>) {
+                    mustFail(() -&gt; action.apply(order));
+                    equal(order.status(), from);
+                    equal(effects.calls, List.of());
+                } <span class="kw">else</span> {
+                    action.apply(order);
+                    equal(order.status(), next);
+                }
+            }
+        }
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">void</span> testEffects() {
+        RecordingEffects effects = <span class="kw">new</span> RecordingEffects();
+        Order order = <span class="kw">new</span> Order(effects);
+        order.pay();
+        order.pack();
+        order.cancel();
+        equal(effects.calls,
+            List.of(<span class="str">&quot;charge&quot;</span>, <span class="str">&quot;reserve&quot;</span>, <span class="str">&quot;release&quot;</span>, <span class="str">&quot;refund&quot;</span>));
+        equal(order.status(), Status.CANCELLED);
+
+        effects = <span class="kw">new</span> RecordingEffects();
+        order = orderAt(Status.PAID, effects);
+        order.cancel();
+        equal(effects.calls, List.of(<span class="str">&quot;refund&quot;</span>));</code></pre></figure><figure class="code source-part"><figcaption>StateDemo.java • part 6 of 6</figcaption><pre><code>        effects = <span class="kw">new</span> RecordingEffects();
+        order = <span class="kw">new</span> Order(effects);
+        order.cancel();
+        equal(effects.calls, List.of());
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">void</span> testFailures() {
+        RecordingEffects effects = <span class="kw">new</span> RecordingEffects();
+        Order order = <span class="kw">new</span> Order(effects);
+        effects.failOn = <span class="str">&quot;charge&quot;</span>;
+        mustFail(order::pay);
+        equal(order.status(), Status.CREATED);
+        equal(effects.calls, List.of());
+
+        effects = <span class="kw">new</span> RecordingEffects();
+        order = orderAt(Status.PAID, effects);
+        effects.failOn = <span class="str">&quot;reserve&quot;</span>;
+        mustFail(order::pack);
+        equal(order.status(), Status.PAID);
+
+        effects = <span class="kw">new</span> RecordingEffects();
+        order = orderAt(Status.PACKED, effects);
+        effects.failOn = <span class="str">&quot;refund&quot;</span>;
+        mustFail(order::cancel);
+        equal(order.status(), Status.PACKED);
+        equal(effects.calls, List.of(<span class="str">&quot;release&quot;</span>));
+        <span class="comment">// State unchanged does NOT mean earlier effects rolled back.</span>
+    }
+
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">void</span> testIndependentOrders() {
+        Order first = <span class="kw">new</span> Order(<span class="kw">new</span> RecordingEffects());
+        Order second = <span class="kw">new</span> Order(<span class="kw">new</span> RecordingEffects());
+        first.pay();
+        equal(first.status(), Status.PAID);
+        equal(second.status(), Status.CREATED);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        testTransitionMatrix();
+        testEffects();
+        testFailures();
+        testIndependentOrders();
+        System.out.println(<span class="str">&quot;PASS: all 30 state/action combinations&quot;</span>);
+        System.out.println(<span class="str">&quot;PASS: effects, failures, independent orders&quot;</span>);
+    }
+}</code></pre></figure><figure class="code "><figcaption>Expected output</figcaption><pre><code>PASS: all 30 state/action combinations
+PASS: effects, failures, independent orders</code></pre></figure></section><section class="chapter references" id="references"><div class="chapter-heading"><p class="eyebrow">References</p><h2>Official sources and scope</h2><p>Sources checked on 1 September 2026. The lesson’s order and ticket rules are illustrative design contracts; the sources verify language behavior and architectural mechanisms.</p></div><aside class="callout verification"><strong>Verification record</strong><p>The complete StateDemo.java listing was compiled with <code>-Xlint:all</code> and executed on OpenJDK 17.0.20. It passed the included checks. Its language features and APIs are supported by Java 25. A Java 25 runtime was not available for direct execution. The section 17 pattern-switch excerpt is checked against the official Java 25 language documentation; it is not part of StateDemo.java.</p></aside><ol><li id="ref-state" value="1"><a href="https://learn.microsoft.com/en-us/archive/msdn-magazine/2001/july/design-patterns-solidify-your-csharp-application-architecture-with-design-patterns#state">State pattern: delegation and localized behavior</a><p>Microsoft, MSDN Magazine archive, “Design Patterns,” State section. Used for the pattern’s structure, not as a claim that classes always beat tables.</p><span class="print-url">https://learn.microsoft.com/en-us/archive/msdn-magazine/2001/july/design-patterns-solidify-your-csharp-application-architecture-with-design-patterns#state</span></li><li id="ref-access" value="2"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-6.html#jls-6.6.1">Java SE 25 access control</a><p>Java Language Specification §6.6.1: private access within the enclosing top-level class or interface.</p><span class="print-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-6.html#jls-6.6.1</span></li><li id="ref-switch" value="3"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.11">Java SE 25 switch expressions and exhaustiveness</a><p>Java Language Specification §14.11 and §15.28.</p><span class="print-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.11</span></li><li id="ref-sealed" value="4"><a href="https://docs.oracle.com/en/java/javase/25/language/sealed-classes-interfaces.html">Sealed classes and interfaces</a><p>Oracle Java 25 Language Updates: permitted subtypes and record implementations.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/language/sealed-classes-interfaces.html</span></li><li id="ref-records" value="5"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Record classes</a><p>Oracle Java 25 Language Updates: components, accessors, canonical constructors, and validation.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/language/records.html</span></li><li id="ref-patterns" value="6"><a href="https://docs.oracle.com/en/java/javase/25/language/pattern-matching-switch.html">Pattern matching with switch</a><p>Oracle Java 25 Language Updates: reference-type patterns and sealed-hierarchy coverage.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/language/pattern-matching-switch.html</span></li><li id="ref-record-api" value="7"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html">Record API and shallow immutability</a><p>Oracle Java SE 25 API: record components and the limits of immutability.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html</span></li><li id="ref-concurrency" value="8"><a href="https://learn.microsoft.com/en-us/ef/core/saving/concurrency">Version checks and optimistic concurrency</a><p>Microsoft EF Core documentation. The version-predicate principle is illustrated here in SQL, without depending on EF Core.</p><span class="print-url">https://learn.microsoft.com/en-us/ef/core/saving/concurrency</span></li><li id="ref-outbox" value="9"><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">Transactional outbox</a><p>AWS Prescriptive Guidance: dual writes, committed publication, and duplicate delivery.</p><span class="print-url">https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html</span></li><li id="ref-javac" value="10"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Java 25 compiler command</a><p>Oracle JDK 25 tool specification for javac and the --release option.</p><span class="print-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li></ol></section><footer>DP · Lesson 6 · State · Java 25 guide<br>Offline HTML with print styling. No fonts, scripts, stylesheets, or images are loaded from the network.</footer></main><script>
+(() => {
+  'use strict';
+  const printButton = document.getElementById('print-guide');
+  printButton.hidden = false;
+  printButton.addEventListener('click', () => window.print());
+  let closedBeforePrint = [];
+  window.addEventListener('beforeprint', () => {
+    closedBeforePrint = [...document.querySelectorAll('details:not([open])')];
+    closedBeforePrint.forEach(d => d.open = true);
+  });
+  window.addEventListener('afterprint', () => {
+    closedBeforePrint.forEach(d => d.open = false);
+    closedBeforePrint = [];
+  });
+  const transitions = {
+    Created: {pay: 'Paid', cancel: 'Cancelled'},
+    Paid: {pack: 'Packed', cancel: 'Cancelled'},
+    Packed: {ship: 'Shipped', cancel: 'Cancelled'},
+    Shipped: {deliver: 'Delivered'}, Delivered: {}, Cancelled: {}
+  };
+  const effectFor = {
+    'Created:pay':'Charge payment.',
+    'Paid:pack':'Reserve inventory.',
+    'Paid:cancel':'Refund payment.',
+    'Packed:cancel':'Release inventory, then refund payment.'
+  };
+  const explorer = document.getElementById('explorer');
+  const current = document.getElementById('current-state');
+  const result = document.getElementById('transition-result');
+  const history = document.getElementById('history');
+  let state = 'Created';
+  explorer.hidden = false;
+  const render = () => {
+    current.textContent = state;
+    document.querySelectorAll('#s12 tbody tr').forEach(row => {
+      row.dataset.active = String(row.querySelector('th').textContent === state);
+    });
+  };
+  explorer.querySelectorAll('[data-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.action;
+      const from = state;
+      const next = transitions[from][action];
+      result.classList.toggle('rejected', !next);
+      if (next) {
+        state = next;
+        result.textContent = from + ' → ' + state + '. ' +
+          (effectFor[from + ':' + action] || 'No external effect in this example.');
+      } else {
+        result.textContent = 'Rejected: cannot ' + action + ' in ' + from +
+          '. State unchanged; no effect invoked.';
+      }
+      const item = document.createElement('li');
+      item.textContent = action + ': ' + from + (next ? ' → ' + next : ' → rejected');
+      history.prepend(item);
+      while (history.children.length > 5) history.lastElementChild.remove();
+      render();
+    });
+  });
+  document.getElementById('reset-order').addEventListener('click', () => {
+    state = 'Created'; history.replaceChildren(); result.classList.remove('rejected');
+    result.textContent = 'Order reset to Created. Try another path.'; render();
+  });
+  render();
+  const download = document.getElementById('download-java');
+  download.hidden = false;
+  download.addEventListener('click', () => {
+    const text = [...document.querySelectorAll('.source-part pre code')]
+      .map(node => node.textContent).join('\n\n') + '\n';
+    const url = URL.createObjectURL(new Blob([text], {type:'text/plain;charset=utf-8'}));
+    const link = document.createElement('a');
+    link.href = url; link.download = 'StateDemo.java';
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    document.getElementById('download-status').textContent = 'StateDemo.java download requested.';
+  });
+})();
+</script></body></html>

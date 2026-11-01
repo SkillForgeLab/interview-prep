@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>Enterprise Architect | Patterns and Interview Mastery Roadmap</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #173329;
+            --muted: #4b6356;
+            --line: #d3e3d7;
+            --green: #166534;
+            --pale: #f1f8f2
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: #eaf3ed;
+            color: var(--ink);
+            font: 15px/1.55 Arial, Helvetica, sans-serif
+        }
+
+        .page {
+            max-width: 1020px;
+            margin: 24px auto;
+            padding: 48px 56px;
+            background: #fff;
+            box-shadow: 0 8px 30px #1235241f
+        }
+
+        h1 {
+            font-size: 30px;
+            line-height: 1.18;
+            margin: 0 0 10px
+        }
+
+        h2 {
+            font-size: 21px;
+            margin: 35px 0 12px;
+            padding-bottom: 7px;
+            border-bottom: 2px solid #cbe3d1;
+            color: #14532d
+        }
+
+        h3 {
+            font-size: 16px;
+            margin: 23px 0 8px;
+            color: #166534
+        }
+
+        p {
+            margin: 9px 0 13px
+        }
+
+        .sub {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .lead {
+            font-size: 16px
+        }
+
+        .tag {
+            display: inline-block;
+            background: #ddf2e2;
+            color: #14532d;
+            border-radius: 4px;
+            padding: 3px 9px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 12px
+        }
+
+        .callout {
+            background: var(--pale);
+            border-left: 4px solid var(--green);
+            padding: 13px 17px;
+            margin: 17px 0
+        }
+
+        .table-wrap {
+            overflow-x: auto
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0 20px;
+            font-size: 13px
+        }
+
+        th, td {
+            border: 1px solid var(--line);
+            padding: 9px 10px;
+            text-align: left;
+            vertical-align: top
+        }
+
+        th {
+            background: #e6f3e9;
+            color: #14532d
+        }
+
+        tr:nth-child(even) td {
+            background: #f8fcf9
+        }
+
+        ul, ol {
+            padding-left: 23px
+        }
+
+        li {
+            margin: 5px 0
+        }
+
+        .section {
+            break-inside: avoid
+        }
+
+        .phase {
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            margin: 14px 0 20px;
+            overflow: hidden
+        }
+
+        .phase h3 {
+            margin: 0;
+            background: #e6f3e9;
+            padding: 11px 14px
+        }
+
+        .phase table {
+            margin: 0
+        }
+
+        .phase .mastery-heading {
+            margin: 0;
+            padding: 12px 14px 8px;
+            background: #f1f8f2;
+            color: #14532d
+        }
+
+        .phase-assignments {
+            margin: 0;
+            padding: 12px 18px 14px 42px
+        }
+
+        .phase-assignments li {
+            padding: 5px 0 7px
+        }
+
+        .phase .mastery-intro, .phase-note {
+            padding: 11px 14px
+        }
+
+        .priority-badge {
+            display: inline-block;
+            min-width: 2.2em;
+            padding: 2px 6px;
+            margin-right: 6px;
+            border: 1px solid #9a3412;
+            border-radius: 999px;
+            background: #9a3412;
+            color: #fff;
+            font-size: .82em;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap
+        }
+
+        .top-priority th:first-child { width: 31% }
+        .top-priority th:nth-child(2) { width: 21% }
+
+        .phase-mastery th:first-child { width: 22% }
+        .phase-mastery th:nth-child(2) { width: 19% }
+        .phase-mastery small { color: var(--muted) }
+
+        .scenario {
+            border: 1px solid var(--line);
+            padding: 13px 16px;
+            border-radius: 6px;
+            margin: 11px 0;
+            break-inside: avoid
+        }
+
+        .scenario h3 {
+            margin: 0 0 7px
+        }
+
+        .scenario p {
+            margin: 5px 0
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        pre {
+            background: #f5faf6;
+            border: 1px solid var(--line);
+            padding: 16px;
+            overflow: auto;
+            font-size: 12px;
+            line-height: 1.4
+        }
+
+        .actions {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            padding: 12px;
+            text-align: center;
+            z-index: 2
+        }
+
+        .actions button {
+            border: 0;
+            background: #166534;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer
+        }
+
+        .actions span {
+            margin-left: 12px;
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        a {
+            color: #166534
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            padding-top: 15px;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 30px
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm
+        }
+
+        @media print {
+            body {
+                background: white;
+                font-size: 11pt
+            }
+
+            .page {
+                margin: 0;
+                max-width: none;
+                padding: 0;
+                box-shadow: none
+            }
+
+            .actions {
+                display: none
+            }
+
+            .priority-badge {
+                background: #fff;
+                color: #7c2d12;
+                border: 2px solid #9a3412
+            }
+
+            .phase {
+                overflow: visible;
+                border: 0
+            }
+
+            h2 {
+                break-after: avoid
+            }
+
+            h3 {
+                break-after: avoid
+            }
+
+            table {
+                font-size: 9pt
+            }
+
+            thead {
+                display: table-header-group
+            }
+
+            tr {
+                break-inside: avoid
+            }
+
+            .scenario, .callout {
+                break-inside: avoid
+            }
+
+            a {
+                color: #14532d;
+                text-decoration: none
+            }
+        }
+
+        @media (max-width: 700px) {
+            .page {
+                margin: 0;
+                padding: 24px 18px
+            }
+
+            h1 {
+                font-size: 25px
+            }
+
+            .actions span {
+                display: none
+            }
+        }
+
+        .study-guide {
+            margin-top: 26px
+        }
+
+        .mastery {
+            table-layout: fixed;
+            width: 100%;
+            font-size: 12px
+        }
+
+        .mastery td, .mastery th {
+            overflow-wrap: anywhere;
+            vertical-align: top
+        }
+
+        .mastery small {
+            color: #246b45
+        }
+
+        .ai-prompt {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            background: #f1f8f2;
+            border: 1px solid #d3e3d7;
+            padding: 16px;
+            border-radius: 8px;
+            font: 12px/1.55 Consolas, monospace;
+            color: #173329
+        }
+
+        @media print {
+            .study-guide {
+                break-before: page
+            }
+
+            .mastery tr {
+                break-inside: avoid
+            }
+
+            .ai-prompt {
+                break-inside: auto
+            }
+
+            h2, h3, h4 {
+                break-after: avoid
+            }
+        }</style>
+</head>
+<body>
+<div class="actions">
+    <button onclick="window.print()">Print / Save as PDF</button>
+    <span>Light theme · Self-contained HTML · A4 print layout</span></div>
+<main class="page"><span class="tag">SENIOR / PRINCIPAL LEVEL</span>
+    <h1>Enterprise Solution Architect<br/>Design Patterns Competency Roadmap
+    </h1>
+    <p class="sub">For an architect with 20 years of experience · Four-phase
+        learning plan</p>
+    <p class="lead">The goal is to select, combine, defend, and reject patterns
+        based on business outcomes, integration complexity, reliability,
+        security, cost, and maintainability—not to memorize names.</p>
+    <div class="callout"><strong>Success criteria:</strong> Demonstrate
+        enterprise-wide architecture decisions, explicit trade-offs, realistic
+        failure handling, and clear communication to both delivery teams and
+        executives.
+    </div>
+    <h2>1. Competency levels</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Level</th>
+            <th>Capability</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>L1 — Awareness</td>
+            <td>Explain purpose and basic structure.</td>
+        </tr>
+        <tr>
+            <td>L2 — Application</td>
+            <td>Apply in a straightforward system.</td>
+        </tr>
+        <tr>
+            <td>L3 — Design</td>
+            <td>Select and compare alternatives.</td>
+        </tr>
+        <tr>
+            <td>L4 — Enterprise</td>
+            <td>Apply across systems, teams, and platforms.</td>
+        </tr>
+        <tr>
+            <td>L5 — Principal</td>
+            <td>Define standards, challenge assumptions, and govern adoption.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Target:</strong> L4–L5 for must-know patterns; L2–L3 for optional
+        patterns.</p>
+    <h2>2. Pattern inventory by category</h2>
+<p>These are the same must-know and optional topics detailed in section 3. Section 2 groups them by category; section 3 places them in study phases.</p>
+    <h3>A. Architecture foundations and domain boundaries</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Layered Architecture (L5) · Critical; Modular Monolith (L5) · Critical; Microservices (L5) · Critical; SOA (L5) · Critical; Hexagonal Architecture (L4) · Critical; DDD (L5) · Critical; Bounded Context (L5) · Critical; Anti-Corruption Layer (L5) · Critical; API-First (L4); Onion Architecture (L4) · Critical; Clean Architecture (L4) · Critical; Event-Driven Architecture (L5) · Critical; Aggregates (L5) · Critical; Domain Events (L4) · Critical; Ports and Adapters (L4) · Critical; Team Topologies (L4) · Critical</td><td>Microkernel; Plugin Architecture; Space-Based Architecture</td></tr></table>
+    <p><strong>Example:</strong> Connect an old ERP, a CRM SaaS platform, and a
+        new e-commerce service. Decide where domain boundaries belong and when
+        direct integration is acceptable. <strong>Trade-off:</strong>
+        Microservices improve independent ownership but increase distributed
+        operations and consistency costs.</p>
+    <h3>B. Distributed systems and resilience</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Circuit Breaker (L5) · Critical; Retry with Backoff and Jitter (L5) · Critical; Timeout (L5) · Critical; Bulkhead (L5) · Critical; Idempotency (L5) · Critical; Saga (L5) · Critical; Transactional Outbox (L5) · Critical; Dead Letter Queue (L4) · Critical; Backpressure (L4) · Critical; Rate Limiting (L5) · Critical; Graceful Degradation (L5) · Critical; Leader Election (L4) · Critical; Load Shedding (L5) · Critical; Connection Pooling (L4) · Critical; Failover (L5) · Critical; Throttling (L4) · Critical</td><td>Distributed Locking; Hedged Requests; Quorum Reads/Writes; Consistent Hashing</td></tr></table>
+    <p><strong>Example:</strong> Payment succeeds while inventory reservation
+        fails. Design retries, compensation, status reconciliation, and
+        duplicate prevention. <strong>Trade-off:</strong> Retrying improves
+        recovery but can overload failing dependencies; Saga compensation is not
+        a database rollback.</p>
+    <h3>C. Enterprise integration and messaging</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Request-Reply (L5) · Critical; API Gateway (L5) · Critical; Backend for Frontend (BFF) (L4) · Critical; Consumer-Driven Contracts (L4); Publish-Subscribe (L5) · Critical; Competing Consumers (L4) · Critical; CDC (L5) · Critical; Message Router (L4) · Critical; Message Translator (L4) · Critical; Strangler Fig (L5) · Critical; Canonical Data Model (L4); Service Mesh (L4) · Critical; Sidecar (L4) · Critical; Service Discovery (L5) · Critical</td><td>Aggregator; Claim Check; Scatter-Gather; Content-Based Router; Pipes and Filters</td></tr></table>
+    <p><strong>Example:</strong> Synchronize customer changes across core
+        banking, CRM, fraud, and analytics. <strong>Trade-off:</strong> One
+        canonical enterprise model reduces some translations but can create a
+        central governance bottleneck.</p>
+    <h3>D. Data architecture and consistency</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Database per Service (L5) · Critical; CQRS (L4) · Critical; Cache-Aside (L5) · Critical; Materialized View (L4) · Critical; Replication (L5) · Critical; Sharding (L4) · Critical; Eventual Consistency (L5); Outbox + CDC (L5); Event Sourcing (L4) · Critical; Lakehouse Architecture (L4); Data Mesh Principles (L4); Caching (L5) · Critical; Polyglot Persistence (L4) · Critical</td><td>Event-Carried State Transfer; Specialized Consistency Models; Lambda/Kappa Architecture; Data Vault</td></tr></table>
+    <p><strong>Example:</strong> Create a unified customer view across 25
+        applications. Address system-of-record ownership, identity matching,
+        master data, and conflicts. <strong>Trade-off:</strong> CQRS adds models
+        and synchronization complexity; Event Sourcing is separate and not
+        required.</p>
+    <h3>E. Cloud, security, and modernization</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Queue-Based Load Leveling (L5) · Critical; Multi-AZ (L5) · Critical; Active-Passive (L5) · Critical; Active-Active (L4) · Critical; Autoscaling (L4) · Critical; Zero Trust (L5) · Critical; Least Privilege (L5) · Critical; Defense in Depth (L5) · Critical; Strangler Fig (L5) · Critical; Branch by Abstraction (L4) · High; Expand-Contract (L4) · High; Multi-Region Active-Active (L4) · Critical; Service Mesh (L4) · Critical; Serverless (L4) · Critical; Multi-Region Architecture (L5) · Critical; OAuth 2.0 / OpenID Connect (L5) · Critical; Token Exchange (L4) · Critical; Secrets Management (L5) · Critical; Parallel Run (L4) · High; Blue-Green Deployment (L4) · High; Canary Deployment (L4) · High</td><td>Cell-Based Architecture; Sidecar Security Enforcement; Advanced Chaos Engineering</td></tr></table>
+    <p><strong>Example:</strong> Migrate a regulated on-premises workload to
+        cloud. Cover identity, encryption, data residency, disaster recovery,
+        rollback, and cost. <strong>Trade-off:</strong> Multi-region
+        active-active adds consistency and operational complexity and should be
+        justified by measurable business needs.</p>
+    <h3>F. Object-oriented / GoF</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Factory Method (L4) · High; Abstract Factory (L4) · High; Builder (L4) · High; Singleton (L4) · High; Adapter (L4) · High; Facade (L4) · High; Strategy (L4) · High; Observer (L4) · High; Decorator (L4) · High; Proxy (L4) · High; Command (L4) · High; Template Method (L4) · High; Chain of Responsibility (L4) · High</td><td>—</td></tr></table><p><strong>Example:</strong> Compose a legacy integration client with clear creation, behavior and access boundaries. <strong>Trade-off:</strong> Object-level patterns help local design but do not replace enterprise architecture decisions.</p><h3>G. Enterprise application</h3><table><tr><th>Must know (target)</th><th>Optional / situational</th></tr><tr><td>Repository (L4) · High; Unit of Work (L4) · High; Dependency Injection (L4) · High; Service Layer (L4) · High; Data Mapper (L4) · High; Specification (L4) · High; Domain Model (L4) · High</td><td>—</td></tr></table><p><strong>Example:</strong> Model an order application with explicit domain behavior, persistence and transaction boundaries. <strong>Trade-off:</strong> Extra layers help when they enforce real boundaries, but add ceremony when the domain is simple.</p><h2>3. Learning, delivery and interview mastery plan</h2>
+<p class="mastery-intro">For each topic, prepare a 60-second explanation, a whiteboard design, when to use or avoid it, two alternatives, failure modes, security and operational implications, and a production example with measurable trade-offs. Categories retain the A–G grouping from the pattern inventory in section 2. Critical and High checklist topics are must-know assignments. The numbered assignments group work by theme; the mastery tables contain the complete pattern inventory for each phase. After each topic, draft the architecture card described in section 4.</p>
+    <div class="phase"><h3>Phase 1 — Architecture foundations</h3>
+<h4 class="mastery-heading">Learning assignments and deliverables</h4>
+<ol class="phase-assignments"><li value="1"><strong>Architecture style selection</strong><br/><span>Required deliverable: Compare three architectures for one business system.</span></li>
+<li value="2"><strong>Domain modeling and ownership boundaries</strong><br/><span>Required deliverable: Domain map and integration boundaries.</span></li>
+<li value="3"><strong>Application and API boundaries</strong><br/><span>Required deliverable: API boundary and dependency diagrams.</span></li>
+<li value="4"><strong>Quality attributes and architecture decisions</strong><br/><span>Required deliverable: Three ADRs with rejected alternatives.</span></li></ol>
+<h4 class="mastery-heading">Must-know interview mastery</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td><strong>Layered Architecture (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Dependency direction, layer responsibilities, bypass risks,
+                    testing boundaries; compare with hexagonal and modular
+                    monolith. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Modular Monolith (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Module ownership, enforceable boundaries, shared deployment,
+                    extraction triggers; defend against premature microservices.
+                    <em>Interview drill:</em> explain a real enterprise
+                    scenario, defend this choice against an alternative, and
+                    identify one failure case.
+                </td></tr>
+<tr><td><strong>Microservices (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Service decomposition, independent deployment, data
+                    ownership, network failure, observability, organizational
+                    prerequisites. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>SOA (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Service contracts, enterprise integration, orchestration,
+                    shared infrastructure and governance; contrast
+                    microservices. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 11">#11</span> <strong>Hexagonal Architecture (L4)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Ports/adapters, dependency inversion, test seams, framework
+                    independence; sketch inbound and outbound adapters. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 1">#1</span> <strong>DDD (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Ubiquitous language, subdomains, context mapping,
+                    aggregates, invariants, domain events and strategic vs
+                    tactical ddd. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 1">#1</span> <strong>Bounded Context (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Context boundaries, ownership, translation, context maps and
+                    avoiding a universal enterprise data model. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 14">#14</span> <strong>Anti-Corruption Layer (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Legacy translation, domain isolation, ownership, latency and
+                    migration lifecycle. <em>Interview drill:</em> explain a
+                    real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>API-First (L4)</strong><br/><small>Must know</small>
+                </td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Contract design, versioning, compatibility, auth,
+                    pagination, errors, lifecycle and governance. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Request-Reply (L5)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Sync coupling, timeout, error contracts, retries, latency
+                    and when async is better. <em>Interview drill:</em> explain
+                    a real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 9">#9</span> <strong>API Gateway (L5)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Routing, auth, throttling, observability, api lifecycle,
+                    bottlenecks and gateway vs service responsibilities. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 9">#9</span> <strong>Backend for Frontend (BFF) (L4)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Client-specific composition, team ownership, api
+                    duplication, cache and mobile/web trade-offs. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Consumer-Driven Contracts (L4)</strong><br/><small>Must
+                    know</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Provider/consumer compatibility, contract tests, deployment
+                    sequencing and breaking changes. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Onion Architecture (L4)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Explain dependency rule and overlap with hexagonal/clean
+                    architecture; name one situation where it is preferable and
+                    one where it is not.
+                </td></tr>
+<tr><td><strong>Clean Architecture (L4)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Explain use cases, boundaries and dependency inversion; name
+                    one situation where it is preferable and one where it is
+                    not.
+                </td></tr>
+<tr><td><strong>Factory Method (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Creation behind an interface, subclass choice and test seams; compare with Abstract Factory and direct construction. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Abstract Factory (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Consistent families of related objects, product compatibility and extensibility; compare with Factory Method. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Builder (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Stepwise construction, validation and immutable results; avoid unnecessary builders for simple objects. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Singleton (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Single-instance lifecycle, concurrency, hidden global state and testing costs; compare with managed dependency scope. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Adapter (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Translate an incompatible object interface while preserving client contracts; distinguish from architecture-level ports and adapters. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Facade (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Provide a simpler boundary over a complex subsystem; avoid hiding important failures or ownership. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Strategy (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Select interchangeable algorithms by context; explain composition, configuration and testing. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Observer (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Notify subscribers of state changes; address lifecycle, ordering and failure; distinguish from distributed publish-subscribe. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Decorator (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Add behavior by composition; explain ordering, transparency and tracing through wrapper chains. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Proxy (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Control access through a representative object; compare local proxy, remote proxy and gateway boundaries. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Command (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Encapsulate an action as an object for queuing, audit or undo; distinguish from a distributed command message. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Template Method (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Fix an algorithm skeleton while varying steps; compare with Strategy and composition. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Chain of Responsibility (L4)</strong><br/><small>Must know · High</small></td><td><small>F — Object-oriented / GoF</small></td><td>Pass a request through ordered handlers; define termination, error behavior and observability. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Repository (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Separate domain-facing persistence contracts from storage details; avoid leaking query and transaction behavior. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Unit of Work (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Coordinate one transactional change set, identity tracking and commit boundaries; explain limits across services. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Dependency Injection (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Provide dependencies explicitly, control object lifetimes and composition roots; avoid service locator behavior. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Service Layer (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Place application orchestration and transaction boundaries outside domain entities; distinguish from domain services. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Data Mapper (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Map domain objects to persistence models without coupling domain logic to storage schemas. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Specification (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Express reusable business predicates and composition; distinguish in-memory evaluation from database translation. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Domain Model (L4)</strong><br/><small>Must know · High</small></td><td><small>G — Enterprise application</small></td><td>Model entities, value objects, invariants and behavior; compare with anemic data models. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Aggregates (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Define consistency boundaries, invariants, roots and transaction scope; avoid oversized aggregates. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Domain Events (L4)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Capture meaningful domain facts, publication boundaries and evolution; distinguish internal events from integration events. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Ports and Adapters (L4)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Define inward-facing ports and replaceable adapters; distinguish this architecture concept from the GoF Adapter pattern. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Service Discovery (L5)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Resolve healthy service instances, handle registration and stale endpoints, and compare client-side with platform discovery. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+</tbody></table>
+<h4 class="mastery-heading">Optional / situational topics (L2–L3)</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td>Microkernel</td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Explain plugin lifecycle, extensibility and core stability;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td>Plugin Architecture</td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Explain contracts, versioning and sandboxing; name one
+                    situation where it is preferable and one where it is not.
+                </td></tr>
+</tbody></table></div>
+    <div class="phase"><h3>Phase 2 — Distributed systems</h3>
+<h4 class="mastery-heading">Learning assignments and deliverables</h4>
+<ol class="phase-assignments"><li value="5"><strong>Dependency resilience and failure handling</strong><br/><span>Required deliverable: Resilience design for a failing dependency.</span></li>
+<li value="6"><strong>Distributed workflow and recovery</strong><br/><span>Required deliverable: Distributed order and payment workflow.</span></li>
+<li value="7"><strong>Event integration and contracts</strong><br/><span>Required deliverable: Five-application event integration design.</span></li>
+<li value="8"><strong>Read models, scale and consistency</strong><br/><span>Required deliverable: Read-scaling and consistency decision matrix.</span></li></ol>
+<h4 class="mastery-heading">Must-know interview mastery</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td><span class="priority-badge" title="Top 15 priority 13">#13</span> <strong>Event-Driven Architecture (L5)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Commands vs events, broker semantics, ordering, schema
+                    evolution, replay, eventual consistency and observability.
+                    <em>Interview drill:</em> explain a real enterprise
+                    scenario, defend this choice against an alternative, and
+                    identify one failure case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 5">#5</span> <strong>Circuit Breaker (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Closed/open/half-open states, thresholds, failure signals,
+                    fallback, observability and when not to trip. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 7">#7</span> <strong>Retry with Backoff and Jitter
+                    (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Transient vs permanent faults, retry budgets, jitter,
+                    idempotency, deadlines and retry storms. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 7">#7</span> <strong>Timeout (L5)</strong><br/><small>Must know · Critical</small>
+                </td><td><small>B — Distributed systems and resilience</small></td><td>Connection vs request timeouts, end-to-end deadlines,
+                    latency budgets and cancellation propagation. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 6">#6</span> <strong>Bulkhead (L5)</strong><br/><small>Must know · Critical</small>
+                </td><td><small>B — Distributed systems and resilience</small></td><td>Thread/connection pool isolation, concurrency limits, blast
+                    radius and capacity trade-offs. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 8">#8</span> <strong>Idempotency (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Keys, deduplication storage, response replay, atomicity,
+                    ttl, side-effect boundaries and payments. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 2">#2</span> <strong>Saga (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Orchestration vs choreography, compensation, irreversible
+                    steps, timeouts, state tracking and reconciliation. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 3">#3</span> <strong>Transactional Outbox (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Atomic database write + outbox, relay, ordering, duplicates,
+                    cleanup and consumer idempotency. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Dead Letter Queue (L4)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Poison messages, retry policy, alerting, replay, privacy and
+                    operational ownership. <em>Interview drill:</em> explain a
+                    real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Backpressure (L4)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Producer/consumer mismatch, bounded queues, admission
+                    control, shedding and throughput/latency trade-offs. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Rate Limiting (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Token/leaky bucket, quotas, fairness, distributed counters,
+                    http 429 and burst behavior. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Graceful Degradation (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Critical vs optional features, fallbacks, stale reads,
+                    feature flags and user-facing behavior. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 12">#12</span> <strong>Publish-Subscribe (L5)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Topic design, fan-out, subscriptions, delivery guarantees,
+                    ordering and schema evolution. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Competing Consumers (L4)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Consumer groups, parallelism, partitions, ordering,
+                    duplicate processing and scaling bottlenecks. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>CDC (L5)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Log-based capture, snapshot + stream, ordering, schema
+                    changes, lag, deletes and system-of-record semantics. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 15">#15</span> <strong>Database per Service (L5)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Ownership, no cross-service joins, consistency, query
+                    composition and reporting alternatives. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 4">#4</span> <strong>CQRS (L4)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Separate models, projection lag, query needs, complexity and
+                    why event sourcing is optional. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Cache-Aside (L5)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Miss/hit flow, invalidation, ttl, stampede, consistency and
+                    eviction. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Materialized View (L4)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Refresh strategy, projection rebuild, lag, source of truth
+                    and query acceleration. <em>Interview drill:</em> explain a
+                    real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Replication (L5)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Sync vs async, lag, failover, read-your-writes, split-brain
+                    and recovery. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Sharding (L4)</strong><br/><small>Must know · Critical</small>
+                </td><td><small>D — Data architecture and consistency</small></td><td>Shard key, skew, resharding, hotspots, cross-shard queries
+                    and tenant isolation. <em>Interview drill:</em> explain a
+                    real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Eventual Consistency (L5)</strong><br/><small>Must
+                    know</small></td><td><small>D — Data architecture and consistency</small></td><td>Staleness bounds, user expectations, invariants,
+                    reconciliation and consistency choices. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Outbox + CDC (L5)</strong><br/><small>Must
+                    know</small></td><td><small>D — Data architecture and consistency</small></td><td>Transaction log capture, outbox delivery, ordering,
+                    duplicates and operations. <em>Interview drill:</em> explain
+                    a real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Queue-Based Load Leveling (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Buffer sizing, consumer scaling, queue age, overload, dlq
+                    and backpressure. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Leader Election (L4)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Explain leases, fencing tokens and split-brain; name one
+                    situation where it is preferable and one where it is not.
+                </td></tr>
+<tr><td><strong>Event Sourcing (L4)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Explain append-only events, replay, projections, event
+                    versioning and GDPR concerns; name one situation where it is
+                    preferable and one where it is not.
+                </td></tr>
+<tr><td><strong>Load Shedding (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Reject excess work deliberately under overload; define admission signals, user impact and recovery thresholds. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Connection Pooling (L4)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Bound connection reuse and concurrency; tune pool size, timeouts, queueing and failure behavior. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Failover (L5)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Detect unhealthy components, move traffic or leadership safely and prevent split-brain during recovery. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Throttling (L4)</strong><br/><small>Must know · Critical</small></td><td><small>B — Distributed systems and resilience</small></td><td>Shape request or work rate, return clear signals and coordinate per-client limits with downstream capacity. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Caching (L5)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Select cache ownership, invalidation, TTL, consistency and stampede controls; compare with Cache-Aside. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Polyglot Persistence (L4)</strong><br/><small>Must know · Critical</small></td><td><small>D — Data architecture and consistency</small></td><td>Choose stores by access pattern and data ownership; address operations, skills, integration and consistency costs. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+</tbody></table>
+<h4 class="mastery-heading">Optional / situational topics (L2–L3)</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td>Space-Based Architecture</td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Explain in-memory grids, partitioning and operational
+                    complexity; name one situation where it is preferable and
+                    one where it is not.
+                </td></tr>
+<tr><td>Distributed Locking</td><td><small>B — Distributed systems and resilience</small></td><td>Explain lease expiry, fencing and correctness; name one
+                    situation where it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Hedged Requests</td><td><small>B — Distributed systems and resilience</small></td><td>Explain tail latency vs extra load; name one situation where
+                    it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Quorum Reads/Writes</td><td><small>B — Distributed systems and resilience</small></td><td>Explain replica agreement, availability and consistency;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td>Consistent Hashing</td><td><small>B — Distributed systems and resilience</small></td><td>Explain key distribution and node churn; name one situation
+                    where it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Event-Carried State Transfer</td><td><small>D — Data architecture and consistency</small></td><td>Explain event payload completeness, duplication and
+                    staleness; name one situation where it is preferable and one
+                    where it is not.
+                </td></tr>
+<tr><td>Specialized Consistency Models</td><td><small>D — Data architecture and consistency</small></td><td>Explain linearizability, causal consistency, quorums and
+                    business invariants; name one situation where it is
+                    preferable and one where it is not.
+                </td></tr>
+</tbody></table></div>
+    <div class="phase"><h3>Phase 3 — Enterprise integration and modernization</h3>
+<h4 class="mastery-heading">Learning assignments and deliverables</h4>
+<ol class="phase-assignments"><li value="9"><strong>Enterprise application integration</strong><br/><span>Required deliverable: Enterprise integration reference architecture.</span></li>
+<li value="10"><strong>Incremental legacy modernization</strong><br/><span>Required deliverable: Phased legacy modernization plan.</span></li>
+<li value="11"><strong>Identity and security boundaries</strong><br/><span>Required deliverable: Cross-platform identity and access design.</span></li>
+<li value="12"><strong>Cloud resilience and disaster recovery</strong><br/><span>Required deliverable: Business-critical hybrid deployment review.</span></li></ol>
+<h4 class="mastery-heading">Must-know interview mastery</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td><strong>Message Router (L4)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Routing rules, content vs metadata, versioning, traceability
+                    and operational ownership. <em>Interview drill:</em> explain
+                    a real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Message Translator (L4)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Schema mapping, semantic mismatch, validation, canonical vs
+                    domain contracts and error handling. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 10">#10</span> <strong>Strangler Fig (L5)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Incremental routing, coexistence, cutover, rollback, data
+                    migration and legacy dependency risks. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Canonical Data Model (L4)</strong><br/><small>Must
+                    know</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Shared semantics, versioning, governance, translation costs
+                    and over-centralization risks. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Lakehouse Architecture (L4)</strong><br/><small>Must
+                    know</small></td><td><small>D — Data architecture and consistency</small></td><td>Batch/stream ingestion, table formats, governance, quality,
+                    cost and bi/ml access patterns. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Data Mesh Principles (L4)</strong><br/><small>Must
+                    know</small></td><td><small>D — Data architecture and consistency</small></td><td>Domain ownership, data products, federated governance,
+                    interoperability and adoption prerequisites. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Multi-AZ (L5)</strong><br/><small>Must know · Critical</small>
+                </td><td><small>E — Cloud, security, and modernization</small></td><td>Failure domains, health checks, regional dependencies,
+                    failover tests and cost. <em>Interview drill:</em> explain a
+                    real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Active-Passive (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Standby modes, failover triggers, rto/rpo, replication and
+                    dr exercises. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Active-Active (L4)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Traffic steering, data conflicts, state replication,
+                    consistency and operational complexity. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Autoscaling (L4)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Metrics, warm-up, limits, stateful constraints, scale-in
+                    safety and cost. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Zero Trust (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Identity-centric access, continuous verification,
+                    device/workload posture, segmentation and policy
+                    enforcement. <em>Interview drill:</em> explain a real
+                    enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Least Privilege (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Role vs attribute policies, jit access, service identities,
+                    privilege reviews and exceptions. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Defense in Depth (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Identity, network, application, data, monitoring, layered
+                    controls and threat modeling. <em>Interview drill:</em>
+                    explain a real enterprise scenario, defend this choice
+                    against an alternative, and identify one failure case.
+                </td></tr>
+<tr><td><span class="priority-badge" title="Top 15 priority 10">#10</span> <strong>Strangler Fig (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Incremental routing, coexistence, cutover, rollback, data
+                    migration and legacy dependency risks. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Branch by Abstraction (L4)</strong><br/><small>Must know · High</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Replace dependency behind interface, feature toggles,
+                    parallel implementations and safe removal. <em>Interview
+                        drill:</em> explain a real enterprise scenario, defend
+                    this choice against an alternative, and identify one failure
+                    case.
+                </td></tr>
+<tr><td><strong>Expand-Contract (L4)</strong><br/><small>Must know · High</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Additive schema change, dual reads/writes, rollout ordering,
+                    backfill and cleanup. <em>Interview drill:</em> explain a
+                    real enterprise scenario, defend this choice against an
+                    alternative, and identify one failure case.
+                </td></tr>
+<tr><td><strong>Service Mesh (L4)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Explain mTLS, traffic policy, overhead and team readiness;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td><strong>Sidecar (L4)</strong><br/><small>Must know · Critical</small></td><td><small>C — Enterprise integration and messaging</small></td><td>Explain deployment coupling, resource cost and policy
+                    enforcement; name one situation where it is preferable and
+                    one where it is not.
+                </td></tr>
+<tr><td><strong>Multi-Region Active-Active (L4)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Explain conflict resolution, residency, RPO/RTO and cost;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td><strong>Service Mesh (L4)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Explain mTLS, traffic policy, overhead and team readiness;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td><strong>Serverless (L4)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Assess event-driven execution, scaling, cold starts, limits, observability and lock-in against long-running services. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Multi-Region Architecture (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Choose regional topology using latency, residency, RTO/RPO, failover and consistency requirements. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>OAuth 2.0 / OpenID Connect (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Explain authorization versus authentication, flows, scopes, token validation and trust boundaries. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Token Exchange (L4)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Delegate identity across services with audience restriction, short lifetimes and auditable trust boundaries. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Secrets Management (L5)</strong><br/><small>Must know · Critical</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Control storage, access, rotation, distribution and audit of credentials and keys. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Parallel Run (L4)</strong><br/><small>Must know · High</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Run legacy and replacement paths side by side; compare outputs, resolve divergence and define cutover criteria. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Blue-Green Deployment (L4)</strong><br/><small>Must know · High</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Switch between complete environments with health gates and rollback; plan database compatibility. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+<tr><td><strong>Canary Deployment (L4)</strong><br/><small>Must know · High</small></td><td><small>E — Cloud, security, and modernization</small></td><td>Release to a small cohort, measure guardrails and expand or roll back safely. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+</tbody></table>
+<h4 class="mastery-heading">Optional / situational topics (L2–L3)</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td>Aggregator</td><td><small>C — Enterprise integration and messaging</small></td><td>Explain fan-in, partial failures and latency; name one
+                    situation where it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Claim Check</td><td><small>C — Enterprise integration and messaging</small></td><td>Explain large payload storage, retention and security; name
+                    one situation where it is preferable and one where it is
+                    not.
+                </td></tr>
+<tr><td>Scatter-Gather</td><td><small>C — Enterprise integration and messaging</small></td><td>Explain parallel calls, time budgets and partial results;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td>Content-Based Router</td><td><small>C — Enterprise integration and messaging</small></td><td>Explain routing rules and testability; name one situation
+                    where it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Pipes and Filters</td><td><small>C — Enterprise integration and messaging</small></td><td>Explain composable transformations and observability; name
+                    one situation where it is preferable and one where it is
+                    not.
+                </td></tr>
+<tr><td>Lambda/Kappa Architecture</td><td><small>D — Data architecture and consistency</small></td><td>Explain batch/stream complexity and operational choices;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+<tr><td>Data Vault</td><td><small>D — Data architecture and consistency</small></td><td>Explain historical modeling, lineage and warehouse
+                    trade-offs; name one situation where it is preferable and
+                    one where it is not.
+                </td></tr>
+<tr><td>Cell-Based Architecture</td><td><small>E — Cloud, security, and modernization</small></td><td>Explain failure isolation, routing and tenancy; name one
+                    situation where it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Sidecar Security Enforcement</td><td><small>E — Cloud, security, and modernization</small></td><td>Explain policy deployment and blast radius; name one
+                    situation where it is preferable and one where it is not.
+                </td></tr>
+<tr><td>Advanced Chaos Engineering</td><td><small>E — Cloud, security, and modernization</small></td><td>Explain hypotheses, guardrails, blast radius and rollback;
+                    name one situation where it is preferable and one where it
+                    is not.
+                </td></tr>
+</tbody></table></div>
+    <div class="phase"><h3>Phase 4 — Principal architect practice</h3>
+<h4 class="mastery-heading">Learning assignments and deliverables</h4>
+<ol class="phase-assignments"><li value="13"><strong>Business capabilities, target state and roadmaps</strong><br/><span>Required deliverable: Three-year target-state roadmap.</span></li>
+<li value="14"><strong>Governance, standards, exceptions and technical debt</strong><br/><span>Required deliverable: Architecture review checklist.</span></li>
+<li value="15"><strong>Trade-off analysis and executive communication</strong><br/><span>Required deliverable: Two-option architecture board presentation.</span></li>
+<li value="16"><strong>Full enterprise architecture case study</strong><br/><span>Required deliverable: Complete proposal with defense and review.</span></li></ol>
+<h4 class="mastery-heading">Must-know interview mastery</h4>
+<table class="mastery phase-mastery"><thead><tr><th>Pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td><strong>Team Topologies (L4)</strong><br/><small>Must know · Critical</small></td><td><small>A — Architecture foundations and domain boundaries</small></td><td>Align team ownership, interaction modes and cognitive load with architecture boundaries and platform responsibilities. <em>Interview drill:</em> explain a real enterprise scenario, defend this choice against an alternative, and identify one failure case.</td></tr>
+</tbody></table>
+
+<p class="phase-note"><strong>Interview synthesis:</strong> Apply the patterns from phases 1–3 to the four deliverables above. Defend choices against alternatives, explain failures and recovery, and translate decisions into standards, roadmaps and executive recommendations.</p></div>
+    <h2>4. Top 15 patterns to prioritize</h2>
+<p>This interview shortlist follows the phase plan above. A shared rank groups closely related patterns; the same badges appear beside their detailed mastery rows in section 3. Event Sourcing and Cache-Aside remain in the full guide for deeper, workload-specific study.</p>
+<table class="top-priority"><thead><tr><th>Priority &amp; pattern / level</th><th>Category</th><th>What to master to pass a senior interview</th></tr></thead><tbody>
+<tr><td><span class="priority-badge">#1</span> <strong>DDD (L5) / Bounded Context (L5)</strong></td><td>A — Architecture foundations</td><td>Identify subdomains, define context boundaries and ownership, map interactions, and defend the split against alternative service boundaries.</td></tr>
+<tr><td><span class="priority-badge">#2</span> <strong>Saga (L5)</strong></td><td>B — Distributed systems</td><td>Design local transactions, orchestration or choreography, compensation, reconciliation, and recovery when compensation itself fails.</td></tr>
+<tr><td><span class="priority-badge">#3</span> <strong>Transactional Outbox (L5)</strong></td><td>B — Distributed systems</td><td>Prevent dual-write loss; explain the local transaction, relay, at-least-once delivery, ordering, and idempotent consumers.</td></tr>
+<tr><td><span class="priority-badge">#4</span> <strong>CQRS (L4)</strong></td><td>D — Data architecture</td><td>Separate write and read models only when warranted; address projections, stale reads, synchronization, and simpler alternatives.</td></tr>
+<tr><td><span class="priority-badge">#5</span> <strong>Circuit Breaker (L5)</strong></td><td>B — Distributed systems</td><td>Set failure thresholds and reset behavior; show how callers fail fast, recover, and avoid cascading outages.</td></tr>
+<tr><td><span class="priority-badge">#6</span> <strong>Bulkhead (L5)</strong></td><td>B — Distributed systems</td><td>Isolate resource pools and workloads; choose concurrency limits and explain what happens when a partition fills.</td></tr>
+<tr><td><span class="priority-badge">#7</span> <strong>Retry with Backoff and Jitter (L5) / Timeout (L5)</strong></td><td>B — Distributed systems</td><td>Budget end-to-end time, retry only safe failures, add backoff and jitter, and prevent retry storms or duplicate effects.</td></tr>
+<tr><td><span class="priority-badge">#8</span> <strong>Idempotency (L5)</strong></td><td>B — Distributed systems</td><td>Define keys, deduplication scope and retention; make repeated commands safe across retries and at-least-once delivery.</td></tr>
+<tr><td><span class="priority-badge">#9</span> <strong>API Gateway (L5) / Backend for Frontend (BFF) (L4)</strong></td><td>C — Enterprise integration</td><td>Define client-facing boundaries, auth, routing and composition; distinguish a shared gateway from client-specific backends.</td></tr>
+<tr><td><span class="priority-badge">#10</span> <strong>Strangler Fig (L5)</strong></td><td>C / E — Integration and modernization</td><td>Plan coexistence, incremental routing, data ownership, cutover and rollback while the legacy system remains live.</td></tr>
+<tr><td><span class="priority-badge">#11</span> <strong>Hexagonal Architecture (L4)</strong></td><td>A — Architecture foundations</td><td>Draw ports and adapters, dependency direction and test seams; explain when the added boundaries pay off.</td></tr>
+<tr><td><span class="priority-badge">#12</span> <strong>Publish-Subscribe (L5)</strong></td><td>C — Enterprise integration</td><td>Explain producer-consumer decoupling, contracts, delivery semantics, ordering, replay and operational failure handling.</td></tr>
+<tr><td><span class="priority-badge">#13</span> <strong>Event-Driven Architecture (L5)</strong></td><td>A — Architecture foundations</td><td>Distinguish commands from events; defend event flow, schema evolution, consistency, observability and recovery.</td></tr>
+<tr><td><span class="priority-badge">#14</span> <strong>Anti-Corruption Layer (L5)</strong></td><td>A — Architecture foundations</td><td>Protect a domain model from legacy semantics; address translation ownership, latency and migration lifecycle.</td></tr>
+<tr><td><span class="priority-badge">#15</span> <strong>Database per Service (L5)</strong></td><td>D — Data architecture</td><td>Define data ownership and cross-service queries; defend consistency, migration and operational costs against shared storage.</td></tr>
+</tbody></table>
+<h3>Architecture card — create after each topic</h3>
+<p>Draft this card from memory after the interview drill, then check and correct it. Keep it concise; give the Top 15 fuller treatment and use shorter cards for the other topics.</p>
+<ol class="architecture-card-fields">
+    <li><strong>Problem:</strong> What specific problem does the pattern solve?</li>
+    <li><strong>Context:</strong> When is it appropriate, and when should it be avoided?</li>
+    <li><strong>Trade-offs:</strong> What complexity, cost and risks does it introduce?</li>
+    <li><strong>Alternatives:</strong> What simpler approach could work, and why might it be sufficient?</li>
+    <li><strong>Implementation:</strong> How would it work in the target stack? State the stack and the main components, data flows and operational controls.</li>
+    <li><strong>Failure scenarios:</strong> What happens during outages, duplicates or traffic spikes? Adapt this field to the pattern; for object-oriented patterns, consider misuse, object lifetime, concurrency and testing.</li>
+</ol>
+<div class="callout"><strong>Top 15 only — Real-world project example:</strong> The AI assistant must find, verify, and provide one named production project that used the pattern. Include the organization and system, the problem, how the pattern was applied, any reported outcome, and a direct link to the organization’s engineering write-up or another primary source. The assistant must do this research itself, without asking you to name a project. If it cannot verify a suitable case, it must say so and must not invent one.</div>
+<h2>5. Worked example — Enterprise order platform</h2>
+    <pre>        Web / Mobile / Partners
+                  |
+             API Gateway
+                  |
+             Order Service
+                  |
+             Order Database
+                  |
+         Transactional Outbox
+                  |
+             Event Broker
+                  |
+         Workflow Orchestrator
+           /       |       \
+      Payment   Inventory  Shipping
+         |         |         |
+      Provider   ERP Adapter  Logistics API
+                    |
+                 Legacy ERP</pre>
+    <table>
+        <tr>
+            <th>Pattern</th>
+            <th>Why use it</th>
+            <th>Trade-off</th>
+        </tr>
+        <tr>
+            <td>API Gateway</td>
+            <td>Routing and entry-point policies</td>
+            <td>Shared dependency and potential bottleneck</td>
+        </tr>
+        <tr>
+            <td>Saga</td>
+            <td>Coordinate multi-system transactions</td>
+            <td>Complex compensation and recovery</td>
+        </tr>
+        <tr>
+            <td>Transactional Outbox</td>
+            <td>Publish events reliably after database commits</td>
+            <td>Relay operations and duplicate handling</td>
+        </tr>
+        <tr>
+            <td>Idempotency</td>
+            <td>Avoid duplicate payment actions</td>
+            <td>Durable request-state tracking</td>
+        </tr>
+        <tr>
+            <td>Anti-Corruption Layer</td>
+            <td>Isolate legacy ERP models</td>
+            <td>Mapping maintenance</td>
+        </tr>
+        <tr>
+            <td>Circuit Breaker</td>
+            <td>Limit pressure on failing services</td>
+            <td>Threshold tuning and recovery handling</td>
+        </tr>
+        <tr>
+            <td>Event-Driven</td>
+            <td>Decouple systems</td>
+            <td>Eventual consistency and tracing complexity</td>
+        </tr>
+    </table>
+    <div class="callout"><strong>Interview challenge:</strong> A payment
+        provider times out after charging the customer. Explain status
+        reconciliation, idempotency, correlation IDs, retry rules, and
+        operational recovery. Do not blindly retry the charge.
+    </div>
+    <h2>6. AI study assistant — copy-and-use instructions</h2>
+        <p>Give the entire HTML file to your AI assistant, then paste this
+            prompt. It is designed for structured interview practice rather than
+            passive reading.</p>
+        <pre class="ai-prompt">You are my Principal Enterprise Solution Architect interview coach. Use the attached roadmap as the complete study syllabus. Treat all MUST-KNOW patterns as target L4–L5 and OPTIONAL patterns as L2–L3.
+
+For EACH topic in the roadmap:
+1. Explain the problem, pattern mechanics and context in plain English.
+2. Draw a small ASCII architecture diagram.
+3. Give a realistic enterprise example involving legacy, SaaS, cloud or regulated systems.
+4. Compare at least two alternatives; explain when NOT to use this pattern.
+5. Explain failure modes, consistency, security, observability, operations and cost implications.
+6. Ask five interview questions: fundamentals, design, failure scenario, trade-off challenge, and executive communication.
+7. Ask ONE question at a time. Wait for my response. Do not reveal the model answer first.
+8. Score my answer 0–5 for correctness, depth, trade-offs, communication and enterprise applicability. Identify missing points and give a stronger model answer.
+9. Make me redo weak answers. Track my topic scores, gaps and revisit dates.
+10. After I answer, ask me to draft an architecture card from memory before you fill gaps. Review and correct it. Use six fields: Problem, Context, Trade-offs, Alternatives (including a simpler option), Implementation in my target stack, and Failure scenarios. Ask for my target stack if unknown; adapt failure scenarios to the pattern. Keep the card concise, with fuller treatment for Top 15 topics.
+11. For each Top 15 topic, YOU must research and provide one real-world production project that used the pattern. Browse the web and verify it with a primary source, preferably the organization’s engineering write-up. Give the organization and system, the problem, how the pattern was implemented, any reported outcome, and a direct source link. Do not ask me to name a project or supply an example. Do not invent a case or present an inferred use as documented fact. If no suitable case can be verified, say so explicitly.
+12. End each topic with three follow-up drills and revisit weak cards later.
+
+Start by assessing my current knowledge in the first must-know topic. Challenge vague claims and unsupported assumptions. If the roadmap uses a concept that is not formally a design pattern, distinguish it from an architectural style, principle, or technique. Do not invent vendor-specific facts; verify current product claims using official documentation.</pre>
+        <h2>7. Interview-ready answer framework</h2>
+        <p><strong>Context → Constraints → Options → Decision → Trade-offs →
+            Failure/Recovery → Evidence.</strong> In every system design answer,
+            quantify expected scale, SLO, RTO/RPO, consistency needs, team
+            capacity and cost before choosing technology. Use ADRs to document
+            decisions.</p>
+    <h2>8. Official reference material</h2>
+    <ul>
+        <li>
+            <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/">Microsoft
+                Learn — Cloud Design Patterns</a></li>
+        <li>
+            <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/">AWS
+                Prescriptive Guidance — Cloud Design Patterns</a></li>
+        <li><a href="https://www.opengroup.org/togaf">The Open Group — TOGAF
+            Standard</a></li>
+    </ul>
+    <footer>Enterprise Solution Architect Design Patterns Competency Roadmap ·
+        Print using the button above or your browser's Print → Save as PDF.
+        Background graphics are optional; the document is designed to remain
+        readable without them.
+    </footer>
+</main>
+</body>
+</html>

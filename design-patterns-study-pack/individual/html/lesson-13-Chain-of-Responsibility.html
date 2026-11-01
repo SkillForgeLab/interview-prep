@@ -1,0 +1,527 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 13: derive Chain of Responsibility from first principles, implement middleware in Java 25-compatible code, and test short-circuit behavior."><title>Lesson 13 · Chain of Responsibility · Java 25</title><style>
+:root{color-scheme:light;--ink:#20333d;--muted:#536771;--teal:#136a68;--paper:#fff;--line:#d8e2e3;--pale:#f1f7f6;--warm:#fcf6ed;--code:#f5f7fa;--serif:Georgia,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"DejaVu Sans Mono",Consolas,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:#f4f7f7;font:16px/1.65 var(--sans)}a{color:#126765;text-decoration-thickness:1px;text-underline-offset:3px}a:hover{text-decoration-thickness:2px}a:focus-visible,button:focus-visible{outline:3px solid #ba7019;outline-offset:4px}button{font:600 13px var(--sans);padding:10px 14px;border:1px solid #aac2c2;border-radius:5px;background:#fff;color:#154f51;cursor:pointer}button:hover{background:#eaf4f2}.js-only{display:none}.js .js-only{display:flex}.frame{display:grid;grid-template-columns:220px minmax(0,900px);max-width:1190px;margin:0 auto;gap:30px;padding:38px 20px 72px}.sidebar{position:sticky;top:30px;align-self:start;font-size:13px;line-height:1.45}.brand{font-weight:800;letter-spacing:.13em;font-size:12px;color:var(--teal);margin-bottom:22px}.sidebar strong{display:block;margin:18px 0 8px}.sidebar a{display:block;text-decoration:none;padding:7px 0;border-bottom:1px solid #e0e8e8;color:var(--muted)}.sidebar a:hover{color:var(--teal)}.sidebar .small{margin-top:18px}.paper{min-width:0;background:var(--paper);border:1px solid var(--line);box-shadow:0 12px 40px #213a4510;padding:50px 56px}.hero{padding-bottom:32px;border-bottom:2px solid var(--teal)}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin:0 0 11px}.hero h1{font:normal clamp(38px,4.5vw,56px)/1.07 var(--serif);letter-spacing:-.035em;margin:16px 0 18px}.subtitle{font-size:20px;line-height:1.5;max-width:580px;color:#455d65}.tags{display:flex;gap:7px;flex-wrap:wrap;margin:23px 0}.tag{font-size:11px;font-weight:650;letter-spacing:.04em;border:1px solid #bfd3d0;border-radius:3px;padding:4px 8px;background:var(--pale)}.actions{gap:8px;flex-wrap:wrap;margin:20px 0}.hero .small{margin:10px 0 0}.intro{margin:26px 0}.small{font-size:12px;color:var(--muted)}.reading-route{border-left:3px solid #a7c7c2;padding:2px 0 2px 18px}.reading-route p{margin:8px 0}.part{margin:58px 0 28px;padding:24px 0 20px;border-top:1px solid #7caaaa;border-bottom:1px solid var(--line)}.part h2{font:normal 32px/1.17 var(--serif);margin:0 0 12px;letter-spacing:-.02em}.part p:last-child{color:var(--muted);margin-bottom:0}.lesson-section{margin:34px 0}.lesson-section>h2{font:700 21px/1.3 var(--sans);display:flex;gap:12px;align-items:baseline;margin:0 0 16px}.section-number{color:var(--teal);font-size:12px;font-weight:750;min-width:22px;letter-spacing:.02em}p{margin:12px 0}strong{font-weight:700}h3{font-size:17px;line-height:1.3;margin:28px 0 14px}ul,ol{padding-left:24px}li{padding-left:3px;margin:9px 0}code{font: .88em/1.5 var(--mono);overflow-wrap:anywhere;background:#f1f5f6;padding:.12em .27em;border-radius:3px}.code-block{margin:18px 0 22px;border:1px solid #dbe2e8;border-radius:5px;background:var(--code);overflow:hidden}.code-block figcaption{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#edf1f4;padding:8px 13px;border-bottom:1px solid #dbe2e8;color:#465962;font-size:10px;font-weight:650;letter-spacing:.015em}.code-block .copy{font-size:10px;padding:3px 7px;background:#fff}.code-block pre{margin:0;padding:14px;overflow-x:auto;tab-size:4;line-height:1.5}.code-block code{padding:0;background:none;font-size:11.4px;line-height:1.55;white-space:pre;word-break:normal;overflow-wrap:normal;border-radius:0}.table-wrap{margin:20px 0;overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left;font-size:13px;line-height:1.5}thead{background:#edf5f3}th{font-size:11px;color:#245858;font-weight:750}td,th{vertical-align:top;padding:11px 12px;border:1px solid var(--line)}tbody tr:nth-child(even){background:#fbfcfc}td:first-child{font-weight:600}td code{font-size:.85em}td p{margin:0}.callout{padding:15px 18px;margin:20px 0;background:var(--pale);border-left:3px solid #6ba59c}.callout>strong{font-size:13px;color:#215d59}.callout p{margin:6px 0 0;font-size:13px;line-height:1.6}.caution{background:var(--warm);border-left-color:#c48b38}.caution>strong{color:#755023}.cite{font-size:11px;vertical-align:super;text-decoration:none;white-space:nowrap;padding-left:2px}.principle{font:normal 22px/1.4 var(--serif);color:#195c59;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0}.major-section{margin-top:60px;padding-top:24px;border-top:2px solid var(--teal)}.major-section>h2{font:normal 32px/1.18 var(--serif);margin:4px 0 22px}.source-part{margin:28px 0}.sources{font-size:13px}.sources li{padding:8px 0;margin:8px 0;break-inside:avoid}.sources p{margin:5px 0}.source-url{font-family:var(--mono);font-size:9px;overflow-wrap:anywhere;color:#5c6c75;display:block}.endnote{font-size:11px;margin-top:35px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted)}.skip-link{position:fixed;top:-80px;left:20px;background:#fff;padding:10px;z-index:10}.skip-link:focus{top:12px}#copy-status{font-size:12px;color:var(--teal);min-height:1.5em}.print-only{display:none}
+@media(max-width:1000px){.frame{grid-template-columns:180px minmax(0,1fr);gap:20px}.paper{padding:36px 30px}.code-block code{font-size:10.5px}}
+@media(max-width:760px){.frame{display:block;padding:0}.sidebar{display:none}.paper{border:0;box-shadow:none;padding:30px 21px}.hero h1{font-size:40px}.subtitle{font-size:18px}.lesson-section>h2{font-size:20px}.part{margin-top:44px}.code-block code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:10.5px}.table-wrap{overflow:visible}table{font-size:12px}td,th{padding:8px}.major-section>h2,.part h2{font-size:28px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:auto;margin:15mm 15mm 17mm;@bottom-left{content:"DP  /  Lesson 13  /  Java 25";font-family:sans-serif;font-size:8pt;color:#5b6c73}@bottom-right{content:counter(page);font-family:sans-serif;font-size:8pt;color:#5b6c73}}
+@media print{html{scroll-behavior:auto}body{background:#fff;font-size:10pt;line-height:1.48;color:#172b33}.frame{display:block;padding:0;margin:0;max-width:none}.sidebar,.js .js-only,.js-only,.skip-link,#copy-status{display:none!important}.paper{padding:0;border:0;box-shadow:none;width:auto}.hero{padding:0 0 18pt}.hero h1{font-size:36pt;max-width:470pt}.subtitle{font-size:14pt}.tag{font-size:8pt}.tags{margin:15pt 0}.small{font-size:8.5pt}.part{break-before:page;margin:0 0 15pt;padding:12pt 0}.part h2{font-size:24pt}.eyebrow{font-size:8pt}.lesson-section{margin:20pt 0}.lesson-section>h2{font-size:15pt;line-height:1.3;margin-bottom:10pt}.section-number{font-size:9pt}h2,h3,figcaption{break-after:avoid}h3{font-size:12pt;margin:15pt 0 9pt}p{orphans:3;widows:3;margin:8pt 0}li{orphans:2;widows:2;margin:5pt 0}.code-block{break-inside:avoid;box-decoration-break:clone;margin:11pt 0;border-radius:0;overflow:visible}.code-block pre{padding:9pt;overflow:visible;font:8.2pt/1.35 var(--mono)}.code-block code{font-size:8.2pt;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}.code-block figcaption{font-size:7.5pt;padding:6pt 9pt;min-height:0}.table-wrap{overflow:visible;margin:12pt 0}table{font-size:9pt;line-height:1.45}th{font-size:8pt}td,th{padding:7pt 8pt}thead{display:table-header-group}tr{break-inside:avoid}.callout{break-inside:avoid;padding:10pt 12pt;margin:12pt 0}.callout p,.callout>strong{font-size:9pt}.major-section{break-before:page;margin:0;padding-top:14pt}.major-section>h2{font-size:25pt}.source-part{margin:16pt 0;break-inside:avoid}.principle{font-size:16pt;padding:14pt 0}.sources{font-size:8.5pt;line-height:1.4}.sources li{padding:3pt 0;margin:4pt 0}.sources p{margin:3pt 0}.source-url{font-size:7pt}.print-only{display:block}a{text-decoration:none;color:#195856}code{font-size:.9em}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.syntax-keyword{color:#185b93;font-weight:600}.syntax-string{color:#855128}.syntax-comment{color:#5b716c}.syntax-number{color:#674896}</style></head><body><a class="skip-link" href="#main">Skip to guide</a><div class="frame"><nav class="sidebar" aria-label="Guide contents"><div class="brand">DP / DESIGN PATTERNS</div><strong>Lesson 13</strong><a href="#s1">01–03 · Derive the need</a><a href="#s4">04–09 · Choose a model</a><a href="#s10">10–13 · Middleware</a><a href="#s14">14–18 · Compare patterns</a><a href="#s19">19–26 · Semantics & tests</a><a href="#exercise">Exercise</a><a href="#reference">Runnable Java reference</a><a href="#pattern-map">Pattern map</a><a href="#sources">Official sources</a><p class="small">Self-contained HTML<br>Light theme · Print stylesheet<br>No external assets</p></nav><main class="paper" id="main"><header class="hero"><p class="eyebrow">Design patterns from first principles · Lesson 13</p><h1>Chain of<br>Responsibility</h1><p class="subtitle">One request. Independent stages.<br>Explicit control over what happens next.</p><div class="tags"><span class="tag">JAVA 25 COMPATIBLE</span><span class="tag">26 LESSON STEPS</span><span class="tag">RUNNABLE REFERENCE</span></div><div class="actions js-only"><button type="button" id="print-guide">Print / Save as PDF</button><button type="button" id="jump-code">Go to full Java example</button></div><p class="small">For PDF: select A4, portrait, 100% scale. Disable browser headers and footers if they duplicate the guide’s footer.</p></header><div class="intro"><p><strong>The core idea:</strong> break request processing into independent stages and give continuation a clear contract.</p><p>We begin with ordinary service code, find the pressure created by repeated processing rules, try a simple list, and introduce middleware only when stages need to wrap downstream work.</p><div class="reading-route"><p><strong>Read in order:</strong> problem → stage abstraction → stop rules → middleware → ordering → failure → tests.</p><p><strong>Prerequisites:</strong> Java interfaces, exceptions, collections, lambdas, and constructors. Records are used for small data carriers.</p></div><p class="small">The lesson is readable and printable without JavaScript. Print and copy controls are conveniences; all explanations and complete source are included below.</p></div><header class="part"><p class="eyebrow">Part I</p><h2>Derive the need</h2><p>Start with ordinary code. Introduce a pattern only when independent stages and different combinations create pressure.</p></header><section id="s1" class="lesson-section"><h2><span class="section-number">01</span>Start without a pattern</h2>
+<p>A money-transfer service can begin as one explicit method. Authentication, validation, a fraud decision, and execution are easy to follow when there is one use case.</p>
+<figure class="code-block"><figcaption>Java · starting design; execution is simulated<button class="copy js-only" data-copy="code-1" type="button">Copy</button></figcaption><pre><code id="code-1"><span class="syntax-keyword">record</span> TransferRequest(String userId, <span class="syntax-keyword">long</span> amountInCents) {}
+<span class="syntax-keyword">record</span> TransferResult(String transactionId) {}
+
+<span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> TransferService {
+    <span class="syntax-keyword">private</span> <span class="syntax-keyword">final</span> java.util.function.Predicate&lt;TransferRequest&gt; suspicious;
+
+    TransferService(
+            java.util.function.Predicate&lt;TransferRequest&gt; suspicious) {
+        this.suspicious = java.util.Objects.requireNonNull(suspicious);
+    }
+
+    TransferResult transfer(TransferRequest request) {
+        <span class="syntax-keyword">if</span> (request.userId() == <span class="syntax-keyword">null</span> || request.userId().isBlank()) {
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> SecurityException(<span class="syntax-string">&quot;Authentication required&quot;</span>);
+        }
+        <span class="syntax-keyword">if</span> (request.amountInCents() &lt;= <span class="syntax-number">0</span>) {
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> IllegalArgumentException(<span class="syntax-string">&quot;Amount must be positive&quot;</span>);
+        }
+        <span class="syntax-keyword">if</span> (request.amountInCents() &gt; <span class="syntax-number">1_000_000</span>) {
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> IllegalArgumentException(<span class="syntax-string">&quot;Transfer limit exceeded&quot;</span>);
+        }
+        <span class="syntax-keyword">if</span> (suspicious.test(request)) {
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> IllegalArgumentException(<span class="syntax-string">&quot;Transfer rejected&quot;</span>);
+        }
+        <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> TransferResult(<span class="syntax-string">&quot;DEMO-TX&quot;</span>);
+    }
+}</code></pre></figure>
+<p><strong>This is a reasonable starting point.</strong> A few <code>if</code> statements do not justify a handler framework.</p>
+<aside class="callout note"><strong>Two deliberate simplifications</strong><p>Here <code>userId</code> is assumed to come from a trusted authentication boundary; checking for a value does not authenticate a caller. The amount cap is a transfer rule. Rate limiting controls request admission, such as requests per time window, and needs a separate policy. The complete example verifies a demo credential before assigning a user ID. <a class="cite" href="#source-9" aria-label="Source 9">[9]</a></p></aside></section><section id="s2" class="lesson-section"><h2><span class="section-number">02</span>Requirements grow</h2>
+<p>Additional concerns arrive: authorization, rate limiting, sanctions checks, audit, and idempotency. Extracting private methods keeps one service readable. The pressure changes when multiple operations need different combinations.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Operation</th><th scope="col">Illustrative stages before execution</th></tr></thead><tbody><tr><td>Transfer money</td><td>Authentication, validation, rate limit, fraud, sanctions, idempotency</td></tr><tr><td>Update profile</td><td>Authentication, validation, rate limit</td></tr><tr><td>Generate report</td><td>Authentication, authorization, rate limit</td></tr></tbody></table></div><p>Now changing a shared rule may require editing several orchestration methods. The recurring unit is a <strong>processing stage</strong>, not the entire use case.</p></section><section id="s3" class="lesson-section"><h2><span class="section-number">03</span>Diagnose the actual problem</h2>
+<p>Each independent stage receives a request, inspects it, and chooses an outcome. The caller should depend on one entry point instead of knowing every stage.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Stage decision</th><th scope="col">Effect</th></tr></thead><tbody><tr><td>Continue</td><td>Allow the next stage to run.</td></tr><tr><td>Stop with a result</td><td>Return a rejection or a completed response.</td></tr><tr><td>Fail</td><td>Throw; downstream processing does not continue unless something deliberately recovers.</td></tr></tbody></table></div>
+<p>That leads to <strong>Chain of Responsibility</strong>: potential handlers receive a request in sequence, with continuation controlled along the chain. The classic form passes until a handler accepts responsibility. <a class="cite" href="#source-1" aria-label="Source 1">[1]</a></p>
+<aside class="callout note"><strong>Keep two variants distinct</strong><p>A <em>first-handler-wins chain</em> looks for a receiver, such as escalating a support request. A <em>processing pipeline</em> runs multiple stages, any of which may stop the request. This lesson develops the pipeline and middleware variant. They share a continuation idea, but are not identical semantics.</p></aside></section><header class="part"><p class="eyebrow">Part II</p><h2>Choose the smallest execution model</h2><p>Start with a list. Add explicit stop results or next-callbacks only when the behavior needs them.</p></header><section id="s4" class="lesson-section"><h2><span class="section-number">04</span>Represent one processing stage</h2>
+<p>Give checks a common contract. Normal return means this check passed. These excerpts use the <code>TransferRequest</code> record from step 1.</p>
+<figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-2" type="button">Copy</button></figcaption><pre><code id="code-2">@FunctionalInterface
+<span class="syntax-keyword">interface</span> Handler {
+    <span class="syntax-keyword">void</span> handle(TransferRequest request);
+}
+
+<span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> AuthenticationHandler <span class="syntax-keyword">implements</span> Handler {
+    @Override
+    <span class="syntax-keyword">public</span> <span class="syntax-keyword">void</span> handle(TransferRequest request) {
+        <span class="syntax-keyword">if</span> (request.userId() == <span class="syntax-keyword">null</span> || request.userId().isBlank()) {
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> SecurityException(<span class="syntax-string">&quot;Authentication required&quot;</span>);
+        }
+    }
+}
+
+<span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> ValidationHandler <span class="syntax-keyword">implements</span> Handler {
+    @Override
+    <span class="syntax-keyword">public</span> <span class="syntax-keyword">void</span> handle(TransferRequest request) {
+        <span class="syntax-keyword">if</span> (request.amountInCents() &lt;= <span class="syntax-number">0</span>) {
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> IllegalArgumentException(<span class="syntax-string">&quot;Amount must be positive&quot;</span>);
+        }
+    }
+}</code></pre></figure><p>A fraud handler can use the same interface and receive a fraud service in its constructor. The rule belongs to the stage; sequencing belongs elsewhere.</p></section><section id="s5" class="lesson-section"><h2><span class="section-number">05</span>A list is often enough</h2>
+<p>The pipeline owns iteration. Handlers do not need a mutable <code>next</code> field.</p>
+<figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-3" type="button">Copy</button></figcaption><pre><code id="code-3"><span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> TransferPipeline {
+    <span class="syntax-keyword">private</span> <span class="syntax-keyword">final</span> java.util.List&lt;Handler&gt; handlers;
+
+    TransferPipeline(java.util.List&lt;Handler&gt; handlers) {
+        this.handlers = java.util.List.copyOf(handlers);
+    }
+
+    <span class="syntax-keyword">void</span> execute(TransferRequest request) {
+        java.util.Objects.requireNonNull(request);
+        <span class="syntax-keyword">for</span> (Handler handler : handlers) {
+            handler.handle(request);
+        }
+    }
+}</code></pre></figure><figure class="code-block"><figcaption>Java · caller excerpt<button class="copy js-only" data-copy="code-4" type="button">Copy</button></figcaption><pre><code id="code-4"><span class="syntax-keyword">var</span> pipeline = <span class="syntax-keyword">new</span> TransferPipeline(java.util.List.of(
+    <span class="syntax-keyword">new</span> AuthenticationHandler(),
+    <span class="syntax-keyword">new</span> ValidationHandler()
+));
+pipeline.execute(request);
+<span class="syntax-comment">// Call the business operation only after execute returns normally.</span></code></pre></figure><p><code>List.copyOf</code> preserves iteration order, rejects null elements, and provides an unmodifiable list. It does not freeze the handler objects inside it. <a class="cite" href="#source-4" aria-label="Source 4">[4]</a></p></section><section id="s6" class="lesson-section"><h2><span class="section-number">06</span>Stopping with an exception</h2>
+<p>If validation throws, the loop exits and later handlers are not invoked. Authentication may already have run; fraud and business execution will not run.</p>
+<p>Use this convention when exception handling matches your application boundary. Expected user rejection can also be represented as data. An exception alone does not undo earlier side effects.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Outcome of handler A</th><th scope="col">Will handler B run?</th></tr></thead><tbody><tr><td>Returns normally</td><td>Yes, under this loop contract.</td></tr><tr><td>Throws an uncaught exception</td><td>No.</td></tr><tr><td>Exception is caught and ignored inside A</td><td>Yes. The outer loop sees normal return.</td></tr></tbody></table></div></section><section id="s7" class="lesson-section"><h2><span class="section-number">07</span>Make continuation an explicit result</h2>
+<p>If stopping is an expected decision, return it. Use a different interface name so the two designs are not accidentally mixed.</p>
+<figure class="code-block"><figcaption>Java · declarations inside an enclosing class<button class="copy js-only" data-copy="code-5" type="button">Copy</button></figcaption><pre><code id="code-5"><span class="syntax-keyword">enum</span> Decision { CONTINUE, STOP }
+
+@FunctionalInterface
+<span class="syntax-keyword">interface</span> DecidingHandler {
+    Decision handle(TransferRequest request);
+}
+
+<span class="syntax-keyword">static</span> Decision execute(java.util.List&lt;DecidingHandler&gt; handlers,
+                        TransferRequest request) {
+    <span class="syntax-keyword">for</span> (DecidingHandler handler : handlers) {
+        Decision decision = java.util.Objects.requireNonNull(
+            handler.handle(request));
+        <span class="syntax-keyword">if</span> (decision == Decision.STOP) <span class="syntax-keyword">return</span> Decision.STOP;
+    }
+    <span class="syntax-keyword">return</span> Decision.CONTINUE;
+}</code></pre></figure><p>The caller must honor <code>STOP</code>. A bare enum says nothing about <em>why</em> processing stopped or whether the request succeeded. If that matters, return a result carrying the reason or response. Middleware below makes that response the return value.</p></section><section id="s8" class="lesson-section"><h2><span class="section-number">08</span>Understand the classic linked form</h2>
+<p>In a linked chain, each handler stores its successor. This version illustrates <em>first-handler-wins</em> using a routing topic.</p>
+<figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-6" type="button">Copy</button></figcaption><pre><code id="code-6"><span class="syntax-keyword">abstract</span> <span class="syntax-keyword">class</span> LinkedHandler {
+    <span class="syntax-keyword">private</span> <span class="syntax-keyword">final</span> LinkedHandler next;
+
+    <span class="syntax-keyword">protected</span> LinkedHandler(LinkedHandler next) {
+        this.next = next;
+    }
+
+    <span class="syntax-keyword">public</span> <span class="syntax-keyword">final</span> String handle(String topic) {
+        <span class="syntax-keyword">if</span> (canHandle(topic)) <span class="syntax-keyword">return</span> respond(topic);
+        <span class="syntax-keyword">if</span> (next != <span class="syntax-keyword">null</span>) <span class="syntax-keyword">return</span> next.handle(topic);
+        <span class="syntax-keyword">return</span> <span class="syntax-string">&quot;Unhandled: &quot;</span> + topic;
+    }
+
+    <span class="syntax-keyword">protected</span> <span class="syntax-keyword">abstract</span> <span class="syntax-keyword">boolean</span> canHandle(String topic);
+    <span class="syntax-keyword">protected</span> <span class="syntax-keyword">abstract</span> String respond(String topic);
+}</code></pre></figure><p>A billing receiver can answer billing topics and forward the rest. Define what happens when nobody handles the request; silence is a poor default. Constructor wiring keeps linkage fixed after construction. Mutable <code>setNext</code> designs need protection against accidental cycles and rewiring.</p></section><section id="s9" class="lesson-section"><h2><span class="section-number">09</span>Prefer a list when it expresses the rules</h2><div class="table-wrap"><table><thead><tr><th scope="col">Execution model</th><th scope="col">Continuation owner</th><th scope="col">Useful when</th></tr></thead><tbody><tr><td>List of checks</td><td>The loop</td><td>Every successful check should proceed; failure stops.</td></tr><tr><td>List of decision handlers</td><td>Stage result, interpreted by loop</td><td>Expected stops need explicit decisions.</td></tr><tr><td>Linked receivers</td><td>Current receiver</td><td>A request seeks a suitable handler.</td></tr><tr><td>Middleware with <code>Next</code></td><td>Current middleware</td><td>Stages wrap downstream work or return a response early.</td></tr></tbody></table></div><p>For the simple pipeline, a list makes configuration and testing straightforward. This is a design recommendation for this problem, not a universal claim that linked handlers are wrong.</p></section><header class="part"><p class="eyebrow">Part III</p><h2>Add middleware when stages must wrap work</h2><p>The key change is ownership of continuation: a stage receives a callable representation of everything downstream.</p></header><section id="s10" class="lesson-section"><h2><span class="section-number">10</span>A stage may need before and after behavior</h2>
+<p>Logging and timing need to surround downstream work. A one-way loop of <code>void</code> checks cannot directly express that nesting.</p>
+<figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-7" type="button">Copy</button></figcaption><pre><code id="code-7">@FunctionalInterface
+<span class="syntax-keyword">interface</span> Next {
+    Response invoke(Request request);
+}
+
+@FunctionalInterface
+<span class="syntax-keyword">interface</span> Middleware {
+    Response handle(Request request, Next next);
+}</code></pre></figure><p><code>Next</code> represents the remainder of the chain. A middleware can call it, pass an enriched request to it, inspect its response, or return its own response without calling it.</p><aside class="callout note"><strong>Contract for this guide</strong><p>Processing is synchronous. Call <code>next</code> zero or one time during <code>handle</code>, return a non-null response, and do not retain <code>next</code>. Zero calls means short-circuit. A terminal handler supplies the response when every stage continues.</p></aside></section><section id="s11" class="lesson-section"><h2><span class="section-number">11</span>Authenticate, then forward trusted identity</h2>
+<p>Authentication establishes identity. A caller-supplied user ID is not evidence. The authenticator returns a verified identity, or an empty result.</p>
+<figure class="code-block"><figcaption>Java · exact excerpt from the complete example<button class="copy js-only" data-copy="code-8" type="button">Copy</button></figcaption><pre><code id="code-8"><span class="syntax-keyword">record</span> Authentication(Authenticator auth) <span class="syntax-keyword">implements</span> Middleware {
+    @Override
+    <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+        <span class="syntax-keyword">var</span> user = auth.authenticate(request.token());
+        <span class="syntax-keyword">if</span> (user.isEmpty()) {
+            <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.UNAUTHENTICATED,
+                <span class="syntax-string">&quot;Authentication required&quot;</span>);
+        }
+        <span class="syntax-keyword">return</span> next.invoke(request.withUser(user.orElseThrow()));
+    }
+}</code></pre></figure><p>The JDK 25 HTTP server has an analogous mechanism: <code>Filter.doFilter</code> can call <code>Filter.Chain.doFilter</code> or stop and send an appropriate response. <a class="cite" href="#source-2" aria-label="Source 2">[2]</a><a class="cite" href="#source-3" aria-label="Source 3">[3]</a></p><p>This is <code>com.sun.net.httpserver.Filter.Chain</code> in the JDK’s <code>jdk.httpserver</code> module. Jakarta Servlet’s <code>jakarta.servlet.FilterChain</code> is a separate API. <a class="cite" href="#source-10" aria-label="Source 10">[10]</a></p></section><section id="s12" class="lesson-section"><h2><span class="section-number">12</span>Logging wraps the downstream call</h2><figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-9" type="button">Copy</button></figcaption><pre><code id="code-9">Middleware logging = (request, next) -&gt; {
+    System.out.println(<span class="syntax-string">&quot;start&quot;</span>);
+    <span class="syntax-keyword">try</span> {
+        <span class="syntax-keyword">return</span> next.invoke(request);
+    } <span class="syntax-keyword">finally</span> {
+        System.out.println(<span class="syntax-string">&quot;finish&quot;</span>);
+    }
+};</code></pre></figure>
+<p>For two wrappers A and B, entry runs A then B; successful return unwinds B then A. Only code that actually exists runs: authentication does not have an “after” action merely because it calls <code>next</code>.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Event</th><th scope="col">Accepted request</th><th scope="col">Authentication rejection</th></tr></thead><tbody><tr><td>1</td><td>Logging starts</td><td>Logging starts</td></tr><tr><td>2</td><td>Authentication calls next</td><td>Authentication returns rejection</td></tr><tr><td>3</td><td>Remaining stages and business run</td><td>Downstream stages are skipped</td></tr><tr><td>4</td><td>Response returns through wrappers</td><td>Rejection returns to logging</td></tr><tr><td>5</td><td>Logging finally runs</td><td>Logging finally runs</td></tr></tbody></table></div><p>A <code>finally</code> block runs during normal return and Java exception unwinding. Code placed only after <code>next.invoke</code> is skipped when that call throws. A throwing <code>finally</code> can replace the original failure. <a class="cite" href="#source-6" aria-label="Source 6">[6]</a></p></section><section id="s13" class="lesson-section"><h2><span class="section-number">13</span>Ordering is behavior</h2>
+<p>Consider two different admission policies. Both can be intentional; choose based on what the limit protects and which identity is available.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Placement</th><th scope="col">Admission key</th><th scope="col">Consequence</th></tr></thead><tbody><tr><td>Before authentication</td><td>Connection, source, or global capacity policy</td><td>Can protect authentication work; must not rely on an unverified user ID.</td></tr><tr><td>After authentication</td><td>Verified user or tenant</td><td>Enforces per-identity quotas; authentication rejects do not reach this limiter.</td></tr></tbody></table></div><p>The reference example uses a <strong>per-user limiter after authentication</strong>. Because it precedes validation, authenticated invalid requests still consume admission attempts. An early coarse limiter and a later per-user limiter can coexist. Actual accounting depends on the limiter’s policy. <a class="cite" href="#source-9" aria-label="Source 9">[9]</a></p><aside class="callout note"><strong>Assembly must preserve list order</strong><p>Build nested middleware from the end of the list toward the beginning. If the list is A, B, C, the result must enter A first and C last. The complete composer in Appendix A implements this and creates a fresh continuation guard for every request.</p></aside></section><header class="part"><p class="eyebrow">Part IV</p><h2>Distinguish neighboring patterns</h2><p>Similar class shapes can serve different design goals. Compare intent and control flow.</p></header><section id="s14" class="lesson-section"><h2><span class="section-number">14</span>Chain vs Decorator</h2><div class="table-wrap"><table><thead><tr><th scope="col">Question</th><th scope="col">Decorator</th><th scope="col">Chain / middleware</th></tr></thead><tbody><tr><td>Primary intent</td><td>Add behavior around an object while preserving its abstraction.</td><td>Let a request pass through potential processors or receivers.</td></tr><tr><td>Typical shape</td><td>Wrapper holds the wrapped object.</td><td>Handler delegates to a successor or a next callback.</td></tr><tr><td>Continuation</td><td>Delegation commonly supports the enhancement.</td><td>Short-circuiting is an explicit part of the contract.</td></tr></tbody></table></div><p>The distinction is intent, not a rule that decorators must always delegate. Middleware may be implemented with a decorator-like structure and still serve a chain-of-responsibility purpose.</p></section><section id="s15" class="lesson-section"><h2><span class="section-number">15</span>Chain vs Observer</h2><div class="table-wrap"><table><thead><tr><th scope="col">Observer</th><th scope="col">Chain</th></tr></thead><tbody><tr><td>An event is offered to multiple subscribers.</td><td>A request follows a configured sequence.</td></tr><tr><td>One subscriber usually does not decide whether another receives it.</td><td>A stage can prevent downstream stages from running.</td></tr><tr><td>Useful for independent reactions such as notifications and analytics.</td><td>Useful for staged request processing.</td></tr></tbody></table></div><p>Observer does not inherently mean parallel or unordered execution. The decisive difference here is the continuation relationship between stages.</p></section><section id="s16" class="lesson-section"><h2><span class="section-number">16</span>Chain vs Template Method</h2>
+<p>Lesson 12 put a stable workflow in a base method and exposed selected subclass operations. Here, the sequence is assembled from collaborators.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Template Method</th><th scope="col">Chain</th></tr></thead><tbody><tr><td>The template method owns the algorithm skeleton.</td><td>A composition location defines the stage sequence.</td></tr><tr><td>Variation commonly uses inheritance.</td><td>Variation commonly uses separately supplied handlers.</td></tr><tr><td>A good fit for one stable lifecycle.</td><td>A good fit for independently composed processing stages.</td></tr></tbody></table></div><p>A chain can be assembled at startup and remain fixed. Configurable composition does not require live mutation. Conversely, if no stage can stop and the order is essential domain logic, an explicit workflow may communicate more clearly.</p></section><section id="s17" class="lesson-section"><h2><span class="section-number">17</span>Chain vs Command</h2>
+<p>A command represents <strong>what is requested</strong>. A chain handles concerns around processing it.</p>
+<figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-10" type="button">Copy</button></figcaption><pre><code id="code-10"><span class="syntax-keyword">record</span> TransferMoneyCommand(
+    String commandId,
+    String fromAccount,
+    String toAccount,
+    <span class="syntax-keyword">long</span> amountInCents
+) {}</code></pre></figure><p>The same command can pass through validation, authorization, and idempotency handling before reaching its business handler. The command does not need to know which middleware exists.</p></section><section id="s18" class="lesson-section"><h2><span class="section-number">18</span>Command pipelines connect the patterns</h2>
+<p>A command pipeline can assemble authorization, validation, logging, transaction handling, and idempotency around execution. This is a useful architecture, but a diagram of stage names does not settle correctness.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Concern</th><th scope="col">Decision you still own</th></tr></thead><tbody><tr><td>Transaction</td><td>Which operations belong to one transaction, and who commits or rolls back?</td></tr><tr><td>Idempotency</td><td>What identifies a repeated request, and how is the outcome stored consistently with the business effect?</td></tr><tr><td>Retry</td><td>Which failures are retryable, and could retrying duplicate side effects?</td></tr></tbody></table></div><p>The continuation guard in this guide prevents a stage from calling downstream twice in one invocation. It does <strong>not</strong> provide durable idempotency or exactly-once business execution across retries.</p></section><header class="part"><p class="eyebrow">Part V</p><h2>Make the semantics visible</h2><p>A useful chain tells you where results come from, where failure is observed, and which dependencies determine order.</p></header><section id="s19" class="lesson-section"><h2><span class="section-number">19</span>Failures and rejections are different outcomes</h2>
+<p>An audit stage that only records “started” cannot report the final decision. Put it outside the stages it must observe, inspect returned outcomes, and catch failures deliberately.</p>
+<figure class="code-block"><figcaption>Java · logging method body excerpt<button class="copy js-only" data-copy="code-11" type="button">Copy</button></figcaption><pre><code id="code-11"><span class="syntax-keyword">try</span> {
+    Response response = next.invoke(request);
+    log.accept(<span class="syntax-string">&quot;result:&quot;</span> + response.outcome());
+    <span class="syntax-keyword">return</span> response;
+} <span class="syntax-keyword">catch</span> (RuntimeException ex) {
+    log.accept(<span class="syntax-string">&quot;failed:&quot;</span> + ex.getClass().getSimpleName());
+    <span class="syntax-keyword">throw</span> ex;
+} <span class="syntax-keyword">finally</span> {
+    log.accept(<span class="syntax-string">&quot;finish&quot;</span>);
+}</code></pre></figure><p>A rejection returned as <code>Response</code> never enters <code>catch</code>. A logging stage placed after authentication cannot observe authentication rejections. The demo log sink is assumed not to throw; production audit failure policy must be explicit.</p><aside class="callout note"><strong>No automatic rollback</strong><p>Stopping a chain does not reverse earlier side effects. A transaction boundary, compensation, and external response mapping remain separate responsibilities. This guide’s business handler returns a simulated result and changes no balances.</p></aside></section><section id="s20" class="lesson-section"><h2><span class="section-number">20</span>Enrichment can hide dependencies</h2>
+<p>If one stage sets a risk score and another reads it, the second depends on the first. Calling the order “configuration” does not remove that dependency.</p>
+<figure class="code-block"><figcaption>Java · teaching excerpt<button class="copy js-only" data-copy="code-12" type="button">Copy</button></figcaption><pre><code id="code-12">Request authenticated = request.withUser(verifiedUserId);
+<span class="syntax-keyword">return</span> next.invoke(authenticated);</code></pre></figure><p>The reference example uses a record and creates replacement values for identity and correlation ID. Its components are strings and a primitive. Records provide final component fields; arbitrary referenced objects inside records would not become deeply immutable. <a class="cite" href="#source-5" aria-label="Source 5">[5]</a></p><p>For a richer dependency such as “risk assessment required before fraud decision,” consider explicit types or orchestration. Do not turn the context into an untyped bag of hidden prerequisites.</p></section><section id="s21" class="lesson-section"><h2><span class="section-number">21</span>Keep required business workflows explicit</h2>
+<p>“Withdraw, deposit, record ledger” describes the transfer use case itself. Hiding those mandatory operations in a reorderable collection can obscure the invariant you need to protect.</p>
+<p>Keep those steps in an explicit application operation with the necessary transaction semantics. Use surrounding middleware for independently composed concerns: authentication, authorization, validation, admission control, logging, metrics, and request normalization.</p>
+<aside class="callout note"><strong>The boundary to remember</strong><p>A chain organizes processing. It does not make unrelated steps independent, enforce transactionality, or make every reordering valid.</p></aside></section><section id="s22" class="lesson-section"><h2><span class="section-number">22</span>Test a handler in isolation</h2>
+<p>Supply a small <code>Next</code> spy. Check the returned decision and whether delegation happened. The complete example uses plain Java checks, so there is no testing-library dependency.</p>
+<figure class="code-block"><figcaption>Java · check body using Appendix A types<button class="copy js-only" data-copy="code-13" type="button">Copy</button></figcaption><pre><code id="code-13"><span class="syntax-keyword">int</span>[] calls = {<span class="syntax-number">0</span>};
+Next spy = request -&gt; {
+    calls[<span class="syntax-number">0</span>]++;
+    <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.OK, <span class="syntax-string">&quot;accepted&quot;</span>);
+};
+Response result = <span class="syntax-keyword">new</span> Validation().handle(
+    <span class="syntax-keyword">new</span> Request(<span class="syntax-string">&quot;demo-token&quot;</span>, <span class="syntax-string">&quot;U1&quot;</span>, -<span class="syntax-number">100</span>, <span class="syntax-string">&quot;test-id&quot;</span>), spy);
+
+check(result.outcome() == Outcome.INVALID, <span class="syntax-string">&quot;negative amount rejected&quot;</span>);
+check(calls[<span class="syntax-number">0</span>] == <span class="syntax-number">0</span>, <span class="syntax-string">&quot;validation must not call next&quot;</span>);</code></pre></figure><p>Also test the passing case: <code>next</code> receives the intended request and its result returns to the caller.</p></section><section id="s23" class="lesson-section"><h2><span class="section-number">23</span>Prove short-circuiting and unwinding</h2><div class="table-wrap"><table><thead><tr><th scope="col">Scenario</th><th scope="col">Assertion that matters</th></tr></thead><tbody><tr><td>Bad credential and bad amount</td><td>Authentication result wins; rate limiting and business are skipped.</td></tr><tr><td>Valid identity, invalid amount</td><td>Validation rejects and business is not called.</td></tr><tr><td>Quota denied / permission denied</td><td>The corresponding result returns; business is not called.</td></tr><tr><td>Downstream throws</td><td>The same exception propagates and outer finally runs.</td></tr><tr><td>Middleware calls next twice</td><td>The second attempt fails before a second downstream execution.</td></tr><tr><td>Same pipeline invoked twice</td><td>Each request starts at the first stage and reaches business once when accepted.</td></tr><tr><td>Empty middleware list</td><td>The terminal handler supplies the response.</td></tr></tbody></table></div><p>These checks verify the continuation contract and observable effects. Checking only a returned error is insufficient: the business handler might already have run.</p></section><section id="s24" class="lesson-section"><h2><span class="section-number">24</span>A practical Java composition root</h2>
+<p>Put the order in one place. The full program supplies every type, a composer, demo policies, a terminal business function, and executable checks.</p>
+<figure class="code-block"><figcaption>Java · exact composition from the complete example<button class="copy js-only" data-copy="code-14" type="button">Copy</button></figcaption><pre><code id="code-14"><span class="syntax-keyword">return</span> compose(List.of(
+    <span class="syntax-keyword">new</span> CorrelationId(),
+    <span class="syntax-keyword">new</span> Logging(log),
+    <span class="syntax-keyword">new</span> Authentication(demoAuth),
+    <span class="syntax-keyword">new</span> RateLimit(limiter),
+    <span class="syntax-keyword">new</span> Validation(),
+    <span class="syntax-keyword">new</span> Authorization(<span class="syntax-string">&quot;U1&quot;</span>::equals)
+), business);</code></pre></figure><p>Correlation ID is assigned before logging. Logging surrounds all policy stages. Authentication establishes identity before per-user admission. Validation and authorization finish before business execution.</p><aside class="callout note"><strong>Why there is no shared cursor</strong><p>The composer builds nested functions once. Each invocation has its own local “next already called” guard. Immutable wiring can be reused; stateful collaborators still need their own concurrency design. <code>List.copyOf</code> does not make a rate limiter or log sink thread-safe.</p></aside></section><section id="s25" class="lesson-section"><h2><span class="section-number">25</span>Recognize when a chain becomes hard to reason about</h2>
+<p>Warning signs include many undocumented ordering rules, shared request mutation, unclear error ownership, duplicate business execution, mutable successor cycles, and runtime configuration that can bypass required checks.</p>
+<p>Write a short contract for each stage: what it requires, what it produces, when it stops, and what it can change. If you cannot explain why a stage exists in that position, make the orchestration explicit or simplify the chain.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Failure mode</th><th scope="col">Design response</th></tr></thead><tbody><tr><td>“Magic” context fields</td><td>Use explicit fields, typed values, or a dedicated workflow.</td></tr><tr><td>Order changed without review</td><td>Centralize assembly and test the invariant.</td></tr><tr><td>Repeated next calls</td><td>Document zero-or-one continuation; guard it if valuable.</td></tr><tr><td>Async work introduced</td><td>Use an asynchronous contract; synchronous finally measures return, not future completion.</td></tr></tbody></table></div></section><section id="s26" class="lesson-section"><h2><span class="section-number">26</span>Use the first-principles decision process</h2>
+<ol class="decision-list">
+<li><strong>Do requests pass through multiple independent processors?</strong> If there is only one simple use case, explicit code may be sufficient.</li>
+<li><strong>Can a stage meaningfully stop or complete processing?</strong> State the expected result for every stopping point.</li>
+<li><strong>Do different operations need different valid compositions?</strong> Keep required dependencies visible when assembling them.</li>
+<li><strong>Should the sender know only the entry point?</strong> Hide stage wiring behind a stable invocation contract.</li>
+<li><strong>Do stages need to surround downstream work?</strong> Choose a next-callback model; otherwise start with a list.</li>
+</ol>
+<p class="principle">Choose Chain of Responsibility because continuation is part of the problem, not because several classes happen to implement the same interface.</p>
+</section><section id="exercise" class="major-section">
+<p class="eyebrow">Practice</p><h2>Build an API request pipeline</h2>
+<p>Define <code>Middleware.handle(Request, Next)</code> and assemble this order in one composition location. Add logging around the stages whose final outcome it must observe.</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Position</th><th scope="col">Stage</th><th scope="col">Responsibility</th></tr></thead><tbody><tr><td>1</td><td>Correlation ID</td><td>Assign request identity for tracing.</td></tr><tr><td>2</td><td>Authentication</td><td>Establish a trusted identity or stop.</td></tr><tr><td>3</td><td>Rate limiting</td><td>Apply the chosen admission policy.</td></tr><tr><td>4</td><td>Validation</td><td>Reject invalid input.</td></tr><tr><td>5</td><td>Authorization</td><td>Check permission for the requested action.</td></tr><tr><td>6</td><td>Business handler</td><td>Execute the use case and return a result.</td></tr></tbody></table></div>
+<h3>Acceptance criteria</h3>
+<ol>
+<li>Authentication failure stops all downstream execution.</li>
+<li>Validation happens only after authentication.</li>
+<li>Logging can run before and after the rest of the chain, including when it throws.</li>
+<li>Business code knows nothing about middleware or <code>Next</code>.</li>
+<li>Middleware order is defined in one composition location.</li>
+<li>Checks prove a rejected request never reaches business execution.</li>
+<li>Explain whether rate limiting belongs before or after authentication, which key it uses, and what consumes quota.</li>
+</ol>
+<h3>Before opening the reference</h3>
+<p>Write the expected trace for an accepted request, an authentication rejection, and a business exception. Decide what an empty chain does and what happens if a stage calls <code>next</code> twice. Then implement the smallest model that satisfies those decisions.</p>
+<aside class="callout note"><strong>Reference choices</strong><p>Appendix A chooses per-user admission after authentication, response values for expected rejection, exception propagation for unexpected failures, outer logging, immutable request enrichment, and a terminal handler. These are explicit choices for the exercise, not universal middleware defaults.</p></aside></section><section id="reference" class="major-section"><p class="eyebrow">Appendix A · runnable reference</p>
+<h2>One file, no external dependencies</h2>
+<p>Save the complete source as <code>Lesson13Demo.java</code>. The following blocks are consecutive parts of that single file; join them in order, or use the download button. The earlier lesson snippets are independent teaching excerpts and should not be pasted together with this class.</p>
+<div class="actions js-only"><button type="button" id="download-java">Download Lesson13Demo.java</button></div>
+<figure class="code-block"><figcaption>Run with JDK 25 · no preview features<button class="copy js-only" data-copy="code-15" type="button">Copy</button></figcaption><pre><code id="code-15">javac --release 25 -Xlint:all -Werror Lesson13Demo.java
+java Lesson13Demo</code></pre></figure>
+<p>The program uses only standard APIs and stable language features supported by Java 25. The <code>--release</code> option selects the language and API target. <a class="cite" href="#source-7" aria-label="Source 7">[7]</a></p>
+<aside class="callout caution"><strong>Verification scope</strong><p>The source compiled with <code>--release 17 -Xlint:all -Werror</code> and its checks passed on OpenJDK 17.0.20 in this workspace. Java 25 API and language compatibility were checked against official documentation. <strong>A JDK 25 execution was not available here.</strong></p></aside>
+<p><strong>Demo boundaries:</strong> fixed credential strings and a simple permission predicate are test doubles. The injected rate limiter returns an admission decision; the example does not implement quota storage or time windows. No network service is called, no tokens are parsed, and no money is moved. The log consumer is assumed not to throw.</p>
+<p>The checks throw <code>AssertionError</code> explicitly, so <code>-ea</code> is not required. The local continuation guard uses <code>AtomicBoolean.compareAndSet</code>; it does not make the whole pipeline asynchronous or transactional. <a class="cite" href="#source-8" aria-label="Source 8">[8]</a></p><section class="source-part" id="source-part-1"><h3>A1. Data and contracts</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 1 of 7<button class="copy js-only" data-copy="code-16" type="button">Copy</button></figcaption><pre><code id="code-16"><span class="syntax-keyword">import</span> java.util.ArrayList;
+<span class="syntax-keyword">import</span> java.util.List;
+<span class="syntax-keyword">import</span> java.util.Objects;
+<span class="syntax-keyword">import</span> java.util.Optional;
+<span class="syntax-keyword">import</span> java.util.UUID;
+<span class="syntax-keyword">import</span> java.util.concurrent.atomic.AtomicBoolean;
+<span class="syntax-keyword">import</span> java.util.function.Consumer;
+<span class="syntax-keyword">import</span> java.util.function.Predicate;
+
+<span class="syntax-keyword">public</span> <span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> Lesson13Demo {
+    <span class="syntax-comment">// PART 1: Data and contracts</span>
+    <span class="syntax-keyword">record</span> Request(String token, String userId,
+                   <span class="syntax-keyword">long</span> amountInCents, String correlationId) {
+        Request withUser(String id) {
+            <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Request(token, id, amountInCents, correlationId);
+        }
+
+        Request withCorrelation(String id) {
+            <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Request(token, userId, amountInCents, id);
+        }
+    }
+
+    <span class="syntax-keyword">enum</span> Outcome {
+        OK, UNAUTHENTICATED, RATE_LIMITED, INVALID, FORBIDDEN
+    }
+
+    <span class="syntax-keyword">record</span> Response(Outcome outcome, String message) {}
+
+    @FunctionalInterface
+    <span class="syntax-keyword">interface</span> Next {
+        Response invoke(Request request);
+    }
+
+    @FunctionalInterface
+    <span class="syntax-keyword">interface</span> Middleware {
+        Response handle(Request request, Next next);
+    }
+
+    @FunctionalInterface
+    <span class="syntax-keyword">interface</span> Authenticator {
+        Optional&lt;String&gt; authenticate(String token);
+    }
+
+    @FunctionalInterface
+    <span class="syntax-keyword">interface</span> RateLimiter {
+        <span class="syntax-keyword">boolean</span> allow(String userId);
+    }</code></pre></figure></section><section class="source-part" id="source-part-2"><h3>A2. Compose once; invoke many times</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 2 of 7<button class="copy js-only" data-copy="code-17" type="button">Copy</button></figcaption><pre><code id="code-17">    <span class="syntax-comment">// PART 2: Compose once; invoke many times</span>
+    <span class="syntax-keyword">static</span> Next compose(List&lt;Middleware&gt; middleware, Next terminal) {
+        <span class="syntax-keyword">var</span> snapshot = List.copyOf(middleware);
+        Objects.requireNonNull(terminal);
+        Next chain = request -&gt; Objects.requireNonNull(
+            terminal.invoke(Objects.requireNonNull(request)));
+
+        <span class="syntax-keyword">for</span> (<span class="syntax-keyword">int</span> i = snapshot.size() - <span class="syntax-number">1</span>; i &gt;= <span class="syntax-number">0</span>; i--) {
+            Middleware current = snapshot.get(i);
+            Next downstream = chain;
+            chain = request -&gt; {
+                Objects.requireNonNull(request);
+                <span class="syntax-keyword">var</span> called = <span class="syntax-keyword">new</span> AtomicBoolean();
+                Next once = forwarded -&gt; {
+                    <span class="syntax-keyword">if</span> (!called.compareAndSet(<span class="syntax-keyword">false</span>, <span class="syntax-keyword">true</span>)) {
+                        <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> IllegalStateException(
+                            <span class="syntax-string">&quot;next may be called at most once&quot;</span>);
+                    }
+                    <span class="syntax-keyword">return</span> downstream.invoke(
+                        Objects.requireNonNull(forwarded));
+                };
+                <span class="syntax-keyword">return</span> Objects.requireNonNull(
+                    current.handle(request, once));
+            };
+        }
+        <span class="syntax-keyword">return</span> chain;
+    }</code></pre></figure></section><section class="source-part" id="source-part-3"><h3>A3. Enrich, surround, authenticate</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 3 of 7<button class="copy js-only" data-copy="code-18" type="button">Copy</button></figcaption><pre><code id="code-18">    <span class="syntax-comment">// PART 3: Enrich, surround, authenticate</span>
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> CorrelationId <span class="syntax-keyword">implements</span> Middleware {
+        @Override
+        <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+            <span class="syntax-keyword">return</span> next.invoke(request.withCorrelation(
+                UUID.randomUUID().toString()));
+        }
+    }
+
+    <span class="syntax-keyword">record</span> Logging(Consumer&lt;String&gt; log) <span class="syntax-keyword">implements</span> Middleware {
+        @Override
+        <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+            log.accept(<span class="syntax-string">&quot;start&quot;</span>);
+            <span class="syntax-keyword">try</span> {
+                Response response = next.invoke(request);
+                log.accept(<span class="syntax-string">&quot;result:&quot;</span> + response.outcome());
+                <span class="syntax-keyword">return</span> response;
+            } <span class="syntax-keyword">catch</span> (RuntimeException ex) {
+                log.accept(<span class="syntax-string">&quot;failed:&quot;</span> + ex.getClass().getSimpleName());
+                <span class="syntax-keyword">throw</span> ex;
+            } <span class="syntax-keyword">finally</span> {
+                log.accept(<span class="syntax-string">&quot;finish&quot;</span>);
+            }
+        }
+    }
+
+    <span class="syntax-keyword">record</span> Authentication(Authenticator auth) <span class="syntax-keyword">implements</span> Middleware {
+        @Override
+        <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+            <span class="syntax-keyword">var</span> user = auth.authenticate(request.token());
+            <span class="syntax-keyword">if</span> (user.isEmpty()) {
+                <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.UNAUTHENTICATED,
+                    <span class="syntax-string">&quot;Authentication required&quot;</span>);
+            }
+            <span class="syntax-keyword">return</span> next.invoke(request.withUser(user.orElseThrow()));
+        }
+    }</code></pre></figure></section><section class="source-part" id="source-part-4"><h3>A4. Rate limit, validate, authorize</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 4 of 7<button class="copy js-only" data-copy="code-19" type="button">Copy</button></figcaption><pre><code id="code-19">    <span class="syntax-comment">// PART 4: Rate limit, validate, authorize</span>
+    <span class="syntax-keyword">record</span> RateLimit(RateLimiter limiter) <span class="syntax-keyword">implements</span> Middleware {
+        @Override
+        <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+            <span class="syntax-keyword">if</span> (!limiter.allow(request.userId())) {
+                <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.RATE_LIMITED,
+                    <span class="syntax-string">&quot;Request quota exhausted&quot;</span>);
+            }
+            <span class="syntax-keyword">return</span> next.invoke(request);
+        }
+    }
+
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">final</span> <span class="syntax-keyword">class</span> Validation <span class="syntax-keyword">implements</span> Middleware {
+        @Override
+        <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+            <span class="syntax-keyword">if</span> (request.amountInCents() &lt;= <span class="syntax-number">0</span>) {
+                <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.INVALID,
+                    <span class="syntax-string">&quot;Amount must be positive&quot;</span>);
+            }
+            <span class="syntax-keyword">return</span> next.invoke(request);
+        }
+    }
+
+    <span class="syntax-keyword">record</span> Authorization(Predicate&lt;String&gt; permitted)
+            <span class="syntax-keyword">implements</span> Middleware {
+        @Override
+        <span class="syntax-keyword">public</span> Response handle(Request request, Next next) {
+            <span class="syntax-keyword">if</span> (!permitted.test(request.userId())) {
+                <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.FORBIDDEN,
+                    <span class="syntax-string">&quot;Transfer permission required&quot;</span>);
+            }
+            <span class="syntax-keyword">return</span> next.invoke(request);
+        }
+    }</code></pre></figure></section><section class="source-part" id="source-part-5"><h3>A5. One composition root, with explicit demo policies</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 5 of 7<button class="copy js-only" data-copy="code-20" type="button">Copy</button></figcaption><pre><code id="code-20">    <span class="syntax-comment">// PART 5: One composition root, with explicit demo policies</span>
+    <span class="syntax-keyword">static</span> Next demoPipeline(RateLimiter limiter, Next business,
+                             Consumer&lt;String&gt; log) {
+        Authenticator demoAuth = token -&gt; {
+            <span class="syntax-keyword">if</span> (<span class="syntax-string">&quot;demo-token&quot;</span>.equals(token)) <span class="syntax-keyword">return</span> Optional.of(<span class="syntax-string">&quot;U1&quot;</span>);
+            <span class="syntax-keyword">if</span> (<span class="syntax-string">&quot;read-only&quot;</span>.equals(token)) <span class="syntax-keyword">return</span> Optional.of(<span class="syntax-string">&quot;U2&quot;</span>);
+            <span class="syntax-keyword">return</span> Optional.empty();
+        };
+        <span class="syntax-keyword">return</span> compose(List.of(
+            <span class="syntax-keyword">new</span> CorrelationId(),
+            <span class="syntax-keyword">new</span> Logging(log),
+            <span class="syntax-keyword">new</span> Authentication(demoAuth),
+            <span class="syntax-keyword">new</span> RateLimit(limiter),
+            <span class="syntax-keyword">new</span> Validation(),
+            <span class="syntax-keyword">new</span> Authorization(<span class="syntax-string">&quot;U1&quot;</span>::equals)
+        ), business);
+    }
+
+    <span class="syntax-keyword">static</span> Response business(Request request) {
+        <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> Response(Outcome.OK,
+            <span class="syntax-string">&quot;Accepted &quot;</span> + request.amountInCents() + <span class="syntax-string">&quot; cents&quot;</span>);
+    }
+
+    <span class="syntax-keyword">public</span> <span class="syntax-keyword">static</span> <span class="syntax-keyword">void</span> main(String[] args) {
+        <span class="syntax-comment">// Always-allow is a test double, not a real rate limiter.</span>
+        Next pipeline = demoPipeline(user -&gt; <span class="syntax-keyword">true</span>,
+            Lesson13Demo::business, System.out::println);
+        System.out.println(pipeline.invoke(
+            <span class="syntax-keyword">new</span> Request(<span class="syntax-string">&quot;demo-token&quot;</span>, <span class="syntax-keyword">null</span>, <span class="syntax-number">500</span>, <span class="syntax-keyword">null</span>)));
+        runChecks();
+        System.out.println(<span class="syntax-string">&quot;All checks passed.&quot;</span>);
+    }</code></pre></figure></section><section class="source-part" id="source-part-6"><h3>A6. Rejections must not reach the business handler</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 6 of 7<button class="copy js-only" data-copy="code-21" type="button">Copy</button></figcaption><pre><code id="code-21">    <span class="syntax-comment">// PART 6: Rejections must not reach the business handler</span>
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">void</span> runChecks() {
+        <span class="syntax-keyword">var</span> events = <span class="syntax-keyword">new</span> ArrayList&lt;String&gt;();
+        <span class="syntax-keyword">int</span>[] businessCalls = {<span class="syntax-number">0</span>};
+        <span class="syntax-keyword">int</span>[] rateCalls = {<span class="syntax-number">0</span>};
+        Next businessSpy = request -&gt; {
+            check(<span class="syntax-string">&quot;U1&quot;</span>.equals(request.userId()), <span class="syntax-string">&quot;trusted user&quot;</span>);
+            check(request.correlationId() != <span class="syntax-keyword">null</span>, <span class="syntax-string">&quot;correlation id&quot;</span>);
+            businessCalls[<span class="syntax-number">0</span>]++;
+            <span class="syntax-keyword">return</span> business(request);
+        };
+        Next pipeline = demoPipeline(user -&gt; {
+            check(user != <span class="syntax-keyword">null</span>, <span class="syntax-string">&quot;authenticate before rate limit&quot;</span>);
+            rateCalls[<span class="syntax-number">0</span>]++;
+            <span class="syntax-keyword">return</span> <span class="syntax-keyword">true</span>;
+        }, businessSpy, events::add);
+
+        Request accepted = <span class="syntax-keyword">new</span> Request(<span class="syntax-string">&quot;demo-token&quot;</span>, <span class="syntax-keyword">null</span>, <span class="syntax-number">500</span>, <span class="syntax-keyword">null</span>);
+        check(pipeline.invoke(accepted).outcome() == Outcome.OK,
+            <span class="syntax-string">&quot;accepted result&quot;</span>);
+        check(pipeline.invoke(accepted).outcome() == Outcome.OK,
+            <span class="syntax-string">&quot;pipeline can be reused&quot;</span>);
+        check(businessCalls[<span class="syntax-number">0</span>] == <span class="syntax-number">2</span>, <span class="syntax-string">&quot;business runs once per call&quot;</span>);
+        check(accepted.userId() == <span class="syntax-keyword">null</span>, <span class="syntax-string">&quot;input record unchanged&quot;</span>);
+
+        events.clear();
+        Response unauthenticated = pipeline.invoke(
+            <span class="syntax-keyword">new</span> Request(<span class="syntax-string">&quot;bad-token&quot;</span>, <span class="syntax-string">&quot;forged&quot;</span>, -<span class="syntax-number">1</span>, <span class="syntax-keyword">null</span>));
+        check(unauthenticated.outcome() == Outcome.UNAUTHENTICATED,
+            <span class="syntax-string">&quot;authenticate before validating the negative amount&quot;</span>);
+        check(rateCalls[<span class="syntax-number">0</span>] == <span class="syntax-number">2</span>, <span class="syntax-string">&quot;auth rejection skips rate limit&quot;</span>);
+        check(businessCalls[<span class="syntax-number">0</span>] == <span class="syntax-number">2</span>, <span class="syntax-string">&quot;auth rejection skips business&quot;</span>);
+        check(events.equals(List.of(<span class="syntax-string">&quot;start&quot;</span>,
+            <span class="syntax-string">&quot;result:UNAUTHENTICATED&quot;</span>, <span class="syntax-string">&quot;finish&quot;</span>)), <span class="syntax-string">&quot;log rejection&quot;</span>);
+
+        check(pipeline.invoke(<span class="syntax-keyword">new</span> Request(<span class="syntax-string">&quot;demo-token&quot;</span>, <span class="syntax-keyword">null</span>, <span class="syntax-number">0</span>, <span class="syntax-keyword">null</span>))
+            .outcome() == Outcome.INVALID, <span class="syntax-string">&quot;reject zero amount&quot;</span>);
+        check(pipeline.invoke(<span class="syntax-keyword">new</span> Request(<span class="syntax-string">&quot;read-only&quot;</span>, <span class="syntax-keyword">null</span>, <span class="syntax-number">1</span>, <span class="syntax-keyword">null</span>))
+            .outcome() == Outcome.FORBIDDEN, <span class="syntax-string">&quot;reject permission&quot;</span>);
+        Next limited = demoPipeline(user -&gt; <span class="syntax-keyword">false</span>, businessSpy, s -&gt; {});
+        check(limited.invoke(accepted).outcome() == Outcome.RATE_LIMITED,
+            <span class="syntax-string">&quot;reject quota&quot;</span>);
+        check(businessCalls[<span class="syntax-number">0</span>] == <span class="syntax-number">2</span>, <span class="syntax-string">&quot;all rejections skip business&quot;</span>);
+
+        checkExceptionalExit(events, accepted);
+        checkContinuationGuard(accepted);
+        checkEmptyChain(accepted);
+    }</code></pre></figure></section><section class="source-part" id="source-part-7"><h3>A7. Failure, double-next and empty-chain behavior</h3><figure class="code-block"><figcaption>Lesson13Demo.java · part 7 of 7<button class="copy js-only" data-copy="code-22" type="button">Copy</button></figcaption><pre><code id="code-22">    <span class="syntax-comment">// PART 7: Failure, double-next and empty-chain behavior</span>
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">void</span> checkExceptionalExit(List&lt;String&gt; events, Request request) {
+        events.clear();
+        <span class="syntax-keyword">var</span> failure = <span class="syntax-keyword">new</span> IllegalStateException(<span class="syntax-string">&quot;simulated failure&quot;</span>);
+        Next broken = demoPipeline(user -&gt; <span class="syntax-keyword">true</span>, r -&gt; {
+            <span class="syntax-keyword">throw</span> failure;
+        }, events::add);
+        <span class="syntax-keyword">try</span> {
+            broken.invoke(request);
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> AssertionError(<span class="syntax-string">&quot;exception must propagate&quot;</span>);
+        } <span class="syntax-keyword">catch</span> (IllegalStateException actual) {
+            check(actual == failure, <span class="syntax-string">&quot;preserve original exception&quot;</span>);
+        }
+        check(events.equals(List.of(<span class="syntax-string">&quot;start&quot;</span>,
+            <span class="syntax-string">&quot;failed:IllegalStateException&quot;</span>, <span class="syntax-string">&quot;finish&quot;</span>)), <span class="syntax-string">&quot;finally runs&quot;</span>);
+    }
+
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">void</span> checkContinuationGuard(Request request) {
+        <span class="syntax-keyword">int</span>[] calls = {<span class="syntax-number">0</span>};
+        Middleware twice = (r, next) -&gt; {
+            next.invoke(r);
+            <span class="syntax-keyword">return</span> next.invoke(r);
+        };
+        Next guarded = compose(List.of(twice), r -&gt; {
+            calls[<span class="syntax-number">0</span>]++;
+            <span class="syntax-keyword">return</span> business(r);
+        });
+        <span class="syntax-keyword">try</span> {
+            guarded.invoke(request);
+            <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> AssertionError(<span class="syntax-string">&quot;double next must fail&quot;</span>);
+        } <span class="syntax-keyword">catch</span> (IllegalStateException expected) {
+            check(calls[<span class="syntax-number">0</span>] == <span class="syntax-number">1</span>, <span class="syntax-string">&quot;never execute downstream twice&quot;</span>);
+        }
+    }
+
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">void</span> checkEmptyChain(Request request) {
+        Next empty = compose(List.of(), Lesson13Demo::business);
+        check(empty.invoke(request).outcome() == Outcome.OK,
+            <span class="syntax-string">&quot;empty chain invokes terminal handler&quot;</span>);
+    }
+
+    <span class="syntax-keyword">static</span> <span class="syntax-keyword">void</span> check(<span class="syntax-keyword">boolean</span> condition, String message) {
+        <span class="syntax-keyword">if</span> (!condition) <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> AssertionError(message);
+    }
+}</code></pre></figure></section><h3>Expected output</h3><figure class="code-block"><figcaption>Console<button class="copy js-only" data-copy="code-23" type="button">Copy</button></figcaption><pre><code id="code-23">start
+result:OK
+finish
+Response[outcome=OK, message=Accepted 500 cents]
+All checks passed.</code></pre></figure></section><section id="pattern-map" class="major-section"><p class="eyebrow">Appendix B · pattern map</p><h2>Place the pattern in the larger picture</h2><div class="table-wrap"><table><thead><tr><th scope="col">Pattern</th><th scope="col">Design pressure it addresses</th></tr></thead><tbody><tr><td>Strategy</td><td>Swap an algorithm behind a shared contract.</td></tr><tr><td>Template Method</td><td>Keep a workflow skeleton; specialize selected steps.</td></tr><tr><td>Chain of Responsibility</td><td>Offer a request to ordered handlers with controlled continuation.</td></tr><tr><td>Observer</td><td>Notify multiple subscribers of an event or change.</td></tr><tr><td>State</td><td>Vary behavior with lifecycle state.</td></tr><tr><td>Command</td><td>Represent a requested action as an object.</td></tr><tr><td>Factory</td><td>Encapsulate implementation selection or object creation.</td></tr><tr><td>Builder</td><td>Assemble a complex object.</td></tr><tr><td>Adapter</td><td>Translate one interface into another.</td></tr><tr><td>Decorator</td><td>Layer behavior around an abstraction.</td></tr><tr><td>Facade</td><td>Offer a simpler entry point to a subsystem.</td></tr><tr><td>Proxy</td><td>Provide a stand-in that controls access.</td></tr><tr><td>Composite</td><td>Model recursive part-whole structures uniformly.</td></tr></tbody></table></div><h3>Next: Repository + Dependency Injection</h3>
+<p>Move from isolated patterns into application architecture: dependency inversion defines the direction of dependencies; dependency injection supplies collaborators; repositories abstract persistence needs; the composition root wires concrete implementations together.</p>
+<p>The question becomes: how can a use case depend on the capabilities it needs while keeping database clients and other infrastructure choices outside its core logic?</p></section><section id="sources" class="major-section"><p class="eyebrow">Appendix C · official references</p><h2>Sources and editorial notes</h2><p>This guide adapts the supplied Lesson 13 and preserves its 26-step teaching sequence. Examples and design recommendations are the guide’s own; official sources below verify the pattern definition and Java contracts. References were checked on 1 September 2026. The guide itself works offline; opening a source link requires a connection.</p><ol class="sources"><li id="source-1"><a href="https://learn.microsoft.com/en-us/archive/msdn-magazine/2001/october/biztalk-implement-design-patterns-for-business-rules-with-orchestration-designer">Microsoft Learn · Chain of Responsibility</a><p>Classic intent: multiple potential receivers, forwarding until handled.</p><span class="source-url">https://learn.microsoft.com/en-us/archive/msdn-magazine/2001/october/biztalk-implement-design-patterns-for-business-rules-with-orchestration-designer</span></li><li id="source-2"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/jdk.httpserver/com/sun/net/httpserver/Filter.html">Oracle · Java 25 Filter</a><p>Pre/post-processing and the choice to continue or send a response.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/jdk.httpserver/com/sun/net/httpserver/Filter.html</span></li><li id="source-3"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/jdk.httpserver/com/sun/net/httpserver/Filter.Chain.html">Oracle · Java 25 Filter.Chain</a><p>Next-filter invocation and the terminal exchange handler.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/jdk.httpserver/com/sun/net/httpserver/Filter.Chain.html</span></li><li id="source-4"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html">Oracle · Java 25 List</a><p>List.of and List.copyOf contracts, order, null handling, and shallow immutability.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html</span></li><li id="source-5"><a href="https://docs.oracle.com/en/java/javase/25/language/records.html">Oracle · Java 25 record classes</a><p>Record components, generated accessors, and final fields.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/language/records.html</span></li><li id="source-6"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.20.2">Oracle · JLS 25, §14.20.2</a><p>Return, exception unwinding, and finally completion rules.</p><span class="source-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.20.2</span></li><li id="source-7"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">Oracle · Java 25 javac</a><p>The --release compiler option and compilation targets.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li><li id="source-8"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/atomic/AtomicBoolean.html">Oracle · Java 25 AtomicBoolean</a><p>compareAndSet semantics used by the continuation guard.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/atomic/AtomicBoolean.html</span></li><li id="source-9"><a href="https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0">Microsoft Learn · Rate limiting middleware</a><p>Admission policies and partitioning; used for concepts, not as a Java API.</p><span class="source-url">https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0</span></li><li id="source-10"><a href="https://jakarta.ee/specifications/servlet/6.1/apidocs/jakarta.servlet/jakarta/servlet/filterchain">Jakarta Servlet 6.1 · FilterChain</a><p>A separate servlet API, distinct from the JDK HTTP server chain.</p><span class="source-url">https://jakarta.ee/specifications/servlet/6.1/apidocs/jakarta.servlet/jakarta/servlet/filterchain</span></li></ol><p class="small">Editorial corrections: the amount cap is labeled as a business limit; JDK and Jakarta filter APIs are distinguished; middleware assembly, a terminal result, failure behavior, and complete checks are supplied; list pipelines and first-handler-wins chains are separated.</p></section><footer class="endnote">DP · Lesson 13 · Adapted from the supplied lesson · Official references checked 1 September 2026</footer><div id="copy-status" role="status" aria-live="polite"></div></main></div><script type="application/json" id="java-source">"import java.util.ArrayList;\nimport java.util.List;\nimport java.util.Objects;\nimport java.util.Optional;\nimport java.util.UUID;\nimport java.util.concurrent.atomic.AtomicBoolean;\nimport java.util.function.Consumer;\nimport java.util.function.Predicate;\n\npublic final class Lesson13Demo {\n    // PART 1: Data and contracts\n    record Request(String token, String userId,\n                   long amountInCents, String correlationId) {\n        Request withUser(String id) {\n            return new Request(token, id, amountInCents, correlationId);\n        }\n\n        Request withCorrelation(String id) {\n            return new Request(token, userId, amountInCents, id);\n        }\n    }\n\n    enum Outcome {\n        OK, UNAUTHENTICATED, RATE_LIMITED, INVALID, FORBIDDEN\n    }\n\n    record Response(Outcome outcome, String message) {}\n\n    @FunctionalInterface\n    interface Next {\n        Response invoke(Request request);\n    }\n\n    @FunctionalInterface\n    interface Middleware {\n        Response handle(Request request, Next next);\n    }\n\n    @FunctionalInterface\n    interface Authenticator {\n        Optional<String> authenticate(String token);\n    }\n\n    @FunctionalInterface\n    interface RateLimiter {\n        boolean allow(String userId);\n    }\n\n    // PART 2: Compose once; invoke many times\n    static Next compose(List<Middleware> middleware, Next terminal) {\n        var snapshot = List.copyOf(middleware);\n        Objects.requireNonNull(terminal);\n        Next chain = request -> Objects.requireNonNull(\n            terminal.invoke(Objects.requireNonNull(request)));\n\n        for (int i = snapshot.size() - 1; i >= 0; i--) {\n            Middleware current = snapshot.get(i);\n            Next downstream = chain;\n            chain = request -> {\n                Objects.requireNonNull(request);\n                var called = new AtomicBoolean();\n                Next once = forwarded -> {\n                    if (!called.compareAndSet(false, true)) {\n                        throw new IllegalStateException(\n                            \"next may be called at most once\");\n                    }\n                    return downstream.invoke(\n                        Objects.requireNonNull(forwarded));\n                };\n                return Objects.requireNonNull(\n                    current.handle(request, once));\n            };\n        }\n        return chain;\n    }\n\n    // PART 3: Enrich, surround, authenticate\n    static final class CorrelationId implements Middleware {\n        @Override\n        public Response handle(Request request, Next next) {\n            return next.invoke(request.withCorrelation(\n                UUID.randomUUID().toString()));\n        }\n    }\n\n    record Logging(Consumer<String> log) implements Middleware {\n        @Override\n        public Response handle(Request request, Next next) {\n            log.accept(\"start\");\n            try {\n                Response response = next.invoke(request);\n                log.accept(\"result:\" + response.outcome());\n                return response;\n            } catch (RuntimeException ex) {\n                log.accept(\"failed:\" + ex.getClass().getSimpleName());\n                throw ex;\n            } finally {\n                log.accept(\"finish\");\n            }\n        }\n    }\n\n    record Authentication(Authenticator auth) implements Middleware {\n        @Override\n        public Response handle(Request request, Next next) {\n            var user = auth.authenticate(request.token());\n            if (user.isEmpty()) {\n                return new Response(Outcome.UNAUTHENTICATED,\n                    \"Authentication required\");\n            }\n            return next.invoke(request.withUser(user.orElseThrow()));\n        }\n    }\n\n    // PART 4: Rate limit, validate, authorize\n    record RateLimit(RateLimiter limiter) implements Middleware {\n        @Override\n        public Response handle(Request request, Next next) {\n            if (!limiter.allow(request.userId())) {\n                return new Response(Outcome.RATE_LIMITED,\n                    \"Request quota exhausted\");\n            }\n            return next.invoke(request);\n        }\n    }\n\n    static final class Validation implements Middleware {\n        @Override\n        public Response handle(Request request, Next next) {\n            if (request.amountInCents() <= 0) {\n                return new Response(Outcome.INVALID,\n                    \"Amount must be positive\");\n            }\n            return next.invoke(request);\n        }\n    }\n\n    record Authorization(Predicate<String> permitted)\n            implements Middleware {\n        @Override\n        public Response handle(Request request, Next next) {\n            if (!permitted.test(request.userId())) {\n                return new Response(Outcome.FORBIDDEN,\n                    \"Transfer permission required\");\n            }\n            return next.invoke(request);\n        }\n    }\n\n    // PART 5: One composition root, with explicit demo policies\n    static Next demoPipeline(RateLimiter limiter, Next business,\n                             Consumer<String> log) {\n        Authenticator demoAuth = token -> {\n            if (\"demo-token\".equals(token)) return Optional.of(\"U1\");\n            if (\"read-only\".equals(token)) return Optional.of(\"U2\");\n            return Optional.empty();\n        };\n        return compose(List.of(\n            new CorrelationId(),\n            new Logging(log),\n            new Authentication(demoAuth),\n            new RateLimit(limiter),\n            new Validation(),\n            new Authorization(\"U1\"::equals)\n        ), business);\n    }\n\n    static Response business(Request request) {\n        return new Response(Outcome.OK,\n            \"Accepted \" + request.amountInCents() + \" cents\");\n    }\n\n    public static void main(String[] args) {\n        // Always-allow is a test double, not a real rate limiter.\n        Next pipeline = demoPipeline(user -> true,\n            Lesson13Demo::business, System.out::println);\n        System.out.println(pipeline.invoke(\n            new Request(\"demo-token\", null, 500, null)));\n        runChecks();\n        System.out.println(\"All checks passed.\");\n    }\n\n    // PART 6: Rejections must not reach the business handler\n    static void runChecks() {\n        var events = new ArrayList<String>();\n        int[] businessCalls = {0};\n        int[] rateCalls = {0};\n        Next businessSpy = request -> {\n            check(\"U1\".equals(request.userId()), \"trusted user\");\n            check(request.correlationId() != null, \"correlation id\");\n            businessCalls[0]++;\n            return business(request);\n        };\n        Next pipeline = demoPipeline(user -> {\n            check(user != null, \"authenticate before rate limit\");\n            rateCalls[0]++;\n            return true;\n        }, businessSpy, events::add);\n\n        Request accepted = new Request(\"demo-token\", null, 500, null);\n        check(pipeline.invoke(accepted).outcome() == Outcome.OK,\n            \"accepted result\");\n        check(pipeline.invoke(accepted).outcome() == Outcome.OK,\n            \"pipeline can be reused\");\n        check(businessCalls[0] == 2, \"business runs once per call\");\n        check(accepted.userId() == null, \"input record unchanged\");\n\n        events.clear();\n        Response unauthenticated = pipeline.invoke(\n            new Request(\"bad-token\", \"forged\", -1, null));\n        check(unauthenticated.outcome() == Outcome.UNAUTHENTICATED,\n            \"authenticate before validating the negative amount\");\n        check(rateCalls[0] == 2, \"auth rejection skips rate limit\");\n        check(businessCalls[0] == 2, \"auth rejection skips business\");\n        check(events.equals(List.of(\"start\",\n            \"result:UNAUTHENTICATED\", \"finish\")), \"log rejection\");\n\n        check(pipeline.invoke(new Request(\"demo-token\", null, 0, null))\n            .outcome() == Outcome.INVALID, \"reject zero amount\");\n        check(pipeline.invoke(new Request(\"read-only\", null, 1, null))\n            .outcome() == Outcome.FORBIDDEN, \"reject permission\");\n        Next limited = demoPipeline(user -> false, businessSpy, s -> {});\n        check(limited.invoke(accepted).outcome() == Outcome.RATE_LIMITED,\n            \"reject quota\");\n        check(businessCalls[0] == 2, \"all rejections skip business\");\n\n        checkExceptionalExit(events, accepted);\n        checkContinuationGuard(accepted);\n        checkEmptyChain(accepted);\n    }\n\n    // PART 7: Failure, double-next and empty-chain behavior\n    static void checkExceptionalExit(List<String> events, Request request) {\n        events.clear();\n        var failure = new IllegalStateException(\"simulated failure\");\n        Next broken = demoPipeline(user -> true, r -> {\n            throw failure;\n        }, events::add);\n        try {\n            broken.invoke(request);\n            throw new AssertionError(\"exception must propagate\");\n        } catch (IllegalStateException actual) {\n            check(actual == failure, \"preserve original exception\");\n        }\n        check(events.equals(List.of(\"start\",\n            \"failed:IllegalStateException\", \"finish\")), \"finally runs\");\n    }\n\n    static void checkContinuationGuard(Request request) {\n        int[] calls = {0};\n        Middleware twice = (r, next) -> {\n            next.invoke(r);\n            return next.invoke(r);\n        };\n        Next guarded = compose(List.of(twice), r -> {\n            calls[0]++;\n            return business(r);\n        });\n        try {\n            guarded.invoke(request);\n            throw new AssertionError(\"double next must fail\");\n        } catch (IllegalStateException expected) {\n            check(calls[0] == 1, \"never execute downstream twice\");\n        }\n    }\n\n    static void checkEmptyChain(Request request) {\n        Next empty = compose(List.of(), Lesson13Demo::business);\n        check(empty.invoke(request).outcome() == Outcome.OK,\n            \"empty chain invokes terminal handler\");\n    }\n\n    static void check(boolean condition, String message) {\n        if (!condition) throw new AssertionError(message);\n    }\n}\n"</script><script>
+document.documentElement.classList.add('js');
+document.getElementById('print-guide').addEventListener('click',()=>window.print());
+document.getElementById('jump-code').addEventListener('click',()=>{location.hash='reference';});
+document.getElementById('download-java').addEventListener('click',()=>{
+ const source=JSON.parse(document.getElementById('java-source').textContent);
+ const url=URL.createObjectURL(new Blob([source],{type:'text/plain;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='Lesson13Demo.java';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{
+ const target=document.getElementById(button.dataset.copy);
+ try{await navigator.clipboard.writeText(target.textContent);button.textContent='Copied';setTimeout(()=>button.textContent='Copy',1600);}
+ catch(error){const range=document.createRange();range.selectNodeContents(target);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);button.textContent='Selected';document.getElementById('copy-status').textContent='Code selected. Use your browser’s Copy command.';setTimeout(()=>button.textContent='Copy',2000);}
+}));
+</script></body></html>

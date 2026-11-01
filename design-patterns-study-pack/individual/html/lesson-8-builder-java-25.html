@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 8: derive Builder from construction problems, implement an immutable Java configuration, and test its invariants."><title>Lesson 8 — Builder | Java 25 Guide</title><style>
+:root { color-scheme:light; --paper:#fff; --page:#f5f4ef; --ink:#172f3d; --muted:#52636c; --line:#d9e0df; --teal:#14675e; --soft:#edf6f2; --sand:#fbf1df; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:24px; }
+body { margin:0; background:var(--page); color:var(--ink); font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+a { color:var(--teal); text-underline-offset:3px; }
+a:hover { color:#073e38; }
+button { font:inherit; cursor:pointer; }
+button:focus-visible,a:focus-visible { outline:3px solid #c78b35; outline-offset:4px; }
+.skip { position:fixed; top:-80px; left:20px; padding:10px; background:white; z-index:50; }
+.skip:focus { top:10px; }
+.layout { display:grid; grid-template-columns:230px minmax(0,880px); gap:42px; max-width:1220px; margin:auto; padding:36px 28px 80px; }
+.sidebar { position:sticky; top:28px; align-self:start; max-height:calc(100vh - 56px); overflow:auto; padding:10px 14px 20px 0; }
+.brand { font-size:13px; font-weight:800; letter-spacing:.14em; margin:0 0 20px; }
+.side-title { font-family:Georgia,serif; font-size:28px; line-height:1.2; margin:0 0 18px; }
+.sidebar nav a { display:block; padding:7px 10px; margin:3px 0; border-left:2px solid transparent; text-decoration:none; color:var(--muted); font-size:13px; line-height:1.45; }
+.sidebar nav a:hover,.sidebar nav a.active { color:var(--teal); background:#e9f0ea; border-color:var(--teal); }
+.sidebar nav small { font-size:10px; display:block; text-transform:uppercase; letter-spacing:.1em; color:#66776c; }
+.side-note { font-size:12px; color:var(--muted); padding-top:18px; border-top:1px solid var(--line); margin-top:20px; }
+main { min-width:0; background:white; border:1px solid var(--line); border-radius:4px; box-shadow:0 8px 35px #1b383509; }
+.hero { padding:54px 58px 42px; background:linear-gradient(120deg,#f7fcf8,#fff 78%); border-top:6px solid var(--teal); border-bottom:1px solid var(--line); }
+.eyebrow { text-transform:uppercase; font-size:11px; font-weight:800; letter-spacing:.17em; color:var(--teal); margin:0 0 13px; }
+h1 { font:normal 70px/1 Georgia,"Times New Roman",serif; letter-spacing:-.045em; margin:0 0 15px; }
+.subtitle { font-size:26px; line-height:1.25; letter-spacing:-.03em; margin:0 0 22px; max-width:600px; font-weight:600; }
+.hero .lead { font-size:18px; line-height:1.6; max-width:610px; }
+.tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; }
+.tag { border:1px solid #c5dad1; padding:3px 9px; border-radius:4px; color:#385c50; background:#f7fbf7; font-size:11px; font-weight:600; }
+.actions { display:flex; flex-wrap:wrap; gap:9px; margin:26px 0 14px; }
+.action { border:1px solid #a8c0b6; color:var(--teal); background:#fff; border-radius:4px; padding:9px 14px; font-size:12px; font-weight:700; text-decoration:none; line-height:1.5; }
+.action.primary { background:var(--teal); color:white; border-color:var(--teal); }
+.print-help { color:var(--muted); font-size:12px; margin:0; }
+.content { padding:0 58px 42px; }
+.reading-note { padding:25px 0 5px; color:var(--muted); font-size:14px; }
+.chapter { margin:42px -58px 28px; padding:29px 58px 25px; background:#f4f7f3; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.chapter h2 { font:normal 29px/1.2 Georgia,serif; margin:0 0 12px; letter-spacing:-.02em; }
+.chapter p:last-child { font-size:14px; line-height:1.6; color:var(--muted); margin:0; }
+.lesson-step { margin:0 0 35px; scroll-margin-top:24px; }
+h2 { font-size:23px; line-height:1.3; letter-spacing:-.025em; margin:28px 0 16px; font-weight:700; }
+.step-number { display:inline-block; color:var(--teal); font-size:12px; font-weight:800; letter-spacing:.03em; vertical-align:middle; margin-right:11px; min-width:23px; }
+h3 { font-size:17px; line-height:1.3; margin:26px 0 12px; }
+p { margin:12px 0 16px; }
+strong { font-weight:700; }
+code { font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace; font-size:.88em; background:#eff3f1; padding:2px 4px; border-radius:3px; color:#184b46; overflow-wrap:anywhere; }
+.codebox { margin:20px 0; border:1px solid #d3ded9; background:#f7f9f7; border-radius:5px; overflow:hidden; }
+.codehead { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 14px; color:#50685e; background:#eef3ef; border-bottom:1px solid #dbe4dc; font-size:10px; font-weight:700; letter-spacing:.02em; }
+.copy { background:white; border:1px solid #cedcd2; border-radius:3px; padding:2px 7px; font-size:10px; color:var(--teal); }
+pre { font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace; font-size:12px; line-height:1.7; padding:17px 18px; margin:0; overflow-x:auto; tab-size:4; }
+pre code { padding:0; background:none; border-radius:0; font-size:inherit; line-height:inherit; color:#253f3b; overflow-wrap:normal; }
+.callout { padding:18px 20px; border-left:3px solid #5a9c84; background:var(--soft); margin:23px 0; font-size:14px; }
+.callout > strong { font-size:14px; color:#164e43; }
+.callout p { margin:8px 0 0; }
+.callout.caution { background:var(--sand); border-color:#bb8531; }
+.callout.caution > strong { color:#73511d; }
+.callout.takeaway { background:#e8f3ec; border-left-width:5px; }
+.table-wrap { margin:19px 0; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; line-height:1.5; text-align:left; }
+th { background:#edf2ed; color:#285044; padding:10px 12px; border-bottom:2px solid #bdcfc3; font-size:11px; }
+td { vertical-align:top; padding:11px 12px; border-bottom:1px solid #dce3dd; }
+tbody tr:nth-child(even) { background:#fafbf9; }
+td:first-child { font-weight:600; min-width:115px; }
+td code { font-size:.92em; }
+ol { padding-left:23px; }
+li { padding-left:3px; margin:9px 0; }
+.decision li { padding-left:6px; margin:15px 0; }
+.appendix { border-top:2px solid #bfd0c3; margin-top:48px; padding-top:30px; }
+.appendix > h2 { font:normal 30px/1.2 Georgia,serif; margin-top:10px; }
+.sources ol { font-size:13px; }
+.sources li { margin:17px 0; }
+.sources li p { margin:3px 0 0; color:var(--muted); }
+.source-url { display:none; }
+.edition { margin-top:40px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; letter-spacing:.04em; }
+#status { min-height:1em; font-size:12px; color:var(--teal); }
+@media(max-width:1100px) { .layout { grid-template-columns:190px minmax(0,1fr); gap:24px; padding:24px 18px; } .hero {padding:40px 36px;} .content {padding:0 36px 36px;} .chapter {margin-left:-36px;margin-right:-36px;padding-left:36px;padding-right:36px;} }
+@media(max-width:800px) { .layout {display:block;max-width:850px;padding:16px;} .sidebar {position:static;max-height:none;padding:0 0 14px;} .brand {margin-bottom:8px;} .side-title,.side-note {display:none;} .sidebar nav {display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;} .sidebar nav a {flex:0 0 auto;border:1px solid var(--line);border-radius:4px;font-size:11px;} .sidebar nav small {display:none;} h1 {font-size:56px;} }
+@media(max-width:520px) { body {font-size:15px;} .layout {padding:0;} main {border-radius:0;border-left:0;border-right:0;} .sidebar {padding:16px;} .hero {padding:32px 22px;} .subtitle {font-size:23px;} .content {padding:0 22px 30px;} .chapter {margin-left:-22px;margin-right:-22px;padding:24px 22px;} h2 {font-size:21px;} .chapter h2 {font-size:27px;} pre {font-size:11px;padding:13px;} td,th {padding:8px;} table {font-size:12px;} .codehead {font-size:9px;} }
+@media(prefers-reduced-motion:reduce) { html {scroll-behavior:auto;} }
+@page { size:auto; margin:16mm 16mm 18mm; @bottom-left { content:"DP  /  LESSON 8 — BUILDER"; font:8pt Arial,sans-serif; color:#53655b; } @bottom-right { content:counter(page); font:8pt Arial,sans-serif; color:#53655b; } }
+@media print {
+  :root { color-scheme:light; }
+  html {scroll-behavior:auto;scroll-padding:0;}
+  body {background:white;color:#182c32;font-size:10pt;line-height:1.5;}
+  .layout {display:block;max-width:none;margin:0;padding:0;}
+  .sidebar,.actions,.copy,#status,.skip,.print-help {display:none!important;}
+  main {border:0;box-shadow:none;border-radius:0;}
+  .hero {padding:14mm 0 8mm;background:white;border-top:3pt solid #14675e;}
+  h1 {font-size:54pt;} .subtitle {font-size:23pt;} .hero .lead {font-size:12pt;max-width:none;}
+  .tag {font-size:8pt;padding:2px 7px;}
+  .content {padding:0;}
+  .reading-note {font-size:9pt;padding:5mm 0 0;}
+  .chapter {margin:8mm 0 5mm;padding:5mm 0;background:white;break-inside:avoid;break-after:avoid;}
+  .chapter h2 {font-size:22pt;}
+  .chapter p:last-child {font-size:10pt;}
+  .eyebrow {font-size:8pt;}
+  .lesson-step {margin-bottom:6mm;}
+  h2 {font-size:15pt;margin:5mm 0 3mm;}
+  h3 {font-size:12pt;margin:5mm 0 3mm;}
+  h2,h3,.codehead {break-after:avoid;page-break-after:avoid;}
+  p {margin:3mm 0;orphans:3;widows:3;}
+  .step-number {font-size:9pt;}
+  .codebox {border:0;border-left:1pt solid #c9d8cc;border-radius:0;overflow:visible;margin:4mm 0;background:#f7f9f7;break-inside:auto;}
+  .code-short {break-inside:avoid;}
+  .codehead {padding:2mm 3mm;font-size:7.5pt;}
+  pre {font-size:8pt;line-height:1.45;padding:3mm;white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;break-inside:auto;}
+  pre code {white-space:pre-wrap;overflow-wrap:anywhere;}
+  .table-wrap {overflow:visible;margin:4mm 0;}
+  table {font-size:9pt;line-height:1.4;table-layout:fixed;}
+  thead {display:table-header-group;}
+  tr {break-inside:avoid;}
+  th {font-size:8pt;} td,th {padding:2.4mm;overflow-wrap:anywhere;}
+  td:first-child {min-width:0;}
+  .callout {font-size:9pt;padding:3mm 4mm;margin:4mm 0;break-inside:avoid;}
+  .callout>strong {font-size:10pt;}
+  li {margin:2mm 0;} .decision li {margin:3mm 0;}
+  .appendix {break-before:auto;margin:8mm 0 0;padding:4mm 0 0;}
+  .sources {break-before:page;}
+  .appendix >h2 {font-size:23pt;}
+  .sources ol {font-size:9pt;}
+  .sources li {break-inside:avoid;margin:4mm 0;}
+  .source-url {display:block;overflow-wrap:anywhere;font:7pt/1.4 ui-monospace,monospace;color:#4a6058;margin-top:1mm;}
+  a {color:inherit;text-decoration:none;}
+  .edition {font-size:8pt;margin-top:7mm;}
+  * {-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style></head>
+<body><a class="skip" href="#main">Skip to guide</a><div class="layout"><aside class="sidebar"><p class="brand">DP / DESIGN PATTERNS</p><p class="side-title">Lesson 8<br>Builder</p><nav aria-label="Lesson contents"><a href="#step-1"><small>01–05</small>Find the pressure</a><a href="#step-6"><small>06–10</small>Derive the pattern</a><a href="#step-11"><small>11–13</small>Working implementation</a><a href="#step-14"><small>14–17</small>Strengthen the API</a><a href="#step-18"><small>18–22</small>Compare the options</a><a href="#step-23"><small>23–27</small>Stages and tests</a><a href="#jdk"><small>Standard library</small>Java 25 in practice</a><a href="#exercise"><small>Exercise</small>Database configuration</a><a href="#map"><small>Connections</small>Pattern map</a><a href="#sources"><small>References</small>Official sources</a></nav><p class="side-note">First principles, then code.<br>Read offline. Print on A4 or Letter.</p></aside><main id="main"><header class="hero"><p class="eyebrow">Lesson 08 · Creational pattern</p><h1>Builder</h1><p class="subtitle">Control complex object construction.</p><p class="lead">Separate <strong>collecting construction decisions</strong> from <strong>creating the final valid object</strong>.</p><div class="tags"><span class="tag">Java 25 compatible</span><span class="tag">No preview features</span><span class="tag">Self-contained guide</span></div><div class="actions"><button class="action primary" id="print-guide" type="button">Print / Save as PDF</button><button class="action" id="download-java" type="button">Download Java examples</button></div><p class="print-help">For PDF: use portrait, 100% scale, and turn browser headers/footers off. Background graphics are optional. All lesson content prints.</p><div id="status" aria-live="polite"></div></header><div class="content"><div class="reading-note"><strong>How to use this guide.</strong> Read the numbered steps in order to preserve the derivation. Earlier excerpts illustrate one idea; files marked “complete” form the runnable examples. Only Java basics—classes, methods, constructors, and collections—are assumed.</div><div class="chapter"><p class="eyebrow">Part I · Find the pressure</p><h2>Start with the construction problem</h2><p>A pattern earns its place by removing a concrete source of mistakes. Begin with the simplest API and watch where it stops helping.</p></div><section class="lesson-step" id="step-1"><h2><span class="step-number">01</span>Start without Builder</h2><p>Suppose we need a value describing an HTTP request. With just two required inputs, a constructor is readable. There is no construction problem to solve yet.</p><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>import java.net.URI;
+
+record SimpleRequest(String method, URI uri) {}
+
+// Inside a method:
+var request = new SimpleRequest(
+    &quot;GET&quot;, URI.create(&quot;https://example.com/users&quot;)
+);</code></pre></div><p>The example is deliberately minimal; a real constructor would still validate its inputs. <strong>Builder is not a prerequisite for validation or immutability.</strong></p></section><section class="lesson-step" id="step-2"><h2><span class="step-number">02</span>Requirements grow</h2><p>Now add headers, query parameters, a body, a timeout, authentication, compression, retry count, and redirects. A constructor begins to look like this:</p><div class="codebox code-short"><div class="codehead"><span>Design sketch · the constructor API we are moving away from</span><button class="copy" type="button">Copy</button></div><pre><code>new RequestSpec(
+    &quot;POST&quot;, uri, headers, queryParams, body,
+    Duration.ofSeconds(10), token, true, 3, false
+);</code></pre></div><p>The arguments contain information, but the call hides their meaning. A reviewer must look up the parameter list to interpret <code>true, 3, false</code>. A new optional field adds more friction to every call site.</p></section><section class="lesson-step" id="step-3"><h2><span class="step-number">03</span>First problem: positional ambiguity</h2><p>Named construction steps make the decisions visible where the object is created. This is the API we will work toward:</p><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>var request = RequestSpec.builder(
+        &quot;POST&quot;, URI.create(&quot;https://example.com/orders&quot;))
+    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    .body(&quot;&quot;&quot;
+        {&quot;productId&quot;:&quot;P123&quot;}
+        &quot;&quot;&quot;)
+    .timeout(Duration.ofSeconds(5))
+    .retryCount(3)
+    .followRedirects(false)
+    .build();</code></pre></div><p>Each optional value now has a label. Our teaching type is called <code>RequestSpec</code> to distinguish it from <code>java.net.http.HttpRequest</code>. It stores configuration; creating it does not execute a request.</p></section><section class="lesson-step" id="step-4"><h2><span class="step-number">04</span>Second problem: optional parameters</h2><p>Constructor overloads can help briefly. As more combinations appear, they form a telescoping family that is hard to maintain and use.</p><div class="codebox code-short"><div class="codehead"><span>Signatures only · telescoping constructor problem</span><button class="copy" type="button">Copy</button></div><pre><code>RequestSpec(String method, URI uri)
+RequestSpec(String method, URI uri, String body)
+RequestSpec(String method, URI uri, String body, Duration timeout)
+// Which overload handles timeout with no body?</code></pre></div><p>A builder lets the caller name just the optional decisions they want to change. Defaults stay inside the construction API.</p></section><section class="lesson-step" id="step-5"><h2><span class="step-number">05</span>Third problem: invalid combinations</h2><p>Construction is more than assigning fields. First, define what counts as a valid result. These are the rules for <em>our example application</em>:</p><div class="table-wrap"><table><thead><tr><th scope="col">Input or combination</th><th scope="col">Rule</th></tr></thead><tbody><tr><td>Method and URI</td><td>Both required. Support the seven uppercase methods listed in the code. Use an absolute HTTP(S) URI with a host, without user info or a fragment.</td></tr><tr><td>Timeout / retry count</td><td>Timeout is non-null and positive. Retry count is zero or greater.</td></tr><tr><td>GET or HEAD plus a body</td><td>Reject this combination.</td></tr><tr><td>POST plus a body</td><td>Require a nonblank Content-Type header.</td></tr><tr><td>Headers</td><td>One value per normalized name. Reject nulls, blank values, invalid names, and control characters other than tab.</td></tr></tbody></table></div><aside class="callout caution"><strong>Separate application policy from HTTP semantics</strong><p>The original lesson phrased “GET cannot have a body” as a general rule. RFC 9110 gives GET content no generally defined semantics and advises clients against it without prior server agreement. Our stricter rejection is an application policy. The POST/Content-Type requirement is also our policy. <a href="#source-http">[1]</a></p></aside><p>We now have three jobs: <strong>collect choices, validate them, and produce a valid value.</strong> Separating these jobs gives us the pressure for Builder.</p></section><div class="chapter"><p class="eyebrow">Part II · Derive the pattern</p><h2>A workspace for construction</h2><p>The builder can be unfinished. The product should be usable as soon as it is returned.</p></div><section class="lesson-step" id="step-6"><h2><span class="step-number">06</span>Build the immutable object first</h2><p>Give the finished value private final fields, no setters, and a private constructor. The constructor snapshots the builder’s state. This excerpt comes from the complete class in step 11.</p><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>private RequestSpec(Builder builder) {
+    method = builder.method;
+    uri = builder.uri;
+    headers = Map.copyOf(builder.headers);
+    body = builder.body;
+    timeout = builder.timeout;
+    retryCount = builder.retryCount;
+    followRedirects = builder.followRedirects;
+}</code></pre></div><p>A private constructor controls entry into this class’s normal public construction path. That only protects validity if every path that calls it validates correctly. The modifier alone does not establish the invariants.</p></section><section class="lesson-step" id="step-7"><h2><span class="step-number">07</span>Create the Builder and give defaults one owner</h2><div class="codebox code-short"><div class="codehead"><span>Inside RequestSpec.Builder</span><button class="copy" type="button">Copy</button></div><pre><code>private final String method;
+private final URI uri;
+private final Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();
+private String body;
+private Duration timeout = Duration.ofSeconds(30);
+private int retryCount = 0;
+private boolean followRedirects = true;</code></pre></div><p>The builder owns mutable optional configuration. Here the required fields are fixed when the builder is created; steps 14–15 explain that refinement. These defaults belong to <code>RequestSpec</code>, not to the JDK HTTP client.</p></section><section class="lesson-step" id="step-8"><h2><span class="step-number">08</span>Add fluent methods</h2><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>public Builder retryCount(int retryCount) {
+    if (retryCount &lt; 0) {
+        throw new IllegalArgumentException(&quot;retryCount must be &gt;= 0&quot;);
+    }
+    this.retryCount = retryCount;
+    return this;
+}</code></pre></div><p><code>return this</code> lets the next method operate on the same builder. It does not construct a new product. Validate an independently invalid argument before assigning it, so a rejected call leaves the existing configuration intact.</p></section><section class="lesson-step" id="step-9"><h2><span class="step-number">09</span>Add a clear endpoint: build()</h2><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>public RequestSpec build() {
+    validateCombinations();
+    return new RequestSpec(this);
+}</code></pre></div><p>The return type changes from <code>Builder</code> to <code>RequestSpec</code>. That is the boundary between preparing a configuration and using a finished value. If validation fails, no product is returned.</p></section><section class="lesson-step" id="step-10"><h2><span class="step-number">10</span>Put each rule at the right boundary</h2><div class="table-wrap"><table><thead><tr><th scope="col">When</th><th scope="col">What to check</th><th scope="col">Failure in this guide</th></tr></thead><tbody><tr><td>Builder creation</td><td>Required inputs, supported method, URI shape</td><td><code>NullPointerException</code> for null; otherwise <code>IllegalArgumentException</code></td></tr><tr><td>Each fluent call</td><td>Nulls and constraints on that one argument</td><td>Same distinction</td></tr><tr><td>build()</td><td>Relationships between fields</td><td><code>IllegalStateException</code></td></tr></tbody></table></div><p>For example, a zero timeout is already invalid when supplied. A POST body without Content-Type may simply be unfinished configuration. Delaying that combination check permits either <code>body(...).header(...)</code> or <code>header(...).body(...)</code>.</p><p>This split is a design choice, not a universal Builder contract. The Java 25 <code>ModuleDescriptor.Builder</code> documentation explicitly describes checking components and invariants as components are added. <a href="#source-module">[2]</a></p><aside class="callout note"><strong>Keep the scope deliberate</strong><p>The working implementation below omits query-parameter assembly, authentication, and compression. They motivated the problem, but they are not needed to demonstrate the pattern. Its header map is a simplified single-value model, and its retry count is configuration, not retry logic.</p></aside></section><div class="chapter"><p class="eyebrow">Part III · Make it concrete</p><h2>One complete, consistent implementation</h2><p>All parts below form RequestSpec.java. Copy them in order, or use the bundled source download at the top of the guide.</p></div><section class="lesson-step" id="step-11"><h2><span class="step-number">11</span>Complete implementation</h2><p>Save this as <code>RequestSpec.java</code>. It uses standard Java APIs and no preview features or third-party dependencies. Header names are normalized with <code>Locale.ROOT</code>; repeated names replace their previous value in this example.</p><div class="codebox"><div class="codehead"><span>RequestSpec.java · 1 of 4 · immutable product and accessors</span><button class="copy" type="button">Copy</button></div><pre><code data-file="RequestSpec.java" data-part="0">import java.net.URI;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+/** Teaching configuration value; building it sends no network request. */
+public final class RequestSpec {
+    private final String method;
+    private final URI uri;
+    private final Map&lt;String, String&gt; headers;
+    private final String body;
+    private final Duration timeout;
+    private final int retryCount;
+    private final boolean followRedirects;
+
+    private RequestSpec(Builder builder) {
+        method = builder.method;
+        uri = builder.uri;
+        headers = Map.copyOf(builder.headers);
+        body = builder.body;
+        timeout = builder.timeout;
+        retryCount = builder.retryCount;
+        followRedirects = builder.followRedirects;
+    }
+
+    public static Builder builder(String method, URI uri) {
+        return new Builder(method, uri);
+    }
+
+    public String method() { return method; }
+    public URI uri() { return uri; }
+    public Map&lt;String, String&gt; headers() { return headers; }
+    // null means no body; an empty string still means a body was supplied.
+    public String body() { return body; }
+    public Duration timeout() { return timeout; }
+    public int retryCount() { return retryCount; }
+    public boolean followRedirects() { return followRedirects; }</code></pre></div><div class="codebox"><div class="codehead"><span>RequestSpec.java · 2 of 4 · required values and defaults</span><button class="copy" type="button">Copy</button></div><pre><code data-file="RequestSpec.java" data-part="1">    public static final class Builder {
+        private static final Set&lt;String&gt; METHODS = Set.of(
+            &quot;GET&quot;, &quot;HEAD&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;
+        );
+
+        private final String method;
+        private final URI uri;
+        private final Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();
+        private String body;
+        private Duration timeout = Duration.ofSeconds(30);
+        private int retryCount = 0;
+        private boolean followRedirects = true;
+
+        private Builder(String method, URI uri) {
+            Objects.requireNonNull(method, &quot;method&quot;);
+            Objects.requireNonNull(uri, &quot;uri&quot;);
+            if (!METHODS.contains(method)) {
+                throw new IllegalArgumentException(&quot;Unsupported method&quot;);
+            }
+            boolean http = &quot;http&quot;.equalsIgnoreCase(uri.getScheme());
+            boolean https = &quot;https&quot;.equalsIgnoreCase(uri.getScheme());
+            if ((!http &amp;&amp; !https) || uri.getHost() == null
+                    || uri.getUserInfo() != null || uri.getFragment() != null) {
+                throw new IllegalArgumentException(
+                    &quot;Use an absolute HTTP(S) URI without user info or fragment&quot;
+                );
+            }
+            this.method = method;
+            this.uri = uri;
+        }</code></pre></div><div class="codebox"><div class="codehead"><span>RequestSpec.java · 3 of 4 · fluent options</span><button class="copy" type="button">Copy</button></div><pre><code data-file="RequestSpec.java" data-part="2">        // One value per name; a repeated name replaces its previous value.
+        public Builder header(String name, String value) {
+            Objects.requireNonNull(name, &quot;header name&quot;);
+            Objects.requireNonNull(value, &quot;header value&quot;);
+            if (!name.matches(&quot;[!#$%&amp;&#x27;*+.^_`|~0-9A-Za-z-]+&quot;)) {
+                throw new IllegalArgumentException(&quot;Invalid header name&quot;);
+            }
+            if (value.isBlank() || value.chars().anyMatch(
+                    c -&gt; c == 127 || (c &lt; 32 &amp;&amp; c != &#x27;\t&#x27;))) {
+                throw new IllegalArgumentException(&quot;Invalid header value&quot;);
+            }
+            headers.put(name.toLowerCase(Locale.ROOT), value);
+            return this;
+        }
+
+        public Builder body(String body) {
+            this.body = Objects.requireNonNull(body, &quot;body&quot;);
+            return this;
+        }
+
+        public Builder timeout(Duration timeout) {
+            Objects.requireNonNull(timeout, &quot;timeout&quot;);
+            if (timeout.isZero() || timeout.isNegative()) {
+                throw new IllegalArgumentException(&quot;timeout must be positive&quot;);
+            }
+            this.timeout = timeout;
+            return this;
+        }
+
+        public Builder retryCount(int retryCount) {
+            if (retryCount &lt; 0) {
+                throw new IllegalArgumentException(&quot;retryCount must be &gt;= 0&quot;);
+            }
+            this.retryCount = retryCount;
+            return this;
+        }
+
+        public Builder followRedirects(boolean value) {
+            followRedirects = value;
+            return this;
+        }</code></pre></div><div class="codebox code-short"><div class="codehead"><span>RequestSpec.java · 4 of 4 · final combination checks</span><button class="copy" type="button">Copy</button></div><pre><code data-file="RequestSpec.java" data-part="3">        public RequestSpec build() {
+            validateCombinations();
+            return new RequestSpec(this);
+        }
+
+        private void validateCombinations() {
+            if ((method.equals(&quot;GET&quot;) || method.equals(&quot;HEAD&quot;))
+                    &amp;&amp; body != null) {
+                throw new IllegalStateException(
+                    &quot;This application forbids a body on GET or HEAD&quot;
+                );
+            }
+            if (method.equals(&quot;POST&quot;) &amp;&amp; body != null
+                    &amp;&amp; !headers.containsKey(&quot;content-type&quot;)) {
+                throw new IllegalStateException(
+                    &quot;POST with a body requires Content-Type in this application&quot;
+                );
+            }
+        }
+    }
+}</code></pre></div><p>Notice the explicit accessors. A normal class does not generate record-style methods such as <code>timeout()</code> for you. They are included so the usage and checks later in this guide compile.</p><aside class="callout note"><strong>Construction does not promise execution safety</strong><p>Accepting <code>retryCount(3)</code> does not make retrying a POST safe. The executor still needs an operation-specific retry policy and, when appropriate, idempotency protection. Builder controls configuration validity, not network outcomes.</p></aside></section><section class="lesson-step" id="step-12"><h2><span class="step-number">12</span>Why make the final object immutable?</h2><p>Once a request configuration is valid, another caller should not be able to silently change it. This implementation combines final fields with immutable component types and an isolated header map.</p><p><code>Map.copyOf</code> returns an unmodifiable map whose entries do not track later changes to the source map. It rejects null keys and values. It is <em>not a deep copy</em>: mutable keys or values would still need their own copying policy. Here both are strings. <a href="#source-map">[3]</a></p><aside class="callout note"><strong>Final references are not deep immutability</strong><p>A <code>final Map</code> field alone only prevents reassignment of the field. If the referenced map were mutable and exposed, the product’s contents could still change.</p></aside></section><section class="lesson-step" id="step-13"><h2><span class="step-number">13</span>The Builder is a temporary workspace</h2><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>var builder = RequestSpec.builder(
+        &quot;GET&quot;, URI.create(&quot;https://example.com/users&quot;))
+    .header(&quot;X-Mode&quot;, &quot;first&quot;);
+
+var first = builder.build();
+var second = builder.header(&quot;x-mode&quot;, &quot;second&quot;).build();
+
+System.out.println(first.headers().get(&quot;x-mode&quot;));  // first
+System.out.println(second.headers().get(&quot;x-mode&quot;)); // second</code></pre></div><p>Our builder is reusable. Each successful build creates a new snapshot, so editing the workspace does not change an earlier product. A POST builder may temporarily have a body without Content-Type; <code>build()</code> is where that unfinished state is rejected.</p><p>Keep each mutable builder confined to one thread. This implementation has no synchronization. Do not infer builder safety from product immutability; the JDK request builder similarly documents that its methods are not synchronized. <a href="#source-jdk-request">[4]</a></p></section><div class="chapter"><p class="eyebrow">Part IV · Strengthen the construction API</p><h2>Make the important choices hard to miss</h2><p>Improve the API without making every possible mistake a type-system problem.</p></div><section class="lesson-step" id="step-14"><h2><span class="step-number">14</span>Required parameters</h2><p>An all-setter API lets a caller forget required fields and discover the mistake only at <code>build()</code>:</p><div class="codebox code-short"><div class="codehead"><span>Design sketch · omitted required fields</span><button class="copy" type="button">Copy</button></div><pre><code>// Earlier API design, not the final RequestSpec API:
+RequestSpec.builder().retryCount(3).build();</code></pre></div><p>The final API requires both values at the entry point:</p><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>public static Builder builder(String method, URI uri) {
+    return new Builder(method, uri);
+}</code></pre></div><p>The compiler enforces the number and types of arguments. It does not prove that a string is valid or a URI is non-null. The builder constructor still validates the supplied values.</p></section><section class="lesson-step" id="step-15"><h2><span class="step-number">15</span>Constructor + Builder can work together</h2><div class="table-wrap"><table><thead><tr><th scope="col">Kind of decision</th><th scope="col">API location</th><th scope="col">Example</th></tr></thead><tbody><tr><td>Required</td><td>Builder factory / private builder constructor</td><td><code>builder("POST", uri)</code></td></tr><tr><td>Optional</td><td>Named fluent method</td><td><code>.timeout(Duration.ofSeconds(5))</code></td></tr><tr><td>Omitted optional value</td><td>Builder field initializer</td><td><code>30 seconds</code></td></tr><tr><td>Final consistency</td><td><code>build()</code></td><td>POST body has Content-Type</td></tr></tbody></table></div><p>Keep the required set small and meaningful. If two required arguments have the same type and are easy to swap, a builder alone does not remove that ambiguity. Better names, a value type, or a different entry point may help.</p></section><section class="lesson-step" id="step-16"><h2><span class="step-number">16</span>Validate contradictory combinations</h2><p>Suppose a future version supports API key, bearer token, and basic credentials, with an application rule allowing only one mode. Separate setters could accidentally configure several.</p><div class="codebox code-short"><div class="codehead"><span>Extension sketch · these fields are not in RequestSpec</span><button class="copy" type="button">Copy</button></div><pre><code>// Excerpt from a hypothetical authentication-enabled builder.
+private void validateAuthentication() {
+    int configured = 0;
+    if (apiKey != null) configured++;
+    if (bearerToken != null) configured++;
+    if (basicCredentials != null) configured++;
+    if (configured &gt; 1) {
+        throw new IllegalStateException(&quot;Choose one authentication mode&quot;);
+    }
+}</code></pre></div><p>Rejecting contradictions is one option. Another is a single <code>authentication(Auth choice)</code> field with distinct types for each supported choice. Model mutually exclusive states directly when that makes the API simpler.</p></section><section class="lesson-step" id="step-17"><h2><span class="step-number">17</span>Builder is more than fluent syntax</h2><p>Builder can own defaults, normalization, derived values, and cross-field rules. But each operation should have clear semantics. In this guide, header normalization occurs when a header is added, and <code>build()</code> validates and snapshots without changing the builder.</p><div class="codebox code-short"><div class="codehead"><span>From header(...) · explicit normalization</span><button class="copy" type="button">Copy</button></div><pre><code>headers.put(name.toLowerCase(Locale.ROOT), value);</code></pre></div><p>If you add a default User-Agent later, choose one authoritative place to apply it. A surprising <code>build()</code> method that silently edits the workspace can make repeated builds harder to reason about. Avoid network calls and other execution side effects during simple value construction.</p></section><div class="chapter"><p class="eyebrow">Part V · Compare the responsibilities</p><h2>Choose the smallest useful abstraction</h2><p>Builder is one construction tool. It does not replace constructors, records, or factories.</p></div><section class="lesson-step" id="step-18"><h2><span class="step-number">18</span>Builder vs Factory</h2><div class="table-wrap"><table><thead><tr><th scope="col">Tool</th><th scope="col">Question it helps answer</th><th scope="col">Typical shape</th></tr></thead><tbody><tr><td>Factory</td><td>What object should the caller receive, and how can creation be hidden?</td><td><code>factory.create(kind)</code></td></tr><tr><td>Builder</td><td>How can several construction decisions be collected and checked?</td><td><code>builder.option(...).build()</code></td></tr></tbody></table></div><p>A factory often selects an implementation, as in the earlier lesson, but factories are broader than type selection. A factory may also create a single concrete type or return a configured builder.</p></section><section class="lesson-step" id="step-19"><h2><span class="step-number">19</span>Factory + Builder</h2><p>Consider database clients. A factory could select a Postgres implementation. Its builder could collect host, port, timeout, pool size, and SSL options. The first responsibility is choosing or hiding creation; the second is assembling configuration.</p><div class="table-wrap"><table><thead><tr><th scope="col">Stage</th><th scope="col">Responsibility</th></tr></thead><tbody><tr><td>Database factory</td><td>Select an appropriate client or builder.</td></tr><tr><td>Concrete client builder</td><td>Collect supported configuration and reject invalid combinations.</td></tr><tr><td>Constructed client/config</td><td>Expose the finished API to its caller.</td></tr></tbody></table></div><p>Use both only if both responsibilities exist. Returning a builder from a factory is a possible design, not a required pattern arrangement.</p></section><section class="lesson-step" id="step-20"><h2><span class="step-number">20</span>Builder vs setters</h2><div class="codebox code-short"><div class="codehead"><span>Design sketch · partially initialized product</span><button class="copy" type="button">Copy</button></div><pre><code>// An API that exposes a half-configured product:
+var request = new MutableRequest();
+request.setMethod(&quot;POST&quot;);
+send(request); // What URI would this use?</code></pre></div><p>The issue is that the object can escape before it is ready. A separate builder gives unfinished state a separate type. Code that requires a <code>RequestSpec</code> cannot receive a <code>RequestSpec.Builder</code> by accident.</p><p>Setters are not always wrong. They suit objects whose valid behavior includes mutation. The goal here is a stable configuration value, so a construction boundary is useful.</p></section><section class="lesson-step" id="step-21"><h2><span class="step-number">21</span>Builder vs Java records</h2><div class="codebox code-short"><div class="codehead"><span>Java · small values with direct construction</span><button class="copy" type="button">Copy</button></div><pre><code>record Point(int x, int y) {}
+
+record Money(long cents, String currency) {
+    Money {
+        if (currency == null || currency.isBlank()) {
+            throw new IllegalArgumentException(&quot;currency is required&quot;);
+        }
+    }
+}</code></pre></div><p>A compact value with a clear constructor often needs no builder. A record can also validate in its canonical or compact constructor. Java records are shallowly immutable: a record component can still refer to a mutable collection. <a href="#source-record">[5]</a></p><p>Records and builders are compatible. A complex record can have a builder, but its public canonical constructor remains an entry point, so put essential validity checks where that path enforces them too.</p></section><section class="lesson-step" id="step-22"><h2><span class="step-number">22</span>Builder can become overengineering</h2><p>For <code>record Person(String name) {}</code>, <code>new Person("Alice")</code> is usually already clear. Adding a mutable workspace and several methods should solve a real problem, not satisfy a field-count rule.</p><div class="table-wrap"><table><thead><tr><th scope="col">Construction pressure</th><th scope="col">Start here</th></tr></thead><tbody><tr><td>A few clear, required values</td><td>A constructor or record.</td></tr><tr><td>A named creation operation or implementation selection</td><td>A factory.</td></tr><tr><td>Many optional choices, defaults, or cross-field rules</td><td>Consider a builder.</td></tr><tr><td>A consequential required sequence</td><td>Consider a staged builder after simpler APIs.</td></tr></tbody></table></div><p><strong>Several meaningful pressures are stronger evidence than “this class has five fields.”</strong></p></section><div class="chapter"><p class="eyebrow">Part VI · Add guarantees carefully</p><h2>Stages, validity, and executable checks</h2><p>Stronger APIs have a cost. Add complexity only where it prevents a problem that matters.</p></div><section class="lesson-step" id="step-23"><h2><span class="step-number">23</span>Staged Builder</h2><p>A staged API can expose only the next valid construction step. The following complete optional wrapper uses our existing builder for validation, instead of duplicating its rules. Save it as <code>StagedRequest.java</code>.</p><div class="codebox"><div class="codehead"><span>StagedRequest.java · complete optional wrapper</span><button class="copy" type="button">Copy</button></div><pre><code data-file="StagedRequest.java" data-part="0">import java.net.URI;
+import java.time.Duration;
+
+public final class StagedRequest {
+    private StagedRequest() {}
+
+    public interface MethodStep {
+        UriStep method(String method);
+    }
+
+    public interface UriStep {
+        OptionsStep uri(URI uri);
+    }
+
+    public interface OptionsStep {
+        OptionsStep header(String name, String value);
+        OptionsStep body(String body);
+        OptionsStep timeout(Duration timeout);
+        RequestSpec build();
+    }
+
+    public static MethodStep builder() { return new Steps(); }
+
+    private static final class Steps
+            implements MethodStep, UriStep, OptionsStep {
+        private String method;
+        private RequestSpec.Builder delegate;
+
+        @Override
+        public UriStep method(String method) {
+            this.method = method;
+            return this;
+        }
+
+        @Override
+        public OptionsStep uri(URI uri) {
+            delegate = RequestSpec.builder(method, uri);
+            return this;
+        }
+
+        @Override
+        public OptionsStep header(String name, String value) {
+            delegate.header(name, value);
+            return this;
+        }
+
+        @Override
+        public OptionsStep body(String body) {
+            delegate.body(body);
+            return this;
+        }
+
+        @Override
+        public OptionsStep timeout(Duration timeout) {
+            delegate.timeout(timeout);
+            return this;
+        }
+
+        @Override
+        public RequestSpec build() { return delegate.build(); }
+    }
+}</code></pre></div><div class="codebox code-short"><div class="codehead"><span>Java · focused excerpt</span><button class="copy" type="button">Copy</button></div><pre><code>var request = StagedRequest.builder()
+    .method(&quot;POST&quot;)
+    .uri(URI.create(&quot;https://example.com/orders&quot;))
+    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    .body(&quot;{}&quot;)
+    .build();
+
+// StagedRequest.builder().build(); // does not compile</code></pre></div><p>The normal typed chain requires a method step, then a URI step, before <code>build()</code> appears. It still permits bad values such as <code>null</code>, which runtime validation must reject. The extra interfaces do not guarantee semantic correctness or make this mutable wrapper safe to share.</p><p>For two required values, <code>RequestSpec.builder(method, uri)</code> is usually simpler. A staged API is justified when the construction sequence itself deserves enforcement.</p></section><section class="lesson-step" id="step-24"><h2><span class="step-number">24</span>Builder and object validity</h2><p>The broader principle is to create a valid object and then use it. Constructors, factories, parsers, and builders can all enforce that boundary.</p><div class="table-wrap"><table><thead><tr><th scope="col">Before build()</th><th scope="col">After a successful build()</th></tr></thead><tbody><tr><td>The workspace may be incomplete.</td><td>All documented construction rules hold.</td></tr><tr><td>Optional choices can change.</td><td>The returned value is stable.</td></tr><tr><td>No execution has happened.</td><td>Execution has still not happened.</td></tr></tbody></table></div><p>A valid request configuration does not prove that a server exists, the credentials work, or a future request will succeed. Those are execution concerns. Keep the guarantee precise.</p></section><section class="lesson-step" id="step-25"><h2><span class="step-number">25</span>Test the construction contract</h2><p>Test defaults, configured options, invalid input, cross-field rules, and snapshot isolation. The following file has no test-framework dependency and uses explicit failures rather than Java’s optional <code>assert</code> mechanism. Save it as <code>BuilderChecks.java</code>.</p><div class="codebox"><div class="codehead"><span>BuilderChecks.java · 25 executable checks</span><button class="copy" type="button">Copy</button></div><pre><code data-file="BuilderChecks.java" data-part="0">import java.net.URI;
+import java.time.Duration;
+
+public final class BuilderChecks {
+    private static final URI USERS = URI.create(&quot;https://example.com/users&quot;);
+    private static final URI ORDERS = URI.create(&quot;https://example.com/orders&quot;);
+    private static int checks;
+
+    public static void main(String[] args) {
+        var defaults = RequestSpec.builder(&quot;GET&quot;, USERS).build();
+        check(defaults.timeout().equals(Duration.ofSeconds(30)), &quot;timeout default&quot;);
+        check(defaults.retryCount() == 0, &quot;retry default&quot;);
+        check(defaults.followRedirects(), &quot;redirect default&quot;);
+        check(defaults.headers().isEmpty() &amp;&amp; defaults.body() == null, &quot;empty defaults&quot;);
+
+        var configured = RequestSpec.builder(&quot;POST&quot;, ORDERS)
+            .body(&quot;{}&quot;) // cross-field rules wait until build()
+            .header(&quot;CONTENT-TYPE&quot;, &quot;application/json&quot;)
+            .timeout(Duration.ofSeconds(5))
+            .retryCount(3)
+            .followRedirects(false)
+            .build();
+        check(configured.method().equals(&quot;POST&quot;) &amp;&amp; configured.uri().equals(ORDERS),
+            &quot;required values&quot;);
+        check(configured.timeout().equals(Duration.ofSeconds(5))
+            &amp;&amp; configured.retryCount() == 3 &amp;&amp; !configured.followRedirects(),
+            &quot;configured options&quot;);
+        check(&quot;application/json&quot;.equals(configured.headers().get(&quot;content-type&quot;)),
+            &quot;header normalization&quot;);
+
+        expect(NullPointerException.class,
+            () -&gt; RequestSpec.builder(null, USERS));
+        expect(NullPointerException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, null));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;get&quot;, USERS));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, URI.create(&quot;/users&quot;)));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).retryCount(-1));
+        expect(NullPointerException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).timeout(null));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).timeout(Duration.ZERO));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).timeout(Duration.ofSeconds(-1)));
+        expect(IllegalStateException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).body(&quot;{}&quot;).build());
+        expect(IllegalStateException.class,
+            () -&gt; RequestSpec.builder(&quot;HEAD&quot;, USERS).body(&quot;&quot;).build());
+        expect(IllegalStateException.class,
+            () -&gt; RequestSpec.builder(&quot;POST&quot;, ORDERS).body(&quot;{}&quot;).build());
+        expect(NullPointerException.class,
+            () -&gt; RequestSpec.builder(&quot;POST&quot;, ORDERS).body(null));
+        expect(NullPointerException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).header(&quot;X-Test&quot;, null));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).header(&quot;Bad Name&quot;, &quot;value&quot;));
+        expect(IllegalArgumentException.class,
+            () -&gt; RequestSpec.builder(&quot;GET&quot;, USERS).header(&quot;X-Test&quot;, &quot;a\r\nb&quot;));
+
+        var builder = RequestSpec.builder(&quot;GET&quot;, USERS).header(&quot;X-Mode&quot;, &quot;first&quot;);
+        var first = builder.build();
+        var second = builder.header(&quot;x-mode&quot;, &quot;second&quot;).build();
+        check(&quot;first&quot;.equals(first.headers().get(&quot;x-mode&quot;)), &quot;snapshot isolated&quot;);
+        check(&quot;second&quot;.equals(second.headers().get(&quot;x-mode&quot;)), &quot;builder reused&quot;);
+        expect(UnsupportedOperationException.class,
+            () -&gt; first.headers().put(&quot;x-mode&quot;, &quot;changed&quot;));
+
+        System.out.println(&quot;Passed &quot; + checks + &quot; builder checks.&quot;);
+    }
+
+    private static void check(boolean condition, String label) {
+        if (!condition) throw new AssertionError(label);
+        checks++;
+    }
+
+    private static void expect(Class&lt;? extends Throwable&gt; type, Runnable action) {
+        try {
+            action.run();
+        } catch (Throwable error) {
+            if (!type.isInstance(error)) {
+                throw new AssertionError(&quot;Expected &quot; + type.getSimpleName(), error);
+            }
+            checks++;
+            return;
+        }
+        throw new AssertionError(&quot;Expected &quot; + type.getSimpleName());
+    }
+}</code></pre></div><p>With a JDK 25 toolchain, put all four supplied Java files in one directory and run:</p><div class="codebox code-short"><div class="codehead"><span>Terminal · POSIX shell; use one line for javac on other shells</span><button class="copy" type="button">Copy</button></div><pre><code>javac --release 25 -Xlint:all RequestSpec.java BuilderChecks.java \
+    StagedRequest.java JdkBuilderExample.java
+java BuilderChecks
+java JdkBuilderExample</code></pre></div><div class="codebox code-short"><div class="codehead"><span>Expected output</span><button class="copy" type="button">Copy</button></div><pre><code>Passed 25 builder checks.
+POST https://example.com/orders
+NEVER</code></pre></div><p><code>--release 25</code> checks the specified Java language level and documented target APIs. <a href="#source-javac">[6]</a> The checks observe public behavior; they do not require a specific private helper layout.</p><aside class="callout note"><strong>Verification for this edition</strong><p>The four complete source files compiled with <code>--release 17 -Xlint:all</code> on the available OpenJDK 17.0.20 runtime; all 25 checks passed, and the JDK example ran. Their APIs were checked against Java SE 25 documentation. ⚠️ A Java 25 runtime execution was not available for this edition. No preview features are used.</p></aside></section><section class="lesson-step" id="step-26"><h2><span class="step-number">26</span>Builder’s core structure</h2><div class="table-wrap"><table><thead><tr><th scope="col">Role</th><th scope="col">In this guide</th><th scope="col">Responsibility</th></tr></thead><tbody><tr><td>Client</td><td>The calling method</td><td>Choose required values and optional settings.</td></tr><tr><td>Builder</td><td><code>RequestSpec.Builder</code></td><td>Hold construction state, defaults, and checks.</td></tr><tr><td>Completion boundary</td><td><code>build()</code></td><td>Validate combinations and produce the product.</td></tr><tr><td>Product</td><td><code>RequestSpec</code></td><td>Expose a valid immutable configuration.</td></tr></tbody></table></div><p>This lesson uses the common fluent Java builder form. In the classic form, a separate director can coordinate a recipe of build steps, sometimes through a shared builder interface to create different representations. A director is unnecessary for the configuration problem we solved.</p></section><section class="lesson-step" id="step-27"><h2><span class="step-number">27</span>The first-principles decision process</h2><ol class="decision"><li><strong>Find a concrete construction mistake.</strong> Are arguments confusing or easy to swap?</li><li><strong>Identify optional choices.</strong> Are overloads multiplying? Who owns defaults?</li><li><strong>Write down validity rules.</strong> Which inputs are independently invalid? Which combinations are invalid?</li><li><strong>Define the product boundary.</strong> Must the result be immutable and ready to use immediately?</li><li><strong>Choose the simplest API that satisfies those needs.</strong> A constructor, factory, or ordinary builder may be enough.</li><li><strong>Add staged types only for a real remaining risk.</strong> Do not encode complexity just because you can.</li></ol><aside class="callout takeaway"><strong>The idea to retain</strong><p>Separate collecting construction decisions from creating the final valid object. Fluent syntax makes the decisions readable; validation and ownership make the design reliable.</p></aside></section><section class="appendix" id="jdk"><p class="eyebrow">In the standard library</p><h2>Recognize the pattern in Java 25</h2><p>Java’s real <code>HttpRequest.Builder</code> collects request settings and builds an immutable <code>HttpRequest</code>. Its setter methods return the builder; each <code>build()</code> returns a new request. <a href="#source-jdk-request">[4]</a></p><div class="codebox code-short"><div class="codehead"><span>JdkBuilderExample.java · complete; no HTTP request is sent</span><button class="copy" type="button">Copy</button></div><pre><code data-file="JdkBuilderExample.java" data-part="0">import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.time.Duration;
+
+public final class JdkBuilderExample {
+    public static void main(String[] args) {
+        var client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();
+
+        var request = HttpRequest.newBuilder(
+                URI.create(&quot;https://example.com/orders&quot;))
+            .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+            .timeout(Duration.ofSeconds(5))
+            .POST(HttpRequest.BodyPublishers.ofString(&quot;{\&quot;productId\&quot;:\&quot;P123\&quot;}&quot;))
+            .build();
+
+        // No send() call: this example only constructs objects.
+        System.out.println(request.method() + &quot; &quot; + request.uri());
+        System.out.println(client.followRedirects());
+    }
+}</code></pre></div><div class="table-wrap"><table><thead><tr><th scope="col">Our teaching API</th><th scope="col">Java 25 API</th></tr></thead><tbody><tr><td><code>RequestSpec.builder(method, uri)</code></td><td><code>HttpRequest.newBuilder(uri)</code> plus a method call such as <code>POST(...)</code></td></tr><tr><td><code>body(String)</code></td><td><code>BodyPublishers.ofString(...)</code> supplies a body publisher.</td></tr><tr><td>One header value per name; replacement</td><td><code>header(...)</code> adds a value; <code>setHeader(...)</code> replaces values.</td></tr><tr><td><code>followRedirects(boolean)</code></td><td>Redirect policy is configured on <code>HttpClient.Builder</code>. <a href="#source-client">[7]</a></td></tr><tr><td><code>retryCount(int)</code></td><td>There is no matching <code>retryCount</code> method on the request builder.</td></tr></tbody></table></div><p>The example creates a client and a request but never calls <code>send</code>. Our 30-second timeout default and application-specific validation rules should not be read as JDK defaults.</p></section><section class="appendix" id="exercise"><p class="eyebrow">Hands-on exercise</p><h2>Build DatabaseConnectionConfig</h2><p>Apply the same reasoning to a database configuration value. Start from these fields, then design the construction boundary.</p><div class="codebox code-short"><div class="codehead"><span>Starting point · fields only; make the final design immutable</span><button class="copy" type="button">Copy</button></div><pre><code>class DatabaseConnectionConfig {
+    String host;
+    int port;
+    String username;
+    String password;
+    boolean ssl;
+    int poolSize;
+    Duration connectTimeout;
+    Duration readTimeout;
+}</code></pre></div><div class="table-wrap"><table><thead><tr><th scope="col">Field</th><th scope="col">Required / default</th><th scope="col">Rule</th></tr></thead><tbody><tr><td>host</td><td>Required</td><td>Non-null and nonblank.</td></tr><tr><td>port</td><td>Required</td><td>1 through 65,535 inclusive.</td></tr><tr><td>username</td><td>Optional; absent by default</td><td>If provided, nonblank.</td></tr><tr><td>password</td><td>Optional; absent by default</td><td>Cannot be configured without a username.</td></tr><tr><td>ssl</td><td><code>true</code></td><td>A construction default; connection behavior is separate.</td></tr><tr><td>poolSize</td><td><code>10</code></td><td>Greater than zero.</td></tr><tr><td>connectTimeout</td><td><code>Duration.ofSeconds(5)</code></td><td>Non-null and positive.</td></tr><tr><td>readTimeout</td><td><code>Duration.ofSeconds(30)</code></td><td>Non-null and positive.</td></tr></tbody></table></div><div class="codebox code-short"><div class="codehead"><span>Target API · use placeholder credentials for the exercise</span><button class="copy" type="button">Copy</button></div><pre><code>var config = DatabaseConnectionConfig
+    .builder(&quot;db.example.com&quot;, 5432)
+    .username(&quot;app&quot;)
+    .password(&quot;exercise-only-placeholder&quot;)
+    .ssl(true)
+    .poolSize(20)
+    .connectTimeout(Duration.ofSeconds(3))
+    .build();</code></pre></div><h3>Acceptance criteria</h3><ol><li>The final config is immutable and exposes no mutators.</li><li>The entry point requires host and port; invalid supplied values are still checked.</li><li>Defaults have one authoritative location.</li><li>Invalid individual values and combinations fail during construction.</li><li>A finished config cannot be obtained half-configured through the public API.</li><li>Use one clear construction path rather than five overloads.</li></ol><h3>Tests that reveal design mistakes</h3><div class="table-wrap"><table><thead><tr><th scope="col">Scenario</th><th scope="col">Expected behavior</th></tr></thead><tbody><tr><td>Only host and port provided</td><td>All documented defaults appear.</td></tr><tr><td>Port 1 or 65,535</td><td>Accepted.</td></tr><tr><td>Port 0 or 65,536; pool size 0</td><td>Rejected.</td></tr><tr><td>Null, zero, or negative timeout</td><td>Rejected.</td></tr><tr><td>Password supplied without username</td><td>Rejected at the combination boundary.</td></tr><tr><td>Password followed by username before build()</td><td>Allowed if the final combination is valid.</td></tr><tr><td>Builder changed after first build()</td><td>The first config remains unchanged.</td></tr></tbody></table></div><aside class="callout note"><strong>Implementation hints</strong><p>Use private final product fields, a private constructor, and <code>builder(host, port)</code>. Keep optional defaults in the builder. Validate independent arguments early and the username/password relationship at <code>build()</code>. Document how optional fields represent absence. Never include the password in diagnostic output.</p></aside><p>The exercise remains intentionally unsolved. The goal is to decide who owns defaults, validity checks, and the boundary between mutable preparation and immutable use.</p></section><section class="appendix" id="map"><p class="eyebrow">Connect the lessons</p><h2>Pattern map so far</h2><div class="table-wrap"><table><thead><tr><th scope="col">Pattern</th><th scope="col">Primary responsibility</th></tr></thead><tbody><tr><td>Strategy</td><td>Make an algorithm interchangeable.</td></tr><tr><td>Factory</td><td>Encapsulate creation; often select an implementation.</td></tr><tr><td>Adapter</td><td>Translate between incompatible interfaces.</td></tr><tr><td>Decorator</td><td>Layer additional behavior.</td></tr><tr><td>Observer</td><td>Notify interested parties about changes or events.</td></tr><tr><td>State</td><td>Vary behavior with lifecycle state.</td></tr><tr><td>Command</td><td>Represent an action or request explicitly.</td></tr><tr><td>Builder</td><td>Control complex object construction.</td></tr></tbody></table></div><h3>Next: Facade</h3><p>Suppose every caller has to coordinate inventory, payment, tax, fraud, shipping, and email services. The next question is: <strong>why must every client understand that subsystem’s internal choreography?</strong> Facade introduces a simpler entry point over a complex subsystem.</p></section><section class="appendix sources" id="sources"><p class="eyebrow">Official references</p><h2>Sources and scope</h2><p>Technical references were checked against Java SE 25 documentation and RFC 9110 on 1 September 2026. The lesson’s design decisions are explained as choices for this example.</p><ol><li id="source-http"><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.1">RFC 9110 · GET content and HTTP field names</a><p>GET content semantics; see also §5.1 for case-insensitive field names.</p><span class="source-url">https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.1</span></li><li id="source-module"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/module/ModuleDescriptor.Builder.html">Java 25 · ModuleDescriptor.Builder</a><p>An official example of validating components during construction.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/module/ModuleDescriptor.Builder.html</span></li><li id="source-map"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html#copyOf(java.util.Map)">Java 25 · Map.copyOf and unmodifiable maps</a><p>Snapshot behavior, null restrictions, and the shallow-copy limitation.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html#copyOf(java.util.Map)</span></li><li id="source-jdk-request"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html">Java 25 · HttpRequest.Builder</a><p>Fluent methods, build(), headers, timeouts, and builder synchronization.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpRequest.Builder.html</span></li><li id="source-record"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html">Java 25 · Record</a><p>Record components, canonical constructors, and shallow immutability.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html</span></li><li id="source-javac"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">JDK 25 · javac command</a><p>Meaning of --release and compiler options.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li><li id="source-client"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.Builder.html#followRedirects(java.net.http.HttpClient.Redirect)">Java 25 · HttpClient.Builder</a><p>Redirect policy belongs to the client builder.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.Builder.html#followRedirects(java.net.http.HttpClient.Redirect)</span></li><li id="source-duration"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html">Java 25 · Duration</a><p>Duration factories, isZero(), isNegative(), and immutable duration values.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html</span></li><li id="source-uri"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/URI.html">Java 25 · URI</a><p>URI creation and component access used in the example.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/URI.html</span></li></ol><p class="edition">DP · Lesson 8 · Builder · Java 25-compatible edition</p></section></div></main></div><script type="application/octet-stream" id="java-bundle">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</script><script>
+const status = document.getElementById('status');
+document.getElementById('print-guide').addEventListener('click', () => window.print());
+for (const btn of document.querySelectorAll('.copy')) {
+  btn.addEventListener('click', async () => {
+    const source = btn.closest('.codebox').querySelector('code').textContent;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(source);
+      } else {
+        const box = document.createElement('textarea');
+        box.value = source; box.style.position = 'fixed'; box.style.opacity = '0';
+        document.body.appendChild(box); box.select();
+        const copied = document.execCommand('copy'); box.remove();
+        if (!copied) throw new Error('Clipboard unavailable');
+      }
+      btn.textContent = 'Copied';
+      setTimeout(() => btn.textContent = 'Copy', 1600);
+    } catch {
+      btn.textContent = 'Select code';
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(btn.closest('.codebox').querySelector('code'));
+      selection.removeAllRanges(); selection.addRange(range);
+    }
+  });
+}
+document.getElementById('download-java').addEventListener('click', () => {
+  const raw = atob(document.getElementById('java-bundle').textContent.trim());
+  const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
+  const url = URL.createObjectURL(new Blob([bytes], {type:'application/zip'}));
+  const a = document.createElement('a'); a.href = url; a.download = 'lesson-8-java-examples.zip';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  status.textContent = 'Java example download requested.';
+});
+if ('IntersectionObserver' in window) {
+  const navLinks = Array.from(document.querySelectorAll('.sidebar nav a'));
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      const link = navLinks.find(a => a.hash === '#' + entry.target.id);
+      if (link) { navLinks.forEach(a => a.classList.remove('active')); link.classList.add('active'); }
+    }
+  }, {rootMargin:'-5% 0px -65% 0px',threshold:0});
+  navLinks.forEach(a => { const target = document.querySelector(a.hash); if (target) observer.observe(target); });
+}
+</script></body></html>

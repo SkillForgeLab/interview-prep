@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 4: derive Decorator from first principles, with self-contained Java 25-compatible examples and print-friendly pages."><title>Lesson 4 · Decorator · Java 25</title><style>
+:root{color-scheme:light;--ink:#172e34;--muted:#50666a;--teal:#116b69;--line:#d3dedb;--paper:#fff;--wash:#f2f6f4;--warm:#fbf4e9}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:#edf2ef;color:var(--ink);font:17px/1.62 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:#086764;text-decoration-thickness:1px;text-underline-offset:3px}button{font:inherit;font-size:14px;cursor:pointer;border:1px solid var(--teal);border-radius:5px;background:var(--teal);color:white;padding:10px 16px}.secondary{background:white;color:var(--teal)}button:focus-visible,a:focus-visible{outline:3px solid #d7872d;outline-offset:4px}button:hover{filter:brightness(.95)}.shell{max-width:1010px;margin:30px auto 64px;background:var(--paper);box-shadow:0 10px 40px #173c3410}.cover{padding:64px 72px 42px;border-top:9px solid var(--teal)}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:750;color:var(--teal);margin-bottom:15px}h1,h2,h3{line-height:1.17}h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-.03em}h1{font-size:68px;margin:18px 0 20px}h1 span{display:block;font-size:35px;line-height:1.2;max-width:680px;margin-top:12px}h2{font-size:37px;margin:0 0 26px}h3{font-size:20px;margin:29px 0 12px;font-weight:680}p{margin:13px 0}.lede{font-size:21px;max-width:710px;line-height:1.5}.badges{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.badges span{border:1px solid var(--line);border-radius:100px;padding:3px 12px;font-size:12px;letter-spacing:.03em}.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0}.small{font-size:13px;color:var(--muted)}.contents{margin:26px 0 0;padding:20px 0 0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}.contents a{text-decoration:none;font-size:14px}.contents a b{color:var(--teal);display:inline-block;width:26px}.chapter{padding:43px 72px 50px;border-top:1px solid var(--line)}.note,.caution{padding:14px 18px;background:var(--wash);border-left:3px solid var(--teal);font-size:15px;margin:22px 0}.caution{background:var(--warm);border-color:#a26927}.principle{margin:26px 0;padding:24px 26px;background:#e9f3ef;border:1px solid #bcdbce;color:#174b45;font:25px/1.4 Georgia,serif}.bridge{border-top:1px solid var(--line);padding-top:18px;margin-top:25px;font-weight:600}table{border-collapse:collapse;width:100%;margin:20px 0;font-size:14px;line-height:1.5;table-layout:fixed}th,td{text-align:left;vertical-align:top;padding:12px 13px;border:1px solid var(--line);overflow-wrap:anywhere}th{background:#eaf1ee;font-weight:650}tr:nth-child(even) td{background:#f8faf8}.code-block{margin:20px 0;border:1px solid #d3dedb;border-radius:5px;background:#f4f7f5;overflow:hidden}.code-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:8px 16px;color:#506964;border-bottom:1px solid #dae4df;background:#eaf0ec}pre{margin:0;padding:17px 18px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.55 "DejaVu Sans Mono",Consolas,"Liberation Mono",monospace;tab-size:4;color:#203f3e}code{font-family:"DejaVu Sans Mono",Consolas,"Liberation Mono",monospace;font-size:.88em}pre code{font-size:inherit}p code,li code,td code{background:#eef3f0;border-radius:3px;padding:1px 4px}.ref{font-size:.75em;vertical-align:super;font-family:system-ui}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}.two-cols pre{font-size:11px;padding:13px}.two-cols p{font-size:14px}.layers{margin:26px 0}.layers div{padding:12px 14px;margin-top:10px;border:1px solid #8fbbb0;background:#f2f8f5;font-weight:650;font-size:13px}.layers span{float:right;color:var(--muted);font-weight:400;font-size:11px}.layers .base{background:#dcefe5}.compact{padding-left:22px}.compact li{margin:5px 0}.sources{padding-left:23px;font-size:13px}.sources li{margin:0 0 17px;padding-left:6px}.sources a{font-size:11px;overflow-wrap:anywhere}.source-listing{border:1px solid var(--line);background:#f7f9f7;margin-top:20px}.source-listing pre{font-size:12px;line-height:1.45}.footer{font-size:12px;color:var(--muted);padding:22px 72px;border-top:1px solid var(--line)}.skip{position:absolute;left:-10000px}.skip:focus{position:static}.print-help{font-size:13px;color:var(--muted)}
+@media(max-width:700px){body{font-size:16px}.shell{margin:0;box-shadow:none}.cover,.chapter{padding:32px 23px}.cover{padding-top:38px}h1{font-size:49px}h1 span{font-size:28px}h2{font-size:31px}.contents,.two-cols{grid-template-columns:1fr}.lede{font-size:18px}th,td{padding:9px 7px;font-size:12px}pre{padding:14px 11px;font-size:11px}.layers div{padding:9px 8px}.layers span{font-size:9px}.footer{padding:22px 23px}}
+@page{size:A4;margin:12mm 15mm 14mm;@bottom-left{content:"DP / Lesson 4 / Decorator";font:8pt sans-serif;color:#61716b}@bottom-right{content:counter(page);font:8pt sans-serif;color:#61716b}}
+@media print{html{scroll-behavior:auto}body{background:white;font-size:9.5pt;line-height:1.4;color:#182c30;-webkit-print-color-adjust:exact;print-color-adjust:exact}.shell{margin:0;max-width:none;box-shadow:none}.cover{padding:9mm 0 0;border-top-width:5px;break-after:page}.chapter{padding:0;border:0;break-before:page}h1{font-size:44pt;margin:8mm 0 6mm}h1 span{font-size:24pt}h2{font-size:24pt;margin-bottom:4mm;break-after:avoid}h3{font-size:12.5pt;margin:4mm 0 2mm;break-after:avoid}.eyebrow{font-size:8pt;margin:0 0 4mm}.lede{font-size:14pt}.badges{margin:7mm 0}.badges span{font-size:8pt}.contents{gap:3mm 6mm;margin-top:8mm}.contents a{font-size:10pt}.actions,.print-help,.skip{display:none!important}p{margin:2.7mm 0;orphans:3;widows:3}.note,.caution{font-size:8.8pt;padding:2.6mm 3.5mm;margin:3mm 0;break-inside:avoid}.principle{font-size:14pt;padding:4mm;margin:4mm 0;break-inside:avoid}.bridge{margin-top:5mm;padding-top:4mm}.code-block{margin:3mm 0;break-inside:avoid;border-radius:0}.code-label{font-size:7pt;padding:2mm 3mm}pre{padding:2.5mm 3.5mm;font-size:8pt;line-height:1.28;white-space:pre-wrap;overflow-wrap:anywhere}.two-cols{gap:4mm}.two-cols pre{font-size:7.1pt;padding:3mm}.two-cols p{font-size:9pt}table{font-size:8.8pt;line-height:1.35;margin:3mm 0}th,td{padding:2mm 2.5mm}tr{break-inside:avoid}thead{display:table-header-group}.layers{margin:5mm 0}.layers div{font-size:9pt;padding:2.5mm;margin-top:2mm}.layers span{font-size:8pt}.small{font-size:8pt}.source-listing{border:0;background:white;margin:0}.source-listing pre{font-size:8pt;line-height:1.33;padding:0;white-space:pre-wrap;orphans:4;widows:4}.compact{break-inside:avoid}.eyebrow{break-after:avoid}.sources{font-size:8.5pt}.sources li{margin-bottom:4mm;break-inside:avoid}.sources a{font-size:7.3pt}.footer{display:none}a{color:#174f4d;text-decoration:none}.ref{text-decoration:underline}button{display:none}}
+</style></head>
+<body><a class="skip" href="#start">Skip to the lesson</a><main class="shell"><header class="cover"><div class="eyebrow">DP / Design patterns from first principles / Lesson 04</div><h1>Decorator<span>Add behavior without modifying the core object</span></h1><p class="lede">Start with one clean shipping capability. Follow the pressure from duplicated concerns to composable wrappers, then make order and failure behavior explicit.</p><div class="badges"><span>Java 25-compatible</span><span>Standard library only</span><span>Self-contained</span><span>Light theme</span></div><div class="principle">Keep the capability. Add a wrapper. Preserve the interface the caller uses.</div><div class="actions"><button type="button" id="print-guide">Print / Save as PDF</button><a href="#run">Jump to complete Java source</a></div><p class="print-help">Print at 100% scale on A4 or Letter. The stylesheet supplies page breaks and hides controls. Disable browser headers/footers if they duplicate page labels. Background graphics are optional; meaning does not depend on color.</p><nav class="contents" aria-label="Guide contents"><a href="#start"><b>01</b>Starting contract</a><a href="#pressure"><b>02</b>Independent concerns</a><a href="#wrapper"><b>03</b>The first decorator</a><a href="#layers"><b>04</b>Metrics and insurance</a><a href="#failure"><b>05</b>Failure semantics</a><a href="#order"><b>06</b>Order and time</a><a href="#testing"><b>07</b>Focused checks</a><a href="#composition"><b>08</b>Composition root</a><a href="#distinctions"><b>09</b>Pattern distinctions</a><a href="#judgment"><b>10</b>Design judgment</a><a href="#exercise"><b>11</b>Payment exercise</a><a href="#run"><b>12</b>Complete Java source</a></nav><p class="small">Read in order to preserve the derivation. Use the contents to revisit a concept or the exercise.</p></header><section class="chapter" id="start"><div class="eyebrow">01 / Establish the capability</div><h2>Start with a design that already works</h2>
+<h3>1. What does checkout need?</h3>
+<p>One capability: calculate a shipping price for an order. A <code>ShippingPolicy</code> supplies it. Checkout adds that price to the merchandise total. The standard and express algorithms can vary independently of checkout.</p>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>record Order(BigDecimal weightKg, BigDecimal total,
+             String destinationZip) {}
+
+@FunctionalInterface
+interface ShippingPolicy {
+    BigDecimal calculate(Order order);
+}
+
+static BigDecimal money(BigDecimal value) {
+    return value.setScale(2, RoundingMode.HALF_UP);
+}
+
+static BigDecimal usd(String value) {
+    return money(new BigDecimal(value));
+}</code></pre></div>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>static final class StandardShipping implements ShippingPolicy {
+    @Override
+    public BigDecimal calculate(Order order) {
+        return money(order.weightKg()
+            .multiply(new BigDecimal(&quot;2.00&quot;)));
+    }
+}
+
+record CheckoutService(ShippingPolicy shipping) {
+    BigDecimal total(Order order) {
+        return money(order.total().add(shipping.calculate(order)));
+    }
+}</code></pre></div>
+<div class="note"><strong>Java reading key.</strong> A <code>record</code> declares its components and receives a constructor and accessors; <code>order.weightKg()</code> reads a component. A record can implement an interface. We use records for small holders, and ordinary classes for the base algorithms. <code>@FunctionalInterface</code> asks the compiler to verify the functional-interface shape. Because <code>ShippingPolicy</code> has one abstract method, it can be implemented with a lambda; the annotation itself is optional. <a class="ref" href="#source-9" aria-label="Source 9">[9]</a></div>
+<h3>2. Make the example’s contract explicit</h3>
+<p>These are invented teaching prices: standard is $2 per kg; express is $4 per kg plus $10. All amounts are USD. Inputs are already validated: non-null fields and dependencies, positive weight, non-negative merchandise total, and a usable ZIP. Validation and currency conversion are outside this lesson.</p>
+<p>Quotes use <code>BigDecimal</code>, with decimal strings and two decimal places. This lesson rounds each pricing layer with <code>HALF_UP</code>; that is a chosen rule, not a universal financial rule. <code>BigDecimal</code> supports decimal arithmetic and explicit rounding. <a class="ref" href="#source-2" aria-label="Source 2">[2]</a></p>
+<p class="bridge">Nothing needs a decorator yet. The pressure appears when unrelated behaviors must follow every algorithm.</p>
+</section><section class="chapter" id="pressure"><div class="eyebrow">02 / Find the pressure</div><h2>A small addition spreads</h2>
+<h3>3. The first request: log each calculation</h3>
+<p>Adding logging directly to standard shipping works:</p>
+<div class="code-block "><div class="code-label">Java · first attempt</div><pre><code>// Replacement calculate method inside StandardShipping.
+public BigDecimal calculate(Order order) {
+    System.out.println(&quot;shipping.started&quot;);
+    BigDecimal cost = money(order.weightKg()
+        .multiply(new BigDecimal(&quot;2.00&quot;)));
+    System.out.println(&quot;shipping.finished=&quot; + cost);
+    return cost;
+}</code></pre></div>
+<h3>4. The same request reaches every implementation</h3>
+<p>Express shipping needs the same messages. So does the legacy-carrier adapter from Lesson 3. Copying the logging into each implementation creates several places to update its format or failure behavior.</p>
+<h3>5. More concerns vary independently</h3>
+<table><thead><tr><th>Concern</th><th>Reason it changes</th><th>What it needs</th></tr></thead><tbody>
+<tr><td>Shipping algorithm</td><td>Carrier or pricing rules</td><td>An order</td></tr>
+<tr><td>Logging</td><td>Message format or destination</td><td>The call and its outcome</td></tr>
+<tr><td>Metrics</td><td>Timing or measurement policy</td><td>The duration of the call</td></tr>
+<tr><td>Insurance</td><td>Optional pricing policy</td><td>The wrapped shipping price</td></tr>
+<tr><td>Weekend surcharge</td><td>Calendar and surcharge rules</td><td>The wrapped price and a weekend decision</td></tr>
+</tbody></table>
+<p>The deeper issue is independent reasons to change becoming entangled. Logging and metrics observe the calculation; insurance and weekend pricing change its result. That distinction will matter when we choose the order.</p>
+<h3>6. Derive the missing object</h3>
+<p>Logging needs <em>something that calculates shipping</em>. It can hold a <code>ShippingPolicy</code>, delegate the work, and add behavior around the call. If the wrapper also implements <code>ShippingPolicy</code>, checkout can use it without learning a new interface.</p>
+<div class="principle">The wrapper both <strong>is usable as</strong> a ShippingPolicy and <strong>holds</strong> a ShippingPolicy.</div>
+</section><section class="chapter" id="wrapper"><div class="eyebrow">03 / Derive Decorator</div><h2>Preserve the interface; wrap the call</h2>
+<h3>7. Build the first decorator</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>record LoggingShipping(ShippingPolicy inner, Consumer&lt;String&gt; log)
+        implements ShippingPolicy {
+    @Override
+    public BigDecimal calculate(Order order) {
+        log.accept(&quot;shipping.started&quot;);
+        try {
+            BigDecimal result = inner.calculate(order);
+            log.accept(&quot;shipping.finished=&quot; + result);
+            return result;
+        } catch (RuntimeException failure) {
+            log.accept(&quot;shipping.failed=&quot;
+                + failure.getClass().getSimpleName());
+            throw failure;
+        }
+    }
+}</code></pre></div>
+<p>The record components become constructor arguments. <code>inner</code> is the wrapped capability; <code>log</code> is an injected message destination. For the lesson, logging and metric destinations must return normally. We examine this assumption in step 13.</p>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>ShippingPolicy shipping = new LoggingShipping(
+    new StandardShipping(), System.out::println);
+CheckoutService checkout = new CheckoutService(shipping);</code></pre></div>
+<h3>8. Read the execution, not just the nesting</h3>
+<table><thead><tr><th>When</th><th>What happens</th></tr></thead><tbody>
+<tr><td>Before delegation</td><td>Logging writes <code>shipping.started</code>.</td></tr>
+<tr><td>Inside</td><td>Standard shipping calculates the price.</td></tr>
+<tr><td>Successful return</td><td>Logging writes the price, then returns it unchanged.</td></tr>
+<tr><td>Runtime exception</td><td>Logging writes a failure event, then rethrows the same exception.</td></tr>
+</tbody></table>
+<h3>9. Name the pattern after the reasoning</h3>
+<p>This is <strong>Decorator</strong>: adding behavior to an individual object through a wrapper. Microsoft’s definition emphasizes that other objects of the original class need not change. <a class="ref" href="#source-1" aria-label="Source 1">[1]</a></p>
+<ol class="compact"><li>Implement the caller’s interface.</li><li>Hold another implementation of that interface.</li><li>Delegate the core work.</li><li>Add behavior around delegation or transform its result.</li></ol>
+<p>Checkout still depends only on <code>ShippingPolicy</code>. In this example, each decorator delegates exactly once. A shared interface enables substitution; the behavioral contract still needs to be respected.</p>
+</section><section class="chapter" id="layers"><div class="eyebrow">04 / Add independent behaviors</div><h2>Observe duration; transform the price</h2>
+<h3>10. Metrics must also run on failure</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>record MetricsShipping(ShippingPolicy inner, LongSupplier nanoTime,
+                       LongConsumer durationNanos)
+        implements ShippingPolicy {
+    @Override
+    public BigDecimal calculate(Order order) {
+        long start = nanoTime.getAsLong();
+        try {
+            return inner.calculate(order);
+        } finally {
+            durationNanos.accept(nanoTime.getAsLong() - start);
+        }
+    }
+}</code></pre></div>
+<p><code>System::nanoTime</code> supplies elapsed-time readings in real use. Subtract readings from the same JVM; this API is not a wall clock and does not promise nanosecond resolution. A <code>LongSupplier</code> makes timing deterministic in tests. <a class="ref" href="#source-3" aria-label="Source 3">[3]</a></p>
+<p><code>finally</code> runs as the delegated call returns or throws during normal Java execution. It records failure duration as well as success duration. <a class="ref" href="#source-4" aria-label="Source 4">[4]</a></p>
+<h3>11. Insurance changes the wrapped result</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>record InsuranceShipping(ShippingPolicy inner)
+        implements ShippingPolicy {
+    @Override
+    public BigDecimal calculate(Order order) {
+        BigDecimal base = inner.calculate(order);
+        return money(base.multiply(new BigDecimal(&quot;1.10&quot;)));
+    }
+}</code></pre></div>
+<p>The invented insurance rule adds 10% of the price returned by the inner policy. A $20.00 quote becomes $22.00. Insurance does not run its arithmetic if the inner calculation throws.</p>
+<h3>12. Stack them</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>ShippingPolicy shipping = new LoggingShipping(
+    new MetricsShipping(
+        new InsuranceShipping(new StandardShipping()),
+        System::nanoTime,
+        nanos -&gt; System.out.println(&quot;duration.ns=&quot; + nanos)),
+    System.out::println);</code></pre></div>
+<p>Calls enter the outer wrapper first. Results return from the inner implementation outward. Here the log sees the insured price, and metrics measures standard shipping plus insurance.</p>
+</section><section class="chapter" id="failure"><div class="eyebrow">05 / Make execution semantics explicit</div><h2>Failure behavior is part of the design</h2>
+<h3>13. “After” and “always” are different requirements</h3>
+<table><thead><tr><th>Behavior</th><th>Before inner call</th><th>After success</th><th>After failure</th></tr></thead><tbody>
+<tr><td>Logging</td><td>Start event</td><td>Result event</td><td>Failure event, rethrow</td></tr>
+<tr><td>Metrics</td><td>Read start</td><td>Record elapsed time</td><td>Record elapsed time</td></tr>
+<tr><td>Insurance</td><td>Nothing</td><td>Multiply and round</td><td>No new price</td></tr>
+<tr><td>Weekend surcharge</td><td>Nothing</td><td>Optionally add $20</td><td>No new price</td></tr>
+</tbody></table>
+<div class="caution"><strong>The sink contract matters.</strong> Java’s <code>Consumer</code> and <code>LongConsumer</code> do not guarantee non-throwing implementations. If a metrics sink throws inside <code>finally</code>, it can replace the original exception or a successful return. A failing logger can also alter the result. The Java specification defines this replacement behavior. <a class="ref" href="#source-4" aria-label="Source 4">[4]</a></div>
+<p>Our example requires the injected log, duration sink, and time source to return normally. If a real integration cannot guarantee that, enforce an explicit failure policy at that boundary. For best-effort diagnostics, sink failures should not turn successful shipping into failed shipping; required audit delivery may need a different design.</p>
+<p>The logger catches <code>RuntimeException</code>, not all <code>Throwable</code> values. An <code>Error</code> still propagates and the metrics <code>finally</code> is attempted, but this logger does not promise a failure event for it. No wrapper guarantees cleanup after abrupt process termination.</p>
+<h3>14. Trace one composed call</h3>
+<table><thead><tr><th>Step</th><th>Success</th><th>Inner runtime exception</th></tr></thead><tbody>
+<tr><td>1</td><td>Log started</td><td>Log started</td></tr>
+<tr><td>2</td><td>Start timer</td><td>Start timer</td></tr>
+<tr><td>3</td><td>Calculate base, then insurance</td><td>Base throws; insurance is skipped</td></tr>
+<tr><td>4</td><td>Record duration</td><td>Record duration</td></tr>
+<tr><td>5</td><td>Log finished; return price</td><td>Log failed; rethrow</td></tr>
+</tbody></table>
+<p class="bridge">A correct wrapper preserves the intended result and failure behavior. Its class shape alone does not prove that.</p>
+</section><section class="chapter" id="order"><div class="eyebrow">06 / Price in a deliberate order</div><h2>The same wrappers can mean different prices</h2>
+<h3>15. Add weekend pricing without hiding a clock</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>record WeekendSurchargeShipping(ShippingPolicy inner,
+                                BooleanSupplier isWeekend)
+        implements ShippingPolicy {
+    @Override
+    public BigDecimal calculate(Order order) {
+        BigDecimal cost = inner.calculate(order);
+        return isWeekend.getAsBoolean()
+            ? money(cost.add(usd(&quot;20.00&quot;))) : cost;
+    }
+}
+
+static boolean isWeekend(Clock clock) {
+    DayOfWeek day = LocalDate.now(clock).getDayOfWeek();
+    return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
+}</code></pre></div>
+<p><code>BooleanSupplier</code> supplies a boolean via <code>getAsBoolean()</code>. Tests pass <code>() -&gt; true</code> or <code>() -&gt; false</code>. <a class="ref" href="#source-5" aria-label="Source 5">[5]</a> In application wiring, choose a business timezone, evaluate an injected <code>Clock</code> once for the quote, and capture that decision. Java’s <code>Clock</code> also supports fixed clocks for tests. <a class="ref" href="#source-6" aria-label="Source 6">[6]</a></p>
+<h3>16. Change the order; change the meaning</h3>
+<div class="two-cols">
+<div><div class="code-block "><div class="code-label">A · insurance outermost</div><pre><code>new InsuranceShipping(
+    new WeekendSurchargeShipping(
+        fixed, () -&gt; true));</code></pre></div><p><strong>($100 + $20) × 1.10 = $132</strong><br>Insurance includes the surcharge.</p></div>
+<div><div class="code-block "><div class="code-label">B · weekend outermost</div><pre><code>new WeekendSurchargeShipping(
+    new InsuranceShipping(fixed),
+    () -&gt; true);</code></pre></div><p><strong>$100 × 1.10 + $20 = $130</strong><br>The surcharge is added after insurance.</p></div>
+</div>
+<p><code>fixed</code> returns $100.00. The outer decorator’s <em>post-processing</em> happens last. Decide which price insurance covers before choosing the nesting.</p>
+<div class="note"><strong>Observation order matters too.</strong> Logging outside insurance sees the final insured price; logging inside sees the earlier price. Metrics outside logging includes logging time; metrics inside excludes the outer log calls. Rounding can introduce further differences between compositions.</div>
+</section><section class="chapter" id="testing"><div class="eyebrow">07 / Verify responsibilities</div><h2>Test the boundary each wrapper owns</h2>
+<h3>17. Replace the carrier with a fixed price</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>record FixedShipping(BigDecimal price) implements ShippingPolicy {
+    @Override
+    public BigDecimal calculate(Order order) {
+        return money(price);
+    }
+}</code></pre></div>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>ShippingPolicy fixed = new FixedShipping(usd(&quot;100.00&quot;));
+checkMoney(&quot;110.00&quot;, new InsuranceShipping(fixed).calculate(order));
+checkMoney(&quot;120.00&quot;, new WeekendSurchargeShipping(
+    fixed, () -&gt; true).calculate(order));
+checkMoney(&quot;100.00&quot;, new WeekendSurchargeShipping(
+    fixed, () -&gt; false).calculate(order));</code></pre></div>
+<p>The complete program supplies <code>order</code> and the check helpers. <code>checkMoney</code> uses <code>compareTo</code> for numeric equality; <code>BigDecimal.equals</code> also considers scale. <a class="ref" href="#source-2" aria-label="Source 2">[2]</a></p>
+<h3>18. Verify the semantics beyond arithmetic</h3>
+<table><thead><tr><th>Check</th><th>Evidence to assert</th></tr></thead><tbody>
+<tr><td>Delegation</td><td>One base call, with the same order</td></tr>
+<tr><td>Logging success</td><td>Started, base call, then finished with the result</td></tr>
+<tr><td>Logging failure</td><td>A failure event; no success event; same exception escapes</td></tr>
+<tr><td>Metrics success / failure</td><td>Two supplied ticks yield the expected duration in both cases</td></tr>
+<tr><td>Pricing order</td><td>Insurance last gives $132; weekend last gives $130</td></tr>
+<tr><td>Rounding</td><td>$0.05 × 1.10 rounds to $0.06 under this lesson’s rule</td></tr>
+</tbody></table>
+<p>The executable checks in the appendix use lists to record events and two-value time sources. They make no network calls and do not sleep. They throw <code>AssertionError</code> directly, so the checks do not depend on enabling Java assertions.</p>
+<p class="bridge">Test each independent behavior, then test any composition whose order carries business meaning.</p>
+</section><section class="chapter" id="composition"><div class="eyebrow">08 / Keep assembly outside checkout</div><h2>Compose objects instead of multiplying subclasses</h2>
+<h3>19. Why not subclass each combination?</h3>
+<p>A logging subclass of standard shipping handles one combination. Add express, insurance, metrics, and weekend options, and the combinations spread. With three algorithms and four independently optional behaviors, there are <strong>3 × 2⁴ = 48 selections</strong> before accounting for different orders. This counts configurations; it does not mean every inheritance design must contain 48 classes.</p>
+<p>Decorator represents the behaviors separately and assembles objects. The base algorithm is chosen once; wrappers can be reused across standard, express, and an adapted carrier. Ordinary inheritance remains useful when a stable specialization is what you need.</p>
+<h3>20. Put construction at the application’s entry point</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>// In main, a factory, or another application assembly point:
+ShippingPolicy priced = new InsuranceShipping(
+    new WeekendSurchargeShipping(
+        new StandardShipping(), () -&gt; weekend));
+ShippingPolicy observed = new LoggingShipping(
+    new MetricsShipping(priced, System::nanoTime, metrics), log);
+CheckoutService checkout = new CheckoutService(observed);</code></pre></div>
+<p>This assembly point is commonly called the <strong>composition root</strong>. It creates dependencies and chooses the object graph. Checkout receives the finished capability through its constructor.</p>
+<div class="layers" role="img" aria-label="Logging wraps Metrics, which wraps Insurance, which wraps Weekend surcharge, which wraps Standard shipping. All expose ShippingPolicy.">
+<div>Logging <span>ShippingPolicy</span><div>Metrics <span>ShippingPolicy</span><div>Insurance <span>ShippingPolicy</span><div>Weekend surcharge <span>ShippingPolicy</span><div class="base">Standard shipping <span>ShippingPolicy</span></div></div></div></div></div>
+</div>
+<p>A factory can select standard, express, or an adapter first. Apply wrappers to that returned <code>ShippingPolicy</code>. Neither checkout nor the decorators need the concrete carrier type.</p>
+</section><section class="chapter" id="distinctions"><div class="eyebrow">09 / Recognize the intent</div><h2>Related patterns solve different pressures</h2>
+<h3>21. Compare the responsibility, not the wrapper syntax</h3>
+<table><thead><tr><th>Idea</th><th>Question it answers</th><th>In our example</th></tr></thead><tbody>
+<tr><td>Strategy</td><td>Which interchangeable algorithm?</td><td>Standard versus express</td></tr>
+<tr><td>Factory</td><td>Which object or graph should be created?</td><td>Select a carrier and assemble its policy</td></tr>
+<tr><td>Adapter</td><td>How can an incompatible API satisfy this boundary?</td><td>Translate <code>getQuote(zip, grams)</code> into <code>calculate(order)</code></td></tr>
+<tr><td>Decorator</td><td>Which behavior surrounds an existing capability?</td><td>Log, time, insure, or surcharge a policy</td></tr>
+<tr><td>Middleware / interceptor</td><td>Which stages surround or route a request?</td><td>A related before/delegate/after structure</td></tr>
+</tbody></table>
+<p>Adapter translates a mismatched interface; Decorator preserves the interface used by the caller and adds behavior. Microsoft defines Adapter in terms of interface conversion. <a class="ref" href="#source-7" aria-label="Source 7">[7]</a> Middleware is a useful analogy, but not every pipeline is an object-oriented Decorator: stages may short-circuit, route, or use a separate continuation contract.</p>
+<h3>22. See the shape in Java’s own APIs</h3>
+<div class="code-block "><div class="code-label">Java · excerpt</div><pre><code>// Independent example: input.bin must already exist.
+try (java.io.InputStream input = new java.io.BufferedInputStream(
+        java.nio.file.Files.newInputStream(
+            java.nio.file.Path.of(&quot;input.bin&quot;)))) {
+    int firstByte = input.read();
+    System.out.println(firstByte); // -1 means end of stream
+}</code></pre></div>
+<p>Java documents <code>FilterInputStream</code> as wrapping another input stream and delegating to it. <code>BufferedInputStream</code> adds buffering and mark/reset support while remaining an <code>InputStream</code>. This is a concrete example of the same composition shape. <a class="ref" href="#source-8" aria-label="Source 8">[8]</a></p>
+<p>Wrapping can affect resource ownership too. With stream wrappers, closing the outer stream closes its underlying stream. Our shipping policies do not own closeable resources, so they do not model that lifecycle. <a class="ref" href="#source-8" aria-label="Source 8">[8]</a></p>
+</section><section class="chapter" id="judgment"><div class="eyebrow">10 / Use judgment</div><h2>Flexibility has a reasoning cost</h2>
+<h3>23. Decide whether the pressure justifies wrappers</h3>
+<ol><li>Identify the capability the caller already needs.</li><li>Find concerns that change independently.</li><li>Check whether those concerns are repeated or optional.</li><li>Ask whether they naturally surround a call or transform its result.</li><li>Keep the caller’s contract intact.</li><li>Choose and test the ordering, result, and failure semantics.</li></ol>
+<p>A single stable calculation may be clearer as one method. Do not introduce a class for every line of code. Decorator earns its cost when independent behaviors need reuse or composition across implementations.</p>
+<h3>24. Stop when the object graph hides the policy</h3>
+<p>Eight nested wrappers can be harder to understand than one explicit workflow. Give important compositions names, centralize assembly, and test their outcomes. An explicit pricing policy or orchestration method may be clearer when rules must operate in a tightly controlled sequence.</p>
+<table><thead><tr><th>Risk</th><th>Design response</th></tr></thead><tbody>
+<tr><td>Unclear order</td><td>Document what each layer observes or transforms</td></tr>
+<tr><td>Duplicate wrapping</td><td>Assemble once; prevent applying insurance twice</td></tr>
+<tr><td>Hidden failure changes</td><td>Specify sink failures and preserve intended exceptions</td></tr>
+<tr><td>Retry plus payment</td><td>Define idempotency before repeating side effects</td></tr>
+<tr><td>Cache plus pricing</td><td>Define which result is cached and what makes it stale</td></tr>
+</tbody></table>
+<p>Configuration, middleware, or a dependency-injection container may organize assembly, but none decides business semantics for you. Same method signatures do not guarantee equivalent behavior.</p>
+<div class="principle">I have a capability. I need independently composable behavior around it. The caller should still use the same interface.</div>
+<p>That is the reason to reach for Decorator.</p>
+</section><section class="chapter" id="exercise"><div class="eyebrow">11 / Apply it</div><h2>Exercise: decorate a payment capability</h2>
+<p>This is a simulation. <code>StripeProcessor</code> below is an invented stub, not the Stripe SDK and not a real charge.</p>
+<div class="code-block "><div class="code-label">Java · place inside an exercise class; import BigDecimal</div><pre><code>record PaymentResult(String transactionId) {}
+
+interface PaymentProcessor {
+    PaymentResult pay(BigDecimal amount);
+}
+
+static final class StripeProcessor implements PaymentProcessor {
+    @Override
+    public PaymentResult pay(BigDecimal amount) {
+        return new PaymentResult(&quot;TX123&quot;);
+    }
+}
+
+record PaymentCheckout(PaymentProcessor processor) {
+    PaymentResult pay(BigDecimal amount) {
+        return processor.pay(amount);
+    }
+}</code></pre></div>
+<p>Add <code>LoggingPayment</code>, <code>MetricsPayment</code>, and <code>FraudCheckPayment</code>. Each must implement <code>PaymentProcessor</code> and hold an inner processor. Assemble logging outside metrics, with fraud checking immediately before the processor.</p>
+<table><thead><tr><th>Acceptance criterion</th><th>What to prove</th></tr></thead><tbody>
+<tr><td>Preserve the boundary</td><td>PaymentCheckout still receives only PaymentProcessor</td></tr>
+<tr><td>Preserve the existing processor</td><td>StripeProcessor is unchanged</td></tr>
+<tr><td>Check fraud before charging</td><td>A rejection produces zero inner payment calls</td></tr>
+<tr><td>Log the correct outcome</td><td>Rejections and failures never produce a success event</td></tr>
+<tr><td>Measure both outcomes</td><td>Record duration on success, rejection, and processor failure</td></tr>
+<tr><td>Keep dependencies testable</td><td>Inject the fraud decision, clock ticks, and observation sinks</td></tr>
+</tbody></table>
+<p><strong>Work through:</strong> Which behavior happens before delegation? Which requires a successful result? Which must be attempted when the inner call throws? Moving metrics inside fraud checking means rejected payments are no longer included in that measurement.</p>
+<h3>Next pressure: Observer</h3>
+<p>After checkout succeeds, email, inventory, loyalty, analytics, and shipping may all need to react. Why should checkout name every consequence? This leads to Observer and publish-subscribe ideas. They are related, but broker-based messaging also raises delivery, ordering, and timing questions that a local listener list does not solve.</p>
+</section><section class="chapter" id="run"><div class="eyebrow">12 / Run and inspect</div><h2>One file, standard Java, no dependencies</h2>
+<p>The full listing below is <code>DecoratorLesson.java</code>. It contains the model, both base algorithms, four decorators, application wiring, and deterministic checks. Earlier snippets are excerpts from this file; they share its imports and helper methods.</p>
+<div class="actions"><button type="button" id="download-java">Download DecoratorLesson.java</button><button type="button" id="copy-java" class="secondary">Copy full Java source</button><span id="copy-status" role="status" aria-live="polite"></span></div>
+<p>If scripting is disabled, copy the complete listing directly into a file with that name. Reading and printing the guide require no JavaScript or external assets.</p>
+<div class="code-block "><div class="code-label">Terminal · use a JDK 25 installation</div><pre><code>javac --release 25 DecoratorLesson.java
+java DecoratorLesson
+java DecoratorLesson --test</code></pre></div>
+<p><code>--release 25</code> selects the Java 25 language and API target. No preview flag or build tool is needed. The launcher accepts the compiled class name and passes following arguments to <code>main</code>. <a class="ref" href="#source-10" aria-label="Source 10">[10]</a></p>
+<table><thead><tr><th>Demo condition</th><th>Shipping</th><th>Checkout total</th></tr></thead><tbody>
+<tr><td>Weekday in the example’s UTC timezone</td><td>$20 × 1.10 = $22.00</td><td>$122.00</td></tr>
+<tr><td>Weekend in the example’s UTC timezone</td><td>($20 + $20) × 1.10 = $44.00</td><td>$144.00</td></tr>
+</tbody></table>
+<p>The demo uses a 10 kg order with $100.00 of merchandise. The duration varies. The test command is designed to print <code>All checks passed.</code> when its checks succeed.</p>
+<div class="caution"><strong>Verification status.</strong> The API and language usage was reviewed against official Java 25 documentation. <strong>⚠ Compilation and Java execution were not verified here:</strong> the workspace has no working JDK. The commands above are included so the exact source and checks can be run locally.</div>
+<h3>Complete source listing</h3>
+<p class="small">Continue through the listing in order. There are no omitted methods or external libraries.</p>
+<div class="source-listing"><pre><code id="full-java">import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Clock;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.LongConsumer;
+import java.util.function.LongSupplier;
+
+public class DecoratorLesson {
+    record Order(BigDecimal weightKg, BigDecimal total,
+                 String destinationZip) {}
+
+    @FunctionalInterface
+    interface ShippingPolicy {
+        BigDecimal calculate(Order order);
+    }
+
+    static BigDecimal money(BigDecimal value) {
+        return value.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    static BigDecimal usd(String value) {
+        return money(new BigDecimal(value));
+    }
+    static final class StandardShipping implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            return money(order.weightKg()
+                .multiply(new BigDecimal(&quot;2.00&quot;)));
+        }
+    }
+
+    static final class ExpressShipping implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            return money(order.weightKg()
+                .multiply(new BigDecimal(&quot;4.00&quot;))
+                .add(usd(&quot;10.00&quot;)));
+        }
+    }
+
+    record CheckoutService(ShippingPolicy shipping) {
+        BigDecimal total(Order order) {
+            return money(order.total().add(shipping.calculate(order)));
+        }
+    }
+    record LoggingShipping(ShippingPolicy inner, Consumer&lt;String&gt; log)
+            implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            log.accept(&quot;shipping.started&quot;);
+            try {
+                BigDecimal result = inner.calculate(order);
+                log.accept(&quot;shipping.finished=&quot; + result);
+                return result;
+            } catch (RuntimeException failure) {
+                log.accept(&quot;shipping.failed=&quot;
+                    + failure.getClass().getSimpleName());
+                throw failure;
+            }
+        }
+    }
+    record MetricsShipping(ShippingPolicy inner, LongSupplier nanoTime,
+                           LongConsumer durationNanos)
+            implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            long start = nanoTime.getAsLong();
+            try {
+                return inner.calculate(order);
+            } finally {
+                durationNanos.accept(nanoTime.getAsLong() - start);
+            }
+        }
+    }
+    record InsuranceShipping(ShippingPolicy inner)
+            implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            BigDecimal base = inner.calculate(order);
+            return money(base.multiply(new BigDecimal(&quot;1.10&quot;)));
+        }
+    }
+    record WeekendSurchargeShipping(ShippingPolicy inner,
+                                    BooleanSupplier isWeekend)
+            implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            BigDecimal cost = inner.calculate(order);
+            return isWeekend.getAsBoolean()
+                ? money(cost.add(usd(&quot;20.00&quot;))) : cost;
+        }
+    }
+
+    static boolean isWeekend(Clock clock) {
+        DayOfWeek day = LocalDate.now(clock).getDayOfWeek();
+        return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
+    }
+    record FixedShipping(BigDecimal price) implements ShippingPolicy {
+        @Override
+        public BigDecimal calculate(Order order) {
+            return money(price);
+        }
+    }
+    public static void main(String[] args) {
+        if (args.length &gt; 0 &amp;&amp; args[0].equals(&quot;--test&quot;)) {
+            runChecks();
+            return;
+        }
+
+        Order order = new Order(new BigDecimal(&quot;10&quot;),
+                                usd(&quot;100.00&quot;), &quot;85001&quot;);
+        Consumer&lt;String&gt; log = System.out::println;
+        LongConsumer metrics = nanos -&gt;
+            System.out.println(&quot;shipping.duration.ns=&quot; + nanos);
+
+        // Demonstration business timezone; choose yours explicitly.
+        Clock clock = Clock.system(ZoneId.of(&quot;UTC&quot;));
+        // One decision per quote; stable even across midnight.
+        boolean weekend = isWeekend(clock);
+
+        ShippingPolicy priced = new InsuranceShipping(
+            new WeekendSurchargeShipping(
+                new StandardShipping(), () -&gt; weekend));
+        ShippingPolicy observed = new LoggingShipping(
+            new MetricsShipping(priced, System::nanoTime, metrics), log);
+
+        CheckoutService checkout = new CheckoutService(observed);
+        System.out.println(&quot;checkout.total=&quot; + checkout.total(order));
+    }
+    static void check(boolean condition, String message) {
+        if (!condition) {
+            throw new AssertionError(message);
+        }
+    }
+
+    static void checkMoney(String expected, BigDecimal actual) {
+        check(usd(expected).compareTo(actual) == 0,
+            &quot;Expected &quot; + expected + &quot;, got &quot; + actual);
+    }
+
+    static LongSupplier ticks(long start, long end) {
+        long[] values = { start, end };
+        int[] next = { 0 };
+        return () -&gt; values[next[0]++];
+    }
+
+    static void expectSameFailure(ShippingPolicy shipping, Order order,
+                                  RuntimeException expected) {
+        try {
+            shipping.calculate(order);
+            throw new AssertionError(&quot;Expected an exception&quot;);
+        } catch (RuntimeException actual) {
+            check(actual == expected, &quot;The original failure must escape&quot;);
+        }
+    }
+    static void runChecks() {
+        Order order = new Order(new BigDecimal(&quot;10&quot;),
+                                usd(&quot;100.00&quot;), &quot;85001&quot;);
+        ShippingPolicy fixed = new FixedShipping(usd(&quot;100.00&quot;));
+
+        checkMoney(&quot;20.00&quot;, new StandardShipping().calculate(order));
+        checkMoney(&quot;50.00&quot;, new ExpressShipping().calculate(order));
+        checkMoney(&quot;120.00&quot;, new CheckoutService(
+            new StandardShipping()).total(order));
+        checkMoney(&quot;110.00&quot;, new InsuranceShipping(fixed).calculate(order));
+        checkMoney(&quot;0.06&quot;, new InsuranceShipping(
+            new FixedShipping(usd(&quot;0.05&quot;))).calculate(order));
+        checkMoney(&quot;120.00&quot;, new WeekendSurchargeShipping(
+            fixed, () -&gt; true).calculate(order));
+        checkMoney(&quot;100.00&quot;, new WeekendSurchargeShipping(
+            fixed, () -&gt; false).calculate(order));
+
+        ShippingPolicy insuranceLast = new InsuranceShipping(
+            new WeekendSurchargeShipping(fixed, () -&gt; true));
+        ShippingPolicy weekendLast = new WeekendSurchargeShipping(
+            new InsuranceShipping(fixed), () -&gt; true);
+        checkMoney(&quot;132.00&quot;, insuranceLast.calculate(order));
+        checkMoney(&quot;130.00&quot;, weekendLast.calculate(order));
+        List&lt;String&gt; events = new ArrayList&lt;&gt;();
+        int[] calls = { 0 };
+        ShippingPolicy base = value -&gt; {
+            calls[0]++;
+            check(value == order, &quot;The same order must be delegated&quot;);
+            events.add(&quot;base&quot;);
+            return usd(&quot;100.00&quot;);
+        };
+        ShippingPolicy observed = new LoggingShipping(
+            new MetricsShipping(base, ticks(100, 175),
+                elapsed -&gt; events.add(&quot;duration=&quot; + elapsed)), events::add);
+        checkMoney(&quot;100.00&quot;, observed.calculate(order));
+        check(calls[0] == 1, &quot;Exactly one delegation&quot;);
+        check(events.equals(List.of(&quot;shipping.started&quot;, &quot;base&quot;,
+            &quot;duration=75&quot;, &quot;shipping.finished=100.00&quot;)),
+            &quot;Success execution order&quot;);
+
+        events.clear();
+        RuntimeException failure = new IllegalStateException(&quot;carrier&quot;);
+        ShippingPolicy failing = value -&gt; { throw failure; };
+        ShippingPolicy observedFailure = new LoggingShipping(
+            new MetricsShipping(failing, ticks(500, 525),
+                elapsed -&gt; events.add(&quot;duration=&quot; + elapsed)), events::add);
+        expectSameFailure(observedFailure, order, failure);
+        check(events.equals(List.of(&quot;shipping.started&quot;, &quot;duration=25&quot;,
+            &quot;shipping.failed=IllegalStateException&quot;)),
+            &quot;Failure duration and logging; no success event&quot;);
+
+        System.out.println(&quot;All checks passed.&quot;);
+    }
+}
+</code></pre></div>
+</section><section class="chapter" id="sources"><div class="eyebrow">Reference / Official sources</div><h2>Sources and example boundaries</h2>
+<p>The lesson progression is adapted from the Lesson 4 text supplied in this conversation. The Java examples, invented prices, checks, and design commentary were written for this guide. The sources below verify pattern definitions and language/API behavior; they do not prescribe the example’s business rules.</p>
+<ol class="sources"><li id="source-1"><strong>Decorator definition.</strong> Microsoft Learn.<br><a href="https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-decorator">https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-decorator</a></li><li id="source-2"><strong>Decimal arithmetic, constructors, equality and rounding.</strong> Oracle Java 25 · BigDecimal.<br><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html</a></li><li id="source-3"><strong>Elapsed-time measurement.</strong> Oracle Java 25 · System.nanoTime.<br><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.html#nanoTime()</a></li><li id="source-4"><strong>try-finally completion and exception replacement.</strong> Java Language Specification 25 · §14.20.2.<br><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.20.2">https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.20.2</a></li><li id="source-5"><strong>Boolean supplier interface.</strong> Oracle Java 25 · BooleanSupplier.<br><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/BooleanSupplier.html">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/BooleanSupplier.html</a></li><li id="source-6"><strong>Injectable time and fixed test clocks.</strong> Oracle Java 25 · Clock.<br><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Clock.html">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Clock.html</a></li><li id="source-7"><strong>Adapter interface conversion.</strong> Microsoft Learn.<br><a href="https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-adapterfaade">https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-adapterfaade</a></li><li id="source-8"><strong>Stream wrapping and buffering.</strong> Oracle Java 25 · FilterInputStream.<br><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/FilterInputStream.html">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/FilterInputStream.html</a></li><li id="source-9"><strong>Records and functional interfaces.</strong> Java Language Specification 25 · §8.10.<br><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-8.html#jls-8.10">https://docs.oracle.com/javase/specs/jls/se25/html/jls-8.html#jls-8.10</a></li><li id="source-10"><strong>Compilation and execution.</strong> Oracle JDK 25 · javac.<br><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</a></li></ol>
+<p class="small">Related official pages: <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/BufferedInputStream.html">BufferedInputStream</a>; <a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-9.html#jls-9.8">functional interfaces (§9.8)</a>; <a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/java.html">java launcher</a>. Sources checked 1 September 2026.</p>
+</section><footer class="footer">Lesson 4 · Decorator · Java 25 edition · Official sources checked 1 September 2026</footer></main><script>
+document.getElementById('print-guide').addEventListener('click',()=>window.print());
+document.getElementById('download-java').addEventListener('click',()=>{
+  const source=document.getElementById('full-java').textContent;
+  const url=URL.createObjectURL(new Blob([source],{type:'text/plain;charset=utf-8'}));
+  const link=document.createElement('a');link.href=url;link.download='DecoratorLesson.java';
+  document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+document.getElementById('copy-java').addEventListener('click',async()=>{
+  const status=document.getElementById('copy-status');
+  try{await navigator.clipboard.writeText(document.getElementById('full-java').textContent);status.textContent='Source copied.';}
+  catch{const selection=window.getSelection();const range=document.createRange();range.selectNodeContents(document.getElementById('full-java'));selection.removeAllRanges();selection.addRange(range);status.textContent='Source selected. Press Ctrl+C or Cmd+C to copy.';}
+});
+</script></body></html>

@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="description" content="Lesson 2: derive Simple Factory and Factory Method from changing requirements, with complete Java 25-compatible labs."><title>Lesson 2 · Factory · Java 25 guide</title><style>
+:root{color-scheme:light;--ink:#202b32;--muted:#53656d;--line:#d9e1df;--accent:#086c64;--wash:#eef6f3;--paper:#fffefb;--code:#f5f6f6}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:#f1f3f0;color:var(--ink);font:17px/1.68 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:#075e77;text-underline-offset:3px}a:hover{color:#023d38}button,select{font:inherit}button{cursor:pointer;border:1px solid #0e7268;border-radius:5px;padding:9px 14px;color:#07594f;background:#fff;font-size:14px;font-weight:650}button:hover{background:var(--wash)}button:focus-visible,a:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #dc9124;outline-offset:3px}.skip{position:absolute;top:-60px;left:20px;background:white;padding:8px;z-index:5}.skip:focus{top:8px}.layout{display:grid;grid-template-columns:240px minmax(0,900px);max-width:1196px;margin:auto;gap:28px;padding:28px 24px 60px}.sidebar{position:sticky;top:26px;align-self:start;max-height:calc(100vh - 50px);overflow-y:auto;padding:12px 6px}.brand{font-weight:800;font-size:13px;letter-spacing:2px;color:var(--accent)}.side-title{font:700 25px/1.2 Georgia,serif;margin:10px 0 24px}.sidebar a{display:block;text-decoration:none;color:var(--muted);font-size:13px;line-height:1.45;padding:6px 8px;border-left:2px solid transparent}.sidebar a:hover{background:white;border-left-color:var(--accent)}.sidebar .nav-num{display:inline-block;width:25px;color:var(--accent);font-weight:700}.side-actions{display:grid;gap:8px;margin:22px 0}.sidebar .small{font-size:12px}.book{min-width:0;background:var(--paper);box-shadow:0 4px 25px #21322b0b;border:1px solid var(--line)}.hero{padding:52px 54px 42px;border-top:7px solid var(--accent);border-bottom:1px solid var(--line);background:linear-gradient(120deg,#f5faf6,var(--paper))}.eyebrow,.chapter-label{font-size:11px;letter-spacing:1.7px;text-transform:uppercase;font-weight:800;color:var(--accent)}h1{font:700 clamp(42px,5vw,62px)/1.04 Georgia,"Times New Roman",serif;letter-spacing:-1.8px;margin:18px 0 16px}h1 span{display:block;font-size:.52em;line-height:1.3;letter-spacing:-.5px;margin-top:10px}.lede{font-size:19px;line-height:1.55;max-width:610px;color:#40545d}.tags{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 18px}.tag{font-size:11px;text-transform:uppercase;letter-spacing:.8px;border:1px solid #bdd4cc;border-radius:20px;padding:3px 10px;background:white}.route{font-size:15px;color:var(--accent);font-weight:650;padding:18px 0 0;border-top:1px solid var(--line)}.intro,.chapter{padding:36px 54px;border-bottom:1px solid var(--line)}h2{font:700 31px/1.2 Georgia,serif;letter-spacing:-.5px;margin:10px 0 23px}h3{font-size:18px;line-height:1.35;margin:28px 0 10px}p{margin:12px 0 17px}li{padding-left:4px;margin:6px 0}ol,ul{padding-left:23px}strong{font-weight:700}em{color:#334c51}.small{font-size:13px;color:var(--muted)}.note,.verification{border-left:3px solid #419989;background:var(--wash);padding:15px 20px;margin:24px 0;font-size:15px}.note p{margin:7px 0 0}.code{margin:24px 0;border:1px solid #d7dfdf;border-radius:5px;overflow:hidden;background:var(--code)}figcaption{padding:7px 14px;border-bottom:1px solid #d7dfdf;font-size:11px;color:#4c6167;font-weight:650;letter-spacing:.3px;background:#edf1f1}pre{font:12.2px/1.62 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;margin:0;tab-size:4;white-space:pre-wrap;overflow-wrap:anywhere}pre code{padding:0;border:none;background:none;font:inherit;color:#24363e}figure pre{padding:15px 16px}p code,li code,td code,aside code{font: .85em/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;background:#edf1ef;border-radius:3px;padding:1px 4px;overflow-wrap:anywhere}.k,.kd,.kn,.kt{color:#304fb0;font-weight:600}.s,.s1,.s2{color:#8c422c}.c,.c1,.cm{color:#62756e;font-style:italic}.m,.mi,.mf{color:#8b428c}.na{color:#08736c}.output{border-left:3px solid #8b9cab;background:#f5f7f8;padding:16px 20px;margin:18px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;margin:24px 0;table-layout:fixed}th,td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{background:#ebf2ef;color:#254c45;font-size:12px}tbody tr:nth-child(even){background:#f9faf8}details{margin:22px 0;border:1px solid #d3dfda;border-radius:4px;background:white}summary{cursor:pointer;font-size:14px;font-weight:700;color:#075e55;padding:13px 16px}details>div:not(.download-row){padding:0 18px 8px}details .code{margin:16px}.source-details .download-row{padding:10px 16px}.source-details{border:0;background:transparent}.source-details summary{background:#eef4f0;border:1px solid #d3dfda}.source-details .code{margin-left:0;margin-right:0}.download-row{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0}.lab-widget{background:#f0f6f5;padding:20px;border:1px solid #c8dcd6;border-radius:5px;margin-top:28px}.lab-widget h3{margin:0}.lab-widget p{font-size:14px}.controls{display:flex;gap:20px;flex-wrap:wrap}.controls label{font-size:13px;font-weight:650;flex:1;min-width:160px}.controls select{display:block;width:100%;background:white;border:1px solid #9ebeb7;border-radius:4px;padding:8px;margin:5px 0 16px;font-size:14px;color:var(--ink)}.trace-result{display:grid;gap:4px;font-size:15px;padding:16px;background:white;border-left:3px solid var(--accent)}.trace-result strong{font-size:14px;color:var(--accent)}.trace-result b{font-size:21px}.checklist{display:grid;gap:10px;margin:20px 0}.checklist label{font-size:15px;display:flex;align-items:baseline;gap:10px}.checklist input{accent-color:var(--accent);flex-shrink:0}.ref{font-size:12px;white-space:nowrap}.references li{margin-bottom:20px}.references p{font-size:14px;margin:3px 0}.source-url{font:11px/1.4 ui-monospace,monospace;overflow-wrap:anywhere;color:#657777;display:block}.print-only{display:none}.print-toc{display:none}.intro h2{font-size:24px}.footer{padding:24px 54px;font-size:12px;color:var(--muted)}#notice{font-size:12px;min-height:1.5em}.source-chunk{break-inside:avoid}
+@media(max-width:980px){.layout{grid-template-columns:1fr;max-width:840px;padding:15px}.sidebar{position:static;max-height:none;padding:5px 0}.sidebar nav,.side-title,.side-note{display:none}.side-actions{display:flex;flex-wrap:wrap;margin:10px 0}.sidebar .brand{float:none}.hero,.chapter,.intro{padding-left:34px;padding-right:34px}}
+@media(max-width:560px){body{font-size:16px}.layout{padding:0}.sidebar{padding:14px}.book{border-left:0;border-right:0}.hero,.chapter,.intro{padding-left:20px;padding-right:20px}.hero{padding-top:34px}h1{font-size:44px}h2{font-size:28px}table{font-size:12px}td,th{padding:8px 6px}pre{font-size:11.2px}.footer{padding:20px}.lede{font-size:17px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A4;margin:16mm 15mm 17mm;@bottom-left{content:"DP / Lesson 2 / Factory";font:8pt sans-serif;color:#596b6b}@bottom-right{content:counter(page);font:8pt sans-serif;color:#596b6b}}
+@media print{html{scroll-behavior:auto}body{font:10pt/1.45 Arial,sans-serif;background:#fff;color:#17282d}.layout{display:block;max-width:none;padding:0;margin:0}.sidebar,.no-print,.skip,.lab-widget{display:none!important}.book{border:0;box-shadow:none;background:#fff}.hero{padding:5mm 0 6mm;background:#fff;border-top:4pt solid #086c64}.hero h1{font-size:36pt;line-height:1.06}.lede{font-size:13pt}.tag{font-size:7pt}.route{font-size:10pt}.intro,.chapter{padding:5mm 0 3mm}.intro .small{display:none}.chapter-label{font-size:8pt}.chapter>h2{font-size:23pt;margin:3mm 0 5mm}.chapter-label,h2,h3,summary,figcaption{break-after:avoid}h3{font-size:12pt;margin:5mm 0 2mm}p{margin:2.5mm 0 3mm;orphans:3;widows:3}li{margin:1.5mm 0}table{font-size:9pt;line-height:1.35;margin:5mm 0}th{font-size:8pt}th,td{padding:2.3mm 2.5mm}thead{display:table-header-group}tr{break-inside:avoid}figure.code{margin:4mm 0;border-radius:0;break-inside:avoid;box-decoration-break:clone}figcaption{font-size:7pt;padding:1.5mm 3mm}pre{font:8.1pt/1.4 "Liberation Mono",Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}figure pre{padding:3mm}.output{font-size:9pt;break-inside:avoid}.note,.verification{font-size:9pt;padding:3mm 4mm;margin:4mm 0;break-inside:avoid}details{border:1px solid #bccfc6;margin:4mm 0;break-inside:auto}details::details-content{display:block;content-visibility:visible}details>div{display:block!important}details>div.download-row{display:none!important}summary{font-size:9pt;padding:3mm 4mm;list-style:none}summary::-webkit-details-marker{display:none}details>div:not(.download-row){padding:0 4mm 2mm}details.source-details{border:0}.source-details>summary{display:none}.source-details .code{margin:4mm 0}.source-chunk{break-inside:auto!important}.source-chunk pre{orphans:4;widows:4}.references{break-before:page}.references li{margin-bottom:4mm}.references p{font-size:9pt}.source-url{font-size:7.3pt}.ref{font-size:8pt}a{color:#194e61;text-decoration:underline}.print-only{display:block}.print-toc{display:block;margin-top:6mm}.print-toc ol{columns:2;column-gap:10mm;list-style:none;padding:0;font-size:9pt}.print-toc li{break-inside:avoid;padding:0;margin:2mm 0}.print-toc a{text-decoration:none}.checklist label{font-size:9pt}.small{font-size:8pt}.footer{display:none}.eyebrow{font-size:8pt}#source-shipping,#source-workflow,#source-payment{break-before:page}}
+</style></head>
+<body><a class="skip" href="#main">Skip to guide</a><div class="layout"><aside class="sidebar" aria-label="Guide navigation"><div class="brand">DP / ENGINEERING LAB</div><div class="side-title">Lesson 2<br>Factory</div><nav aria-label="Contents"><a href="#start"><span class="nav-num">01</span>Begin with working code</a><a href="#pressure"><span class="nav-num">02</span>Create the pressure before the pattern</a><a href="#extract"><span class="nav-num">03</span>Give creation one owner</a><a href="#types"><span class="nav-num">04</span>Make the boundary explicit in Java</a><a href="#use"><span class="nav-num">05</span>Separate construction from use</a><a href="#construction"><span class="nav-num">06</span>When constructors become architectural decisions</a><a href="#tests"><span class="nav-num">07</span>Test each responsibility separately</a><a href="#drone"><span class="nav-num">08</span>Add drone shipping and inspect the change</a><a href="#factory-method"><span class="nav-num">09</span>Derive Factory Method from a new pressure</a><a href="#distinctions"><span class="nav-num">10</span>Choose the smallest creation boundary</a><a href="#registry"><span class="nav-num">11</span>Use a registry when configuration is the pressure</a><a href="#run"><span class="nav-num">12</span>Run the complete system</a><a href="#exercise"><span class="nav-num">13</span>Exercise: move creation out of payment use</a><a href="#review"><span class="nav-num">14</span>The thought process to carry forward</a><a href="#source-shipping"><span class="nav-num">A</span>Shipping: complete source</a><a href="#source-workflow"><span class="nav-num">B</span>Factory Method: complete source</a><a href="#source-payment"><span class="nav-num">C</span>Payment: reference solution</a><a href="#references">Official references</a></nav><div class="side-actions"><button id="print" type="button">Print / Save as PDF</button><button id="expand" type="button">Expand answers &amp; source</button></div><p class="small side-note">One HTML file. Works offline.<br>All source is embedded.</p><p id="notice" role="status" aria-live="polite"></p></aside>
+<main id="main" class="book"><header class="hero"><div class="eyebrow">Lesson 02 / Design from first principles</div><h1>Factory<span>Controlling object creation</span></h1><p class="lede">Working code first. A real change next. Then a boundary that gives construction knowledge one owner.</p><div class="tags"><span class="tag">Java 25 compatible</span><span class="tag">3 complete labs</span><span class="tag">No dependencies</span></div><p class="route">Problem → pressure → diagnosis → refactor → test → name → trade-offs</p></header>
+<div class="intro"><h2>How to use this guide</h2><p>Read sections 1–8 in order and keep a Java editor open. Predict the effect of each change before you run it. Then derive Factory Method from its own pressure, examine the registry alternative, and complete the payment exercise.</p><p>You need basic Java methods, classes and interfaces. Records, enums, lambdas and switch expressions are explained where they appear. You do not need the previous lesson: the shipping model and Strategy foundation are rebuilt here.</p><p class="small">For PDF: use <strong>Print / Save as PDF</strong>, portrait orientation, A4 or Letter, and disable the browser's own headers and footers. All answers and full source expand for printing. Reading needs no network; Java programs run locally with a JDK.</p><noscript><p>JavaScript is disabled. All lesson text and source remain readable. Copy source manually and use your browser’s print command.</p></noscript><div class="print-toc"><h3>Contents</h3><ol><li><a href="#start">01. Begin with working code</a></li><li><a href="#pressure">02. Create the pressure before the pattern</a></li><li><a href="#extract">03. Give creation one owner</a></li><li><a href="#types">04. Make the boundary explicit in Java</a></li><li><a href="#use">05. Separate construction from use</a></li><li><a href="#construction">06. When constructors become architectural decisions</a></li><li><a href="#tests">07. Test each responsibility separately</a></li><li><a href="#drone">08. Add drone shipping and inspect the change</a></li><li><a href="#factory-method">09. Derive Factory Method from a new pressure</a></li><li><a href="#distinctions">10. Choose the smallest creation boundary</a></li><li><a href="#registry">11. Use a registry when configuration is the pressure</a></li><li><a href="#run">12. Run the complete system</a></li><li><a href="#exercise">13. Exercise: move creation out of payment use</a></li><li><a href="#review">14. The thought process to carry forward</a></li><li><a href="#source-shipping">A. Shipping: complete source</a></li><li><a href="#source-workflow">B. Factory Method: complete source</a></li><li><a href="#source-payment">C. Payment: reference solution</a></li><li><a href="#references">Official references</a></li></ol></div></div>
+<section id="start" class="chapter"><div class="chapter-label">01 / Working baseline</div><h2>Begin with working code</h2>
+<p>Strategy gave checkout one capability: <em>calculate shipping for an order</em>. Standard, express and overnight policies implement that capability. Checkout can use any of them without knowing their formulas.</p>
+<p>That leaves a concrete question: <strong>who creates the policy for this request?</strong> Imagine the request contains <code>shippingMethod: "express"</code>. The simplest controller selects the object and gives it to checkout.</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> BigDecimal checkoutBefore(String method, Order order) {
+    Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+    ShippingPolicy policy = <span class="k">switch</span> (method) {
+        <span class="k">case</span> <span class="s">&quot;standard&quot;</span> -&gt; <span class="k">new</span> StandardShipping();
+        <span class="k">case</span> <span class="s">&quot;express&quot;</span> -&gt; <span class="k">new</span> ExpressShipping();
+        <span class="k">case</span> <span class="s">&quot;overnight&quot;</span> -&gt; <span class="k">new</span> OvernightShipping();
+        <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                <span class="s">&quot;Unknown shipping method: &quot;</span> + method);
+    };
+    <span class="k">return</span> <span class="k">new</span> CheckoutService(policy).total(order);
+}</code></pre></figure>
+<p>This works. One caller with three simple constructors does not automatically need another abstraction. A <code>switch</code> is a reasonable way to make a finite choice.</p>
+<h3>Rebuild the foundation</h3>
+<p>Our order contains weight in kilograms and a subtotal. The shared contract returns the shipping charge. All examples use one fictional currency with two decimal places. The rates below are teaching data, not carrier prices.</p>
+<table><thead><tr><th>Policy</th><th>Teaching rule</th><th>Shipping for 5 kg</th></tr></thead><tbody>
+<tr><td>Standard</td><td>weight × 2</td><td>10.00</td></tr>
+<tr><td>Express</td><td>weight × 4 + 10</td><td>30.00</td></tr>
+<tr><td>Overnight</td><td>weight × 7 + 25</td><td>60.00</td></tr></tbody></table>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">record</span> Order(BigDecimal weightKg, BigDecimal subtotal) {
+    Order {
+        Objects.requireNonNull(weightKg, <span class="s">&quot;weightKg&quot;</span>);
+        Objects.requireNonNull(subtotal, <span class="s">&quot;subtotal&quot;</span>);
+        <span class="k">if</span> (weightKg.signum() &lt;= 0 || subtotal.signum() &lt; 0) {
+            <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Invalid order&quot;</span>);
+        }
+        subtotal = subtotal.setScale(2, RoundingMode.UNNECESSARY);
+    }
+}
+
+@FunctionalInterface
+<span class="k">interface</span> ShippingPolicy {
+    BigDecimal calculate(Order order);
+}
+
+<span class="k">static</span> BigDecimal decimal(String value) {
+    <span class="k">return</span> <span class="k">new</span> BigDecimal(value);
+}
+
+<span class="k">static</span> BigDecimal money(BigDecimal value) {
+    <span class="k">return</span> value.setScale(2, RoundingMode.HALF_UP);
+}</code></pre></figure>
+<p>The record supplies accessors such as <code>order.weightKg()</code>. Its compact constructor rejects nonpositive weight and negative subtotals, then requires the subtotal to be representable in cents. Records provide component-based data carriers; their component references are final, but arbitrary referenced objects need not be deeply immutable. Here the components are immutable <code>BigDecimal</code> values. <a class="ref" href="#ref-2">[2]</a></p>
+<p>Construct decimal constants from strings. The lab rounds the completed shipping charge to two places using <code>HALF_UP</code>; that is an explicit teaching rule. <code>UNNECESSARY</code> rejects a subtotal such as <code>100.001</code> instead of silently changing it. <a class="ref" href="#ref-3">[3]</a></p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> StandardShipping <span class="k">implements</span> ShippingPolicy {
+    <span class="k">public</span> BigDecimal calculate(Order order) {
+        <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;2.00&quot;</span>)));
+    }
+}
+
+<span class="k">static</span> <span class="k">final</span> <span class="k">class</span> ExpressShipping <span class="k">implements</span> ShippingPolicy {
+    <span class="k">public</span> BigDecimal calculate(Order order) {
+        <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;4.00&quot;</span>))
+                .add(decimal(<span class="s">&quot;10.00&quot;</span>)));
+    }
+}
+
+<span class="k">static</span> <span class="k">final</span> <span class="k">class</span> OvernightShipping <span class="k">implements</span> ShippingPolicy {
+    <span class="k">public</span> BigDecimal calculate(Order order) {
+        <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;7.00&quot;</span>))
+                .add(decimal(<span class="s">&quot;25.00&quot;</span>)));
+    }
+}</code></pre></figure>
+<p><code>ShippingPolicy</code> promises a nonnegative charge in the same currency and at two decimal places for a valid order. These implementations meet that contract. Currency conversion, taxes and real carrier rules are outside this lab.</p>
+</section><section id="pressure" class="chapter"><div class="chapter-label">02 / Change and diagnosis</div><h2>Create the pressure before the pattern</h2>
+<p>Now an admin quote screen, an order service, an estimator and a scheduled job all need shipping policies. Each copies the selection code.</p>
+<table><thead><tr><th>Caller</th><th>Knowledge it now carries</th></tr></thead><tbody>
+<tr><td>Checkout controller</td><td>All concrete policy names and constructors</td></tr>
+<tr><td>Admin quote controller</td><td>The same names and constructors</td></tr>
+<tr><td>Order service</td><td>The same names and constructors</td></tr>
+<tr><td>Shipping estimator</td><td>The same names and constructors</td></tr>
+<tr><td>Scheduled job</td><td>The same names and constructors</td></tr></tbody></table>
+<p>The next request is “add drone shipping.” One selection rule now needs edits in five places. A missed edit could make one entry point reject a method that another accepts.</p>
+<aside class="note"><strong>Diagnosis: duplicated construction knowledge</strong><p>The problem is the spread of knowledge about which class to create and how to build it. The number of <code>switch</code> statements is only a symptom.</p></aside>
+<p>Call this <strong>change amplification</strong>: one concept changes, but unrelated modules must be edited together. Count the places that own the decision, not merely the lines of code.</p>
+<h3>Ask the design questions</h3>
+<ol><li>What varies? The available shipping implementations and how they are constructed.</li>
+<li>What is stable? Checkout adds a shipping charge to a subtotal.</li>
+<li>What does stable code need? A <code>ShippingPolicy</code>.</li>
+<li>What knowledge should have one owner? The method-to-object mapping and the construction recipe.</li></ol>
+<details class="answer" open><summary>Pause: would extracting each shipping formula fix this new problem?</summary><div><p>No. Strategy already extracted those formulas. Callers still duplicate selection and construction. We need a boundary around a different responsibility.</p></div></details></section><section id="extract" class="chapter"><div class="chapter-label">03 / First refactoring</div><h2>Give creation one owner</h2>
+<p>First move the existing string-based selection into a class with one method. Return the capability the caller needs.</p>
+<figure class="code"><figcaption>Java · intermediate refactoring</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> StringShippingFactory {
+    ShippingPolicy create(String method) {
+        Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+        <span class="k">return</span> <span class="k">switch</span> (method) {
+            <span class="k">case</span> <span class="s">&quot;standard&quot;</span> -&gt; <span class="k">new</span> StandardShipping();
+            <span class="k">case</span> <span class="s">&quot;express&quot;</span> -&gt; <span class="k">new</span> ExpressShipping();
+            <span class="k">case</span> <span class="s">&quot;overnight&quot;</span> -&gt; <span class="k">new</span> OvernightShipping();
+            <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                    <span class="s">&quot;Unknown shipping method: &quot;</span> + method);
+        };
+    }
+}</code></pre></figure>
+<p>Now callers ask for a policy. They no longer repeat concrete constructors. We have derived a <strong>Simple Factory</strong>: one place encapsulates object creation. Microsoft distinguishes this from Factory Method and Abstract Factory. <a class="ref" href="#ref-1">[1]</a></p>
+<p>The benefit is ownership. If a construction recipe changes, there is one deliberate place to update it. A static function could provide the same boundary; the extra class is not the essence of the design.</p>
+<table><thead><tr><th>Responsibility</th><th>Owner</th></tr></thead><tbody>
+<tr><td>Decode and validate a request value</td><td>Request boundary</td></tr>
+<tr><td>Select and construct a shipping policy</td><td>Factory</td></tr>
+<tr><td>Calculate a shipping charge</td><td>Shipping policy</td></tr>
+<tr><td>Add the charge to the subtotal</td><td>Checkout service</td></tr></tbody></table>
+<details class="answer" open><summary>Pause: did we remove the selection decision?</summary><div><p>No. We gave it one owner. Every caller delegates to that owner. Removing all conditionals was never a requirement.</p></div></details></section><section id="types" class="chapter"><div class="chapter-label">04 / Typed input</div><h2>Make the boundary explicit in Java</h2>
+<p>A factory accepting any string still permits typos in internal code. Introduce an enum for the methods supported by this application, and translate external text at the edge.</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">enum</span> ShippingMethod {
+    STANDARD, EXPRESS, OVERNIGHT;
+
+    <span class="k">static</span> ShippingMethod fromRequest(String raw) {
+        <span class="k">if</span> (raw == <span class="k">null</span>) {
+            <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Missing shipping method&quot;</span>);
+        }
+        <span class="k">return</span> <span class="k">switch</span> (raw.strip().toLowerCase(Locale.ROOT)) {
+            <span class="k">case</span> <span class="s">&quot;standard&quot;</span> -&gt; STANDARD;
+            <span class="k">case</span> <span class="s">&quot;express&quot;</span> -&gt; EXPRESS;
+            <span class="k">case</span> <span class="s">&quot;overnight&quot;</span> -&gt; OVERNIGHT;
+            <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                    <span class="s">&quot;Unknown shipping method: &quot;</span> + raw);
+        };
+    }
+}</code></pre></figure>
+<p>The parser deliberately accepts surrounding whitespace and mixed case. <code>Locale.ROOT</code> makes case conversion independent of the user's locale. Unknown, blank and missing values fail explicitly. <a class="ref" href="#ref-7">[7]</a></p>
+<p>The factory now accepts only the domain type:</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> ShippingPolicyFactory {
+    ShippingPolicy create(ShippingMethod method) {
+        Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+        <span class="k">return</span> <span class="k">switch</span> (method) {
+            <span class="k">case</span> STANDARD -&gt; <span class="k">new</span> StandardShipping();
+            <span class="k">case</span> EXPRESS -&gt; <span class="k">new</span> ExpressShipping();
+            <span class="k">case</span> OVERNIGHT -&gt; <span class="k">new</span> OvernightShipping();
+        };
+    }
+}</code></pre></figure>
+<p>This enum <code>switch</code> expression covers every constant, so it needs no <code>default</code>. Add an enum constant and recompile the source: the incomplete factory switch becomes a compiler error. We reject <code>null</code> explicitly because an enum reference can still be null. <a class="ref" href="#ref-4">[4]</a></p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code>factory.create(ShippingMethod.EXPRESS); <span class="c1">// Valid</span>
+<span class="c1">// factory.create(&quot;banana&quot;);           // Does not compile</span>
+<span class="c1">// factory.create(null);               // Compiles, then throws</span></code></pre></figure>
+<aside class="note"><strong>Types do not validate an HTTP request</strong><p>JSON text is external data. Parse it before constructing the domain object. In a real HTTP adapter, translate an invalid method into the application’s client-error response. An enum alone does not do that work.</p></aside>
+<p>The parser and factory contain different mappings. One maps public request vocabulary to a domain value; the other maps that value to an implementation. A new method may require both to change. Localized change does not mean exactly one edited file.</p>
+</section><section id="use" class="chapter"><div class="chapter-label">05 / Object composition</div><h2>Separate construction from use</h2>
+<p>Checkout's job is to combine a subtotal and a shipping charge. It receives the policy it will use:</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> CheckoutService {
+    <span class="k">private</span> <span class="k">final</span> ShippingPolicy shipping;
+
+    CheckoutService(ShippingPolicy shipping) {
+        this.shipping = Objects.requireNonNull(shipping, <span class="s">&quot;shipping&quot;</span>);
+    }
+
+    BigDecimal total(Order order) {
+        Objects.requireNonNull(order, <span class="s">&quot;order&quot;</span>);
+        <span class="k">return</span> order.subtotal().add(shipping.calculate(order));
+    }
+}</code></pre></figure>
+<p>The field is final, so this checkout object keeps the policy chosen at construction. This is constructor injection using plain Java. A dependency-injection framework is not required.</p>
+<p>Wire the objects at the application boundary. This small method stands in for a controller; the demo creates ordinary objects and does not run an HTTP server.</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> BigDecimal checkout(String rawMethod, Order order) {
+    ShippingMethod method = ShippingMethod.fromRequest(rawMethod);
+    <span class="k">var</span> factory = <span class="k">new</span> ShippingPolicyFactory();
+    ShippingPolicy policy = factory.create(method);
+    <span class="k">var</span> service = <span class="k">new</span> CheckoutService(policy);
+    <span class="k">return</span> service.total(order);
+}</code></pre></figure>
+<table><thead><tr><th>At runtime</th><th>What happens</th></tr></thead><tbody>
+<tr><td>1. Parse</td><td><code>"express"</code> becomes <code>ShippingMethod.EXPRESS</code>.</td></tr>
+<tr><td>2. Construct</td><td>The factory returns an <code>ExpressShipping</code> through the <code>ShippingPolicy</code> interface.</td></tr>
+<tr><td>3. Compose</td><td>The boundary supplies that policy to <code>CheckoutService</code>.</td></tr>
+<tr><td>4. Use</td><td>Checkout calls <code>calculate(order)</code>; the express implementation runs.</td></tr></tbody></table>
+<p>The boundary knows the factory and the interface. The factory knows concrete classes. Checkout only needs the policy contract. A different boundary can select a different policy without rewriting checkout.</p>
+<details class="answer" open><summary>Pause: should CheckoutService ask a global factory for its policy?</summary><div><p>For this design, that would hide its dependency and mix selection with use again. Passing the policy makes the service’s requirement visible and makes substitution straightforward.</p></div></details></section><section id="construction" class="chapter"><div class="chapter-label">06 / Growing construction pressure</div><h2>When constructors become architectural decisions</h2>
+<p>A zero-argument constructor is cheap to repeat. Real construction may involve a maps client, a pricing repository, a surcharge provider and a logger. Now a caller would need to know which implementations to use, which configuration to supply and which dependencies are shared.</p>
+<figure class="code"><figcaption>Java · conceptual sketch, not a runnable lab fragment</figcaption><pre><code><span class="c1">// Construction sketch only: these collaborator types are not in the lab.</span>
+<span class="k">var</span> policy = <span class="k">new</span> ExpressShipping(
+        <span class="k">new</span> DistanceCalculator(mapsClient),
+        pricingRepository,
+        fuelSurchargeProvider,
+        logger);</code></pre></figure>
+<p>Put that recipe in the creation boundary. Supply already configured long-lived collaborators to the factory from the application's startup code. The factory can then build policies using those collaborators.</p>
+<aside class="note"><strong>Creation also raises a lifetime question</strong><p>The lab returns a fresh, stateless policy on each call. A factory can instead return a shared instance, but sharing introduces state and concurrency questions. The name “factory” does not promise either fresh or cached objects.</p></aside>
+<p>Keep resource ownership explicit. If startup creates a database pool or network client, startup should arrange its shutdown. Moving a constructor into a factory does not by itself solve configuration, lifecycle or error handling.</p>
+<p>The practical test is whether the caller should carry this construction knowledge. If it obscures the caller's own job or is repeated across entry points, isolate it.</p>
+</section><section id="tests" class="chapter"><div class="chapter-label">07 / Verification</div><h2>Test each responsibility separately</h2>
+<p>Use a different question for each boundary. A factory-selection test is allowed to name a concrete type because choosing that type is the behavior under test. Checkout tests should not depend on which production policy is chosen.</p>
+<table><thead><tr><th>Test</th><th>Question</th><th>Example expectation</th></tr></thead><tbody>
+<tr><td>Request parser</td><td>Which external values are accepted?</td><td><code>" Express "</code> becomes <code>EXPRESS</code>; <code>"banana"</code> is rejected.</td></tr>
+<tr><td>Factory</td><td>Was the intended implementation selected?</td><td><code>EXPRESS</code> produces <code>ExpressShipping</code>.</td></tr>
+<tr><td>Strategy</td><td>Is the price calculation correct?</td><td>5 kg express shipping costs 30.00.</td></tr>
+<tr><td>Checkout</td><td>Does orchestration use its dependency?</td><td>A fake charge of 10.00 makes a 100.00 subtotal total 110.00.</td></tr>
+<tr><td>Composition</td><td>Do the pieces cooperate?</td><td>External <code>"express"</code> produces total 130.00.</td></tr></tbody></table>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">var</span> order = <span class="k">new</span> Order(decimal(<span class="s">&quot;5&quot;</span>), decimal(<span class="s">&quot;100.00&quot;</span>));
+<span class="k">var</span> factory = <span class="k">new</span> ShippingPolicyFactory();
+
+check(factory.create(ShippingMethod.EXPRESS)
+        <span class="k">instanceof</span> ExpressShipping, <span class="s">&quot;Express selection&quot;</span>);
+amount(<span class="s">&quot;30.00&quot;</span>, <span class="k">new</span> ExpressShipping().calculate(order));
+
+ShippingPolicy fake = ignored -&gt; decimal(<span class="s">&quot;10.00&quot;</span>);
+amount(<span class="s">&quot;110.00&quot;</span>, <span class="k">new</span> CheckoutService(fake).total(order));
+amount(<span class="s">&quot;130.00&quot;</span>, checkout(<span class="s">&quot;express&quot;</span>, order));</code></pre></figure>
+<p>The lambda works because <code>ShippingPolicy</code> has one abstract method. It supplies a predictable test implementation. The full file defines <code>check</code>, <code>amount</code> and <code>rejects</code>; these checks throw on failure and do not require <code>-ea</code> or a test-library download. <a class="ref" href="#ref-8">[8]</a></p>
+<p><code>amount</code> uses <code>BigDecimal.compareTo</code> for numeric equality, so <code>30.0</code> and <code>30.00</code> compare as the same amount. <code>equals</code> also compares scale. <a class="ref" href="#ref-3">[3]</a></p>
+<div class="lab-widget"><h3>Trace one request</h3><p>Change a method and weight. The subtotal stays at 100.00. This browser calculation illustrates the Java lab; it does not execute Java.</p>
+<div class="controls"><label>Shipping method<select id="trace-method"><option value="standard">Standard</option><option value="express" selected>Express</option><option value="overnight">Overnight</option></select></label>
+<label>Weight in kilograms<select id="trace-weight"><option value="1">1 kg</option><option value="5" selected>5 kg</option><option value="10">10 kg</option><option value="20">20 kg</option></select></label></div>
+<div id="trace-result" class="trace-result" role="status" aria-live="polite"><strong>EXPRESS → ExpressShipping</strong><span>Shipping: 5 × 4 + 10 = 30.00</span><span>Checkout: 100.00 + 30.00 = <b>130.00</b></span></div></div>
+<p class="print-only">Worked example: EXPRESS selects ExpressShipping. At 5 kg, shipping is 5 × 4 + 10 = 30.00. Checkout is 100.00 + 30.00 = 130.00.</p>
+</section><section id="drone" class="chapter"><div class="chapter-label">08 / Locality of change</div><h2>Add drone shipping and inspect the change</h2>
+<p>Keep this extension separate from the baseline lab. Implement the new calculation first:</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> DroneShipping <span class="k">implements</span> ShippingPolicy {
+    <span class="k">public</span> BigDecimal calculate(Order order) {
+        <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;5.00&quot;</span>))
+                .add(decimal(<span class="s">&quot;20.00&quot;</span>)));
+    }
+}</code></pre></figure>
+<p>Then add the domain value and update the boundaries that own its meaning:</p>
+<table><thead><tr><th>Location</th><th>Edit</th></tr></thead><tbody>
+<tr><td><code>ShippingMethod</code></td><td>Add <code>DRONE</code>.</td></tr>
+<tr><td><code>fromRequest</code></td><td>Add <code>case "drone" -&gt; DRONE;</code></td></tr>
+<tr><td><code>ShippingPolicyFactory</code></td><td>Add <code>case DRONE -&gt; new DroneShipping();</code></td></tr>
+<tr><td>Tests</td><td>Test parsing, selection, 45.00 shipping at 5 kg, and total 145.00.</td></tr>
+<tr><td>Optional registry</td><td>If you retain the registry example, register <code>DroneShipping::new</code> too.</td></tr></tbody></table>
+<p><code>CheckoutService</code> needs no edit. Existing policy algorithms also stay intact. The illustrative <code>checkoutBefore</code> method intentionally remains the old version: it demonstrates why the original design needed repeated edits.</p>
+<details class="answer" open><summary>Try it: what should happen after adding DRONE to the enum but before updating the factory?</summary><div><p>Recompilation should fail because the enum switch expression is incomplete. Once the factory is updated, the optional registry still needs its new entry: its constructor checks completeness at runtime.</p></div></details>
+<h3>What about the Open/Closed Principle?</h3>
+<p>In this design, checkout is insulated from new shipping implementations by its interface. The factory is deliberately responsible for the supported implementation set. Editing its mapping is an intentional trade-off.</p>
+<p>“Never modify existing code” is too blunt a rule to guide this decision. Ask whether the change stays with the owner of the knowledge and whether stable clients remain insulated. User interfaces, API schemas or configuration may still need deliberate updates to expose a new option.</p>
+</section><section id="factory-method" class="chapter"><div class="chapter-label">09 / A different variation point</div><h2>Derive Factory Method from a new pressure</h2>
+<p>Now consider a shipping-document workflow: validate an order, create a carrier-specific label, then save the label. Validation and saving are shared. The concrete label product varies with the workflow subclass.</p>
+<p>Define the product capability first. These carrier names label local teaching objects; there are no carrier API calls or real shipping labels.</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">record</span> Order(String id) {}
+
+<span class="k">interface</span> ShippingLabel {
+    String render();
+}
+
+<span class="c1">// Local teaching objects; these do not call carrier APIs.</span>
+<span class="k">record</span> FedExLabel(String orderId) <span class="k">implements</span> ShippingLabel {
+    <span class="k">public</span> String render() { <span class="k">return</span> <span class="s">&quot;FedEx label: &quot;</span> + orderId; }
+}
+
+<span class="k">record</span> UpsLabel(String orderId) <span class="k">implements</span> ShippingLabel {
+    <span class="k">public</span> String render() { <span class="k">return</span> <span class="s">&quot;UPS label: &quot;</span> + orderId; }
+}</code></pre></figure>
+<p>Keep the shared process in a base class. Give subclasses one creation hook:</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">abstract</span> <span class="k">static</span> <span class="k">class</span> ShippingWorkflow {
+    <span class="k">private</span> <span class="k">final</span> Consumer&lt;ShippingLabel&gt; save;
+
+    ShippingWorkflow(Consumer&lt;ShippingLabel&gt; save) {
+        this.save = Objects.requireNonNull(save, <span class="s">&quot;save&quot;</span>);
+    }
+
+    <span class="k">final</span> ShippingLabel process(Order order) {
+        Objects.requireNonNull(order, <span class="s">&quot;order&quot;</span>);
+        <span class="k">if</span> (order.id() == <span class="k">null</span> || order.id().isBlank()) {
+            <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Missing order id&quot;</span>);
+        }
+        ShippingLabel label = Objects.requireNonNull(
+                createLabel(order), <span class="s">&quot;label&quot;</span>);
+        save.accept(label);
+        <span class="k">return</span> label;
+    }
+
+    <span class="k">protected</span> <span class="k">abstract</span> ShippingLabel createLabel(Order order);
+}</code></pre></figure>
+<p>The <code>final</code> process method preserves the operation order. <code>createLabel</code> is the <strong>Factory Method</strong>: a subclass supplies the concrete product. The injected <code>Consumer</code> is a saving callback; the runnable lab uses an in-memory list.</p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> FedExWorkflow <span class="k">extends</span> ShippingWorkflow {
+    FedExWorkflow(Consumer&lt;ShippingLabel&gt; save) { super(save); }
+
+    @Override
+    <span class="k">protected</span> ShippingLabel createLabel(Order order) {
+        <span class="k">return</span> <span class="k">new</span> FedExLabel(order.id());
+    }
+}
+
+<span class="k">static</span> <span class="k">final</span> <span class="k">class</span> UpsWorkflow <span class="k">extends</span> ShippingWorkflow {
+    UpsWorkflow(Consumer&lt;ShippingLabel&gt; save) { super(save); }
+
+    @Override
+    <span class="k">protected</span> ShippingLabel createLabel(Order order) {
+        <span class="k">return</span> <span class="k">new</span> UpsLabel(order.id());
+    }
+}</code></pre></figure>
+<p>At the boundary, <code>new FedExWorkflow(saved::add)</code> chooses a workflow. Inside <code>process</code>, the virtual call to <code>createLabel</code> reaches that subclass. The base workflow then uses the returned <code>ShippingLabel</code>.</p>
+<aside class="note"><strong>Two related ideas appear in the same example</strong><p><code>process</code> has the shape of Template Method: a stable algorithm with an overridable step. That step is specifically about creating a product, so <code>createLabel</code> serves as Factory Method. The names describe different roles.</p></aside>
+<p>This is useful when a workflow hierarchy already provides a meaningful extension point. If label creation is the only variation, injecting a <code>Function&lt;Order, ShippingLabel&gt;</code> may be simpler than introducing subclasses. The pressure should justify the inheritance.</p>
+</section><section id="distinctions" class="chapter"><div class="chapter-label">10 / Terminology and trade-offs</div><h2>Choose the smallest creation boundary</h2>
+<table><thead><tr><th>Design</th><th>Who chooses the product?</th><th>Use when</th><th>Cost</th></tr></thead><tbody>
+<tr><td>Direct construction</td><td>The caller</td><td>One obvious recipe in one suitable location</td><td>Caller knows the concrete class</td></tr>
+<tr><td>Simple Factory</td><td>A centralized function or object</td><td>Several callers need the same selection or wiring</td><td>A mapping and an extra hop</td></tr>
+<tr><td>GoF Factory Method</td><td>An overridden creator method in a subclass</td><td>A base workflow needs subclasses to determine a product</td><td>Inheritance and more types</td></tr>
+<tr><td>Supplier registry</td><td>A registered creation function</td><td>Wiring varies with configuration</td><td>Registration and completeness checks</td></tr></tbody></table>
+<p>Simple Factory and GoF Factory Method are different concepts. A method called <code>create</code>, or a static method returning an object, is not automatically the GoF pattern. Abstract Factory addresses families of related products; it is outside this lesson's implementation. <a class="ref" href="#ref-1">[1]</a></p>
+<h3>When not to add a factory</h3>
+<ul><li>There is one simple implementation and one suitable construction site.</li>
+<li>The factory would only wrap <code>new</code> without hiding useful knowledge.</li>
+<li>It introduces a hierarchy merely to avoid one controlled selection.</li>
+<li>The caller actually needs to choose and configure a concrete object directly.</li></ul>
+<p>Prefer the simplest design that contains the change you can explain. An extra abstraction has to earn its navigation, wiring and debugging cost.</p>
+</section><section id="registry" class="chapter"><div class="chapter-label">11 / Alternative implementation</div><h2>Use a registry when configuration is the pressure</h2>
+<p>Suppose startup configuration supplies the available construction recipes. Replace the hard-coded factory switch with a map from the enum to a <code>Supplier&lt;ShippingPolicy&gt;</code>. A supplier provides a value through <code>get()</code>. Constructor references such as <code>ExpressShipping::new</code> act as creation functions. <a class="ref" href="#ref-5">[5]</a></p>
+<figure class="code"><figcaption>Java · excerpt</figcaption><pre><code><span class="k">static</span> <span class="k">final</span> <span class="k">class</span> RegistryShippingFactory {
+    <span class="k">private</span> <span class="k">final</span> Map&lt;ShippingMethod, Supplier&lt;ShippingPolicy&gt;&gt; creators;
+
+    RegistryShippingFactory(
+            Map&lt;ShippingMethod, Supplier&lt;ShippingPolicy&gt;&gt; creators) {
+        this.creators = Map.copyOf(creators);
+        <span class="k">if</span> (!this.creators.keySet().equals(
+                EnumSet.allOf(ShippingMethod.<span class="k">class</span>))) {
+            <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Incomplete registry&quot;</span>);
+        }
+    }
+
+    ShippingPolicy create(ShippingMethod method) {
+        Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+        <span class="k">return</span> Objects.requireNonNull(
+                creators.get(method).get(), <span class="s">&quot;Supplier returned null&quot;</span>);
+    }
+}
+
+<span class="k">static</span> RegistryShippingFactory configuredRegistry() {
+    <span class="k">var</span> creators = <span class="k">new</span> EnumMap&lt;ShippingMethod,
+            Supplier&lt;ShippingPolicy&gt;&gt;(ShippingMethod.<span class="k">class</span>);
+    creators.put(ShippingMethod.STANDARD, StandardShipping::<span class="k">new</span>);
+    creators.put(ShippingMethod.EXPRESS, ExpressShipping::<span class="k">new</span>);
+    creators.put(ShippingMethod.OVERNIGHT, OvernightShipping::<span class="k">new</span>);
+    <span class="k">return</span> <span class="k">new</span> RegistryShippingFactory(creators);
+}</code></pre></figure>
+<p><code>EnumMap</code> is a map specialized for enum keys. The registry copies its input so later map edits do not change its configuration. This copy is shallow: objects captured by suppliers can still have state. <a class="ref" href="#ref-6">[6]</a><a class="ref" href="#ref-10">[10]</a></p>
+<p>Unlike an exhaustive switch, a Java map literal does not make the compiler require every enum key. The constructor checks completeness at startup and rejects missing entries. It also rejects a supplier that returns null when invoked.</p>
+<p>The registry shown here still has a <em>closed</em> enum vocabulary. It is not an open-ended plugin system: adding a new method still needs source edits to the enum and request parser. A dynamically extensible identifier scheme would be a separate design decision.</p>
+<aside class="note"><strong>Supplier does not mean “fresh instance”</strong><p>These constructor references create fresh objects. A supplier could return a cached object instead. The Supplier contract does not require a distinct result on each invocation. <a class="ref" href="#ref-5">[5]</a></p></aside>
+<p>The boundary is the same: request a capability and let one owner handle construction. Switching from a conditional to a map changes the implementation technique, not the underlying responsibility.</p>
+</section><section id="run" class="chapter"><div class="chapter-label">12 / Complete runnable labs</div><h2>Run the complete system</h2>
+<p>The full files are embedded below. Use the download buttons in a browser or copy the complete source from the appendices. Save each under its displayed filename in one folder.</p>
+<div class="download-row no-print"><button type="button" data-download="FactoryLesson.java">Download shipping lab</button><button type="button" data-download="FactoryMethodLesson.java">Download workflow lab</button></div>
+<p>Use a JDK, which includes <code>javac</code>. Check that both commands report version 25, then compile and run. These files use standard Java syntax and APIs with no preview flags or external dependencies. <code>--release 25</code> selects Java 25's language and API target. <a class="ref" href="#ref-9">[9]</a></p>
+<figure class="code"><figcaption>Terminal · run from the folder containing the source files</figcaption><pre><code>java -version
+javac -version
+javac --release 25 -Xlint:all FactoryLesson.java FactoryMethodLesson.java
+java FactoryLesson
+java FactoryMethodLesson</code></pre></figure>
+<h3>Expected output</h3>
+<pre class="output">Checkout total: 130.00
+All shipping checks passed.
+FedEx label: ORD-42
+UPS label: ORD-42
+All workflow checks passed.</pre>
+<p>The main shipping path is the original 5 kg order with a 100.00 subtotal. The full file also runs the baseline version, the registry alternative and checks for invalid input, invalid orders and rounding.</p>
+<p class="verification"><strong>Verification note.</strong> All three embedded Java files were compiled with <code>-Xlint:all</code> and run successfully on OpenJDK 17.0.20. They use features and APIs available in Java 25, verified against the official Java 25 references below. A Java 25 runtime was unavailable for execution in the authoring environment.</p>
+<h3>What the source layout means</h3>
+<p>To keep each download independent, related classes are nested in one public lab class. <code>static</code> nested classes need no enclosing lab instance. This packaging is for a runnable lesson; a larger application can place the types in separate files. Snippets are excerpts and omit the imports or enclosing class unless shown.</p>
+</section><section id="exercise" class="chapter"><div class="chapter-label">13 / Hands-on practice</div><h2>Exercise: move creation out of payment use</h2>
+<p>Your payment entry point currently selects a concrete processor and calls it. These are local processor stubs; the exercise does not integrate payment providers or move money.</p>
+<figure class="code"><figcaption>Java · starting method; processor stubs are in Appendix C</figcaption><pre><code><span class="k">static</span> String pay(String method, BigDecimal amount) {
+    Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+    <span class="k">return</span> <span class="k">switch</span> (method) {
+        <span class="k">case</span> <span class="s">&quot;card&quot;</span> -&gt; <span class="k">new</span> StripeCardProcessor().pay(amount);
+        <span class="k">case</span> <span class="s">&quot;paypal&quot;</span> -&gt; <span class="k">new</span> PayPalProcessor().pay(amount);
+        <span class="k">case</span> <span class="s">&quot;bank&quot;</span> -&gt; <span class="k">new</span> BankTransferProcessor().pay(amount);
+        <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                <span class="s">&quot;Unknown payment method: &quot;</span> + method);
+    };
+}</code></pre></figure>
+<h3>Work through the decisions</h3>
+<ol><li>Identify the changing knowledge: processor selection and construction.</li>
+<li>Define <code>PaymentProcessor</code> as the capability to execute <code>pay(amount)</code>.</li>
+<li>Make <code>PaymentService</code> receive that capability in its constructor.</li>
+<li>Create <code>PaymentMethod</code> and a request parser.</li>
+<li>Give <code>PaymentProcessorFactory</code> the mapping from method to processor.</li>
+<li>Compose the parser, factory and service at the entry point.</li>
+<li>Test parsing, selection, each stub's behavior, and service delegation separately.</li></ol>
+<h3>Acceptance checklist</h3>
+<div class="checklist">
+<label><input type="checkbox"> PaymentService never names StripeCardProcessor.</label>
+<label><input type="checkbox"> PaymentService contains no selection switch.</label>
+<label><input type="checkbox"> Each processor can be tested independently.</label>
+<label><input type="checkbox"> Factory selection can be tested independently.</label>
+<label><input type="checkbox"> Adding crypto needs no PaymentService edit.</label>
+<label><input type="checkbox"> Unknown methods and invalid amounts fail explicitly.</label>
+</div>
+<p class="small">Checklist ticks are for this open page only; they are not saved.</p>
+<details class="answer" open><summary>Hint: what should PaymentService depend on?</summary><div><p>Only <code>PaymentProcessor</code>. Its payment method validates the amount and delegates to the supplied processor. Request strings and concrete processor classes belong elsewhere.</p></div></details>
+<details class="answer" open><summary>Review: how would you add crypto?</summary><div><p>Add a <code>CryptoProcessor</code>, a <code>CRYPTO</code> enum value, the external text mapping, and the factory branch. Add selection and processor tests. The service remains unchanged because the payment capability is unchanged.</p></div></details>
+<p>Try the refactoring before opening <a href="#source-payment">Appendix C</a>. The reference solution uses strings as fake receipts to keep attention on dependencies.</p>
+<div class="download-row no-print"><button type="button" data-download="PaymentSolution.java">Download payment solution</button></div>
+<figure class="code"><figcaption>Terminal</figcaption><pre><code>javac --release 25 -Xlint:all PaymentSolution.java
+java PaymentSolution</code></pre></figure>
+<pre class="output">card:25.00
+All payment checks passed.</pre>
+</section><section id="review" class="chapter"><div class="chapter-label">14 / Design review</div><h2>The thought process to carry forward</h2>
+<table><thead><tr><th>Ask while coding</th><th>What the answer tells you</th></tr></thead><tbody>
+<tr><td>Who knows the concrete classes?</td><td>Where construction decisions currently live.</td></tr>
+<tr><td>Should those callers know?</td><td>Whether use and construction have become mixed.</td></tr>
+<tr><td>Is the same recipe copied?</td><td>Whether one change will spread across unrelated modules.</td></tr>
+<tr><td>What does the consumer actually need?</td><td>The capability to place at the dependency boundary.</td></tr>
+<tr><td>Who should own creation?</td><td>A suitable factory or composition boundary.</td></tr>
+<tr><td>What extra cost did I introduce?</td><td>Whether the abstraction earns its complexity.</td></tr></tbody></table>
+<p><strong>Strategy</strong> isolates interchangeable behavior. <strong>Factory</strong> isolates selection and construction. They often cooperate, but solve different change problems.</p>
+<h3>Next pressure: an incompatible provider API</h3>
+<p>A third-party client returns a quote using a postal code and a weight in grams, while checkout expects <code>ShippingPolicy.calculate(order)</code>. Our current order model would also need a destination at the appropriate boundary.</p>
+<p>Once the required data is present, an Adapter can translate our request and the provider's response. That is the next lesson: derive a boundary from incompatible interfaces, then implement it.</p>
+</section><section id="source-shipping" class="chapter"><div class="chapter-label">A / Source appendix</div><h2>Shipping: complete source</h2><p>Includes the baseline, typed factory, strategies, checkout, optional registry and executable checks. Copy all consecutive blocks into <code>FactoryLesson.java</code>; they form one complete file.</p><details class="source-details" open><summary>Complete source: FactoryLesson.java</summary><div class="download-row no-print"><button type="button" data-download="FactoryLesson.java">Download FactoryLesson.java</button><button type="button" data-copy="FactoryLesson.java">Copy complete file</button></div><figure class="code source-chunk"><figcaption>FactoryLesson.java · lines 1–40</figcaption><pre><code><span class="k">import</span> java.math.BigDecimal;
+<span class="k">import</span> java.math.RoundingMode;
+<span class="k">import</span> java.util.EnumMap;
+<span class="k">import</span> java.util.EnumSet;
+<span class="k">import</span> java.util.Locale;
+<span class="k">import</span> java.util.Map;
+<span class="k">import</span> java.util.Objects;
+<span class="k">import</span> java.util.function.Supplier;
+
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> FactoryLesson {
+    <span class="k">record</span> Order(BigDecimal weightKg, BigDecimal subtotal) {
+        Order {
+            Objects.requireNonNull(weightKg, <span class="s">&quot;weightKg&quot;</span>);
+            Objects.requireNonNull(subtotal, <span class="s">&quot;subtotal&quot;</span>);
+            <span class="k">if</span> (weightKg.signum() &lt;= 0 || subtotal.signum() &lt; 0) {
+                <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Invalid order&quot;</span>);
+            }
+            subtotal = subtotal.setScale(2, RoundingMode.UNNECESSARY);
+        }
+    }
+
+    @FunctionalInterface
+    <span class="k">interface</span> ShippingPolicy {
+        BigDecimal calculate(Order order);
+    }
+
+    <span class="k">static</span> BigDecimal decimal(String value) {
+        <span class="k">return</span> <span class="k">new</span> BigDecimal(value);
+    }
+
+    <span class="k">static</span> BigDecimal money(BigDecimal value) {
+        <span class="k">return</span> value.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> StandardShipping <span class="k">implements</span> ShippingPolicy {
+        <span class="k">public</span> BigDecimal calculate(Order order) {
+            <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;2.00&quot;</span>)));
+        }
+    }</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryLesson.java · lines 41–82</figcaption><pre><code>    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> ExpressShipping <span class="k">implements</span> ShippingPolicy {
+        <span class="k">public</span> BigDecimal calculate(Order order) {
+            <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;4.00&quot;</span>))
+                    .add(decimal(<span class="s">&quot;10.00&quot;</span>)));
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> OvernightShipping <span class="k">implements</span> ShippingPolicy {
+        <span class="k">public</span> BigDecimal calculate(Order order) {
+            <span class="k">return</span> money(order.weightKg().multiply(decimal(<span class="s">&quot;7.00&quot;</span>))
+                    .add(decimal(<span class="s">&quot;25.00&quot;</span>)));
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> CheckoutService {
+        <span class="k">private</span> <span class="k">final</span> ShippingPolicy shipping;
+
+        CheckoutService(ShippingPolicy shipping) {
+            this.shipping = Objects.requireNonNull(shipping, <span class="s">&quot;shipping&quot;</span>);
+        }
+
+        BigDecimal total(Order order) {
+            Objects.requireNonNull(order, <span class="s">&quot;order&quot;</span>);
+            <span class="k">return</span> order.subtotal().add(shipping.calculate(order));
+        }
+    }
+
+    <span class="k">static</span> BigDecimal checkoutBefore(String method, Order order) {
+        Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+        ShippingPolicy policy = <span class="k">switch</span> (method) {
+            <span class="k">case</span> <span class="s">&quot;standard&quot;</span> -&gt; <span class="k">new</span> StandardShipping();
+            <span class="k">case</span> <span class="s">&quot;express&quot;</span> -&gt; <span class="k">new</span> ExpressShipping();
+            <span class="k">case</span> <span class="s">&quot;overnight&quot;</span> -&gt; <span class="k">new</span> OvernightShipping();
+            <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                    <span class="s">&quot;Unknown shipping method: &quot;</span> + method);
+        };
+        <span class="k">return</span> <span class="k">new</span> CheckoutService(policy).total(order);
+    }
+
+    <span class="k">enum</span> ShippingMethod {
+        STANDARD, EXPRESS, OVERNIGHT;</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryLesson.java · lines 83–118</figcaption><pre><code>        <span class="k">static</span> ShippingMethod fromRequest(String raw) {
+            <span class="k">if</span> (raw == <span class="k">null</span>) {
+                <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Missing shipping method&quot;</span>);
+            }
+            <span class="k">return</span> <span class="k">switch</span> (raw.strip().toLowerCase(Locale.ROOT)) {
+                <span class="k">case</span> <span class="s">&quot;standard&quot;</span> -&gt; STANDARD;
+                <span class="k">case</span> <span class="s">&quot;express&quot;</span> -&gt; EXPRESS;
+                <span class="k">case</span> <span class="s">&quot;overnight&quot;</span> -&gt; OVERNIGHT;
+                <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                        <span class="s">&quot;Unknown shipping method: &quot;</span> + raw);
+            };
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> ShippingPolicyFactory {
+        ShippingPolicy create(ShippingMethod method) {
+            Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+            <span class="k">return</span> <span class="k">switch</span> (method) {
+                <span class="k">case</span> STANDARD -&gt; <span class="k">new</span> StandardShipping();
+                <span class="k">case</span> EXPRESS -&gt; <span class="k">new</span> ExpressShipping();
+                <span class="k">case</span> OVERNIGHT -&gt; <span class="k">new</span> OvernightShipping();
+            };
+        }
+    }
+
+    <span class="k">static</span> BigDecimal checkout(String rawMethod, Order order) {
+        ShippingMethod method = ShippingMethod.fromRequest(rawMethod);
+        <span class="k">var</span> factory = <span class="k">new</span> ShippingPolicyFactory();
+        ShippingPolicy policy = factory.create(method);
+        <span class="k">var</span> service = <span class="k">new</span> CheckoutService(policy);
+        <span class="k">return</span> service.total(order);
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> RegistryShippingFactory {
+        <span class="k">private</span> <span class="k">final</span> Map&lt;ShippingMethod, Supplier&lt;ShippingPolicy&gt;&gt; creators;</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryLesson.java · lines 119–152</figcaption><pre><code>        RegistryShippingFactory(
+                Map&lt;ShippingMethod, Supplier&lt;ShippingPolicy&gt;&gt; creators) {
+            this.creators = Map.copyOf(creators);
+            <span class="k">if</span> (!this.creators.keySet().equals(
+                    EnumSet.allOf(ShippingMethod.<span class="k">class</span>))) {
+                <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Incomplete registry&quot;</span>);
+            }
+        }
+
+        ShippingPolicy create(ShippingMethod method) {
+            Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+            <span class="k">return</span> Objects.requireNonNull(
+                    creators.get(method).get(), <span class="s">&quot;Supplier returned null&quot;</span>);
+        }
+    }
+
+    <span class="k">static</span> RegistryShippingFactory configuredRegistry() {
+        <span class="k">var</span> creators = <span class="k">new</span> EnumMap&lt;ShippingMethod,
+                Supplier&lt;ShippingPolicy&gt;&gt;(ShippingMethod.<span class="k">class</span>);
+        creators.put(ShippingMethod.STANDARD, StandardShipping::<span class="k">new</span>);
+        creators.put(ShippingMethod.EXPRESS, ExpressShipping::<span class="k">new</span>);
+        creators.put(ShippingMethod.OVERNIGHT, OvernightShipping::<span class="k">new</span>);
+        <span class="k">return</span> <span class="k">new</span> RegistryShippingFactory(creators);
+    }
+
+    <span class="k">static</span> <span class="k">void</span> check(<span class="k">boolean</span> condition, String name) {
+        <span class="k">if</span> (!condition) <span class="k">throw</span> <span class="k">new</span> AssertionError(name);
+    }
+
+    <span class="k">static</span> <span class="k">void</span> amount(String expected, BigDecimal actual) {
+        check(decimal(expected).compareTo(actual) == 0,
+                <span class="s">&quot;Expected &quot;</span> + expected + <span class="s">&quot;, got &quot;</span> + actual);
+    }</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryLesson.java · lines 153–196</figcaption><pre><code>    <span class="k">static</span> <span class="k">void</span> rejects(Class&lt;? <span class="k">extends</span> RuntimeException&gt; expected,
+                        Runnable action) {
+        <span class="k">try</span> {
+            action.run();
+        } <span class="k">catch</span> (RuntimeException error) {
+            check(expected.isInstance(error), <span class="s">&quot;Unexpected exception&quot;</span>);
+            <span class="k">return</span>;
+        }
+        <span class="k">throw</span> <span class="k">new</span> AssertionError(<span class="s">&quot;Expected &quot;</span> + expected.getSimpleName());
+    }
+
+    <span class="k">static</span> <span class="k">void</span> runChecks() {
+        <span class="k">var</span> order = <span class="k">new</span> Order(decimal(<span class="s">&quot;5&quot;</span>), decimal(<span class="s">&quot;100.00&quot;</span>));
+        <span class="k">var</span> factory = <span class="k">new</span> ShippingPolicyFactory();
+        check(factory.create(ShippingMethod.STANDARD)
+                <span class="k">instanceof</span> StandardShipping, <span class="s">&quot;Standard selection&quot;</span>);
+        check(factory.create(ShippingMethod.EXPRESS)
+                <span class="k">instanceof</span> ExpressShipping, <span class="s">&quot;Express selection&quot;</span>);
+        check(factory.create(ShippingMethod.OVERNIGHT)
+                <span class="k">instanceof</span> OvernightShipping, <span class="s">&quot;Overnight selection&quot;</span>);
+        amount(<span class="s">&quot;10.00&quot;</span>, <span class="k">new</span> StandardShipping().calculate(order));
+        amount(<span class="s">&quot;30.00&quot;</span>, <span class="k">new</span> ExpressShipping().calculate(order));
+        amount(<span class="s">&quot;60.00&quot;</span>, <span class="k">new</span> OvernightShipping().calculate(order));
+        amount(<span class="s">&quot;110.00&quot;</span>, <span class="k">new</span> CheckoutService(o -&gt; decimal(<span class="s">&quot;10.00&quot;</span>))
+                .total(order));
+        amount(<span class="s">&quot;130.00&quot;</span>, checkout(<span class="s">&quot; Express &quot;</span>, order));
+        amount(<span class="s">&quot;130.00&quot;</span>, checkoutBefore(<span class="s">&quot;express&quot;</span>, order));
+        <span class="k">var</span> registry = configuredRegistry();
+        <span class="k">for</span> (<span class="k">var</span> method : ShippingMethod.values()) {
+            check(registry.create(method).getClass()
+                    == factory.create(method).getClass(), <span class="s">&quot;Registry selection&quot;</span>);
+        }
+        amount(<span class="s">&quot;30.00&quot;</span>, registry.create(ShippingMethod.EXPRESS)
+                .calculate(order));
+        amount(<span class="s">&quot;2.47&quot;</span>, <span class="k">new</span> StandardShipping().calculate(
+                <span class="k">new</span> Order(decimal(<span class="s">&quot;1.235&quot;</span>), decimal(<span class="s">&quot;0&quot;</span>))));
+        amount(<span class="s">&quot;2.48&quot;</span>, <span class="k">new</span> StandardShipping().calculate(
+                <span class="k">new</span> Order(decimal(<span class="s">&quot;1.2375&quot;</span>), decimal(<span class="s">&quot;0&quot;</span>))));
+        rejects(IllegalArgumentException.<span class="k">class</span>,
+                () -&gt; ShippingMethod.fromRequest(<span class="s">&quot;banana&quot;</span>));
+        rejects(IllegalArgumentException.<span class="k">class</span>,
+                () -&gt; ShippingMethod.fromRequest(<span class="s">&quot; &quot;</span>));
+        rejects(IllegalArgumentException.<span class="k">class</span>,
+                () -&gt; ShippingMethod.fromRequest(<span class="k">null</span>));</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryLesson.java · lines 197–214</figcaption><pre><code>        rejects(NullPointerException.<span class="k">class</span>, () -&gt; factory.create(<span class="k">null</span>));
+        rejects(IllegalArgumentException.<span class="k">class</span>,
+                () -&gt; <span class="k">new</span> Order(decimal(<span class="s">&quot;0&quot;</span>), decimal(<span class="s">&quot;100&quot;</span>)));
+        rejects(IllegalArgumentException.<span class="k">class</span>,
+                () -&gt; <span class="k">new</span> Order(decimal(<span class="s">&quot;5&quot;</span>), decimal(<span class="s">&quot;-1&quot;</span>)));
+        rejects(ArithmeticException.<span class="k">class</span>,
+                () -&gt; <span class="k">new</span> Order(decimal(<span class="s">&quot;5&quot;</span>), decimal(<span class="s">&quot;100.001&quot;</span>)));
+        rejects(IllegalArgumentException.<span class="k">class</span>,
+                () -&gt; <span class="k">new</span> RegistryShippingFactory(Map.of()));
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(String[] args) {
+        <span class="k">var</span> order = <span class="k">new</span> Order(decimal(<span class="s">&quot;5&quot;</span>), decimal(<span class="s">&quot;100.00&quot;</span>));
+        System.out.println(<span class="s">&quot;Checkout total: &quot;</span> + checkout(<span class="s">&quot;express&quot;</span>, order));
+        runChecks();
+        System.out.println(<span class="s">&quot;All shipping checks passed.&quot;</span>);
+    }
+}</code></pre></figure></details></section><section id="source-workflow" class="chapter"><div class="chapter-label">B / Source appendix</div><h2>Factory Method: complete source</h2><p>A standalone workflow with local carrier labels, an in-memory saving callback and checks. Copy all consecutive blocks into <code>FactoryMethodLesson.java</code>; they form one complete file.</p><details class="source-details" open><summary>Complete source: FactoryMethodLesson.java</summary><div class="download-row no-print"><button type="button" data-download="FactoryMethodLesson.java">Download FactoryMethodLesson.java</button><button type="button" data-copy="FactoryMethodLesson.java">Copy complete file</button></div><figure class="code source-chunk"><figcaption>FactoryMethodLesson.java · lines 1–42</figcaption><pre><code><span class="k">import</span> java.util.ArrayList;
+<span class="k">import</span> java.util.List;
+<span class="k">import</span> java.util.Objects;
+<span class="k">import</span> java.util.function.Consumer;
+
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> FactoryMethodLesson {
+    <span class="k">record</span> Order(String id) {}
+
+    <span class="k">interface</span> ShippingLabel {
+        String render();
+    }
+
+    <span class="c1">// Local teaching objects; these do not call carrier APIs.</span>
+    <span class="k">record</span> FedExLabel(String orderId) <span class="k">implements</span> ShippingLabel {
+        <span class="k">public</span> String render() { <span class="k">return</span> <span class="s">&quot;FedEx label: &quot;</span> + orderId; }
+    }
+
+    <span class="k">record</span> UpsLabel(String orderId) <span class="k">implements</span> ShippingLabel {
+        <span class="k">public</span> String render() { <span class="k">return</span> <span class="s">&quot;UPS label: &quot;</span> + orderId; }
+    }
+
+    <span class="k">abstract</span> <span class="k">static</span> <span class="k">class</span> ShippingWorkflow {
+        <span class="k">private</span> <span class="k">final</span> Consumer&lt;ShippingLabel&gt; save;
+
+        ShippingWorkflow(Consumer&lt;ShippingLabel&gt; save) {
+            this.save = Objects.requireNonNull(save, <span class="s">&quot;save&quot;</span>);
+        }
+
+        <span class="k">final</span> ShippingLabel process(Order order) {
+            Objects.requireNonNull(order, <span class="s">&quot;order&quot;</span>);
+            <span class="k">if</span> (order.id() == <span class="k">null</span> || order.id().isBlank()) {
+                <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Missing order id&quot;</span>);
+            }
+            ShippingLabel label = Objects.requireNonNull(
+                    createLabel(order), <span class="s">&quot;label&quot;</span>);
+            save.accept(label);
+            <span class="k">return</span> label;
+        }
+
+        <span class="k">protected</span> <span class="k">abstract</span> ShippingLabel createLabel(Order order);
+    }</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryMethodLesson.java · lines 43–86</figcaption><pre><code>    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> FedExWorkflow <span class="k">extends</span> ShippingWorkflow {
+        FedExWorkflow(Consumer&lt;ShippingLabel&gt; save) { super(save); }
+
+        @Override
+        <span class="k">protected</span> ShippingLabel createLabel(Order order) {
+            <span class="k">return</span> <span class="k">new</span> FedExLabel(order.id());
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> UpsWorkflow <span class="k">extends</span> ShippingWorkflow {
+        UpsWorkflow(Consumer&lt;ShippingLabel&gt; save) { super(save); }
+
+        @Override
+        <span class="k">protected</span> ShippingLabel createLabel(Order order) {
+            <span class="k">return</span> <span class="k">new</span> UpsLabel(order.id());
+        }
+    }
+
+    <span class="k">static</span> <span class="k">void</span> check(<span class="k">boolean</span> condition, String name) {
+        <span class="k">if</span> (!condition) <span class="k">throw</span> <span class="k">new</span> AssertionError(name);
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(String[] args) {
+        List&lt;ShippingLabel&gt; saved = <span class="k">new</span> ArrayList&lt;&gt;();
+        <span class="k">var</span> order = <span class="k">new</span> Order(<span class="s">&quot;ORD-42&quot;</span>);
+        ShippingWorkflow fedEx = <span class="k">new</span> FedExWorkflow(saved::add);
+        ShippingWorkflow ups = <span class="k">new</span> UpsWorkflow(saved::add);
+        ShippingLabel first = fedEx.process(order);
+        ShippingLabel second = ups.process(order);
+        check(first <span class="k">instanceof</span> FedExLabel, <span class="s">&quot;FedEx product&quot;</span>);
+        check(second <span class="k">instanceof</span> UpsLabel, <span class="s">&quot;UPS product&quot;</span>);
+        check(first.render().equals(<span class="s">&quot;FedEx label: ORD-42&quot;</span>), <span class="s">&quot;Order forwarded&quot;</span>);
+        check(saved.size() == 2 &amp;&amp; saved.get(0) == first
+                &amp;&amp; saved.get(1) == second, <span class="s">&quot;Products saved once in order&quot;</span>);
+        <span class="k">boolean</span> rejected = <span class="k">false</span>;
+        <span class="k">try</span> {
+            fedEx.process(<span class="k">new</span> Order(<span class="s">&quot; &quot;</span>));
+        } <span class="k">catch</span> (IllegalArgumentException expected) {
+            rejected = <span class="k">true</span>;
+        }
+        check(rejected &amp;&amp; saved.size() == 2, <span class="s">&quot;Reject before saving&quot;</span>);
+        System.out.println(first.render());
+        System.out.println(second.render());
+        System.out.println(<span class="s">&quot;All workflow checks passed.&quot;</span>);</code></pre></figure><figure class="code source-chunk"><figcaption>FactoryMethodLesson.java · lines 87–88</figcaption><pre><code>    }
+}</code></pre></figure></details></section><section id="source-payment" class="chapter"><div class="chapter-label">C / Source appendix</div><h2>Payment: reference solution</h2><p>Open after trying the exercise. All processors are local stubs. Copy all consecutive blocks into <code>PaymentSolution.java</code>; they form one complete file.</p><details class="source-details" open><summary>Complete source: PaymentSolution.java</summary><div class="download-row no-print"><button type="button" data-download="PaymentSolution.java">Download PaymentSolution.java</button><button type="button" data-copy="PaymentSolution.java">Copy complete file</button></div><figure class="code source-chunk"><figcaption>PaymentSolution.java · lines 1–41</figcaption><pre><code><span class="k">import</span> java.math.BigDecimal;
+<span class="k">import</span> java.math.RoundingMode;
+<span class="k">import</span> java.util.Locale;
+<span class="k">import</span> java.util.Objects;
+
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> PaymentSolution {
+    <span class="k">enum</span> PaymentMethod {
+        CARD, PAYPAL, BANK;
+
+        <span class="k">static</span> PaymentMethod fromRequest(String raw) {
+            <span class="k">if</span> (raw == <span class="k">null</span>) {
+                <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Missing payment method&quot;</span>);
+            }
+            <span class="k">return</span> <span class="k">switch</span> (raw.strip().toLowerCase(Locale.ROOT)) {
+                <span class="k">case</span> <span class="s">&quot;card&quot;</span> -&gt; CARD;
+                <span class="k">case</span> <span class="s">&quot;paypal&quot;</span> -&gt; PAYPAL;
+                <span class="k">case</span> <span class="s">&quot;bank&quot;</span> -&gt; BANK;
+                <span class="k">default</span> -&gt; <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(
+                        <span class="s">&quot;Unknown payment method: &quot;</span> + raw);
+            };
+        }
+    }
+
+    @FunctionalInterface
+    <span class="k">interface</span> PaymentProcessor {
+        String pay(BigDecimal amount);
+    }
+
+    <span class="c1">// Local stubs only: no SDKs, network calls or real payments.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> StripeCardProcessor <span class="k">implements</span> PaymentProcessor {
+        <span class="k">public</span> String pay(BigDecimal amount) { <span class="k">return</span> <span class="s">&quot;card:&quot;</span> + amount; }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> PayPalProcessor <span class="k">implements</span> PaymentProcessor {
+        <span class="k">public</span> String pay(BigDecimal amount) { <span class="k">return</span> <span class="s">&quot;paypal:&quot;</span> + amount; }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> BankTransferProcessor <span class="k">implements</span> PaymentProcessor {
+        <span class="k">public</span> String pay(BigDecimal amount) { <span class="k">return</span> <span class="s">&quot;bank:&quot;</span> + amount; }
+    }</code></pre></figure><figure class="code source-chunk"><figcaption>PaymentSolution.java · lines 42–85</figcaption><pre><code>    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> PaymentProcessorFactory {
+        PaymentProcessor create(PaymentMethod method) {
+            Objects.requireNonNull(method, <span class="s">&quot;method&quot;</span>);
+            <span class="k">return</span> <span class="k">switch</span> (method) {
+                <span class="k">case</span> CARD -&gt; <span class="k">new</span> StripeCardProcessor();
+                <span class="k">case</span> PAYPAL -&gt; <span class="k">new</span> PayPalProcessor();
+                <span class="k">case</span> BANK -&gt; <span class="k">new</span> BankTransferProcessor();
+            };
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> PaymentService {
+        <span class="k">private</span> <span class="k">final</span> PaymentProcessor processor;
+
+        PaymentService(PaymentProcessor processor) {
+            this.processor = Objects.requireNonNull(processor, <span class="s">&quot;processor&quot;</span>);
+        }
+
+        String pay(BigDecimal amount) {
+            Objects.requireNonNull(amount, <span class="s">&quot;amount&quot;</span>);
+            <span class="k">if</span> (amount.signum() &lt;= 0) {
+                <span class="k">throw</span> <span class="k">new</span> IllegalArgumentException(<span class="s">&quot;Amount must be positive&quot;</span>);
+            }
+            <span class="k">return</span> processor.pay(amount.setScale(2, RoundingMode.UNNECESSARY));
+        }
+    }
+
+    <span class="k">static</span> <span class="k">void</span> check(<span class="k">boolean</span> condition, String name) {
+        <span class="k">if</span> (!condition) <span class="k">throw</span> <span class="k">new</span> AssertionError(name);
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(String[] args) {
+        <span class="k">var</span> factory = <span class="k">new</span> PaymentProcessorFactory();
+        <span class="k">var</span> value = <span class="k">new</span> BigDecimal(<span class="s">&quot;25.00&quot;</span>);
+        check(factory.create(PaymentMethod.CARD)
+                <span class="k">instanceof</span> StripeCardProcessor, <span class="s">&quot;Card selection&quot;</span>);
+        check(factory.create(PaymentMethod.PAYPAL)
+                <span class="k">instanceof</span> PayPalProcessor, <span class="s">&quot;PayPal selection&quot;</span>);
+        check(factory.create(PaymentMethod.BANK)
+                <span class="k">instanceof</span> BankTransferProcessor, <span class="s">&quot;Bank selection&quot;</span>);
+        check(<span class="k">new</span> StripeCardProcessor().pay(value).equals(<span class="s">&quot;card:25.00&quot;</span>),
+                <span class="s">&quot;Card behavior&quot;</span>);
+        check(<span class="k">new</span> PayPalProcessor().pay(value).equals(<span class="s">&quot;paypal:25.00&quot;</span>),
+                <span class="s">&quot;PayPal behavior&quot;</span>);</code></pre></figure><figure class="code source-chunk"><figcaption>PaymentSolution.java · lines 86–104</figcaption><pre><code>        check(<span class="k">new</span> BankTransferProcessor().pay(value).equals(<span class="s">&quot;bank:25.00&quot;</span>),
+                <span class="s">&quot;Bank behavior&quot;</span>);
+        <span class="k">var</span> fake = <span class="k">new</span> PaymentService(amount -&gt; <span class="s">&quot;fake:&quot;</span> + amount);
+        check(fake.pay(value).equals(<span class="s">&quot;fake:25.00&quot;</span>), <span class="s">&quot;Delegation&quot;</span>);
+        check(PaymentMethod.fromRequest(<span class="s">&quot; CARD &quot;</span>) == PaymentMethod.CARD,
+                <span class="s">&quot;Input normalization&quot;</span>);
+        <span class="k">boolean</span> rejected = <span class="k">false</span>;
+        <span class="k">try</span> { fake.pay(BigDecimal.ZERO); }
+        <span class="k">catch</span> (IllegalArgumentException expected) { rejected = <span class="k">true</span>; }
+        check(rejected, <span class="s">&quot;Invalid amount&quot;</span>);
+        rejected = <span class="k">false</span>;
+        <span class="k">try</span> { PaymentMethod.fromRequest(<span class="s">&quot;banana&quot;</span>); }
+        <span class="k">catch</span> (IllegalArgumentException expected) { rejected = <span class="k">true</span>; }
+        check(rejected, <span class="s">&quot;Invalid method&quot;</span>);
+        <span class="k">var</span> processor = factory.create(PaymentMethod.fromRequest(<span class="s">&quot;card&quot;</span>));
+        System.out.println(<span class="k">new</span> PaymentService(processor).pay(value));
+        System.out.println(<span class="s">&quot;All payment checks passed.&quot;</span>);
+    }
+}</code></pre></figure></details></section><section id="references" class="chapter references"><div class="chapter-label">References / official documentation</div><h2>Sources and verification</h2><p>The lesson’s problem sequence is adapted from the supplied Lesson 2. Java language and API statements were checked against these official references on 1 September 2026. The examples, fictional rates and design trade-offs are teaching material.</p><ol><li id="ref-1"><a href="https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-factories">Microsoft Learn · Design Patterns: Factories</a><p>Terminology: Simple Factory, Factory Method and Abstract Factory.</p><span class="source-url">https://learn.microsoft.com/en-us/shows/visual-studio-toolbox/design-patterns-factories</span></li><li id="ref-2"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-8.html">Java Language Specification 25 · Classes</a><p>Enums (§8.9), records and compact constructors (§8.10), and nested classes.</p><span class="source-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-8.html</span></li><li id="ref-3"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html">Java SE 25 API · BigDecimal</a><p>Decimal construction, immutability, scale, rounding and equality.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html</span></li><li id="ref-4"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.11.1.1">Java Language Specification 25 · Exhaustive switch blocks</a><p>Exhaustiveness for enum switches; see also switch expressions in Chapter 15.</p><span class="source-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-14.html#jls-14.11.1.1</span></li><li id="ref-5"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html">Java SE 25 API · Supplier</a><p>The get() contract and lack of a freshness guarantee.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html</span></li><li id="ref-6"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/EnumMap.html">Java SE 25 API · EnumMap</a><p>Maps with enum keys.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/EnumMap.html</span></li><li id="ref-7"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html">Java SE 25 API · String</a><p>strip(), isBlank() and locale-aware case conversion.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html</span></li><li id="ref-8"><a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-15.html">Java Language Specification 25 · Expressions</a><p>Lambdas (§15.27), method references (§15.13) and switch expressions (§15.28).</p><span class="source-url">https://docs.oracle.com/javase/specs/jls/se25/html/jls-15.html</span></li><li id="ref-9"><a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html">JDK 25 · javac command</a><p>Compilation, --release and -Xlint.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html</span></li><li id="ref-10"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html">Java SE 25 API · Map</a><p>copyOf() creates an unmodifiable map and rejects null keys and values.</p><span class="source-url">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html</span></li></ol><p>Lab execution: OpenJDK 17.0.20, compiler warnings enabled, three successful main programs. Java 25 compatibility was checked against the references; execution on Java 25 was not available.</p></section><footer class="footer">DP / Lesson 2 · First-principles design practice · Java 25-compatible edition</footer></main></div><script>
+const files = {"FactoryMethodLesson.java": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.Objects;\nimport java.util.function.Consumer;\n\npublic final class FactoryMethodLesson {\n    // region products\n    record Order(String id) {}\n\n    interface ShippingLabel {\n        String render();\n    }\n\n    // Local teaching objects; these do not call carrier APIs.\n    record FedExLabel(String orderId) implements ShippingLabel {\n        public String render() { return \"FedEx label: \" + orderId; }\n    }\n\n    record UpsLabel(String orderId) implements ShippingLabel {\n        public String render() { return \"UPS label: \" + orderId; }\n    }\n    // endregion\n\n    // region workflow\n    abstract static class ShippingWorkflow {\n        private final Consumer<ShippingLabel> save;\n\n        ShippingWorkflow(Consumer<ShippingLabel> save) {\n            this.save = Objects.requireNonNull(save, \"save\");\n        }\n\n        final ShippingLabel process(Order order) {\n            Objects.requireNonNull(order, \"order\");\n            if (order.id() == null || order.id().isBlank()) {\n                throw new IllegalArgumentException(\"Missing order id\");\n            }\n            ShippingLabel label = Objects.requireNonNull(\n                    createLabel(order), \"label\");\n            save.accept(label);\n            return label;\n        }\n\n        protected abstract ShippingLabel createLabel(Order order);\n    }\n    // endregion\n\n    // region subclasses\n    static final class FedExWorkflow extends ShippingWorkflow {\n        FedExWorkflow(Consumer<ShippingLabel> save) { super(save); }\n\n        @Override\n        protected ShippingLabel createLabel(Order order) {\n            return new FedExLabel(order.id());\n        }\n    }\n\n    static final class UpsWorkflow extends ShippingWorkflow {\n        UpsWorkflow(Consumer<ShippingLabel> save) { super(save); }\n\n        @Override\n        protected ShippingLabel createLabel(Order order) {\n            return new UpsLabel(order.id());\n        }\n    }\n    // endregion\n\n    static void check(boolean condition, String name) {\n        if (!condition) throw new AssertionError(name);\n    }\n\n    public static void main(String[] args) {\n        List<ShippingLabel> saved = new ArrayList<>();\n        var order = new Order(\"ORD-42\");\n        ShippingWorkflow fedEx = new FedExWorkflow(saved::add);\n        ShippingWorkflow ups = new UpsWorkflow(saved::add);\n        ShippingLabel first = fedEx.process(order);\n        ShippingLabel second = ups.process(order);\n        check(first instanceof FedExLabel, \"FedEx product\");\n        check(second instanceof UpsLabel, \"UPS product\");\n        check(first.render().equals(\"FedEx label: ORD-42\"), \"Order forwarded\");\n        check(saved.size() == 2 && saved.get(0) == first\n                && saved.get(1) == second, \"Products saved once in order\");\n        boolean rejected = false;\n        try {\n            fedEx.process(new Order(\" \"));\n        } catch (IllegalArgumentException expected) {\n            rejected = true;\n        }\n        check(rejected && saved.size() == 2, \"Reject before saving\");\n        System.out.println(first.render());\n        System.out.println(second.render());\n        System.out.println(\"All workflow checks passed.\");\n    }\n}\n", "PaymentSolution.java": "import java.math.BigDecimal;\nimport java.math.RoundingMode;\nimport java.util.Locale;\nimport java.util.Objects;\n\npublic final class PaymentSolution {\n    enum PaymentMethod {\n        CARD, PAYPAL, BANK;\n\n        static PaymentMethod fromRequest(String raw) {\n            if (raw == null) {\n                throw new IllegalArgumentException(\"Missing payment method\");\n            }\n            return switch (raw.strip().toLowerCase(Locale.ROOT)) {\n                case \"card\" -> CARD;\n                case \"paypal\" -> PAYPAL;\n                case \"bank\" -> BANK;\n                default -> throw new IllegalArgumentException(\n                        \"Unknown payment method: \" + raw);\n            };\n        }\n    }\n\n    @FunctionalInterface\n    interface PaymentProcessor {\n        String pay(BigDecimal amount);\n    }\n\n    // Local stubs only: no SDKs, network calls or real payments.\n    static final class StripeCardProcessor implements PaymentProcessor {\n        public String pay(BigDecimal amount) { return \"card:\" + amount; }\n    }\n\n    static final class PayPalProcessor implements PaymentProcessor {\n        public String pay(BigDecimal amount) { return \"paypal:\" + amount; }\n    }\n\n    static final class BankTransferProcessor implements PaymentProcessor {\n        public String pay(BigDecimal amount) { return \"bank:\" + amount; }\n    }\n\n    static final class PaymentProcessorFactory {\n        PaymentProcessor create(PaymentMethod method) {\n            Objects.requireNonNull(method, \"method\");\n            return switch (method) {\n                case CARD -> new StripeCardProcessor();\n                case PAYPAL -> new PayPalProcessor();\n                case BANK -> new BankTransferProcessor();\n            };\n        }\n    }\n\n    static final class PaymentService {\n        private final PaymentProcessor processor;\n\n        PaymentService(PaymentProcessor processor) {\n            this.processor = Objects.requireNonNull(processor, \"processor\");\n        }\n\n        String pay(BigDecimal amount) {\n            Objects.requireNonNull(amount, \"amount\");\n            if (amount.signum() <= 0) {\n                throw new IllegalArgumentException(\"Amount must be positive\");\n            }\n            return processor.pay(amount.setScale(2, RoundingMode.UNNECESSARY));\n        }\n    }\n\n    static void check(boolean condition, String name) {\n        if (!condition) throw new AssertionError(name);\n    }\n\n    public static void main(String[] args) {\n        var factory = new PaymentProcessorFactory();\n        var value = new BigDecimal(\"25.00\");\n        check(factory.create(PaymentMethod.CARD)\n                instanceof StripeCardProcessor, \"Card selection\");\n        check(factory.create(PaymentMethod.PAYPAL)\n                instanceof PayPalProcessor, \"PayPal selection\");\n        check(factory.create(PaymentMethod.BANK)\n                instanceof BankTransferProcessor, \"Bank selection\");\n        check(new StripeCardProcessor().pay(value).equals(\"card:25.00\"),\n                \"Card behavior\");\n        check(new PayPalProcessor().pay(value).equals(\"paypal:25.00\"),\n                \"PayPal behavior\");\n        check(new BankTransferProcessor().pay(value).equals(\"bank:25.00\"),\n                \"Bank behavior\");\n        var fake = new PaymentService(amount -> \"fake:\" + amount);\n        check(fake.pay(value).equals(\"fake:25.00\"), \"Delegation\");\n        check(PaymentMethod.fromRequest(\" CARD \") == PaymentMethod.CARD,\n                \"Input normalization\");\n        boolean rejected = false;\n        try { fake.pay(BigDecimal.ZERO); }\n        catch (IllegalArgumentException expected) { rejected = true; }\n        check(rejected, \"Invalid amount\");\n        rejected = false;\n        try { PaymentMethod.fromRequest(\"banana\"); }\n        catch (IllegalArgumentException expected) { rejected = true; }\n        check(rejected, \"Invalid method\");\n        var processor = factory.create(PaymentMethod.fromRequest(\"card\"));\n        System.out.println(new PaymentService(processor).pay(value));\n        System.out.println(\"All payment checks passed.\");\n    }\n}\n", "FactoryLesson.java": "import java.math.BigDecimal;\nimport java.math.RoundingMode;\nimport java.util.EnumMap;\nimport java.util.EnumSet;\nimport java.util.Locale;\nimport java.util.Map;\nimport java.util.Objects;\nimport java.util.function.Supplier;\n\npublic final class FactoryLesson {\n    // region model\n    record Order(BigDecimal weightKg, BigDecimal subtotal) {\n        Order {\n            Objects.requireNonNull(weightKg, \"weightKg\");\n            Objects.requireNonNull(subtotal, \"subtotal\");\n            if (weightKg.signum() <= 0 || subtotal.signum() < 0) {\n                throw new IllegalArgumentException(\"Invalid order\");\n            }\n            subtotal = subtotal.setScale(2, RoundingMode.UNNECESSARY);\n        }\n    }\n\n    @FunctionalInterface\n    interface ShippingPolicy {\n        BigDecimal calculate(Order order);\n    }\n\n    static BigDecimal decimal(String value) {\n        return new BigDecimal(value);\n    }\n\n    static BigDecimal money(BigDecimal value) {\n        return value.setScale(2, RoundingMode.HALF_UP);\n    }\n    // endregion\n\n    // region strategies\n    static final class StandardShipping implements ShippingPolicy {\n        public BigDecimal calculate(Order order) {\n            return money(order.weightKg().multiply(decimal(\"2.00\")));\n        }\n    }\n\n    static final class ExpressShipping implements ShippingPolicy {\n        public BigDecimal calculate(Order order) {\n            return money(order.weightKg().multiply(decimal(\"4.00\"))\n                    .add(decimal(\"10.00\")));\n        }\n    }\n\n    static final class OvernightShipping implements ShippingPolicy {\n        public BigDecimal calculate(Order order) {\n            return money(order.weightKg().multiply(decimal(\"7.00\"))\n                    .add(decimal(\"25.00\")));\n        }\n    }\n    // endregion\n\n    // region checkout\n    static final class CheckoutService {\n        private final ShippingPolicy shipping;\n\n        CheckoutService(ShippingPolicy shipping) {\n            this.shipping = Objects.requireNonNull(shipping, \"shipping\");\n        }\n\n        BigDecimal total(Order order) {\n            Objects.requireNonNull(order, \"order\");\n            return order.subtotal().add(shipping.calculate(order));\n        }\n    }\n    // endregion\n\n    // region before\n    static BigDecimal checkoutBefore(String method, Order order) {\n        Objects.requireNonNull(method, \"method\");\n        ShippingPolicy policy = switch (method) {\n            case \"standard\" -> new StandardShipping();\n            case \"express\" -> new ExpressShipping();\n            case \"overnight\" -> new OvernightShipping();\n            default -> throw new IllegalArgumentException(\n                    \"Unknown shipping method: \" + method);\n        };\n        return new CheckoutService(policy).total(order);\n    }\n    // endregion\n\n    // region method\n    enum ShippingMethod {\n        STANDARD, EXPRESS, OVERNIGHT;\n\n        static ShippingMethod fromRequest(String raw) {\n            if (raw == null) {\n                throw new IllegalArgumentException(\"Missing shipping method\");\n            }\n            return switch (raw.strip().toLowerCase(Locale.ROOT)) {\n                case \"standard\" -> STANDARD;\n                case \"express\" -> EXPRESS;\n                case \"overnight\" -> OVERNIGHT;\n                default -> throw new IllegalArgumentException(\n                        \"Unknown shipping method: \" + raw);\n            };\n        }\n    }\n    // endregion\n\n    // region factory\n    static final class ShippingPolicyFactory {\n        ShippingPolicy create(ShippingMethod method) {\n            Objects.requireNonNull(method, \"method\");\n            return switch (method) {\n                case STANDARD -> new StandardShipping();\n                case EXPRESS -> new ExpressShipping();\n                case OVERNIGHT -> new OvernightShipping();\n            };\n        }\n    }\n    // endregion\n\n    // region composition\n    static BigDecimal checkout(String rawMethod, Order order) {\n        ShippingMethod method = ShippingMethod.fromRequest(rawMethod);\n        var factory = new ShippingPolicyFactory();\n        ShippingPolicy policy = factory.create(method);\n        var service = new CheckoutService(policy);\n        return service.total(order);\n    }\n    // endregion\n\n    // region registry\n    static final class RegistryShippingFactory {\n        private final Map<ShippingMethod, Supplier<ShippingPolicy>> creators;\n\n        RegistryShippingFactory(\n                Map<ShippingMethod, Supplier<ShippingPolicy>> creators) {\n            this.creators = Map.copyOf(creators);\n            if (!this.creators.keySet().equals(\n                    EnumSet.allOf(ShippingMethod.class))) {\n                throw new IllegalArgumentException(\"Incomplete registry\");\n            }\n        }\n\n        ShippingPolicy create(ShippingMethod method) {\n            Objects.requireNonNull(method, \"method\");\n            return Objects.requireNonNull(\n                    creators.get(method).get(), \"Supplier returned null\");\n        }\n    }\n\n    static RegistryShippingFactory configuredRegistry() {\n        var creators = new EnumMap<ShippingMethod,\n                Supplier<ShippingPolicy>>(ShippingMethod.class);\n        creators.put(ShippingMethod.STANDARD, StandardShipping::new);\n        creators.put(ShippingMethod.EXPRESS, ExpressShipping::new);\n        creators.put(ShippingMethod.OVERNIGHT, OvernightShipping::new);\n        return new RegistryShippingFactory(creators);\n    }\n    // endregion\n\n    // region checks\n    static void check(boolean condition, String name) {\n        if (!condition) throw new AssertionError(name);\n    }\n\n    static void amount(String expected, BigDecimal actual) {\n        check(decimal(expected).compareTo(actual) == 0,\n                \"Expected \" + expected + \", got \" + actual);\n    }\n\n    static void rejects(Class<? extends RuntimeException> expected,\n                        Runnable action) {\n        try {\n            action.run();\n        } catch (RuntimeException error) {\n            check(expected.isInstance(error), \"Unexpected exception\");\n            return;\n        }\n        throw new AssertionError(\"Expected \" + expected.getSimpleName());\n    }\n\n    static void runChecks() {\n        var order = new Order(decimal(\"5\"), decimal(\"100.00\"));\n        var factory = new ShippingPolicyFactory();\n        check(factory.create(ShippingMethod.STANDARD)\n                instanceof StandardShipping, \"Standard selection\");\n        check(factory.create(ShippingMethod.EXPRESS)\n                instanceof ExpressShipping, \"Express selection\");\n        check(factory.create(ShippingMethod.OVERNIGHT)\n                instanceof OvernightShipping, \"Overnight selection\");\n        amount(\"10.00\", new StandardShipping().calculate(order));\n        amount(\"30.00\", new ExpressShipping().calculate(order));\n        amount(\"60.00\", new OvernightShipping().calculate(order));\n        amount(\"110.00\", new CheckoutService(o -> decimal(\"10.00\"))\n                .total(order));\n        amount(\"130.00\", checkout(\" Express \", order));\n        amount(\"130.00\", checkoutBefore(\"express\", order));\n        var registry = configuredRegistry();\n        for (var method : ShippingMethod.values()) {\n            check(registry.create(method).getClass()\n                    == factory.create(method).getClass(), \"Registry selection\");\n        }\n        amount(\"30.00\", registry.create(ShippingMethod.EXPRESS)\n                .calculate(order));\n        amount(\"2.47\", new StandardShipping().calculate(\n                new Order(decimal(\"1.235\"), decimal(\"0\"))));\n        amount(\"2.48\", new StandardShipping().calculate(\n                new Order(decimal(\"1.2375\"), decimal(\"0\"))));\n        rejects(IllegalArgumentException.class,\n                () -> ShippingMethod.fromRequest(\"banana\"));\n        rejects(IllegalArgumentException.class,\n                () -> ShippingMethod.fromRequest(\" \"));\n        rejects(IllegalArgumentException.class,\n                () -> ShippingMethod.fromRequest(null));\n        rejects(NullPointerException.class, () -> factory.create(null));\n        rejects(IllegalArgumentException.class,\n                () -> new Order(decimal(\"0\"), decimal(\"100\")));\n        rejects(IllegalArgumentException.class,\n                () -> new Order(decimal(\"5\"), decimal(\"-1\")));\n        rejects(ArithmeticException.class,\n                () -> new Order(decimal(\"5\"), decimal(\"100.001\")));\n        rejects(IllegalArgumentException.class,\n                () -> new RegistryShippingFactory(Map.of()));\n    }\n    // endregion\n\n    // region main\n    public static void main(String[] args) {\n        var order = new Order(decimal(\"5\"), decimal(\"100.00\"));\n        System.out.println(\"Checkout total: \" + checkout(\"express\", order));\n        runChecks();\n        System.out.println(\"All shipping checks passed.\");\n    }\n    // endregion\n}\n"};
+const notice = document.getElementById('notice');
+document.querySelectorAll('details').forEach(d => d.open = false);
+document.querySelectorAll('[data-download]').forEach(button => button.addEventListener('click', () => {
+  const name = button.dataset.download;
+  const url = URL.createObjectURL(new Blob([files[name]], {type:'text/plain;charset=utf-8'}));
+  const link = document.createElement('a'); link.href=url; link.download=name;
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}));
+document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(files[button.dataset.copy]); button.textContent='Copied'; }
+  catch { button.textContent='Select and copy the source below'; }
+}));
+document.getElementById('expand').addEventListener('click', () => {
+  const allOpen = [...document.querySelectorAll('details')].every(d => d.open);
+  document.querySelectorAll('details').forEach(d => d.open = !allOpen);
+  document.getElementById('expand').textContent=allOpen?'Expand answers & source':'Collapse answers & source';
+});
+let printState;
+function preparePrint(){
+  if(!printState) printState=[...document.querySelectorAll('details')].map(d => [d,d.open]);
+  document.querySelectorAll('details').forEach(d=>d.open=true);
+}
+function restorePrint(){ if(printState){printState.forEach(([d,state])=>d.open=state);printState=undefined;} }
+window.addEventListener('beforeprint',preparePrint);
+window.addEventListener('afterprint',restorePrint);
+document.getElementById('print').addEventListener('click',()=>{preparePrint();window.print();});
+const method=document.getElementById('trace-method'), weight=document.getElementById('trace-weight');
+function trace(){
+  const rules={standard:[2,0,'StandardShipping'],express:[4,10,'ExpressShipping'],overnight:[7,25,'OvernightShipping']};
+  const [rate,base,type]=rules[method.value], kg=Number(weight.value), cost=kg*rate+base;
+  document.getElementById('trace-result').innerHTML=`<strong>${method.value.toUpperCase()} → ${type}</strong><span>Shipping: ${kg} × ${rate} + ${base} = ${cost.toFixed(2)}</span><span>Checkout: 100.00 + ${cost.toFixed(2)} = <b>${(100+cost).toFixed(2)}</b></span>`;
+}
+method.addEventListener('change',trace);weight.addEventListener('change',trace);
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{
+  const target=document.getElementById(a.getAttribute('href').slice(1));
+  if(target){target.querySelectorAll('details.source-details').forEach(d=>d.open=true);}
+}));
+</script></body></html>
