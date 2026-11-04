@@ -94,3 +94,16 @@ repetitive designs.
 I recommend beginning with Card Payment Authorization, covering the essential
 fundamentals as they appear. It offers the best starting point for the
 highest-priority concepts.
+
+01-card-payment-authorization
+02-double-entry-ledger
+03-e-commerce-checkout
+04-multi-region-transactional-system
+05-legacy_mainframe-modernization
+06-real-time-fraud-detection
+07-transactional-outbox
+08-distributed-rate-limiter
+09-b2b-partner-API
+10-cdc-pipeline
+11-disaster-recovery
+12-ticket booking

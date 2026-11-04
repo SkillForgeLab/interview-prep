@@ -1,0 +1,486 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Design 5 — Real-Time Fraud Detection System</title><style>
+/* The original PDF skill style sheet is embedded below. */
+/* Architect's Field Notes — original study-guide design recreation.
+   Standalone builder embeds this file into its generated HTML. */
+:root {
+  --navy: #112c3a;
+  --header: #193a4b;
+  --ink: #273944;
+  --heading: #17313e;
+  --muted: #75838d;
+  --line: #d9e2e7;
+  --zebra: #f6f8f9;
+  --accent: #64c8e6;
+  --accent-soft: #eaf8fc;
+}
+@page {
+  size: A4;
+  margin: 19mm 19mm 19mm;
+  @top-left {
+    content: "INTERVIEW / FIELD GUIDE";
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  @top-right {
+    content: string(running-topic);
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .02em;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+    color: #9aa5ae;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 6.3pt;
+    letter-spacing: .03em;
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page, decimal-leading-zero);
+    color: #394b56;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-weight: 700;
+    font-size: 7pt;
+    vertical-align: middle;
+  }
+}
+@page cover {
+  size: A4;
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Inter", "DejaVu Sans", sans-serif;
+  font-size: 9.4pt;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: #fff;
+  overflow-wrap: break-word;
+}
+.cover {
+  page: cover;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  overflow: hidden;
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 29.6mm 26mm;
+}
+.cover::before, .cover::after {
+  content: "";
+  position: absolute;
+  border: .55pt solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
+.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
+.cover-brand {
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: .31em;
+  text-transform: uppercase;
+  color: #dceaf0;
+}
+.cover-series {
+  font-size: 8pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #98b3c1;
+  margin-top: 7mm;
+}
+.cover-accent-bar {
+  position: absolute;
+  left: 26mm; top: 80mm;
+  height: 3.5mm; width: 21mm;
+  background: var(--accent);
+}
+.cover-title {
+  position: absolute;
+  left: 25.5mm; right: 25mm; top: 97mm;
+  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+  font-size: 42pt;
+  font-weight: 800;
+  letter-spacing: -.043em;
+  line-height: 1.08;
+  color: #fff;
+}
+.cover-title .second { display: block; color: var(--accent); }
+.cover-title.long { font-size: 37pt; }
+.cover-sub {
+  position: absolute;
+  left: 26mm; right: 31mm; top: 173.5mm;
+  color: #bdcdd5;
+  font-size: 11.5pt;
+  line-height: 1.7;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.cover-note {
+  color: #91aab7;
+  text-transform: none;
+  font-size: 9pt;
+  letter-spacing: .01em;
+  margin-top: 7mm;
+  line-height: 1.6;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 31mm; left: 26mm;
+  font-size: 7.8pt;
+  line-height: 1.9;
+  letter-spacing: .065em;
+  color: #cfdae0;
+}
+.cover-rule {
+  position: absolute;
+  bottom: 62mm; height: .35pt;
+  left: 26mm; right: 26mm;
+  background: rgba(255,255,255,.15);
+}
+.cover-number {
+  position: absolute;
+  bottom: 29mm; right: 26mm;
+  color: var(--accent);
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 39pt;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+/* Introduction + automatically generated navigable contents. */
+.preface { break-after: page; }
+.preface-label, .toc-overline {
+  color: var(--accent);
+  font-size: 7.6pt;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+.preface h1 { display: none; }
+.preface h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: var(--heading);
+  margin: 5mm 0 5mm;
+  border-bottom: .5pt solid var(--line);
+  padding-bottom: 2.5mm;
+}
+.preface p { font-size: 9.5pt; line-height: 1.6; }
+.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
+.toc h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 21pt;
+  letter-spacing: -.03em;
+  margin: 2mm 0 5mm;
+  border: 0;
+  padding: 0;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li {
+  display: flex;
+  align-items: baseline;
+  gap: 5mm;
+  font-size: 9.1pt;
+  padding: 2.7mm 1mm;
+  border-top: .5pt solid #e7ecef;
+  break-inside: avoid;
+}
+.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
+.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
+.toc a { color: var(--ink); text-decoration: none; }
+/* Continuous editorial body: sections can flow across pages. */
+.content { padding: 0; }
+.content h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 17.2pt;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.28;
+  letter-spacing: -.024em;
+  margin: 11mm 0 5mm;
+  padding-top: 5.5mm;
+  border-top: .6pt solid var(--line);
+  break-after: avoid;
+}
+.content h2::before {
+  content: "CHAPTER";
+  display: block;
+  color: var(--accent);
+  font-size: 7pt;
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .19em;
+  margin-bottom: 2.2mm;
+}
+.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.content h3 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 11.6pt;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  color: var(--heading);
+  margin: 7mm 0 2.5mm;
+  break-after: avoid;
+}
+.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #1a3341; }
+a { color: #23778e; text-decoration: none; }
+hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
+ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
+li { padding-left: .5mm; margin: 1.5mm 0; }
+li::marker { color: var(--accent); }
+li p { margin: 0; }
+blockquote {
+  background: var(--accent-soft);
+  border-left: 2.5pt solid var(--accent);
+  margin: 4mm 0 6mm;
+  padding: 4mm 5.2mm;
+  color: #2b4654;
+  font-size: 9.4pt;
+  line-height: 1.56;
+}
+blockquote p { margin-bottom: 2.3mm; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: #143743; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.42;
+  color: var(--ink);
+  margin: 3.6mm 0 4.8mm;
+  overflow-wrap: anywhere;
+}
+thead { display: table-header-group; }
+thead th {
+  background: var(--header);
+  color: #fff;
+  text-align: left;
+  font-weight: 700;
+  padding: 2.2mm 2.4mm;
+  vertical-align: top;
+  border-right: 1pt solid rgba(255,255,255,.04);
+}
+thead th strong { color: #fff; }
+tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--zebra); }
+tr { break-inside: avoid; }
+table.wide { font-size: 7.15pt; }
+table.wide th, table.wide td { padding: 1.8mm; }
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: .91em;
+  color: #22445a;
+}
+pre {
+  color: #dce9f0;
+  background: #173746;
+  padding: 4mm 5mm;
+  font-size: 8.3pt;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 4mm 0;
+}
+pre code { color: inherit; }
+.task-list-item { list-style: none; margin-left: -5mm; }
+.task-box {
+  display: inline-block;
+  border: .85pt solid #7b8b93;
+  width: 2.6mm; height: 2.6mm;
+  margin-right: 3mm;
+  vertical-align: baseline;
+}
+.task-box.checked { background: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 7.8pt; }
+@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+
+
+:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"DESIGN 5 — REAL-TIME FRAUD DETECTION SYSTEM";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
+@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 07 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title">Design 5 — Real-Time<span class="second">Fraud Detection System</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">07</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><em>10-minute interview answer · American Express Solution Architect Preparation</em></p><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-problem-requirements">1. Problem &amp; Requirements</a></li><li><span class="toc-num">02</span><a href="#2-high-level-architecture">2. High-Level Architecture</a></li><li><span class="toc-num">03</span><a href="#3-key-design-decisions-with-reasons">3. Key Design Decisions — With Reasons</a></li><li><span class="toc-num">04</span><a href="#4-end-to-end-request-flow">4. End-to-End Request Flow</a></li><li><span class="toc-num">05</span><a href="#5-data-model-correctness">5. Data Model &amp; Correctness</a></li><li><span class="toc-num">06</span><a href="#6-failure-handling-scalability-security">6. Failure Handling, Scalability &amp; Security</a></li><li><span class="toc-num">07</span><a href="#7-key-points-to-remember">7. Key Points to Remember</a></li><li><span class="toc-num">08</span><a href="#8-interview-closing-summary">8. Interview Closing Summary</a></li></ol></nav></section><main class="content"><h2 id="1-problem-requirements">1. Problem &amp; Requirements</h2>
+<p>Design a system that detects potentially fraudulent credit card transactions <strong>before authorization is approved</strong>.</p>
+<p>The system analyzes transaction patterns, applies fraud rules, and uses machine learning to generate a risk decision.</p>
+<p><strong>Functional requirements:</strong></p>
+<ul><li>Evaluate transactions in real time.</li><li>Detect suspicious behavior using rules and ML.</li><li>Track transaction velocity (frequency and amount).</li><li>Return a risk decision and reason codes.</li><li>Continuously update fraud signals using transaction events.</li></ul>
+<p><strong>Non-functional requirements:</strong></p>
+<ul><li><strong>Low latency:</strong> Must fit within the authorization response deadline.</li><li><strong>High availability:</strong> Fraud service failures must be handled safely.</li><li><strong>Scalability:</strong> Handle high transaction volumes.</li><li><strong>Feature freshness:</strong> Use recent transaction behavior.</li><li><strong>Auditability:</strong> Record why a decision was made.</li></ul>
+<p><strong>Assumption:</strong> 10,000 peak TPS with an illustrative 100 ms p99 fraud-decision budget. These are design assumptions, not American Express figures.</p>
+<h2 id="2-high-level-architecture">2. High-Level Architecture</h2>
+<pre><code>                 Card Network
+                      |
+                      v
+             Authorization Service
+                      |
+                      v
+                Fraud Engine
+                      |
+             +--------+--------+
+             |        |        |
+             v        v        v
+           Rules    ML Model  Feature
+           Engine   Serving   Store
+             |        |        ^
+             +--------+        |
+                  |            |
+                  v            |
+             Risk Decision     |
+                  |            |
+                  v            |
+          Authorization Service|
+                               |
+   Transaction Events          |
+          |                    |
+          v                    |
+     Kafka / Event Stream      |
+          |                    |
+          v                    |
+     Stream Processor ---------+
+          |
+          v
+   Historical Data Lake
+          |
+          v
+    Model Training</code></pre>
+<p><strong>Two distinct processing paths:</strong></p>
+<ol start="1"><li><strong>Synchronous:</strong> Evaluate the current transaction and return a risk decision.</li><li><strong>Asynchronous:</strong> Process transaction events, update fraud features, and improve models.</li></ol>
+<p>The synchronous path must not wait for the Kafka pipeline to finish.</p>
+<h2 id="3-key-design-decisions-with-reasons">3. Key Design Decisions — With Reasons</h2>
+<table><thead><tr><th>Decision</th><th>Choice</th><th>Why / Trade-off</th></tr></thead><tbody><tr><td>Fraud evaluation</td><td>Synchronous API</td><td>Authorization needs an immediate risk decision</td></tr><tr><td>Detection</td><td>Rules + ML</td><td>Rules enforce explicit policies; ML detects complex patterns</td></tr><tr><td>Feature storage</td><td>Low-latency key-value/online feature store</td><td>Fast access to recent customer behavior</td></tr><tr><td>Streaming</td><td>Kafka + stream processor</td><td>Continuously update transaction features</td></tr><tr><td>Historical storage</td><td>Data lake/warehouse</td><td>Support training and investigations</td></tr><tr><td>Hard velocity limits</td><td>Atomic counters or coordinated state</td><td>Eventually updated counters may miss concurrent attempts</td></tr><tr><td>Reliability</td><td>Risk-approved fallback rules</td><td>Avoid uncontrolled fail-open behavior</td></tr><tr><td>Model deployment</td><td>Versioned serving with canary/shadow testing</td><td>Reduce risk from model changes</td></tr><tr><td>Scaling</td><td>Stateless scoring + partitioned event processing</td><td>Independently scale scoring and feature updates</td></tr></tbody></table>
+<h3 id="decision-1-why-rules-and-ml-together">Decision 1 — Why Rules and ML Together?</h3>
+<p><strong>Rules engine:</strong> Evaluates explicit conditions.</p>
+<p>Examples:</p>
+<ul><li>Card reported stolen.</li><li>Transaction violates a merchant restriction.</li><li>Transaction exceeds a defined hard velocity limit.</li></ul>
+<p><strong>ML model:</strong> Identifies combinations of suspicious signals.</p>
+<p>Examples:</p>
+<ul><li>Unusual purchase amount.</li><li>Sudden spending pattern change.</li><li>Suspicious device and merchant behavior.</li></ul>
+<p><strong>Why both?</strong></p>
+<p>Rules provide deterministic controls. ML detects complex patterns that simple rules may miss.</p>
+<p><strong>Trade-off:</strong> ML needs training data, monitoring, explanations, and lifecycle management.</p>
+<p>The final decision policy combines both outputs. A high ML risk score does not automatically override mandatory business rules.</p>
+<h3 id="decision-2-why-use-kafka-and-stream-processing">Decision 2 — Why Use Kafka and Stream Processing?</h3>
+<p>Suppose a card experiences five purchase attempts within one minute.</p>
+<p>The fraud service needs recent activity, not just historical averages.</p>
+<pre><code>Transaction Events
+       |
+       v
+      Kafka
+       |
+       v
+Stream Processor
+       |
+       v
+Calculate:
+- Attempts in last 1 minute
+- Total amount in last 5 minutes
+- Declines in last 10 minutes
+       |
+       v
+Online Feature Store</code></pre>
+<p><strong>Concept — Windowing:</strong> Grouping stream events over a defined time interval to calculate counts, totals, or other statistics.</p>
+<p>Kafka Streams supports event-time processing, which distinguishes when an event occurred from when the processor received it. This matters for delayed and out-of-order events.</p>
+<p><strong>Why Kafka?</strong> It supports durable event ingestion, partitioned consumption, and replay.</p>
+<p><strong>Alternative:</strong> A managed stream service or another broker with equivalent capabilities.</p>
+<h3 id="decision-3-why-use-an-online-feature-store">Decision 3 — Why Use an Online Feature Store?</h3>
+<p>We cannot query a large historical warehouse for every authorization.</p>
+<p>Instead, precompute frequently needed features.</p>
+<table><thead><tr><th>Feature</th><th>Example</th></tr></thead><tbody><tr><td><code>txn_count_5m</code></td><td>8</td></tr><tr><td><code>total_amount_1h</code></td><td>$2,500</td></tr><tr><td><code>declined_count_10m</code></td><td>4</td></tr><tr><td><code>merchant_risk_score</code></td><td>0.82</td></tr><tr><td><code>avg_txn_amount_30d</code></td><td>$75</td></tr></tbody></table>
+<p>Use a low-latency online store for scoring and a historical store for model training.</p>
+<p>AWS SageMaker Feature Store, for example, distinguishes online low-latency feature access from offline historical feature storage.</p>
+<p><strong>Important limitation:</strong> Stream-updated features can lag behind the latest transactions.</p>
+<p>If a rule requires an exact maximum of five attempts, an eventually updated stream counter alone is insufficient. Use coordinated atomic counting or another authoritative enforcement mechanism.</p>
+<p><strong>Remember:</strong> An online feature store accelerates decisions; it does not automatically guarantee fresh or strongly consistent data.</p>
+<h3 id="decision-4-why-not-run-ml-asynchronously">Decision 4 — Why Not Run ML Asynchronously?</h3>
+<p>Fraud detection must influence the authorization <strong>before approval</strong>.</p>
+<p>If we approve first and run ML through Kafka afterward, we may detect fraud too late.</p>
+<p>Therefore:</p>
+<ul><li>Online risk scoring happens synchronously.</li><li>Feature updates, model training, investigations, and reporting happen asynchronously.</li></ul>
+<p>This is the most important architectural distinction.</p>
+<h3 id="decision-5-how-do-we-handle-ml-failures">Decision 5 — How Do We Handle ML Failures?</h3>
+<p>Suppose the ML service times out.</p>
+<p>Options:</p>
+<table><thead><tr><th>Approach</th><th>Advantage</th><th>Disadvantage</th></tr></thead><tbody><tr><td>Fail open</td><td>Fewer legitimate purchases interrupted</td><td>Higher fraud exposure</td></tr><tr><td>Fail closed</td><td>Stronger fraud protection</td><td>Higher false-decline risk</td></tr><tr><td>Degraded rules</td><td>Can retain limited safe decision-making</td><td>Less detection capability</td></tr></tbody></table>
+<p><strong>Choice:</strong> A predefined, risk-approved degraded policy.</p>
+<p>For example, use verified card information, available risk rules, and recent trusted features to evaluate transactions permitted under the fallback policy.</p>
+<p>Mandatory controls must not be bypassed.</p>
+<p>Use bounded timeouts, circuit breakers, and redundant scoring instances.</p>
+<h2 id="4-end-to-end-request-flow">4. End-to-End Request Flow</h2>
+<pre><code>1. Authorization request arrives
+               |
+               v
+2. Fraud Engine receives request
+               |
+               v
+3. Fetch recent fraud features
+               |
+               v
+4. Evaluate mandatory rules
+               |
+               v
+5. Execute ML risk scoring
+               |
+               v
+6. Combine results using policy
+               |
+               v
+7. Return risk decision
+               |
+               v
+8. Authorization Service makes
+   final approve/decline decision
+               |
+               v
+9. Publish transaction outcome
+               |
+               v
+10. Kafka updates features
+    and historical records</code></pre>
+<p>Example risk decision:</p>
+<pre><code>{
+  "transactionId": "txn_123",
+  "riskScore": 0.91,
+  "riskLevel": "HIGH",
+  "recommendation": "DECLINE",
+  "reasonCodes": ["HIGH_VELOCITY"],
+  "modelVersion": "v12",
+  "policyVersion": "p4"
+}</code></pre>
+<p>The fraud recommendation is an input to authorization. The issuer applies the final policy, including any supported authentication or referral actions.</p>
+<h2 id="5-data-model-correctness">5. Data Model &amp; Correctness</h2>
+<table><thead><tr><th>Entity</th><th>Purpose</th></tr></thead><tbody><tr><td><code>TransactionEvent</code></td><td>Authorization attempt and outcome</td></tr><tr><td><code>FraudFeature</code></td><td>Recent behavior and aggregated statistics</td></tr><tr><td><code>RiskDecision</code></td><td>Score, decision, reasons, and policy version</td></tr><tr><td><code>ModelVersion</code></td><td>Identifies the model used</td></tr><tr><td><code>FraudCase</code></td><td>Confirmed/suspected fraud and investigation outcome</td></tr></tbody></table>
+<p><strong>Key correctness requirements:</strong></p>
+<ul><li>Duplicate transaction events must not inflate velocity counts.</li><li>Hard limits need appropriate atomic enforcement.</li><li>Fraud decisions must record model, rules, and feature freshness.</li><li>Events arriving late must be handled according to defined windowing rules.</li><li>Decisions must be auditable without unnecessarily exposing sensitive data.</li></ul>
+<h2 id="6-failure-handling-scalability-security">6. Failure Handling, Scalability &amp; Security</h2>
+<table><thead><tr><th>Scenario</th><th>Design response</th><th>Why</th></tr></thead><tbody><tr><td>ML service unavailable</td><td>Approved fallback policy</td><td>Controlled degradation</td></tr><tr><td>Feature store unavailable</td><td>Use permitted trusted features and fallback</td><td>Avoid uncontrolled decisions</td></tr><tr><td>Kafka unavailable</td><td>Durable event publication/outbox</td><td>Preserve updates for recovery</td></tr><tr><td>Duplicate events</td><td>Event-ID deduplication</td><td>Prevent inflated fraud counters</td></tr><tr><td>Out-of-order events</td><td>Event time, late-event handling</td><td>Correct historical aggregates</td></tr><tr><td>Traffic spike</td><td>Scale stateless fraud workers</td><td>Increase scoring capacity</td></tr><tr><td>Model accuracy degrades</td><td>Monitor drift, rollback model</td><td>Reduce incorrect decisions</td></tr><tr><td>Sensitive data exposure</td><td>Tokenization, encryption, restricted access</td><td>Protect financial/customer data</td></tr></tbody></table>
+<h3 id="scaling-strategy">Scaling Strategy</h3>
+<ul><li><strong>Fraud API:</strong> Horizontally scale stateless instances.</li><li><strong>ML serving:</strong> Scale inference instances independently.</li><li><strong>Kafka:</strong> Partition account-level events using stable account keys.</li><li><strong>Feature store:</strong> Distribute key-based access and monitor hotspots.</li><li><strong>Data lake:</strong> Store historical events separately from online scoring.</li></ul>
+<h3 id="operational-metrics">Operational Metrics</h3>
+<p>Monitor p99 scoring latency, feature age, service errors, model drift, fraud detection rate, false-decline rate, and financial losses.</p>
+<p>For ML governance, NIST's AI Risk Management Framework emphasizes ongoing measurement, monitoring, and management of AI risks.</p>
+<h2 id="7-key-points-to-remember">7. Key Points to Remember</h2>
+<ol start="1"><li><strong>Synchronous scoring, asynchronous updates.</strong> Fraud decisions must happen before approval; event streams update historical and recent signals independently.</li><li><strong>Rules + ML.</strong> Rules enforce known policies; ML identifies complex fraud patterns.</li><li><strong>Online feature store for low latency.</strong> Precompute recent behavioral features rather than querying historical data for every authorization.</li><li><strong>Feature freshness matters.</strong> Stream processing may lag. Hard velocity limits require stronger coordination.</li><li><strong>Fraud protection must fail safely.</strong> Use explicit fallback rules, model versioning, monitoring, and auditability.</li></ol>
+<h2 id="8-interview-closing-summary">8. Interview Closing Summary</h2>
+<blockquote><p>I would design fraud detection with a synchronous risk engine using business rules, ML models, and a low-latency online feature store. Kafka and stream processing continuously update behavioral features, while historical data supports model training and investigations. Mandatory rules and hard velocity constraints use appropriately consistent state, because asynchronous features may lag. I would scale scoring independently, implement risk-approved fallback policies, and monitor model performance, false declines, latency, and feature freshness. This balances fraud prevention, customer experience, and system reliability.</p></blockquote>
+<hr>
+<p><strong>Next design:</strong> Payment Gateway &amp; Orchestration System — routing across payment processors, external API failures, retries, circuit breakers, payment state machines, and preventing duplicate charges across providers.</p></main></body></html>

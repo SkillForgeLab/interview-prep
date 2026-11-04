@@ -1,0 +1,555 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Module 1 — Architecture Fundamentals and Design Decisions</title><style>
+/* The original PDF skill style sheet is embedded below. */
+/* Architect's Field Notes — original study-guide design recreation.
+   Standalone builder embeds this file into its generated HTML. */
+:root {
+  --navy: #112c3a;
+  --header: #193a4b;
+  --ink: #273944;
+  --heading: #17313e;
+  --muted: #75838d;
+  --line: #d9e2e7;
+  --zebra: #f6f8f9;
+  --accent: #64c8e6;
+  --accent-soft: #eaf8fc;
+}
+@page {
+  size: A4;
+  margin: 19mm 19mm 19mm;
+  @top-left {
+    content: "INTERVIEW / FIELD GUIDE";
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  @top-right {
+    content: string(running-topic);
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .02em;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+    color: #9aa5ae;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 6.3pt;
+    letter-spacing: .03em;
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page, decimal-leading-zero);
+    color: #394b56;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-weight: 700;
+    font-size: 7pt;
+    vertical-align: middle;
+  }
+}
+@page cover {
+  size: A4;
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Inter", "DejaVu Sans", sans-serif;
+  font-size: 9.4pt;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: #fff;
+  overflow-wrap: break-word;
+}
+.cover {
+  page: cover;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  overflow: hidden;
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 29.6mm 26mm;
+}
+.cover::before, .cover::after {
+  content: "";
+  position: absolute;
+  border: .55pt solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
+.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
+.cover-brand {
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: .31em;
+  text-transform: uppercase;
+  color: #dceaf0;
+}
+.cover-series {
+  font-size: 8pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #98b3c1;
+  margin-top: 7mm;
+}
+.cover-accent-bar {
+  position: absolute;
+  left: 26mm; top: 80mm;
+  height: 3.5mm; width: 21mm;
+  background: var(--accent);
+}
+.cover-title {
+  position: absolute;
+  left: 25.5mm; right: 25mm; top: 97mm;
+  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+  font-size: 42pt;
+  font-weight: 800;
+  letter-spacing: -.043em;
+  line-height: 1.08;
+  color: #fff;
+}
+.cover-title .second { display: block; color: var(--accent); }
+.cover-title.long { font-size: 37pt; }
+.cover-sub {
+  position: absolute;
+  left: 26mm; right: 31mm; top: 173.5mm;
+  color: #bdcdd5;
+  font-size: 11.5pt;
+  line-height: 1.7;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.cover-note {
+  color: #91aab7;
+  text-transform: none;
+  font-size: 9pt;
+  letter-spacing: .01em;
+  margin-top: 7mm;
+  line-height: 1.6;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 31mm; left: 26mm;
+  font-size: 7.8pt;
+  line-height: 1.9;
+  letter-spacing: .065em;
+  color: #cfdae0;
+}
+.cover-rule {
+  position: absolute;
+  bottom: 62mm; height: .35pt;
+  left: 26mm; right: 26mm;
+  background: rgba(255,255,255,.15);
+}
+.cover-number {
+  position: absolute;
+  bottom: 29mm; right: 26mm;
+  color: var(--accent);
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 39pt;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+/* Introduction + automatically generated navigable contents. */
+.preface { break-after: page; }
+.preface-label, .toc-overline {
+  color: var(--accent);
+  font-size: 7.6pt;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+.preface h1 { display: none; }
+.preface h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: var(--heading);
+  margin: 5mm 0 5mm;
+  border-bottom: .5pt solid var(--line);
+  padding-bottom: 2.5mm;
+}
+.preface p { font-size: 9.5pt; line-height: 1.6; }
+.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
+.toc h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 21pt;
+  letter-spacing: -.03em;
+  margin: 2mm 0 5mm;
+  border: 0;
+  padding: 0;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li {
+  display: flex;
+  align-items: baseline;
+  gap: 5mm;
+  font-size: 9.1pt;
+  padding: 2.7mm 1mm;
+  border-top: .5pt solid #e7ecef;
+  break-inside: avoid;
+}
+.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
+.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
+.toc a { color: var(--ink); text-decoration: none; }
+/* Continuous editorial body: sections can flow across pages. */
+.content { padding: 0; }
+.content h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 17.2pt;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.28;
+  letter-spacing: -.024em;
+  margin: 11mm 0 5mm;
+  padding-top: 5.5mm;
+  border-top: .6pt solid var(--line);
+  break-after: avoid;
+}
+.content h2::before {
+  content: "CHAPTER";
+  display: block;
+  color: var(--accent);
+  font-size: 7pt;
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .19em;
+  margin-bottom: 2.2mm;
+}
+.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.content h3 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 11.6pt;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  color: var(--heading);
+  margin: 7mm 0 2.5mm;
+  break-after: avoid;
+}
+.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #1a3341; }
+a { color: #23778e; text-decoration: none; }
+hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
+ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
+li { padding-left: .5mm; margin: 1.5mm 0; }
+li::marker { color: var(--accent); }
+li p { margin: 0; }
+blockquote {
+  background: var(--accent-soft);
+  border-left: 2.5pt solid var(--accent);
+  margin: 4mm 0 6mm;
+  padding: 4mm 5.2mm;
+  color: #2b4654;
+  font-size: 9.4pt;
+  line-height: 1.56;
+}
+blockquote p { margin-bottom: 2.3mm; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: #143743; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.42;
+  color: var(--ink);
+  margin: 3.6mm 0 4.8mm;
+  overflow-wrap: anywhere;
+}
+thead { display: table-header-group; }
+thead th {
+  background: var(--header);
+  color: #fff;
+  text-align: left;
+  font-weight: 700;
+  padding: 2.2mm 2.4mm;
+  vertical-align: top;
+  border-right: 1pt solid rgba(255,255,255,.04);
+}
+thead th strong { color: #fff; }
+tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--zebra); }
+tr { break-inside: avoid; }
+table.wide { font-size: 7.15pt; }
+table.wide th, table.wide td { padding: 1.8mm; }
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: .91em;
+  color: #22445a;
+}
+pre {
+  color: #dce9f0;
+  background: #173746;
+  padding: 4mm 5mm;
+  font-size: 8.3pt;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 4mm 0;
+}
+pre code { color: inherit; }
+.task-list-item { list-style: none; margin-left: -5mm; }
+.task-box {
+  display: inline-block;
+  border: .85pt solid #7b8b93;
+  width: 2.6mm; height: 2.6mm;
+  margin-right: 3mm;
+  vertical-align: baseline;
+}
+.task-box.checked { background: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 7.8pt; }
+@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+
+
+:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"MODULE 1 — ARCHITECTURE FUNDAMENTALS AND DESIGN DECISIONS";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
+@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 02 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title long">Module 1 — Architecture<span class="second">Fundamentals and Design Decisions</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">02</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>American Express Solution Architect — System Design Preparation</strong> <strong>Lesson 1: Requirements → Architecture → Trade-offs</strong></p>
+<blockquote><p><strong>Scope:</strong> This is a worked design exercise and general architecture guidance, not a description of American Express&#39;s internal architecture. Numbers, service interfaces, and workloads are illustrative assumptions.</p></blockquote><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-the-most-important-principle">1. The most important principle</a></li><li><span class="toc-num">02</span><a href="#2-understand-five-types-of-requirements">2. Understand five types of requirements</a></li><li><span class="toc-num">03</span><a href="#3-how-to-derive-architecture-decisions">3. How to derive architecture decisions</a></li><li><span class="toc-num">04</span><a href="#4-problem-and-requirements">4. Problem and requirements</a></li><li><span class="toc-num">05</span><a href="#5-start-with-a-simple-baseline">5. Start with a simple baseline</a></li><li><span class="toc-num">06</span><a href="#6-introduce-an-authoritative-financial-source">6. Introduce an authoritative financial source</a></li><li><span class="toc-num">07</span><a href="#7-introduce-reliable-events">7. Introduce reliable events</a></li><li><span class="toc-num">08</span><a href="#8-choose-the-database-and-schema">8. Choose the database and schema</a></li><li><span class="toc-num">09</span><a href="#9-estimate-scale-before-choosing-infrastructure">9. Estimate scale before choosing infrastructure</a></li><li><span class="toc-num">10</span><a href="#10-design-for-failures">10. Design for failures</a></li><li><span class="toc-num">11</span><a href="#11-security-and-observability">11. Security and observability</a></li><li><span class="toc-num">12</span><a href="#12-final-architecture">12. Final architecture</a></li><li><span class="toc-num">13</span><a href="#13-change-the-requirements-change-the-architecture">13. Change the requirements; change the architecture</a></li><li><span class="toc-num">14</span><a href="#14-concepts-and-takeaways">14. Concepts and takeaways</a></li><li><span class="toc-num">15</span><a href="#next-design-2-credit-card-authorization-system">Next: Design 2 — Credit Card Authorization System</a></li></ol></nav></section><main class="content"><h2 id="1-the-most-important-principle">1. The most important principle</h2>
+<p><strong>Architecture decisions must come from requirements, not from technology preferences.</strong></p>
+<p>Consider three financial applications:</p>
+<table><thead><tr><th>System</th><th>Most important requirement</th><th>Likely architectural approach</th></tr></thead><tbody><tr><td>Transfer money between accounts</td><td>Never lose or create money</td><td>ACID transactions and strongly controlled writes</td></tr><tr><td>View transaction history</td><td>Fast reads over large amounts of data</td><td>Read-optimized database, indexing, and pagination</td></tr><tr><td>Detect fraudulent transactions</td><td>Very fast decisions using current signals</td><td>Low-latency scoring, streaming, and fast feature access</td></tr></tbody></table>
+<p>All three handle financial transactions, but they need different architectures.</p>
+<p><strong>Weak approach:</strong> "We need a scalable system, so we'll use microservices, Kafka, Redis, Kubernetes, and NoSQL."</p>
+<p><strong>Better approach:</strong> "The system processes money. Correctness is critical, while some downstream updates can be delayed. Therefore, we'll use transactional writes for financial state and asynchronous events for noncritical processing."</p>
+<p>The second approach explains <em>why</em> each technology or pattern is appropriate.</p>
+<h2 id="2-understand-five-types-of-requirements">2. Understand five types of requirements</h2>
+<table><thead><tr><th>Requirement</th><th>What it means</th><th>Example</th></tr></thead><tbody><tr><td><strong>Correctness</strong></td><td>What must never go wrong?</td><td>Never debit an account twice for one logical transfer</td></tr><tr><td><strong>Performance</strong></td><td>How quickly must work complete?</td><td>Authorization must finish within a defined latency budget</td></tr><tr><td><strong>Scale</strong></td><td>How much traffic and data?</td><td>Large transaction history with high peak read traffic</td></tr><tr><td><strong>Availability</strong></td><td>What happens when components fail?</td><td>A service remains available after one instance fails</td></tr><tr><td><strong>Security</strong></td><td>Who can access what?</td><td>Users cannot read another customer's transactions</td></tr></tbody></table>
+<p>Also evaluate <strong>cost, maintainability, compliance, and operational complexity</strong>.</p>
+<p>Separate requirements that cannot be violated from those where trade-offs are acceptable. For example, a history screen might tolerate a short visibility delay; a financial ledger cannot tolerate duplicate postings caused by the same business instruction.</p>
+<h2 id="3-how-to-derive-architecture-decisions">3. How to derive architecture decisions</h2>
+<h3 id="a-sql-or-nosql">A. SQL or NoSQL?</h3>
+<p>Start with <em>operations and guarantees</em>, not the product name.</p>
+<table><thead><tr><th>Requirement</th><th>Likely choice</th><th>Why</th></tr></thead><tbody><tr><td>Money transfers with strict invariants</td><td>Relational database</td><td>Transactions, constraints, and controlled concurrency</td></tr><tr><td>Simple key-based lookup at very large scale</td><td>Key-value database</td><td>Efficient access by primary key</td></tr><tr><td>Flexible nested documents</td><td>Document database</td><td>Flexible data structure</td></tr><tr><td>Complex full-text search</td><td>Search engine</td><td>Inverted indexes and relevance queries</td></tr><tr><td>Aggregate billions of events</td><td>Analytical database</td><td>Columnar storage and analytical query execution</td></tr></tbody></table>
+<p><strong>Concept — ACID:</strong> Atomicity, Consistency, Isolation, Durability. ACID provides guarantees inside a supported transaction boundary; it does not automatically provide consistency across unrelated services or databases.</p>
+<h3 id="b-synchronous-or-asynchronous">B. Synchronous or asynchronous?</h3>
+<p>Suppose a payment succeeds and a customer should receive an email.</p>
+<p><strong>Synchronous path:</strong></p>
+<pre><code>Payment API
+    |
+    v
+Process Payment
+    |
+    v
+Send Email
+    |
+    v
+Return Response</code></pre>
+<p>The email dependency can delay the response or make the request appear to fail after payment processing has succeeded.</p>
+<p><strong>Asynchronous path:</strong></p>
+<pre><code>Payment API
+    |
+    v
+Process Payment
+    |
+    +----&gt; Return Response
+    |
+    v
+Publish Durable Event
+    |
+    v
+Email Consumer</code></pre>
+<p>The email is independent of the payment's critical path. But publishing it must still be reliable, for example through a <strong>transactional outbox</strong>.</p>
+<p><strong>Rule:</strong> Choose synchronous interactions when the caller requires an immediate answer, and asynchronous processing when the work can safely happen later or independently.</p>
+<h3 id="c-strong-or-eventual-consistency">C. Strong or eventual consistency?</h3>
+<p>The displayed transaction list may lag behind the authoritative ledger if the user experience permits it. An available-credit decision, however, must use a state model that protects the required financial invariants.</p>
+<ul><li><strong>Strong consistency:</strong> Reads and writes satisfy a specified ordering/visibility guarantee.</li><li><strong>Eventual consistency:</strong> Replicas or read models may temporarily lag but converge when updates stop.</li></ul>
+<p>A single business system can use stronger guarantees for financial state and eventual consistency for history, analytics, or notifications.</p>
+<h3 id="d-cache-or-direct-database-access">D. Cache or direct database access?</h3>
+<p>Caching is valuable when read repetition is high and the business can tolerate defined staleness.</p>
+<ul><li><strong>Good candidate:</strong> Merchant display metadata.</li><li><strong>Conditional candidate:</strong> The first page of transaction history, if freshness requirements permit.</li><li><strong>Poor candidate as sole source:</strong> An authoritative funds-availability decision using stale cache data.</li></ul>
+<p>Caching creates invalidation, expiry, eviction, stampede, and outage concerns. Add it to address demonstrated needs.</p>
+<h3 id="e-monolith-or-microservices">E. Monolith or microservices?</h3>
+<p>A monolith can be the best baseline for a small domain with unified releases and modest scale. Microservices are more attractive when capabilities require independent releases, scaling, ownership, or security boundaries.</p>
+<p>Microservices introduce network failure modes, distributed data management, observability needs, and operational overhead.</p>
+<p><strong>Principle:</strong> Prefer the simplest architecture that meets requirements; add complexity only when justified.</p>
+<hr>
+<h1 id="worked-design-1-credit-card-transaction-history-service">Worked Design 1 — Credit Card Transaction History Service</h1>
+<h2 id="4-problem-and-requirements">4. Problem and requirements</h2>
+<p>Design a service that allows credit card customers to view recent and historical transactions, filter activity, and paginate results.</p>
+<p><strong>Functional requirements</strong></p>
+<table><thead><tr><th>Requirement</th><th>Explanation</th></tr></thead><tbody><tr><td>Recent transactions</td><td>Show latest activity</td></tr><tr><td>Transaction details</td><td>Amount, merchant, currency, status, date</td></tr><tr><td>Filtering</td><td>Date and status filters</td></tr><tr><td>Pagination</td><td>Efficiently return successive pages</td></tr><tr><td>Security</td><td>Only authorized account holders/users can access data</td></tr><tr><td>Status updates</td><td>Handle changes such as pending to posted</td></tr></tbody></table>
+<p><strong>Out of scope:</strong> Payment authorization, money transfers, refunds, and financial settlement. Those belong to other capabilities.</p>
+<p><strong>Illustrative non-functional assumptions</strong></p>
+<ul><li>The workload is read-heavy.</li><li>The service holds large historical datasets.</li><li>Reads should be fast and predictable.</li><li>A small, explicitly defined visibility lag is acceptable for some activity.</li><li>Historical records must not be lost.</li><li>Another financial subsystem owns the authoritative financial state.</li></ul>
+<p>These assumptions justify considering a read-optimized projection.</p>
+<h2 id="5-start-with-a-simple-baseline">5. Start with a simple baseline</h2>
+<pre><code>Customer App
+     |
+     v
+Transaction History API
+     |
+     v
+Relational Database</code></pre>
+<p><strong>Why?</strong> The schema is structured. Queries primarily select one account's activity in date order. Indexes support those queries. We have not identified a reason to introduce Kafka, sharding, Redis, or a multi-service architecture.</p>
+<h3 id="define-the-api">Define the API</h3>
+<pre><code>GET /v1/accounts/{accountId}/transactions?limit=50&amp;cursor=opaque-value</code></pre>
+<p>Example response:</p>
+<pre><code>{
+  "transactions": [
+    {
+      "transactionId": "txn_123",
+      "amountMinor": 2599,
+      "currency": "USD",
+      "merchant": "Example Store",
+      "status": "POSTED",
+      "postedAt": "2026-11-01T14:30:00Z"
+    }
+  ],
+  "nextCursor": "opaque-value"
+}</code></pre>
+<p><code>amountMinor: 2599</code> represents USD 25.99 in cents, rather than using an imprecise binary floating-point currency value.</p>
+<h3 id="why-cursor-pagination-instead-of-offset">Why cursor pagination instead of OFFSET?</h3>
+<p>An offset query with a very large offset may scan or skip many records. Cursor pagination resumes after a known position using an index.</p>
+<pre><code>CREATE INDEX idx_account_history
+ON transactions (
+    account_id,
+    posted_at DESC,
+    transaction_id DESC
+);</code></pre>
+<p>The transaction ID is a deterministic tie-breaker when timestamps match.</p>
+<p><strong>Concept — Composite index:</strong> An ordered index over multiple columns. Its usefulness depends on the query's filters and sorting order.</p>
+<p>Cursor pagination helps with deep browsing, but updates arriving between requests can still affect stability. Define how changing datasets and cursors behave.</p>
+<h2 id="6-introduce-an-authoritative-financial-source">6. Introduce an authoritative financial source</h2>
+<p>A history service should consume records from the system responsible for financial transaction processing. It should not independently decide whether payments are authorized or settled.</p>
+<pre><code>Financial Processing System
+            |
+            v
+  Authoritative Data Store
+            |
+            v
+  Reliable Change Events
+            |
+            v
+ Transaction History Store
+            ^
+            |
+  Transaction History API
+            ^
+            |
+       Customer App</code></pre>
+<p><strong>Why separate stores?</strong> Financial processing prioritizes correctness; transaction browsing prioritizes fast read queries. Separating responsibilities prevents high-volume customer reads from directly competing with critical financial writes.</p>
+<p><strong>Concept — CQRS (Command Query Responsibility Segregation):</strong> Different models may handle commands and queries. They can have separate stores, but this is not mandatory. CQRS adds synchronization and consistency complexity.</p>
+<h2 id="7-introduce-reliable-events">7. Introduce reliable events</h2>
+<h3 id="the-dual-write-problem">The dual-write problem</h3>
+<p>Imagine the financial system commits a record but crashes before publishing an event.</p>
+<pre><code>1. Save financial record
+2. Commit database
+3. Publish event</code></pre>
+<p>A crash between steps 2 and 3 may leave the history projection permanently unaware of the transaction.</p>
+<h3 id="transactional-outbox">Transactional outbox</h3>
+<p>Write the authoritative change and an outbox record atomically in the <em>same local database transaction</em>:</p>
+<pre><code>BEGIN;
+-- Save financial record
+-- Save outbox event
+COMMIT;</code></pre>
+<p>Then a publisher sends outbox records to a broker:</p>
+<pre><code>Financial Processing System
+            |
+            v
++---------------------------+
+| Financial Database        |
+|  - Transaction Records    |
+|  - Outbox Events          |
++---------------------------+
+            |
+            v
+     Outbox Publisher
+            |
+            v
+        Event Broker
+            |
+            v
+     History Projector
+            |
+            v
+       History Store</code></pre>
+<p><strong>Concept — Transactional outbox:</strong> Persist a business change and the intention to publish its event in one local transaction.</p>
+<p><strong>Important failure:</strong> The publisher can successfully send an event and crash before recording success. The event may then be published again. Consumers therefore must be <strong>idempotent</strong>.</p>
+<p><strong>Idempotency:</strong> Repeating the same logical operation must not create additional business effects. The consumer can track unique event IDs, enforce database constraints, and use transaction ID/version to reject duplicates or stale updates.</p>
+<p>Do not treat broker delivery alone as an unconditional exactly-once business guarantee.</p>
+<h2 id="8-choose-the-database-and-schema">8. Choose the database and schema</h2>
+<pre><code>CREATE TABLE transactions (
+    transaction_id VARCHAR(64) PRIMARY KEY,
+    account_id VARCHAR(64) NOT NULL,
+    amount_minor BIGINT NOT NULL,
+    currency CHAR(3) NOT NULL,
+    merchant_name VARCHAR(255),
+    status VARCHAR(30) NOT NULL,
+    posted_at TIMESTAMP,
+    source_version BIGINT NOT NULL
+);</code></pre>
+<p><strong>Why SQL?</strong> Structured schema and predictable account/date queries make a relational store a reasonable baseline. A distributed key-value or wide-column database might be preferable if scaling and access needs justify it; NoSQL is not inherently required for a large system.</p>
+<h3 id="pending-vs-posted-activity">Pending vs. posted activity</h3>
+<p>Pending authorizations and posted transactions are different lifecycle states. A history API may combine a pending-activity projection with posted transactions, but must avoid double-display and avoid implying pending amounts are already settled.</p>
+<h2 id="9-estimate-scale-before-choosing-infrastructure">9. Estimate scale before choosing infrastructure</h2>
+<p><strong>Hypothetical workload:</strong> 36 million transaction updates/day.</p>
+<table><thead><tr><th>Metric</th><th>Illustration</th></tr></thead><tbody><tr><td>Average writes</td><td>~417/s</td></tr><tr><td>Assumed 10× peak</td><td>~4,167/s</td></tr><tr><td>Raw records at 1 KB each</td><td>~36 GB/day</td></tr><tr><td>Raw data for 365 days</td><td>~13.1 TB</td></tr></tbody></table>
+<p>These estimates exclude indexes, replicas, metadata, audit data, and backups. Read rates need separate assumptions.</p>
+<p><strong>Derive scaling actions from observed bottlenecks:</strong></p>
+<table><thead><tr><th>Observed bottleneck</th><th>Consider</th><th>Reason</th></tr></thead><tbody><tr><td>API CPU saturation</td><td>Add stateless API instances</td><td>Horizontal scale</td></tr><tr><td>Slow history queries</td><td>Optimize query and indexes</td><td>Fix access path before adding systems</td></tr><tr><td>Repeated expensive reads</td><td>Cache eligible queries</td><td>Reduce redundant database load</td></tr><tr><td>Read pressure on primary</td><td>Read replicas or read-specific store</td><td>Isolate reads</td></tr><tr><td>Hard-to-manage historical volume</td><td>Partition/archive records</td><td>Manage large datasets efficiently</td></tr><tr><td>One database cannot meet capacity</td><td>Sharding</td><td>Distribute load and storage</td></tr></tbody></table>
+<p><strong>Partitioning:</strong> Organize data into subsets, possibly within a database, such as by time. <strong>Sharding:</strong> Distribute data across independent database nodes; adds routing, rebalancing, and operational complexity.</p>
+<p>Since most history requests target one account, account-based distribution could work, subject to hotspot and reporting requirements.</p>
+<h2 id="10-design-for-failures">10. Design for failures</h2>
+<table><thead><tr><th>Failure</th><th>Desired behavior</th><th>Design response</th></tr></thead><tbody><tr><td>API instance crashes</td><td>Other instances serve requests</td><td>Load balancer and stateless replicas</td></tr><tr><td>Database is unavailable</td><td>Controlled failure or approved fallback</td><td>Failover and bounded retries</td></tr><tr><td>Broker goes offline</td><td>Financial event is not lost</td><td>Durable outbox and eventual replay</td></tr><tr><td>Consumer crashes after processing</td><td>Duplicate event causes no duplicate effect</td><td>Idempotent consumer</td></tr><tr><td>Events arrive out of order</td><td>Older state never overwrites newer state</td><td>Versions and valid state transitions</td></tr><tr><td>Projector falls behind</td><td>Detect delayed history freshness</td><td>Lag metrics, alerts, replay</td></tr><tr><td>Popular queries overload DB</td><td>Protect storage performance</td><td>Query limits, rate limiting, caching</td></tr><tr><td>Region goes offline</td><td>Recover to business targets</td><td>Replication and disaster recovery plan</td></tr></tbody></table>
+<p><strong>Timeout:</strong> Stop waiting after a defined interval. A timeout does <em>not</em> prove the remote operation failed.</p>
+<p><strong>Retry with exponential backoff:</strong> Retry eligible transient failures after increasing delays, with jitter and retry limits. Operations must be safe to retry.</p>
+<p><strong>Circuit breaker:</strong> Stop invoking a repeatedly failing dependency temporarily so that failures do not cascade.</p>
+<h2 id="11-security-and-observability">11. Security and observability</h2>
+<p><strong>Security:</strong></p>
+<ul><li>Authenticate callers and authorize access to the specific account on every relevant request.</li><li>Do not trust a customer-supplied <code>accountId</code> by itself.</li><li>Encrypt data in transit and at rest.</li><li>Use least-privilege service access and controlled credentials.</li><li>Mask sensitive identifiers and maintain access audit trails.</li><li>Apply appropriate retention and privacy requirements.</li></ul>
+<p><strong>Observability:</strong></p>
+<table><thead><tr><th>Metric</th><th>Purpose</th></tr></thead><tbody><tr><td>p95/p99 API latency</td><td>Detect slow tail requests</td></tr><tr><td>Error rate by endpoint</td><td>Detect customer-facing failures</td></tr><tr><td>Consumer lag</td><td>Measure projection delay</td></tr><tr><td>Oldest pending outbox event</td><td>Detect publication backlog</td></tr><tr><td>DB query latency</td><td>Diagnose access paths and saturation</td></tr><tr><td>Reconciliation mismatch count</td><td>Find disagreement between source and read model</td></tr></tbody></table>
+<p><strong>p99 latency:</strong> 99% of measured requests finish at or below this response time, under the stated measurement window and traffic distribution.</p>
+<h2 id="12-final-architecture">12. Final architecture</h2>
+<pre><code>                CUSTOMER APPLICATION
+                         |
+                         v
+                API Gateway / WAF
+                         |
+                         v
+                 History Service
+                  /           \
+                 v             v
+           Authorization     History DB
+           Enforcement           ^
+                                 |
+                           History Projector
+                                 ^
+                                 |
+                            Event Broker
+                                 ^
+                                 |
+                          Outbox Publisher
+                                 ^
+                                 |
+                +----------------------------+
+                | Financial Processing System|
+                |                            |
+                | Authoritative Data + Outbox|
+                +----------------------------+</code></pre>
+<p>The history projection serves optimized customer reads, while the financial system remains the source of truth. Additional replication, caching, partitioning, and sharding are conditional on explicit needs.</p>
+<h2 id="13-change-the-requirements-change-the-architecture">13. Change the requirements; change the architecture</h2>
+<table><thead><tr><th>New requirement</th><th>Change</th><th>Why</th></tr></thead><tbody><tr><td>Show authoritative available balance</td><td>Query authoritative ledger/balance service</td><td>History may lag</td></tr><tr><td>Advanced merchant-name search</td><td>Add search index</td><td>Specialized full-text access</td></tr><tr><td>Prevent silent changes to financial history</td><td>Immutable ledger entries and compensating corrections</td><td>Preserve accounting auditability</td></tr><tr><td>Regional disaster recovery</td><td>Tested replication and recovery</td><td>Meet stated RPO/RTO</td></tr><tr><td>Notify customer of new transactions</td><td>Notification event consumer</td><td>Separate side effects from history reads</td></tr><tr><td>Real-time fraud decision</td><td>Low-latency scoring in authorization path</td><td>A lagging history projection is insufficient</td></tr></tbody></table>
+<h2 id="14-concepts-and-takeaways">14. Concepts and takeaways</h2>
+<table><thead><tr><th>Concept</th><th>Core lesson</th></tr></thead><tbody><tr><td>Relational databases</td><td>Choose around query patterns and transaction guarantees</td></tr><tr><td>Indexes / cursor pagination</td><td>Optimize actual API access patterns</td></tr><tr><td>CQRS</td><td>Separate read and write models when justified</td></tr><tr><td>Events</td><td>Decouple downstream work from critical processing</td></tr><tr><td>Transactional outbox</td><td>Prevent loss between database commit and event publication</td></tr><tr><td>Idempotency</td><td>Retries and duplicate delivery must not duplicate business effects</td></tr><tr><td>Eventual consistency</td><td>Accept lag only where the business permits it</td></tr><tr><td>Scaling</td><td>Measure before introducing extra complexity</td></tr><tr><td>Resilience</td><td>Design for partial failures and uncertain outcomes</td></tr><tr><td>Security</td><td>Enforce object-level authorization and protect data</td></tr></tbody></table>
+<p><strong>Central lesson:</strong> A business system can use several consistency models, storage strategies, and communication styles. Each should be selected for a particular requirement—not because it is fashionable.</p>
+<hr>
+<h2 id="next-design-2-credit-card-authorization-system">Next: Design 2 — Credit Card Authorization System</h2>
+<p>We will derive the architecture for the authorization path, including request validation, fraud checks, available credit, concurrency, timeout budgets, duplicate prevention, reversals, uncertain outcomes, high availability, security, and recovery.</p>
+<p>The central contrast is that a read-optimized, eventually consistent transaction-history projection must <strong>not</strong> be treated as the authoritative source for approving financial transactions.</p></main></body></html>

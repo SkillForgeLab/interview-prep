@@ -1,0 +1,455 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Legacy / Mainframe Modernization</title><style>
+/* The original PDF skill style sheet is embedded below. */
+/* Architect's Field Notes — original study-guide design recreation.
+   Standalone builder embeds this file into its generated HTML. */
+:root {
+  --navy: #112c3a;
+  --header: #193a4b;
+  --ink: #273944;
+  --heading: #17313e;
+  --muted: #75838d;
+  --line: #d9e2e7;
+  --zebra: #f6f8f9;
+  --accent: #64c8e6;
+  --accent-soft: #eaf8fc;
+}
+@page {
+  size: A4;
+  margin: 19mm 19mm 19mm;
+  @top-left {
+    content: "INTERVIEW / FIELD GUIDE";
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  @top-right {
+    content: string(running-topic);
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .02em;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+    color: #9aa5ae;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 6.3pt;
+    letter-spacing: .03em;
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page, decimal-leading-zero);
+    color: #394b56;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-weight: 700;
+    font-size: 7pt;
+    vertical-align: middle;
+  }
+}
+@page cover {
+  size: A4;
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Inter", "DejaVu Sans", sans-serif;
+  font-size: 9.4pt;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: #fff;
+  overflow-wrap: break-word;
+}
+.cover {
+  page: cover;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  overflow: hidden;
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 29.6mm 26mm;
+}
+.cover::before, .cover::after {
+  content: "";
+  position: absolute;
+  border: .55pt solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
+.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
+.cover-brand {
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: .31em;
+  text-transform: uppercase;
+  color: #dceaf0;
+}
+.cover-series {
+  font-size: 8pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #98b3c1;
+  margin-top: 7mm;
+}
+.cover-accent-bar {
+  position: absolute;
+  left: 26mm; top: 80mm;
+  height: 3.5mm; width: 21mm;
+  background: var(--accent);
+}
+.cover-title {
+  position: absolute;
+  left: 25.5mm; right: 25mm; top: 97mm;
+  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+  font-size: 42pt;
+  font-weight: 800;
+  letter-spacing: -.043em;
+  line-height: 1.08;
+  color: #fff;
+}
+.cover-title .second { display: block; color: var(--accent); }
+.cover-title.long { font-size: 37pt; }
+.cover-sub {
+  position: absolute;
+  left: 26mm; right: 31mm; top: 173.5mm;
+  color: #bdcdd5;
+  font-size: 11.5pt;
+  line-height: 1.7;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.cover-note {
+  color: #91aab7;
+  text-transform: none;
+  font-size: 9pt;
+  letter-spacing: .01em;
+  margin-top: 7mm;
+  line-height: 1.6;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 31mm; left: 26mm;
+  font-size: 7.8pt;
+  line-height: 1.9;
+  letter-spacing: .065em;
+  color: #cfdae0;
+}
+.cover-rule {
+  position: absolute;
+  bottom: 62mm; height: .35pt;
+  left: 26mm; right: 26mm;
+  background: rgba(255,255,255,.15);
+}
+.cover-number {
+  position: absolute;
+  bottom: 29mm; right: 26mm;
+  color: var(--accent);
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 39pt;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+/* Introduction + automatically generated navigable contents. */
+.preface { break-after: page; }
+.preface-label, .toc-overline {
+  color: var(--accent);
+  font-size: 7.6pt;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+.preface h1 { display: none; }
+.preface h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: var(--heading);
+  margin: 5mm 0 5mm;
+  border-bottom: .5pt solid var(--line);
+  padding-bottom: 2.5mm;
+}
+.preface p { font-size: 9.5pt; line-height: 1.6; }
+.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
+.toc h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 21pt;
+  letter-spacing: -.03em;
+  margin: 2mm 0 5mm;
+  border: 0;
+  padding: 0;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li {
+  display: flex;
+  align-items: baseline;
+  gap: 5mm;
+  font-size: 9.1pt;
+  padding: 2.7mm 1mm;
+  border-top: .5pt solid #e7ecef;
+  break-inside: avoid;
+}
+.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
+.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
+.toc a { color: var(--ink); text-decoration: none; }
+/* Continuous editorial body: sections can flow across pages. */
+.content { padding: 0; }
+.content h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 17.2pt;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.28;
+  letter-spacing: -.024em;
+  margin: 11mm 0 5mm;
+  padding-top: 5.5mm;
+  border-top: .6pt solid var(--line);
+  break-after: avoid;
+}
+.content h2::before {
+  content: "CHAPTER";
+  display: block;
+  color: var(--accent);
+  font-size: 7pt;
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .19em;
+  margin-bottom: 2.2mm;
+}
+.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.content h3 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 11.6pt;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  color: var(--heading);
+  margin: 7mm 0 2.5mm;
+  break-after: avoid;
+}
+.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #1a3341; }
+a { color: #23778e; text-decoration: none; }
+hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
+ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
+li { padding-left: .5mm; margin: 1.5mm 0; }
+li::marker { color: var(--accent); }
+li p { margin: 0; }
+blockquote {
+  background: var(--accent-soft);
+  border-left: 2.5pt solid var(--accent);
+  margin: 4mm 0 6mm;
+  padding: 4mm 5.2mm;
+  color: #2b4654;
+  font-size: 9.4pt;
+  line-height: 1.56;
+}
+blockquote p { margin-bottom: 2.3mm; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: #143743; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.42;
+  color: var(--ink);
+  margin: 3.6mm 0 4.8mm;
+  overflow-wrap: anywhere;
+}
+thead { display: table-header-group; }
+thead th {
+  background: var(--header);
+  color: #fff;
+  text-align: left;
+  font-weight: 700;
+  padding: 2.2mm 2.4mm;
+  vertical-align: top;
+  border-right: 1pt solid rgba(255,255,255,.04);
+}
+thead th strong { color: #fff; }
+tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--zebra); }
+tr { break-inside: avoid; }
+table.wide { font-size: 7.15pt; }
+table.wide th, table.wide td { padding: 1.8mm; }
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: .91em;
+  color: #22445a;
+}
+pre {
+  color: #dce9f0;
+  background: #173746;
+  padding: 4mm 5mm;
+  font-size: 8.3pt;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 4mm 0;
+}
+pre code { color: inherit; }
+.task-list-item { list-style: none; margin-left: -5mm; }
+.task-box {
+  display: inline-block;
+  border: .85pt solid #7b8b93;
+  width: 2.6mm; height: 2.6mm;
+  margin-right: 3mm;
+  vertical-align: baseline;
+}
+.task-box.checked { background: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 7.8pt; }
+@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+
+
+:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"LEGACY / MAINFRAME MODERNIZATION";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
+@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 01 OF 04</div><div class="cover-accent-bar"></div><div class="cover-title">Legacy / Mainframe<span class="second">Modernization</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">01</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>Solution architecture case study • Financial-services account servicing • 3 November 2026</strong> <strong>Design position:</strong> Incremental, domain-by-domain modernization with explicit ownership, compatibility layers, verified data replication, safe cutover, and a viable rollback plan.</p>
+<blockquote><p><strong>Scenario, not a claim about American Express:</strong> A large card issuer has a hypothetical IBM z/OS estate using COBOL/CICS and Db2 for z/OS, with batch jobs and several dependent channels. Customers need account profile, transaction-history, and address-change capabilities. The existing platform is business-critical. Actual technology, SLOs, volumes, compliance boundaries, and downstream dependencies must be discovered.</p></blockquote><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-executive-design-decision">1. Executive design decision</a></li><li><span class="toc-num">02</span><a href="#2-problem-scope-and-discovery">2. Problem, scope, and discovery</a></li><li><span class="toc-num">03</span><a href="#3-quality-requirements-and-their-architectural-consequences">3. Quality requirements and their architectural consequences</a></li><li><span class="toc-num">04</span><a href="#4-baseline-typical-legacy-architecture">4. Baseline: typical legacy architecture</a></li><li><span class="toc-num">05</span><a href="#5-recommended-coexistence-architecture">5. Recommended coexistence architecture</a></li><li><span class="toc-num">06</span><a href="#6-derive-the-main-architectural-choices">6. Derive the main architectural choices</a></li><li><span class="toc-num">07</span><a href="#7-api-and-data-contracts">7. API and data contracts</a></li><li><span class="toc-num">08</span><a href="#8-critical-request-flows">8. Critical request flows</a></li><li><span class="toc-num">09</span><a href="#9-data-migration-ordering-and-correctness">9. Data migration, ordering and correctness</a></li><li><span class="toc-num">10</span><a href="#10-migration-roadmap-with-entry-exit-gates">10. Migration roadmap with entry / exit gates</a></li><li><span class="toc-num">11</span><a href="#11-failure-handling-and-resilience">11. Failure handling and resilience</a></li><li><span class="toc-num">12</span><a href="#12-security-and-compliance-architecture">12. Security and compliance architecture</a></li><li><span class="toc-num">13</span><a href="#13-testing-and-cutover-proof">13. Testing and cutover proof</a></li><li><span class="toc-num">14</span><a href="#14-observability-governance-cost-and-ownership">14. Observability, governance, cost, and ownership</a></li><li><span class="toc-num">15</span><a href="#15-alternatives-objections-and-decision-triggers">15. Alternatives, objections, and decision triggers</a></li><li><span class="toc-num">16</span><a href="#16-interview-ready-narrative">16. Interview-ready narrative</a></li><li><span class="toc-num">17</span><a href="#17-official-technical-references">17. Official technical references</a></li></ol></nav></section><main class="content"><h2 id="1-executive-design-decision">1. Executive design decision</h2>
+<p><strong>Choose the Strangler Fig pattern</strong>, not a one-shot rewrite. Introduce a stable API facade and an anti-corruption layer (ACL) around existing business transactions. Extract <strong>transaction-history reads first</strong>, using a replicated read projection where the source supports committed-change capture. Keep <strong>address-change writes on the mainframe</strong> until the entire bounded context and its dependent consumers can be transferred safely. Move write ownership only once, with a controlled cutover, reconciliation, and explicitly engineered rollback path.</p>
+<p>Why: a mainframe is not automatically slow or unreliable. The problem is usually <em>change coupling</em>, access to modern interfaces, undocumented dependencies, or cost/skills—not age alone. Preserving working transaction logic reduces the initial blast radius.</p>
+<p><strong>Hard invariants:</strong></p>
+<ol start="1"><li>For each business record/domain, exactly one system owns authoritative writes at a time.</li><li>Never claim success for a write unless the authoritative transaction committed or an explicit asynchronous contract says <em>accepted, pending</em>.</li><li>Treat CDC projections as eventually consistent, not as a second transactional source of truth.</li><li>Never retry an unknown-outcome write blindly; first establish whether the authoritative operation committed.</li><li>Retirement of legacy code is optional: retain shared core logic if risk and economics favor it.</li></ol>
+<h2 id="2-problem-scope-and-discovery">2. Problem, scope, and discovery</h2>
+<h3 id="business-problem">Business problem</h3>
+<ul><li>Faster, independently deployable digital features without destabilizing card/account servicing.</li><li>Consistent interfaces for mobile, web, and partner channels.</li><li>Reduced coupling to COBOL copybooks, CICS transaction interfaces, batch windows, and hidden dependencies.</li><li>Verifiable continuity of customer data, business rules, security, and auditability during migration.</li></ul>
+<h3 id="in-scope-use-cases">In-scope use cases</h3>
+<ul><li>Read account profile and recent transaction history.</li><li>Change an account's mailing address with authorization, concurrency checks, and audit trail.</li><li>Continue running required nightly jobs and legacy downstream integrations during coexistence.</li><li>Expose a stable versioned API while internal implementations change.</li></ul>
+<p><strong>Out of scope for this first wave:</strong> replacing the card authorization switch, general ledger, all batch processing, and all mainframe databases. Those need separate domain-level designs and risk assessments.</p>
+<h3 id="discovery-before-selecting-technology">Discovery before selecting technology</h3>
+<p>Inventory COBOL programs, CICS/IMS transactions, Db2 tables, VSAM files, copybooks, IBM MQ integrations, JCL/batch dependencies, schedulers, security identities, report consumers, transaction boundaries, data retention, code-page and packed-decimal formats, and business rule owners. Trace a <em>business capability</em> through online and batch code; do not infer boundaries from table names alone. Find which consumers read data directly or bypass intended APIs.</p>
+<p><strong>Sizing:</strong> Request actual read/write peak throughput, concurrent sessions, mainframe transaction capacity, batch-period peaks, p95/p99 latency baselines, dataset growth, network RTT, maximum tolerable replica lag, and recovery targets. Do not invent SLO numbers. For an illustrative capacity model, if peak reads = <code>R</code> requests/s and each request causes <code>C</code> mainframe calls, legacy demand is approximately <code>R × C</code>; reducing <code>C</code> by serving eligible reads from a projection is a primary reason for read extraction. Validate that replication cost does not erase this gain.</p>
+<h2 id="3-quality-requirements-and-their-architectural-consequences">3. Quality requirements and their architectural consequences</h2>
+<table><thead><tr><th>Requirement</th><th>Design consequence</th><th>Why</th></tr></thead><tbody><tr><td>Correct address changes</td><td>Single authoritative writer + transactional legacy call + idempotency</td><td>Avoid divergent addresses and duplicate side effects</td></tr><tr><td>Responsive transaction history</td><td>Dedicated read projection with bounded freshness</td><td>Avoid repeated cross-network, high-volume OLTP calls</td></tr><tr><td>No business-rule regression</td><td>Preserve existing rules initially; golden-master comparisons</td><td>Hidden rules may reside in COBOL, JCL, and downstream jobs</td></tr><tr><td>High availability</td><td>Isolate channels from mainframe failures; defined degradation</td><td>Digital frontend must not amplify a core outage</td></tr><tr><td>Audit and privacy</td><td>AuthN/AuthZ, purpose-based access, field minimization, immutable trails</td><td>Financial data has elevated risk</td></tr><tr><td>Controlled migration</td><td>Route by capability, cohort, and ownership</td><td>Small reversible read rollout; explicit write cutover</td></tr><tr><td>Cost efficiency</td><td>Avoid chatty integration; measure capacity and run cost</td><td>New cloud components plus old platform can temporarily cost more</td></tr></tbody></table>
+<h2 id="4-baseline-typical-legacy-architecture">4. Baseline: typical legacy architecture</h2>
+<pre><code>  Web / Mobile / Partners / Internal Apps
+                 |
+                 v
+    Proprietary integration / MQ / batch files
+                 |
+                 v
+       IBM z/OS application estate
+       +-------------------------+
+       | CICS / COBOL rules      |
+       | Db2 / VSAM data         |
+       | JCL + scheduled batch   |
+       +-------------------------+
+                 |
+                 v
+       Reports / downstream systems</code></pre>
+<p>The exact stack above is a <strong>hypothesis to validate</strong>. Some estates already have modern APIs, events, and strong operational separation. The modernization plan should reuse them rather than duplicate them.</p>
+<h2 id="5-recommended-coexistence-architecture">5. Recommended coexistence architecture</h2>
+<pre><code>      Web / Mobile / Partner Applications
+                      |
+                 Identity + WAF
+                      |
+              API Gateway / Facade
+           versioned business contracts
+                      |
+           Capability routing policy
+          /                    \
+         v                      v
+ Transaction History       Account Servicing
+   Read Service              Command Service
+         |                      |
+  Read Projection DB       Idempotency Store
+         ^                      |
+         |                   ACL / Adapter
+  Projection Consumer           |
+         ^                 z/OS Connect or
+         |                approved MQ / CICS
+  Durable Change Stream         |
+         ^                      v
+         |             Mainframe COBOL/CICS
+  Db2 committed-change CDC      |
+         ^                      v
+         +------------------ Db2/VSAM
+                                |
+                        Batch + downstream
+
+   Cross-cutting: mTLS / authz / audit / telemetry
+                   reconciliation / lag monitoring
+                   traffic controls / rollback routing</code></pre>
+<p><strong>Placement of components:</strong></p>
+<ul><li><strong>Facade / API gateway:</strong> Stable public contract, authentication enforcement, rate limits, routing, versioning. It does not implement core business rules.</li><li><strong>Capability router:</strong> A controlled map of which backend owns <em>each</em> operation. A flag changes routing; it must not change source-of-truth ownership by itself.</li><li><strong>ACL:</strong> Converts modern domain terms into legacy request records, statuses, data encodings, and error semantics. Prevents copybook and COBOL concerns from leaking into digital services.</li><li><strong>Mainframe adapter:</strong> Use an approved integration such as IBM z/OS Connect for supported REST exposure of CICS/IMS/Db2 assets; IBM MQ may be a better fit for existing asynchronous interfaces. Choice depends on proven availability and transaction semantics.</li><li><strong>Read projection:</strong> A database optimized for transaction-history queries. It is not authoritative and must expose its freshness and replay/rebuild mechanism.</li><li><strong>CDC stream:</strong> Copy committed mainframe changes where source and tooling allow, maintain checkpoint/watermark, and support replay, DLQ, and gap detection. Check whether data lives in Db2 versus VSAM or batch files before choosing CDC technology.</li><li><strong>Existing batch:</strong> Remains part of the truth model until each job and every report/consumer is explicitly migrated or retired.</li></ul>
+<h2 id="6-derive-the-main-architectural-choices">6. Derive the main architectural choices</h2>
+<table><thead><tr><th>Decision</th><th>Selected approach</th><th>Why not the obvious alternative?</th><th>Revisit when…</th></tr></thead><tbody><tr><td>Migration strategy</td><td>Incremental strangler</td><td>Big-bang rewrite combines unknown business rules, migration, and cutover risk</td><td>Capability is isolated, fully specified, and cheaply replaceable</td></tr><tr><td>Preserve core logic</td><td>Expose legacy transaction through ACL</td><td>Reimplementing COBOL rules first risks subtle functional differences</td><td>Rules are covered by parity tests and ownership is transferable</td></tr><tr><td>Service boundaries</td><td>Business capability (history, account servicing)</td><td>One microservice per COBOL program merely recreates legacy coupling</td><td>Domain events, ownership, and dependencies are understood</td></tr><tr><td>Read migration</td><td>Snapshot + CDC + read projection</td><td>Requerying Db2 for every digital request couples traffic to mainframe</td><td>Read freshness must be strictly transactional</td></tr><tr><td>Write migration</td><td>One writer; mainframe first</td><td>Dual writes produce inconsistent state on partial failure</td><td>Whole write domain is cut over with reliable synchronization</td></tr><tr><td>Sync/async</td><td>Sync for address-command result; async for read projections and reporting</td><td>Pure async cannot promise a completed write immediately</td><td>API deliberately offers accepted/pending workflow</td></tr><tr><td>Data store</td><td>Relational store for operation tracking; query-shaped projection for reads</td><td>NoSQL is not intrinsically faster or safer for every workload</td><td>Demonstrated scale and access patterns justify a different model</td></tr><tr><td>Hosting</td><td>Privately connected, managed application runtime + managed persistence</td><td>Direct browser-to-mainframe exposure has poor isolation and security</td><td>Measured operating requirements favor another runtime</td></tr><tr><td>Event delivery</td><td>At-least-once + idempotent consumers</td><td>'Exactly once' across heterogeneous systems cannot be assumed</td><td>A specific connector and entire transactional boundary prove stronger guarantees</td></tr></tbody></table>
+<p><strong>Key vocabulary:</strong> <em>Strangler Fig</em> = replace functionality piece by piece behind a stable interface. <em>ACL</em> = a translating adapter between incompatible models. <em>Bounded context</em> = a domain with coherent rules and ownership. <em>CDC</em> = replicate committed database changes. <em>Idempotency</em> = repeating an operation identifier does not repeat the business effect. <em>System of record</em> = the authority for a particular data domain.</p>
+<h2 id="7-api-and-data-contracts">7. API and data contracts</h2>
+<p>Use business-oriented APIs rather than raw COBOL transaction names:</p>
+<pre><code>GET /v1/accounts/{accountId}/transactions?cursor=...&amp;limit=50
+Authorization: Bearer &lt;access-token&gt;
+
+200 OK
+{
+  "items": [{"transactionId":"t-123","amountMinor":2750,
+             "currency":"USD","postedAt":"..."}],
+  "nextCursor":"...", "dataAsOf":"..."
+}</code></pre>
+<p><code>dataAsOf</code> documents replica freshness. The read query uses deterministic pagination; do not promise the most recent write is visible immediately in an asynchronous projection.</p>
+<pre><code>PUT /v1/accounts/{accountId}/mailing-address
+Authorization: Bearer &lt;access-token&gt;
+Idempotency-Key: client-operation-uuid
+If-Match: "account-version"
+
+{ "address": {"line1":"...","city":"...", "region":"...","postalCode":"..."} }</code></pre>
+<p>Return <code>200</code> only after an authoritative commit and verified outcome. Return <code>409</code> or <code>412</code> for an account-version conflict under the documented API contract. If the outcome is unknown after a timeout, return a documented pending/unknown-operation response with <code>operationId</code> and a status endpoint—<strong>not a false failure or a second write attempt</strong>.</p>
+<h3 id="minimal-data-ownership-model">Minimal data ownership model</h3>
+<table><thead><tr><th>Entity / record</th><th>Authority during coexistence</th><th>Modern copy / use</th></tr></thead><tbody><tr><td>Account profile</td><td>Mainframe</td><td>Optional read cache or projection</td></tr><tr><td>Mailing address</td><td>Mainframe</td><td>Non-authoritative display; no independent write</td></tr><tr><td>Posted transaction history</td><td>Mainframe</td><td>CDC-built read projection</td></tr><tr><td>Operation idempotency record</td><td>Command integration boundary plus authoritative dedup support</td><td>Status/retry control; needs end-to-end design</td></tr><tr><td>Routing ownership registry</td><td>Modern platform governance</td><td>Versioned and audited capability routing</td></tr><tr><td>Audit events</td><td>Approved audit system</td><td>Append-only security/change evidence</td></tr></tbody></table>
+<p><strong>Encoding and semantics:</strong> define canonical account identifiers; currency in integer minor units or exact decimals; ISO dates and explicit timezone; code-page conversion; COBOL COMP-3/packed decimals if present; null/blank semantics; and error-code translation. Never change rounding or business calendar rules silently.</p>
+<h2 id="8-critical-request-flows">8. Critical request flows</h2>
+<h3 id="a-transaction-history-read-lower-risk-first-migration">A. Transaction-history read (lower-risk first migration)</h3>
+<ol start="1"><li>Client authenticates; gateway enforces account authorization and input limits.</li><li>Router selects the modern History Read Service for eligible cohorts.</li><li>Service queries its indexed projection by <code>accountId</code>, timestamp, and deterministic cursor; returns freshness watermark.</li><li>Projection consumer applies <strong>committed</strong> CDC events, deduplicates, and records source checkpoints.</li><li>If the projection is stale beyond the agreed freshness policy, return explicit stale/error behavior or use a tightly controlled legacy fallback. <strong>Never silently claim real-time accuracy.</strong></li></ol>
+<p><strong>Why this order:</strong> extracted reads are comparatively reversible. The legacy mainframe retains write ownership. A projection can be rebuilt from a consistent snapshot and durable change log; if this cannot be guaranteed, don't market it as lossless CDC.</p>
+<h3 id="b-mailing-address-change-initially-legacy-owned">B. Mailing-address change (initially legacy-owned)</h3>
+<ol start="1"><li>Authorize the authenticated user for the specific account and verify the expected profile version.</li><li>Persist a client operation key and immutable request hash. Duplicate key + different payload is rejected.</li><li>Call the ACL using a stable <code>operationId</code>; ACL maps canonical address to legacy schema and validates encoding.</li><li>Mainframe CICS transaction performs the authoritative change <strong>and ideally records the same operation identifier atomically</strong>. Return a committed status and new version.</li><li>If commit is confirmed, complete the modern operation record and respond success. CDC later updates read copies.</li><li>If the network times out, record <code>UNKNOWN</code> and query status/reconcile. Do <strong>not</strong> blindly replay. If legacy cannot check/deduplicate operation IDs, automatic retries of writes must remain disabled until a safe protocol exists.</li></ol>
+<p><strong>Why a local idempotency table is insufficient:</strong> a crash after the mainframe commits but before the modern service records success leaves an ambiguous outcome. Deduplication or status inquiry must cross the legacy transaction boundary.</p>
+<h3 id="c-batch-completion-cdc-reconciliation">C. Batch completion / CDC reconciliation</h3>
+<ol start="1"><li>Discover whether overnight jobs mutate Db2, VSAM, generated files, and derived totals.</li><li>If Db2 CDC observes those <em>committed</em> mutations, publish into the history projection with source positions.</li><li>For file- or VSAM-derived changes outside CDC coverage, create a separate governed change feed or scheduled snapshot/delta ingestion.</li><li>Compare key counts, record-level hashes/fields, business totals, missing IDs, and source-versus-target watermarks.</li><li>Quarantine mapping defects, emit alerts, and rerun a safe replay/rebuild without changing mainframe truth.</li></ol>
+<h2 id="9-data-migration-ordering-and-correctness">9. Data migration, ordering and correctness</h2>
+<p><strong>Bootstrap:</strong> Capture a consistent source snapshot and a matching source-log position. Load the snapshot, then apply all subsequent committed changes from that position. Do not take a snapshot and start CDC later without overlap controls: a gap can lose mutations. Use connector-specific supported bootstrap methods and verify recovery behavior.</p>
+<p><strong>Event correctness:</strong> Carry <code>sourceRecordId</code>, <code>sourceCommitPosition</code>, schema version, operation type, and event ID. Use idempotent upserts and deletes. Preserve per-record ordering using source log order/sequence checks; a distributed event bus does not magically guarantee global order. Invalid events go to quarantine/DLQ with replay tooling.</p>
+<p><strong>Read consistency:</strong> Transaction history is eventually consistent; address updates are acknowledged only by the authoritative writer. If a workflow requires read-your-writes consistency, route that read to the authoritative source or use a version barrier/wait-for-projection policy. Don't use stale cached data to decide whether an account can be changed.</p>
+<p><strong>Write ownership transfer (later wave):</strong> Freeze or drain incoming commands for the bounded context, complete source-to-target catch-up, reconcile invariants, switch the <em>single writer</em> routing, restart commands against the new owner, and monitor with an agreed rollback window. Once new writes occur, reversal requires a trustworthy reverse sync or forward-recovery plan; changing a feature flag alone is not a complete rollback.</p>
+<h2 id="10-migration-roadmap-with-entry-exit-gates">10. Migration roadmap with entry / exit gates</h2>
+<table><thead><tr><th>Phase</th><th>Scope</th><th>Gate to advance</th><th>Rollback reality</th></tr></thead><tbody><tr><td>0. Assess</td><td>Program/dependency map, data lineage, workloads, security</td><td>Identified owners, interfaces, baselines, risk register</td><td>No customer impact</td></tr><tr><td>1. Wrap</td><td>Facade, contract tests, observability; 100% legacy backing</td><td>Same outputs, approved access controls, capacity protection</td><td>Route back to existing entry point</td></tr><tr><td>2. Replicate</td><td>Snapshot, CDC, read projection; shadow reads only</td><td>Coverage and reconciliation reliable; freshness acceptable</td><td>Stop serving projection</td></tr><tr><td>3. Route reads</td><td>Progressive eligible-cohort rollout</td><td>Parity, error rate, capacity, and lag meet agreed thresholds</td><td>Route reads to original source if capacity permits</td></tr><tr><td>4. Modern commands</td><td>New command API, still legacy-owned write</td><td>Idempotency across boundary, status inquiry, audit parity</td><td>Route commands through previous legacy path</td></tr><tr><td>5. Transfer domain</td><td>New owner of a <em>complete, bounded write domain</em></td><td>Cutover validation + all dependent consumers changed</td><td>Requires reverse-sync/forward-fix design</td></tr><tr><td>6. Retire selectively</td><td>Remove unused programs, files, interfaces</td><td>No hidden callers, jobs, or regulatory retention blockers</td><td>Preserve backup/archival access as required</td></tr></tbody></table>
+<p><strong>How to pick the first domain:</strong> Prefer high business value, clear ownership, low coupling, stable rules, testable outputs, and tolerable eventual consistency. Transaction-history search is an illustration, not automatically suitable for every organization.</p>
+<h2 id="11-failure-handling-and-resilience">11. Failure handling and resilience</h2>
+<table><thead><tr><th>Failure</th><th>Response / mitigation</th></tr></thead><tbody><tr><td>Mainframe unavailable for a command</td><td>Fail closed for writes or expose an explicitly durable pending workflow if business rules allow; never fabricate commit</td></tr><tr><td>CICS call times out after commit</td><td>Store <code>UNKNOWN</code>, query using operation ID, reconcile; prevent unsafe retry</td></tr><tr><td>CDC falls behind</td><td>Alarm on lag and source positions; return <code>dataAsOf</code>; suspend stale-sensitive features</td></tr><tr><td>CDC event duplicated/out of order</td><td>Idempotent consumer, per-record source sequence, replay/DLQ</td></tr><tr><td>Legacy capacity threatened by fallback</td><td>Per-operation rate limits, bulkhead pool, circuit breaker; shed low-priority reads</td></tr><tr><td>New read store outage</td><td>Controlled legacy fallback only with tested capacity; otherwise explicit degradation</td></tr><tr><td>Network partition</td><td>Avoid split-brain writes; current owner remains sole writer</td></tr><tr><td>Batch job changes hidden state</td><td>Inventory jobs; compare end-of-batch totals and source-to-target state</td></tr><tr><td>Feature rollback after modern writes</td><td>Not safe without reverse data transfer and reconciliation; favor forward recovery when necessary</td></tr></tbody></table>
+<p>Retries: safe reads may use bounded retries with jitter if allowed. Writes may only retry when end-to-end idempotency and unknown-outcome lookup have been proven. Set dependency timeouts within the caller's deadline and use circuit breakers to protect z/OS capacity.</p>
+<h2 id="12-security-and-compliance-architecture">12. Security and compliance architecture</h2>
+<ul><li><strong>Identity:</strong> OIDC/OAuth2 for channels when appropriate; service-to-service identity with mTLS or signed workload credentials. Map users and technical identities to approved mainframe authorization mechanisms.</li><li><strong>Authorization:</strong> Account-level entitlements on every request. Gateway authentication alone is insufficient. Ensure least-privilege service accounts and separation of duties.</li><li><strong>Network:</strong> Private connectivity, segmentation, ingress/egress allowlists, certificate and key rotation, monitored trust boundaries. Do not expose raw CICS/Db2 interfaces to public clients.</li><li><strong>Data:</strong> Minimize replicated fields; tokenize or omit cardholder data where possible, encrypt in transit and at rest, control KMS/HSM access, remove secrets/PII from logs and dead-letter payloads. Determine actual PCI DSS scope with the responsible security/compliance team rather than assuming every component is out of scope.</li><li><strong>Audit:</strong> Record who requested the change, authorization decision, operation ID, before/after references where policy permits, mainframe result, routing policy version, and reconciliation outcomes. Apply retention and tamper-evidence requirements.</li><li><strong>Threat cases:</strong> spoofed caller, replayed request, compromised adapter, unintended CDC overexposure, stale authorization, privilege escalation, and data exfiltration.</li></ul>
+<h2 id="13-testing-and-cutover-proof">13. Testing and cutover proof</h2>
+<p><strong>Functional parity:</strong> Build a <em>golden-master</em> suite by capturing approved, sanitized legacy inputs and expected outputs. Compare business outcomes across dates, currencies, holidays, error codes, missing addresses, batch cutoffs, duplicate requests, and COBOL data representations. Shadow <strong>reads</strong> are safe; shadow <strong>writes against production</strong> are not, unless designed as side-effect-free validation.</p>
+<p><strong>Migration checks:</strong> Count and hash records at defined source positions; compare per-account history and totals; verify CDC initialization without gaps; test delete handling, schema changes, replay, backfill and recovery from checkpoint loss.</p>
+<p><strong>Non-functional:</strong> Performance tests include network latency, CICS concurrency and peak batch contention, connection pool saturation, burst traffic, dependency failure, security policy, penetration testing, and recovery drills. Test version/contract compatibility against all consumers, including forgotten internal and batch clients.</p>
+<p><strong>Cutover runbook:</strong> Freeze requirements and mappings → validate baseline/checkpoints → confirm downstream readiness → canary read cohorts → reconcile → publish routing change → monitor → decide continue/stop based on pre-agreed gates. For writes, add command drain/freeze and reverse-sync/forward-fix procedures before any switch.</p>
+<h2 id="14-observability-governance-cost-and-ownership">14. Observability, governance, cost, and ownership</h2>
+<p><strong>Metrics:</strong> End-to-end p50/p95/p99 latency, error rate, dependency timeout, CICS calls per request, queue age, CDC lag and position gaps, projection freshness, data mismatch count, unknown-outcome commands, batch duration, routing cohorts, and manual reconciliations. Correlate modern trace IDs with legacy request/transaction identifiers where feasible; do not place sensitive payloads in traces.</p>
+<p><strong>Operations:</strong> Named owners for gateway, ACL, mainframe service, CDC, projection, schema mapping, and reconciliation. Maintain an architecture decision record (ADR), data ownership register, contract versions, operational handoffs, incident playbooks, and service dependency map.</p>
+<p><strong>Cost model:</strong> Compare legacy CPU/transaction demand and software charges, connectivity, CDC licensing, storage, managed compute, security operations, team cost, and coexistence overhead. The temporary cost of running <em>both systems</em> is a real migration cost; do not promise automatic savings.</p>
+<h2 id="15-alternatives-objections-and-decision-triggers">15. Alternatives, objections, and decision triggers</h2>
+<table><thead><tr><th>Alternative</th><th>Appropriate when</th><th>Main reason not to select by default</th></tr></thead><tbody><tr><td>Big-bang rewrite</td><td>Small self-contained application, fully understood rules, controlled outage</td><td>High correlated business/data/cutover risk</td></tr><tr><td>Replatform COBOL unchanged</td><td>Strong need to leave current hardware; preserve tested logic</td><td>Moves runtime but does not remove coupling or fix domain design</td></tr><tr><td>Automated refactoring</td><td>Proven conversion tooling and parity tests, stable domain model</td><td>Generated code may preserve structural debt; hard to prove equivalence for every rule</td></tr><tr><td>Retain mainframe + modern APIs</td><td>Core remains efficient, stable, compliant, and economically sensible</td><td>Does not solve every long-term agility constraint</td></tr><tr><td>CDC + CQRS reads</td><td>Stale-tolerant read workload and reliable committed-change feed</td><td>Extra state, monitoring, and reconciliation complexity</td></tr><tr><td>Synchronous all the way to mainframe</td><td>Low traffic, strict freshness, no reliable CDC</td><td>Higher latency and mainframe dependency per request</td></tr><tr><td>Bidirectional synchronization</td><td>Only with fully specified conflict-resolution/ownership invariants</td><td>Split-brain risk and very complex recovery</td></tr></tbody></table>
+<p><strong>Architectural principle:</strong> A domain can be <em>modernized</em> without immediately leaving z/OS. “Cloud-first” is not a sufficient business reason to migrate stateful financial transaction logic.</p>
+<h2 id="16-interview-ready-narrative">16. Interview-ready narrative</h2>
+<blockquote><p>“I would not begin by rewriting COBOL. I would first map business capabilities, transaction boundaries, batch dependencies, and ownership. Then I would introduce a stable API facade with an anti-corruption layer that calls the existing CICS/Db2-backed functions. I would move lower-risk reads first using a consistent snapshot and CDC-based projection, with explicit freshness and reconciliation. Writes would continue to have one source of truth until an entire bounded context could be cut over. The difficult decisions are idempotency across the legacy boundary, unknown commit outcomes, CDC coverage, batch coupling, data parity, and genuine rollback after writer ownership changes. I would prove each wave with contract, parity, load, recovery, and security gates, and I would retain high-value mainframe components when that is the safer and more economical outcome.”</p></blockquote>
+<h3 id="ten-facts-worth-remembering">Ten facts worth remembering</h3>
+<ol start="1"><li>Modernization ≠ mandatory migration off a mainframe.</li><li>The hardest problem is usually hidden domain and batch coupling, not API syntax.</li><li>Strangler routing changes <em>implementation</em> incrementally; it does not authorize dual writers.</li><li>ACL translates semantics; a gateway primarily handles common API concerns.</li><li>CDC creates read replicas and needs snapshot/log continuity, sequencing, and reconciliation.</li><li>One source of truth per bounded write domain prevents split brain.</li><li>A modern idempotency table alone cannot fix unknown commits inside legacy CICS.</li><li>Shadow reads are useful; production dual writes can create harmful side effects.</li><li>Read cutover is relatively reversible; write-owner cutover may not be.</li><li>Success means verified business behavior, reliability, security, and operating economics—not just moving COBOL to Java.</li></ol>
+<h2 id="17-official-technical-references">17. Official technical references</h2>
+<ol start="1"><li><strong>AWS — Strangler Fig pattern</strong>: https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/strangler-fig.html</li><li><strong>AWS — Anti-corruption layer pattern</strong>: https://docs.aws.amazon.com/en_en/prescriptive-guidance/latest/cloud-design-patterns/acl.html</li><li><strong>IBM — z/OS Connect API providers</strong>: https://www.ibm.com/docs/en/zos-connect/3.0.0?topic=connect-what-are-zos-api-providers</li><li><strong>IBM — Data replication on z/OS</strong>: https://www.ibm.com/docs/en/zos-basic-skills?topic=tools-data-replication-zos</li><li><strong>IBM — CDC Replication for Db2 for z/OS</strong>: https://www.ibm.com/docs/en/idr/11.4.0?topic=replication-infosphere-cdc-db2-zos</li><li><strong>AWS — Mainframe modernization approaches</strong>: https://docs.aws.amazon.com/m2/latest/userguide/modernization-m2.html</li><li><strong>AWS — Mainframe decoupling best practices</strong>: https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-mainframe-decoupling-patterns/best-practices.html</li><li><strong>NIST — SP 800-207 Zero Trust Architecture</strong>: https://csrc.nist.gov/pubs/sp/800/207/final</li><li><strong>PCI Security Standards Council — PCI DSS v4.0.1 announcement</strong>: https://blog.pcisecuritystandards.org/just-published-pci-dss-v4-0-1</li><li><strong>AWS — Mainframe cutover guidance</strong>: https://docs.aws.amazon.com/prescriptive-guidance/latest/replatform-mainframe-apps-shared-db2/cutover.html</li></ol>
+<p><em>These references support the patterns and technology descriptions. The proposed architecture, example endpoints, entity schemas, migration gates, and operating requirements are design recommendations for the hypothetical scenario—not vendor guarantees or details of American Express's internal systems.</em></p></main></body></html>

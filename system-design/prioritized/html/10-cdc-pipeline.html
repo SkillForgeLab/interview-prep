@@ -1,0 +1,454 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>System Design #10 — Change Data Capture (CDC) Pipeline</title><style>
+/* The original PDF skill style sheet is embedded below. */
+/* Architect's Field Notes — original study-guide design recreation.
+   Standalone builder embeds this file into its generated HTML. */
+:root {
+  --navy: #112c3a;
+  --header: #193a4b;
+  --ink: #273944;
+  --heading: #17313e;
+  --muted: #75838d;
+  --line: #d9e2e7;
+  --zebra: #f6f8f9;
+  --accent: #64c8e6;
+  --accent-soft: #eaf8fc;
+}
+@page {
+  size: A4;
+  margin: 19mm 19mm 19mm;
+  @top-left {
+    content: "INTERVIEW / FIELD GUIDE";
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  @top-right {
+    content: string(running-topic);
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .02em;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+    color: #9aa5ae;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 6.3pt;
+    letter-spacing: .03em;
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page, decimal-leading-zero);
+    color: #394b56;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-weight: 700;
+    font-size: 7pt;
+    vertical-align: middle;
+  }
+}
+@page cover {
+  size: A4;
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Inter", "DejaVu Sans", sans-serif;
+  font-size: 9.4pt;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: #fff;
+  overflow-wrap: break-word;
+}
+.cover {
+  page: cover;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  overflow: hidden;
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 29.6mm 26mm;
+}
+.cover::before, .cover::after {
+  content: "";
+  position: absolute;
+  border: .55pt solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
+.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
+.cover-brand {
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: .31em;
+  text-transform: uppercase;
+  color: #dceaf0;
+}
+.cover-series {
+  font-size: 8pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #98b3c1;
+  margin-top: 7mm;
+}
+.cover-accent-bar {
+  position: absolute;
+  left: 26mm; top: 80mm;
+  height: 3.5mm; width: 21mm;
+  background: var(--accent);
+}
+.cover-title {
+  position: absolute;
+  left: 25.5mm; right: 25mm; top: 97mm;
+  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+  font-size: 42pt;
+  font-weight: 800;
+  letter-spacing: -.043em;
+  line-height: 1.08;
+  color: #fff;
+}
+.cover-title .second { display: block; color: var(--accent); }
+.cover-title.long { font-size: 37pt; }
+.cover-sub {
+  position: absolute;
+  left: 26mm; right: 31mm; top: 173.5mm;
+  color: #bdcdd5;
+  font-size: 11.5pt;
+  line-height: 1.7;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.cover-note {
+  color: #91aab7;
+  text-transform: none;
+  font-size: 9pt;
+  letter-spacing: .01em;
+  margin-top: 7mm;
+  line-height: 1.6;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 31mm; left: 26mm;
+  font-size: 7.8pt;
+  line-height: 1.9;
+  letter-spacing: .065em;
+  color: #cfdae0;
+}
+.cover-rule {
+  position: absolute;
+  bottom: 62mm; height: .35pt;
+  left: 26mm; right: 26mm;
+  background: rgba(255,255,255,.15);
+}
+.cover-number {
+  position: absolute;
+  bottom: 29mm; right: 26mm;
+  color: var(--accent);
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 39pt;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+/* Introduction + automatically generated navigable contents. */
+.preface { break-after: page; }
+.preface-label, .toc-overline {
+  color: var(--accent);
+  font-size: 7.6pt;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+.preface h1 { display: none; }
+.preface h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: var(--heading);
+  margin: 5mm 0 5mm;
+  border-bottom: .5pt solid var(--line);
+  padding-bottom: 2.5mm;
+}
+.preface p { font-size: 9.5pt; line-height: 1.6; }
+.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
+.toc h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 21pt;
+  letter-spacing: -.03em;
+  margin: 2mm 0 5mm;
+  border: 0;
+  padding: 0;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li {
+  display: flex;
+  align-items: baseline;
+  gap: 5mm;
+  font-size: 9.1pt;
+  padding: 2.7mm 1mm;
+  border-top: .5pt solid #e7ecef;
+  break-inside: avoid;
+}
+.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
+.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
+.toc a { color: var(--ink); text-decoration: none; }
+/* Continuous editorial body: sections can flow across pages. */
+.content { padding: 0; }
+.content h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 17.2pt;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.28;
+  letter-spacing: -.024em;
+  margin: 11mm 0 5mm;
+  padding-top: 5.5mm;
+  border-top: .6pt solid var(--line);
+  break-after: avoid;
+}
+.content h2::before {
+  content: "CHAPTER";
+  display: block;
+  color: var(--accent);
+  font-size: 7pt;
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .19em;
+  margin-bottom: 2.2mm;
+}
+.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.content h3 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 11.6pt;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  color: var(--heading);
+  margin: 7mm 0 2.5mm;
+  break-after: avoid;
+}
+.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #1a3341; }
+a { color: #23778e; text-decoration: none; }
+hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
+ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
+li { padding-left: .5mm; margin: 1.5mm 0; }
+li::marker { color: var(--accent); }
+li p { margin: 0; }
+blockquote {
+  background: var(--accent-soft);
+  border-left: 2.5pt solid var(--accent);
+  margin: 4mm 0 6mm;
+  padding: 4mm 5.2mm;
+  color: #2b4654;
+  font-size: 9.4pt;
+  line-height: 1.56;
+}
+blockquote p { margin-bottom: 2.3mm; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: #143743; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.42;
+  color: var(--ink);
+  margin: 3.6mm 0 4.8mm;
+  overflow-wrap: anywhere;
+}
+thead { display: table-header-group; }
+thead th {
+  background: var(--header);
+  color: #fff;
+  text-align: left;
+  font-weight: 700;
+  padding: 2.2mm 2.4mm;
+  vertical-align: top;
+  border-right: 1pt solid rgba(255,255,255,.04);
+}
+thead th strong { color: #fff; }
+tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--zebra); }
+tr { break-inside: avoid; }
+table.wide { font-size: 7.15pt; }
+table.wide th, table.wide td { padding: 1.8mm; }
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: .91em;
+  color: #22445a;
+}
+pre {
+  color: #dce9f0;
+  background: #173746;
+  padding: 4mm 5mm;
+  font-size: 8.3pt;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 4mm 0;
+}
+pre code { color: inherit; }
+.task-list-item { list-style: none; margin-left: -5mm; }
+.task-box {
+  display: inline-block;
+  border: .85pt solid #7b8b93;
+  width: 2.6mm; height: 2.6mm;
+  margin-right: 3mm;
+  vertical-align: baseline;
+}
+.task-box.checked { background: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 7.8pt; }
+@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+
+
+:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"SYSTEM DESIGN #10 — CHANGE DATA CAPTURE (CDC) PIPELINE";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
+@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 03 OF 04</div><div class="cover-accent-bar"></div><div class="cover-title long">System Design #10 — Change<span class="second">Data Capture (CDC) Pipeline</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">03</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>Solution Architect interview preparation | Reference architecture and decision guide</strong> <strong>Edition:</strong> 3 November 2026 <strong>Example stack:</strong> PostgreSQL logical decoding + Debezium + Kafka + independent sinks <strong>Scope:</strong> Generic financial-services scenario; this is not a description of American Express&#39;s internal systems.</p>
+<hr>
+<h2>Executive summary</h2>
+<p><strong>Problem.</strong> A financial services application writes transaction-status records to a PostgreSQL OLTP database. Search, customer-service dashboards, an operational data store, and analytics all need fresh changes. Repeatedly querying the production database would increase load, couple consumers to the source schema, and still make deletions and missed updates difficult to handle.</p>
+<p><strong>Recommended design.</strong> Capture committed row changes from PostgreSQL&#39;s write-ahead log (WAL) using a Debezium source connector running in Kafka Connect. Store the resulting change events in partitioned Kafka topics with an explicit schema contract. Independent consumers build projections and analytical datasets. Use snapshot-plus-streaming for bootstrap, at-least-once processing with idempotent sinks, replayable retention, end-to-end monitoring, and strict sensitive-data controls.</p>
+<p><strong>Core trade-off.</strong> CDC provides low-source-impact, near-real-time replication, but it is <em>not</em> the same as an atomic business-event bus. It introduces eventual consistency, schema coupling, source WAL-retention risk, and replay/duplicate handling. Use a transactional outbox when consumers need semantically meaningful domain events rather than row-level mutations.</p>
+<h3>Architecture at a glance</h3>
+<pre><code> OLTP application
+       |
+       v
+ +---------------------+
+ | PostgreSQL primary  |  Source of truth
+ | transactions table  |
+ | WAL + logical slot  |
+ +----------+----------+
+            | committed row changes
+            v
+ +---------------------+       +------------------+
+ | Debezium connector  |------&gt;| Kafka Connect    |
+ | snapshot + WAL read |       | managed runtime  |
+ +----------+----------+       +------------------+
+            |
+            v
+ +---------------------+       +------------------+
+ | Kafka CDC topic(s)  |&lt;-----&gt;| Schema Registry  |
+ | keyed by record ID  |       | schema versions  |
+ +-----+---------+-----+       +------------------+
+       |         |         \
+       v         v          v
+  State       Analytics   Search / alert
+  projector   pipeline    consumers
+       |         |
+       v         v
+  Read-model   Object store / warehouse
+  database
+
+ Cross-cutting: IAM, encryption, monitoring, DLQ, replay, reconciliation</code></pre><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-define-the-problem-and-boundaries">1. Define the problem and boundaries</a></li><li><span class="toc-num">02</span><a href="#2-derive-the-architectural-choices">2. Derive the architectural choices</a></li><li><span class="toc-num">03</span><a href="#3-component-responsibilities">3. Component responsibilities</a></li><li><span class="toc-num">04</span><a href="#4-end-to-end-request-and-data-flows">4. End-to-end request and data flows</a></li><li><span class="toc-num">05</span><a href="#5-event-contract-and-data-semantics">5. Event contract and data semantics</a></li><li><span class="toc-num">06</span><a href="#6-consistency-and-delivery-guarantees">6. Consistency and delivery guarantees</a></li><li><span class="toc-num">07</span><a href="#7-partitioning-scaling-and-retention">7. Partitioning, scaling, and retention</a></li><li><span class="toc-num">08</span><a href="#8-failure-modes-and-recovery-strategy">8. Failure modes and recovery strategy</a></li><li><span class="toc-num">09</span><a href="#9-security-and-compliance-design">9. Security and compliance design</a></li><li><span class="toc-num">10</span><a href="#10-monitoring-slos-and-operational-readiness">10. Monitoring, SLOs, and operational readiness</a></li><li><span class="toc-num">11</span><a href="#11-validation-strategy-before-production">11. Validation strategy before production</a></li><li><span class="toc-num">12</span><a href="#12-alternatives-and-when-to-select-them">12. Alternatives and when to select them</a></li><li><span class="toc-num">13</span><a href="#13-architecture-decision-records-concise-summary">13. Architecture decision records — concise summary</a></li><li><span class="toc-num">14</span><a href="#14-interview-ready-explanation-one-minute-narrative">14. Interview-ready explanation (one-minute narrative)</a></li><li><span class="toc-num">15</span><a href="#15-official-technical-references">15. Official technical references</a></li></ol></nav></section><main class="content"><h2 id="1-define-the-problem-and-boundaries">1. Define the problem and boundaries</h2>
+<h3 id="11-functional-requirements">1.1 Functional requirements</h3>
+<ol start="1"><li>Capture <strong>INSERT</strong>, <strong>UPDATE</strong>, and <strong>DELETE</strong> operations for an approved set of source tables after they commit.</li><li>Deliver new changes to multiple independent downstream applications with low delay.</li><li>Bootstrap an empty downstream system with existing rows <strong>without a gap</strong> between initial load and live changes.</li><li>Allow a consumer to restart, catch up, or replay retained changes without requesting them again from the source.</li><li>Support schema evolution, explicit deletion handling, and controlled downstream access.</li><li>Detect missing, stuck, duplicated, delayed, or malformed processing; provide repair procedures.</li></ol>
+<h3 id="12-non-functional-requirements-proposed-interview-assumptions">1.2 Non-functional requirements — proposed interview assumptions</h3>
+<p>These numbers are <strong>illustrative design targets, not verified production requirements</strong>.</p>
+<table><thead><tr><th>Dimension</th><th>Assumed target</th><th>Architectural consequence</th></tr></thead><tbody><tr><td>Freshness</td><td>99% of healthy-path updates visible downstream within 10 s</td><td>Streaming CDC, end-to-end lag metric</td></tr><tr><td>Availability</td><td>Source database must keep serving core transactions if analytics is down</td><td>Decouple source and sinks using broker</td></tr><tr><td>Correctness</td><td>No silently lost committed source changes inside supported retention/recovery window</td><td>Durable offsets, WAL monitoring, replay, reconciliation</td></tr><tr><td>Delivery</td><td>At-least-once end-to-end; duplicates tolerated and suppressed at sinks</td><td>Idempotent application of changes</td></tr><tr><td>Recovery</td><td>Rebuild a sink from retained stream or a fresh snapshot</td><td>Topic retention + backfill runbook</td></tr><tr><td>Ordering</td><td>Preserve order for the same business key in each topic</td><td>Stable record key and Kafka partitioning</td></tr><tr><td>Privacy</td><td>Do not replicate raw card data or unnecessary personal data</td><td>Source allowlist and field-level controls</td></tr></tbody></table>
+<p><strong>Out of scope.</strong> This pipeline does not authorize payments, decide financial truth, guarantee synchronous updates across services, or replace the source ledger. The source OLTP system remains authoritative.</p>
+<h3 id="13-scale-estimate-assumptions-not-vendor-limits">1.3 Scale estimate (assumptions, not vendor limits)</h3>
+<table><thead><tr><th>Input</th><th>Assumption / calculation</th></tr></thead><tbody><tr><td>Average source change rate</td><td>500 events/s</td></tr><tr><td>Peak rate</td><td>5,000 events/s (10x average)</td></tr><tr><td>Average serialized record</td><td>1 KB after envelope/metadata, for initial sizing</td></tr><tr><td>Events per day</td><td>500 × 86,400 = <strong>43.2 million</strong></td></tr><tr><td>Logical data per day</td><td>About <strong>43.2 GB/day</strong> (decimal units)</td></tr><tr><td>Seven-day logical retention</td><td>About <strong>302.4 GB</strong></td></tr><tr><td>Three replicas, before overhead</td><td>About <strong>907 GB</strong> of broker storage</td></tr></tbody></table>
+<p><strong>Why estimate?</strong> The dominant decisions depend on change rate, peak rate, record size, number of sinks, snapshot size, and retention. Recalculate for compression, replication, indexes, log compaction, safety headroom, and expected growth. The peak rate determines throughput capacity; average rate drives retained volume.</p>
+<h2 id="2-derive-the-architectural-choices">2. Derive the architectural choices</h2>
+<table><thead><tr><th>Decision</th><th>Select</th><th>Why / when to reconsider</th></tr></thead><tbody><tr><td>Capture mechanism</td><td><strong>Log-based CDC</strong> from PostgreSQL WAL</td><td>Reads committed changes and avoids repeated table scans. Polling is simpler for low-volume, timestamped tables but can miss deletes or short-lived states.</td></tr><tr><td>Capture engine</td><td><strong>Debezium PostgreSQL connector</strong></td><td>Provides snapshot and WAL streaming, documented operations, and Kafka Connect integration. Check supported versions/operations.</td></tr><tr><td>Integration layer</td><td><strong>Kafka</strong></td><td>Durable buffer, multiple consumer groups, retained replay. A queue may suffice if only one worker consumes each task and replay is unnecessary.</td></tr><tr><td>Connector runtime</td><td><strong>Kafka Connect distributed workers</strong></td><td>Externalized connector lifecycle and offsets. Important: the PostgreSQL connector itself runs <strong>one source task</strong>, so more workers do not parallelize a single PostgreSQL capture task.</td></tr><tr><td>Topic strategy</td><td><strong>Topic per governed source table</strong> initially</td><td>Clear ownership/schema and table-level access. Aggregate across tables only with explicit ordering/contract requirements.</td></tr><tr><td>Partition key</td><td><strong>Stable primary/business record ID</strong></td><td>All events for a key normally land in one partition and can be applied in key order. A hot key may need special treatment.</td></tr><tr><td>Serialization</td><td><strong>Versioned Avro/Protobuf/JSON Schema</strong>, with a registry where supported</td><td>Makes breaking changes visible before they disrupt consumers. Contract evolution must be governed.</td></tr><tr><td>Sink semantics</td><td><strong>Idempotent upsert/delete + offset discipline</strong></td><td>Replay and connector recovery can produce duplicates. Do not assume one-and-only-one side effect.</td></tr><tr><td>Analytical storage</td><td><strong>Object store / warehouse</strong></td><td>Cheap historical storage and analytical queries; not the synchronous source of truth.</td></tr><tr><td>Business events</td><td><strong>Transactional outbox (conditional)</strong></td><td>Choose when consumers need <code>PaymentAuthorized</code> rather than a mutable row's <code>status</code> update.</td></tr></tbody></table>
+<h3 id="21-why-not-database-polling">2.1 Why not database polling?</h3>
+<p>Polling <code>WHERE updated_at &gt; last_poll</code> seems easy, but clock precision, transaction timing, concurrent updates, and deletes make it fragile without additional controls. Continuous scans also burden the OLTP database. Prefer polling only when scale and consistency needs are modest and the source cannot expose logs.</p>
+<h3 id="22-why-kafka-rather-than-direct-debezium-to-warehouse">2.2 Why Kafka rather than direct Debezium-to-warehouse?</h3>
+<p>A direct sink is simpler for one destination. Kafka adds operational complexity, but it <strong>decouples consumer availability</strong>, supports independent consumer groups, and retains a replayable change stream. We select it because several downstream systems need the same updates with different speeds and recovery needs.</p>
+<h2 id="3-component-responsibilities">3. Component responsibilities</h2>
+<table><thead><tr><th>Component</th><th>Responsibility</th><th>Critical design concern</th></tr></thead><tbody><tr><td>PostgreSQL OLTP</td><td>Commit source-of-truth writes</td><td>Keep transaction workload healthy; support logical decoding</td></tr><tr><td>Publication / replication slot</td><td>Define captured tables and track WAL position</td><td>Lagging slot retains WAL and can exhaust disk</td></tr><tr><td>Debezium source connector</td><td>Perform consistent initial snapshot, then stream change events</td><td>Source task state, connector offsets, failure recovery</td></tr><tr><td>Kafka Connect workers</td><td>Host and supervise connector tasks</td><td>HA for workers is not source parallelism</td></tr><tr><td>Kafka brokers and topics</td><td>Buffer, partition, retain, replay records</td><td>Capacity, replication, retention, ACLs</td></tr><tr><td>Schema Registry</td><td>Publish and check schema versions</td><td>Compatibility across producers and consumers</td></tr><tr><td>State projector</td><td>Apply latest valid record state to read model</td><td>Idempotency, deletes, stale event protection</td></tr><tr><td>Analytics pipeline</td><td>Validate/transform and load history or aggregates</td><td>Replay, dedupe, late arrivals, batch commits</td></tr><tr><td>Observability + operations</td><td>Lag, slot health, DLQs, drift detection, recovery</td><td>Detect failure before WAL or freshness budgets are exceeded</td></tr></tbody></table>
+<h2 id="4-end-to-end-request-and-data-flows">4. End-to-end request and data flows</h2>
+<h3 id="41-one-committed-transaction-update">4.1 One committed transaction update</h3>
+<ol start="1"><li>Application updates a transaction-status row inside a normal database transaction.</li><li>PostgreSQL commits it and writes the change to WAL; <strong>no direct application-to-Kafka dual write</strong> is required.</li><li>The replication slot exposes committed changes to Debezium's PostgreSQL connector.</li><li>Debezium creates a change event containing the operation (<code>c</code>, <code>u</code>, <code>d</code>, or snapshot <code>r</code>), key, row state, and source metadata.</li><li>Kafka receives the record in the corresponding topic; the record key identifies the transaction row.</li><li>Consumers read independently. The read-model consumer upserts a row or deletes it as appropriate; the analytics consumer appends to a governed historical dataset.</li><li>A consumer records processing progress only after its durable sink update succeeds (or coordinates both atomically when available).</li></ol>
+<h3 id="42-initial-snapshot-without-a-gap">4.2 Initial snapshot without a gap</h3>
+<p>A brand-new Kafka topic cannot reconstruct rows that changed <strong>before</strong> CDC was enabled merely by replaying current WAL. Debezium's typical initial mode captures a <strong>consistent snapshot</strong> and then streams subsequent changes from the appropriate log position.</p>
+<pre><code> Time -------------------------------------------------------&gt;
+    | snapshot start          | snapshot finish
+    |-------------------------|
+            source writes keep occurring
+    [read existing rows]       [consume WAL after snapshot point]
+                 \              /
+                   coherent downstream state</code></pre>
+<p><strong>Why not <code>SELECT *</code> followed by <code>start streaming</code>?</strong> Writes committed between the two operations can be missed. Snapshot/stream coordination is part of the CDC connector's job. Large initial snapshots need capacity planning and may increase source read/IO load. Incremental snapshots can backfill selected tables in chunks when appropriate.</p>
+<h3 id="43-retry-and-replay">4.3 Retry and replay</h3>
+<p>If a consumer fails after updating its sink but before committing its offset, the same Kafka record may be processed again. Therefore a sink must handle repeated upserts/deletes, or dedupe by stable event identity and guard against stale ordering. If a consumer's retained offsets are gone, replay requires a controlled new snapshot or historical archive, not wishful recovery.</p>
+<h2 id="5-event-contract-and-data-semantics">5. Event contract and data semantics</h2>
+<h3 id="51-illustrative-record-simplified-not-a-literal-full-debezium-payload">5.1 Illustrative record — simplified, not a literal full Debezium payload</h3>
+<pre><code>{
+  "key": { "transaction_id": "txn_1032" },
+  "value": {
+    "op": "u",
+    "before": { "status": "PENDING" },
+    "after": {
+      "transaction_id": "txn_1032",
+      "status": "APPROVED",
+      "amount_minor": 2500,
+      "currency": "USD"
+    },
+    "source": { "table": "transactions", "lsn": "source-position" },
+    "event_time": "2026-11-03T16:00:00Z"
+  }
+}</code></pre>
+<p>The concrete Debezium envelope includes more fields than this example and depends on connector configuration. Never treat the example's <code>lsn</code> string as a guaranteed globally unique event ID. Use schema-provided source metadata and business identifiers correctly.</p>
+<h3 id="52-the-essential-semantics">5.2 The essential semantics</h3>
+<ul><li><strong>Snapshot <code>r</code>:</strong> represents existing row state during a snapshot; <strong>create <code>c</code>, update <code>u</code>, delete <code>d</code></strong> represent subsequent changes.</li><li><strong>Deletes:</strong> interpret connector delete events and optional tombstones deliberately. A tombstone is useful for Kafka log compaction, but it is not by itself a universal sink-delete command.</li><li><strong>Ordering:</strong> Kafka preserves order <strong>inside a partition</strong>. Using a stable row key gives practical per-key ordering in a topic. There is no automatic total order across topics or partitions.</li><li><strong>Transaction boundaries:</strong> multi-table source transactions may produce several records/topics. If consumers require transaction-level atomic application, enable/use transaction metadata or design an explicit downstream coordination mechanism.</li><li><strong>Schemas:</strong> use additive changes where possible; test rename, type changes, primary-key changes, and nullability. Schema compatibility rules vary with selected format and policy.</li><li><strong>PII:</strong> exclude or pseudonymize protected fields <strong>before exposing them to broadly shared topics</strong>. Kafka retention, logs, backups, and replays extend the data's exposure lifetime.</li></ul>
+<h3 id="53-idempotent-sink-pattern">5.3 Idempotent sink pattern</h3>
+<p>For a latest-state projector: (a) consume by stable key, (b) apply upsert/delete in a database transaction, and (c) commit/checkpoint progress only after the write. If the sink uses a separate offset store, protect against replayed or older events using a stable source sequence or transactional offset/state record. <strong>Do not rely on a timestamp alone</strong> to determine correct row order.</p>
+<p>For financial side effects (e.g., crediting an account), <strong>do not trigger a non-idempotent money movement directly from a raw row-change event</strong>. Prefer a transactional outbox event with a durable business event ID and a consumer-side uniqueness constraint.</p>
+<h2 id="6-consistency-and-delivery-guarantees">6. Consistency and delivery guarantees</h2>
+<p><strong>Source correctness:</strong> PostgreSQL is authoritative. CDC normally observes committed data, but the stream can lag the source.</p>
+<p><strong>Delivery guarantee:</strong> Design the end-to-end system as <strong>at least once</strong>, with idempotent sinks. Kafka Connect supports exactly-once source connector capabilities in supported configurations, but this does <strong>not</strong> automatically make external sink side effects exactly once. Debezium documents duplicates after some failures.</p>
+<p><strong>Ordering contract:</strong> Promise only per-key order within a topic partition, and specify how keys and partition counts are managed. Changing partition counts can change key routing, so plan such changes carefully.</p>
+<p><strong>Cross-table consistency:</strong> If a business operation updates <code>transactions</code> and <code>balances</code>, the two Kafka topics are not a globally atomic read view. Downstream consumers needing a consistent financial view should use an authoritative ledger or transactional projection strategy; CDC itself does not invent that guarantee.</p>
+<p><strong>Eventual consistency:</strong> The read model can temporarily disagree with the source during healthy operation. Define a measured freshness SLO and a clear response when it is exceeded.</p>
+<h2 id="7-partitioning-scaling-and-retention">7. Partitioning, scaling, and retention</h2>
+<h3 id="71-how-scaling-actually-works">7.1 How scaling actually works</h3>
+<ul><li>Capture throughput is bounded by database WAL generation, logical decoding, network, and Debezium's <strong>single PostgreSQL source task</strong>.</li><li>Kafka can parallelize consumers using partitions and consumer-group members. Choose enough partitions for expected sink throughput, while considering operational cost.</li><li>Give different downstream systems <strong>different consumer groups</strong>. Two services in the same group share work rather than each getting the full stream.</li><li>Scale hot or expensive sinks independently. Prevent one failed sink from blocking unrelated consumers.</li><li>Treat large snapshots separately from steady-state throughput; throttle or schedule when necessary to protect OLTP.</li></ul>
+<h3 id="72-retention-and-replay">7.2 Retention and replay</h3>
+<ul><li><strong>Kafka retention is finite.</strong> Choose a retention window long enough for normal outages and reprocessing. Archive changes to object storage if reprocessing must span a longer period.</li><li><strong>PostgreSQL WAL retention is a different budget.</strong> If Debezium stalls, a logical replication slot can pin WAL until the source disk fills. Alert and recover well before that happens.</li><li>Topic <strong>log compaction</strong> may be appropriate for latest-state reconstruction, while delete tombstones and compaction windows must be handled correctly. It is not a substitute for keeping a complete audit history.</li><li>To reconstruct downstream <strong>history</strong>, append immutable change records to a governed store; to reconstruct <strong>current state</strong>, replay ordered upserts/deletes or take a fresh snapshot.</li></ul>
+<h2 id="8-failure-modes-and-recovery-strategy">8. Failure modes and recovery strategy</h2>
+<table><thead><tr><th>Failure</th><th>Expected behavior</th><th>Recommended response</th></tr></thead><tbody><tr><td>Debezium worker crashes</td><td>Another worker can resume connector task; duplicates possible</td><td>Preserve offsets and slot, restart, validate downstream lag</td></tr><tr><td>PostgreSQL source unavailable</td><td>Streaming pauses; sinks become stale</td><td>Preserve authoritative DB recovery, reconnect, monitor WAL/offset continuity</td></tr><tr><td>PostgreSQL primary failover</td><td>Slot continuity depends on PG version, configuration, and managed service</td><td>Validate failover-slot configuration before production; never assume offset continuity</td></tr><tr><td>Kafka broker/cluster outage</td><td>Source connector eventually stalls; WAL may accumulate</td><td>Restore Kafka, monitor connector and replication-slot disk budget</td></tr><tr><td>Sink database unavailable</td><td>Sink lags while other consumers continue</td><td>Retry with backoff; resume from durable offsets; isolate failed consumer</td></tr><tr><td>Malformed/incompatible schema</td><td>Consumer may stop or reject event</td><td>Contract checks, quarantine/DLQ, alert, fix and replay; avoid silent skip</td></tr><tr><td>Duplicate event</td><td>Replayed event may arrive again</td><td>Idempotent upsert/delete or business ID dedupe</td></tr><tr><td>Consumer backlog beyond retention</td><td>Kafka can no longer replay missing offsets</td><td>Restore from archive or perform controlled re-snapshot</td></tr><tr><td>Unbounded WAL growth</td><td>Source disk pressure and risk to transaction availability</td><td>Alert on retained WAL/slot lag; throttle source work or repair connector immediately</td></tr><tr><td>Missing delete or wrong key</td><td>Stale rows in read model</td><td>Explicit delete handling, stable key design, source-sink reconciliation</td></tr></tbody></table>
+<p><strong>Subtle failover risk:</strong> In PostgreSQL 17+ there are supported failover logical slots, but the feature must be configured and verified. Older versions and some topologies need different procedures. Always validate the actual database service's documented behavior.</p>
+<h2 id="9-security-and-compliance-design">9. Security and compliance design</h2>
+<ol start="1"><li><strong>Data minimization:</strong> allowlist tables and columns. In financial-services examples, do not send PAN, CVV, secrets, or unnecessary customer identifiers into general Kafka topics. Secure or tokenize sensitive values before publication wherever the architecture permits.</li><li><strong>Source privilege:</strong> create dedicated replication credentials with only required replication and table permissions; store credentials in a secrets manager and rotate them safely.</li><li><strong>Network isolation:</strong> private connectivity among source, connectors, Kafka, registry, and sinks; TLS for transport.</li><li><strong>Kafka access control:</strong> topic-level producer/consumer permissions, encrypted storage, separate credentials per sink, and audit logs.</li><li><strong>Governance:</strong> classify topics, set retention/deletion rules, track lineage, record approved consumers, and restrict replay access.</li><li><strong>Deletion/privacy:</strong> distinguish source row deletes, log compaction, and deletion from archives/backups. Define a separate privacy workflow if legal requirements call for downstream erasure.</li></ol>
+<p><strong>Important:</strong> Merely replicating cardholder data into Kafka can expand regulated-data scope. Prefer excluding it; if unavoidable, design compliance controls with the responsible security team rather than assuming encryption alone is sufficient.</p>
+<h2 id="10-monitoring-slos-and-operational-readiness">10. Monitoring, SLOs, and operational readiness</h2>
+<table><thead><tr><th>Measurement</th><th>Why it matters</th></tr></thead><tbody><tr><td>End-to-end freshness (source commit → sink visible)</td><td>Business-facing proof of timeliness</td></tr><tr><td>Connector task state and restart count</td><td>Detect capture failures and restart storms</td></tr><tr><td>Source LSN progress and replication-slot lag</td><td>Detect pinned WAL before source disk exhaustion</td></tr><tr><td>PostgreSQL disk usage and retained WAL bytes</td><td>Protect the OLTP system</td></tr><tr><td>Kafka broker throughput and partition health</td><td>Ensure durable buffering at peak</td></tr><tr><td>Per-consumer partition lag and processing age</td><td>Detect slow or broken sinks</td></tr><tr><td>Error rate, retries, DLQ volume, schema rejections</td><td>Find bad data and unrecovered processing</td></tr><tr><td>Source vs. sink record counts / sampled hash comparisons</td><td>Find silent data divergence</td></tr></tbody></table>
+<p><strong>Example alert policy (illustrative):</strong> warn when end-to-end delay exceeds the 10-second target persistently; page before WAL retention threatens source capacity; page if connector source progress stops while the source is writing. Thresholds must be based on tested capacity and recovery time, not copied as universal defaults.</p>
+<p><strong>Operational runbooks required:</strong> restart connector without dropping slot; recover failed consumer; replay a topic; backfill after retention loss; migrate schema; handle primary failover; verify reconciliation; rotate secrets.</p>
+<h2 id="11-validation-strategy-before-production">11. Validation strategy before production</h2>
+<ul><li><strong>Correctness:</strong> compare initial snapshot counts and selected checksums with source; test concurrent updates during snapshot.</li><li><strong>Change coverage:</strong> exercise create, update, delete, primary-key change, and schema changes.</li><li><strong>Failure injection:</strong> terminate source connector and sink mid-write, disconnect Kafka, and force a source primary failover.</li><li><strong>Duplicate/reorder protection:</strong> replay records; verify a latest-state sink does not regress and side effects are not duplicated.</li><li><strong>Capacity:</strong> test snapshot load, steady-state throughput, 10x spike, consumer catch-up, and WAL growth during outages.</li><li><strong>Security:</strong> verify topic ACLs, secret handling, TLS, data minimization, and restricted replay access.</li><li><strong>DR:</strong> confirm recovery point and recovery time from actual tests; a backup that was not restored successfully is not a validated recovery plan.</li></ul>
+<h2 id="12-alternatives-and-when-to-select-them">12. Alternatives and when to select them</h2>
+<table><thead><tr><th>Option</th><th>Best fit</th><th>Major limitation</th></tr></thead><tbody><tr><td>Timestamp polling</td><td>Small, simple, low-risk tables</td><td>Deletes and missed writes require extra safeguards; source query load</td></tr><tr><td>Log-based CDC + Kafka</td><td>Many consumers need near-real-time, replayable row changes</td><td>More platform components and eventual consistency</td></tr><tr><td>Database-native logical replication</td><td>Building PostgreSQL-to-PostgreSQL replicas</td><td>Narrower than a governed multi-consumer event pipeline</td></tr><tr><td>Direct CDC to managed warehouse</td><td>One analytical destination, limited replay needs</td><td>Tighter coupling and lower general-purpose fan-out</td></tr><tr><td>Application dual write (DB + broker)</td><td>Generally avoid</td><td>Partial failure causes database/event divergence</td></tr><tr><td>Transactional outbox + CDC</td><td>Guaranteed correspondence between business state and a domain-event record</td><td>Requires application schema and business-event design</td></tr><tr><td>Periodic batch ETL</td><td>Daily reports, low freshness requirements</td><td>High latency; not event-driven</td></tr></tbody></table>
+<h2 id="13-architecture-decision-records-concise-summary">13. Architecture decision records — concise summary</h2>
+<p><strong>ADR-01 — WAL-based CDC instead of polling.</strong> Selected for committed row changes and lower recurring source query load. Rejected polling because deletes, multiple updates, and tracking boundaries are harder to guarantee.</p>
+<p><strong>ADR-02 — Kafka as durable buffer.</strong> Selected for replay and independent consumers; rejected direct synchronous fan-out because slow sinks should not affect the source transaction path.</p>
+<p><strong>ADR-03 — Stable primary-key partitioning.</strong> Selected to preserve per-row order in each topic; rejected random partitioning because updates to one record could be consumed out of order.</p>
+<p><strong>ADR-04 — At-least-once with idempotent sinks.</strong> Selected because it is robust across restart and replay. Rejected claiming universal end-to-end exactly-once behavior across arbitrary external databases and side effects.</p>
+<p><strong>ADR-05 — Governed schemas and least-privilege access.</strong> Selected to prevent breaking consumers and uncontrolled spread of sensitive source records; rejected unversioned free-form payloads.</p>
+<p><strong>ADR-06 — Snapshot + stream with recovery runbooks.</strong> Selected for a complete initial state plus later changes; rejected naïve bulk copy plus unrelated stream start because there can be a gap.</p>
+<h2 id="14-interview-ready-explanation-one-minute-narrative">14. Interview-ready explanation (one-minute narrative)</h2>
+<blockquote><p>"I would keep PostgreSQL as the source of truth and use log-based CDC instead of polling to observe committed row changes. A Debezium PostgreSQL connector in Kafka Connect would perform the initial snapshot and then stream WAL changes into Kafka. I would partition by a stable record ID to preserve per-key order and give each downstream application its own consumer group. The key decisions are at-least-once processing with idempotent sinks, versioned schemas, WAL/connector/consumer-lag monitoring, and careful handling of deletes and source failover. Analytics and search can lag independently without affecting payment transactions. If consumers need meaningful business events, I would add a transactional outbox rather than treat every row update as a business event."</p></blockquote>
+<h3 id="what-makes-this-a-strong-solution-architect-design">What makes this a strong Solution Architect design</h3>
+<ul><li>It starts from <strong>source correctness and business boundaries</strong>, not a technology shopping list.</li><li>It distinguishes <strong>database row changes from domain events</strong>.</li><li>It covers the operational trap: <strong>replication slots can retain WAL</strong> and threaten the source database.</li><li>It states precisely where <strong>ordering and delivery promises stop</strong>.</li><li>It protects sensitive information and gives each consumer an independent recovery path.</li><li>It identifies the trade-off between <strong>replayability and added platform complexity</strong>.</li></ul>
+<h2 id="15-official-technical-references">15. Official technical references</h2>
+<p>These are vendor/project-maintained sources for the chosen example stack. Specific connector properties and behaviors depend on deployed versions; check the actual version before implementation.</p>
+<ol start="1"><li><strong>Debezium — PostgreSQL connector:</strong> https://debezium.io/documentation/reference/stable/connectors/postgresql.html  Snapshot, <code>c/u/d/r</code> event structure, connector task behavior, failure recovery, PostgreSQL failover, WAL management.</li><li><strong>Debezium — Architecture:</strong> https://debezium.io/documentation/reference/stable/architecture.html  Kafka Connect topology and connector-to-consumer flow.</li><li><strong>PostgreSQL — Logical decoding concepts:</strong> https://www.postgresql.org/docs/current/logicaldecoding-explanation.html  WAL, replication slots, replay, restart/duplicate behavior, retained WAL risk.</li><li><strong>Apache Kafka — Design:</strong> https://kafka.apache.org/42/design/design/  Partitions, consumer groups, and messaging semantics.</li><li><strong>Apache Kafka — Kafka Connect user guide:</strong> https://kafka.apache.org/42/kafka-connect/user-guide/  Connect worker/runtime operations and connector management.</li><li><strong>Confluent — Schema evolution and compatibility:</strong> https://docs.confluent.io/platform/current/schema-registry/fundamentals/schema-evolution.html  Compatibility modes and schema governance. (Product-specific registry implementation.)</li><li><strong>Debezium — Outbox event router:</strong> https://debezium.io/documentation/reference/stable/transformations/outbox-event-router.html  Transactional outbox pattern for reliable domain-event publication.</li><li><strong>PostgreSQL — Replication configuration:</strong> https://www.postgresql.org/docs/current/logical-replication-config.html  Logical replication server configuration and sizing controls.</li></ol>
+<hr>
+<p><strong>Key takeaway:</strong> A successful CDC pipeline is not simply “Postgres → Debezium → Kafka.” Its design must make snapshot correctness, repeatable application of changes, ordered keys, WAL safety, replay, privacy, and source failover explicit.</p></main></body></html>

@@ -1,0 +1,464 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Design 3 — Double-Entry Financial Ledger</title><style>
+/* The original PDF skill style sheet is embedded below. */
+/* Architect's Field Notes — original study-guide design recreation.
+   Standalone builder embeds this file into its generated HTML. */
+:root {
+  --navy: #112c3a;
+  --header: #193a4b;
+  --ink: #273944;
+  --heading: #17313e;
+  --muted: #75838d;
+  --line: #d9e2e7;
+  --zebra: #f6f8f9;
+  --accent: #64c8e6;
+  --accent-soft: #eaf8fc;
+}
+@page {
+  size: A4;
+  margin: 19mm 19mm 19mm;
+  @top-left {
+    content: "INTERVIEW / FIELD GUIDE";
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  @top-right {
+    content: string(running-topic);
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .02em;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+    color: #9aa5ae;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 6.3pt;
+    letter-spacing: .03em;
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page, decimal-leading-zero);
+    color: #394b56;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-weight: 700;
+    font-size: 7pt;
+    vertical-align: middle;
+  }
+}
+@page cover {
+  size: A4;
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Inter", "DejaVu Sans", sans-serif;
+  font-size: 9.4pt;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: #fff;
+  overflow-wrap: break-word;
+}
+.cover {
+  page: cover;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  overflow: hidden;
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 29.6mm 26mm;
+}
+.cover::before, .cover::after {
+  content: "";
+  position: absolute;
+  border: .55pt solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
+.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
+.cover-brand {
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: .31em;
+  text-transform: uppercase;
+  color: #dceaf0;
+}
+.cover-series {
+  font-size: 8pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #98b3c1;
+  margin-top: 7mm;
+}
+.cover-accent-bar {
+  position: absolute;
+  left: 26mm; top: 80mm;
+  height: 3.5mm; width: 21mm;
+  background: var(--accent);
+}
+.cover-title {
+  position: absolute;
+  left: 25.5mm; right: 25mm; top: 97mm;
+  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+  font-size: 42pt;
+  font-weight: 800;
+  letter-spacing: -.043em;
+  line-height: 1.08;
+  color: #fff;
+}
+.cover-title .second { display: block; color: var(--accent); }
+.cover-title.long { font-size: 37pt; }
+.cover-sub {
+  position: absolute;
+  left: 26mm; right: 31mm; top: 173.5mm;
+  color: #bdcdd5;
+  font-size: 11.5pt;
+  line-height: 1.7;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.cover-note {
+  color: #91aab7;
+  text-transform: none;
+  font-size: 9pt;
+  letter-spacing: .01em;
+  margin-top: 7mm;
+  line-height: 1.6;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 31mm; left: 26mm;
+  font-size: 7.8pt;
+  line-height: 1.9;
+  letter-spacing: .065em;
+  color: #cfdae0;
+}
+.cover-rule {
+  position: absolute;
+  bottom: 62mm; height: .35pt;
+  left: 26mm; right: 26mm;
+  background: rgba(255,255,255,.15);
+}
+.cover-number {
+  position: absolute;
+  bottom: 29mm; right: 26mm;
+  color: var(--accent);
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 39pt;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+/* Introduction + automatically generated navigable contents. */
+.preface { break-after: page; }
+.preface-label, .toc-overline {
+  color: var(--accent);
+  font-size: 7.6pt;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+.preface h1 { display: none; }
+.preface h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: var(--heading);
+  margin: 5mm 0 5mm;
+  border-bottom: .5pt solid var(--line);
+  padding-bottom: 2.5mm;
+}
+.preface p { font-size: 9.5pt; line-height: 1.6; }
+.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
+.toc h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 21pt;
+  letter-spacing: -.03em;
+  margin: 2mm 0 5mm;
+  border: 0;
+  padding: 0;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li {
+  display: flex;
+  align-items: baseline;
+  gap: 5mm;
+  font-size: 9.1pt;
+  padding: 2.7mm 1mm;
+  border-top: .5pt solid #e7ecef;
+  break-inside: avoid;
+}
+.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
+.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
+.toc a { color: var(--ink); text-decoration: none; }
+/* Continuous editorial body: sections can flow across pages. */
+.content { padding: 0; }
+.content h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 17.2pt;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.28;
+  letter-spacing: -.024em;
+  margin: 11mm 0 5mm;
+  padding-top: 5.5mm;
+  border-top: .6pt solid var(--line);
+  break-after: avoid;
+}
+.content h2::before {
+  content: "CHAPTER";
+  display: block;
+  color: var(--accent);
+  font-size: 7pt;
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .19em;
+  margin-bottom: 2.2mm;
+}
+.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.content h3 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 11.6pt;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  color: var(--heading);
+  margin: 7mm 0 2.5mm;
+  break-after: avoid;
+}
+.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #1a3341; }
+a { color: #23778e; text-decoration: none; }
+hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
+ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
+li { padding-left: .5mm; margin: 1.5mm 0; }
+li::marker { color: var(--accent); }
+li p { margin: 0; }
+blockquote {
+  background: var(--accent-soft);
+  border-left: 2.5pt solid var(--accent);
+  margin: 4mm 0 6mm;
+  padding: 4mm 5.2mm;
+  color: #2b4654;
+  font-size: 9.4pt;
+  line-height: 1.56;
+}
+blockquote p { margin-bottom: 2.3mm; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: #143743; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.42;
+  color: var(--ink);
+  margin: 3.6mm 0 4.8mm;
+  overflow-wrap: anywhere;
+}
+thead { display: table-header-group; }
+thead th {
+  background: var(--header);
+  color: #fff;
+  text-align: left;
+  font-weight: 700;
+  padding: 2.2mm 2.4mm;
+  vertical-align: top;
+  border-right: 1pt solid rgba(255,255,255,.04);
+}
+thead th strong { color: #fff; }
+tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--zebra); }
+tr { break-inside: avoid; }
+table.wide { font-size: 7.15pt; }
+table.wide th, table.wide td { padding: 1.8mm; }
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: .91em;
+  color: #22445a;
+}
+pre {
+  color: #dce9f0;
+  background: #173746;
+  padding: 4mm 5mm;
+  font-size: 8.3pt;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 4mm 0;
+}
+pre code { color: inherit; }
+.task-list-item { list-style: none; margin-left: -5mm; }
+.task-box {
+  display: inline-block;
+  border: .85pt solid #7b8b93;
+  width: 2.6mm; height: 2.6mm;
+  margin-right: 3mm;
+  vertical-align: baseline;
+}
+.task-box.checked { background: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 7.8pt; }
+@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+
+
+:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"DESIGN 3 — DOUBLE-ENTRY FINANCIAL LEDGER";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
+@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 05 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title">Design 3 — Double-Entry<span class="second">Financial Ledger</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">05</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>10-minute system design answer | Solution Architect interview preparation</strong></p><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-problem-requirements">1. Problem &amp; Requirements</a></li><li><span class="toc-num">02</span><a href="#2-understand-double-entry-accounting">2. Understand Double-Entry Accounting</a></li><li><span class="toc-num">03</span><a href="#3-high-level-architecture">3. High-Level Architecture</a></li><li><span class="toc-num">04</span><a href="#4-key-design-decisions-with-reasons">4. Key Design Decisions — With Reasons</a></li><li><span class="toc-num">05</span><a href="#5-end-to-end-request-flow">5. End-to-End Request Flow</a></li><li><span class="toc-num">06</span><a href="#6-failure-handling-scalability-security">6. Failure Handling, Scalability &amp; Security</a></li><li><span class="toc-num">07</span><a href="#7-key-points-to-remember">7. Key Points to Remember</a></li><li><span class="toc-num">08</span><a href="#8-interview-closing-summary">8. Interview Closing Summary</a></li></ol></nav></section><main class="content"><h2 id="1-problem-requirements">1. Problem &amp; Requirements</h2>
+<p>Design a financial ledger that reliably records money movement and maintains correct account balances.</p>
+<p><strong>Functional requirements</strong></p>
+<ul><li>Record financial transactions using debit and credit entries.</li><li>Maintain accurate balances.</li><li>Support refunds, reversals, and adjustments.</li><li>Prevent duplicate postings.</li><li>Provide transaction history and audit records.</li></ul>
+<p><strong>Non-functional requirements</strong></p>
+<ul><li><strong>Strong consistency:</strong> Financial entries must be correct.</li><li><strong>Atomicity:</strong> All entries of a transaction succeed or fail together.</li><li><strong>Immutability:</strong> Posted financial records cannot be silently modified.</li><li><strong>High availability and durability:</strong> No loss of acknowledged financial postings.</li><li><strong>Auditability:</strong> Every change must be traceable.</li></ul>
+<p><strong>Key assumption:</strong> We are designing the authoritative ledger for a financial product, not just a transaction-history API.</p>
+<h2 id="2-understand-double-entry-accounting">2. Understand Double-Entry Accounting</h2>
+<p>Every financial transaction records both a debit and a credit.</p>
+<p><strong>Example: A $100 credit card purchase clears</strong> (simplified issuer-accounting perspective):</p>
+<table><thead><tr><th>Account</th><th>Debit</th><th>Credit</th></tr></thead><tbody><tr><td>Cardholder Receivable (Asset)</td><td>$100</td><td>—</td></tr><tr><td>Merchant Settlement Payable (Liability)</td><td>—</td><td>$100</td></tr><tr><td><strong>Total</strong></td><td><strong>$100</strong></td><td><strong>$100</strong></td></tr></tbody></table>
+<p><strong>Core invariant:</strong> <code>Sum(debits) = Sum(credits)</code> for each posted journal transaction, separately for each currency.</p>
+<p>The actual accounting entries depend on the issuer, network, settlement model, and applicable accounting rules. Debit and credit do not simply mean money leaving or entering a bank account; their effect depends on account type.</p>
+<p><strong>Why not simply update a balance?</strong> A balance-only database may show the current amount without reliably preserving <em>why</em> it changed. A double-entry ledger stores the accounting effect and allows balances to be reconstructed and checked.</p>
+<h2 id="3-high-level-architecture">3. High-Level Architecture</h2>
+<pre><code>            Payment / Clearing Service
+                       |
+                       v
+                 Ledger API
+                       |
+                       v
+               Ledger Service
+                 /         \
+                v           v
+        Idempotency      Validation
+           Check         and Rules
+                \           /
+                 v         v
+              Posting Engine
+                     |
+                     v
+             Transactional DB
+           +-------------------+
+           | Journal           |
+           | Journal Entries   |
+           | Account Balances  |
+           | Idempotency       |
+           | Outbox            |
+           +-------------------+
+                     |
+                     v
+               Event Broker
+                 /       \
+                v         v
+          Reporting   Reconciliation</code></pre>
+<p><strong>Why these components?</strong></p>
+<ul><li><strong>Ledger Service:</strong> Centralizes accounting rules and posting.</li><li><strong>Transactional DB:</strong> Commits all related financial entries together.</li><li><strong>Balance table:</strong> Enables fast balance lookups.</li><li><strong>Idempotency record:</strong> Prevents the same business event from posting twice.</li><li><strong>Outbox and event broker:</strong> Distribute committed financial events to downstream systems.</li></ul>
+<p>The journal is the accounting source of truth; reporting and analytics are derived views.</p>
+<h2 id="4-key-design-decisions-with-reasons">4. Key Design Decisions — With Reasons</h2>
+<table><thead><tr><th>Decision</th><th>Choice</th><th>Why / Trade-off</th></tr></thead><tbody><tr><td>Database</td><td>Relational DB with ACID transactions</td><td>All journal entries must commit atomically; other transactional databases may also work.</td></tr><tr><td>Accounting model</td><td>Double-entry</td><td>Balanced, traceable postings.</td></tr><tr><td>History</td><td>Append-only posted entries</td><td>Preserve an audit trail; correct with new entries.</td></tr><tr><td>Balance reads</td><td>Transactionally maintained balance table</td><td>Fast reads without summing all entries.</td></tr><tr><td>Consistency</td><td>Strong for posting</td><td>No partial journal commits.</td></tr><tr><td>Idempotency</td><td>Unique business posting identity</td><td>Prevent duplicate postings on retries.</td></tr><tr><td>Messaging</td><td>Broker + transactional outbox</td><td>Reliable downstream delivery without blocking commits.</td></tr><tr><td>Scaling</td><td>Partition by accounting domain if needed</td><td>Keep journal postings atomic where possible.</td></tr></tbody></table>
+<h3 id="decision-1-why-acid-transactions">Decision 1 — Why ACID Transactions?</h3>
+<pre><code>BEGIN TRANSACTION
+  Debit Receivable      $100
+  Credit Payable        $100
+  Update account balances
+  Save idempotency record
+  Save outbox event
+COMMIT</code></pre>
+<p>If one required operation fails, the whole transaction rolls back. A debit without its matching credit must never commit.</p>
+<h3 id="decision-2-why-immutable-journal-entries">Decision 2 — Why Immutable Journal Entries?</h3>
+<p>If a $100 posting is wrong, do <strong>not</strong> overwrite it with $80. Preserve the original and create reversing and corrected journal entries.</p>
+<p><strong>Why:</strong> Auditability, traceability, reconciliation, and the ability to reconstruct prior financial states.</p>
+<p><strong>Concept — append-only:</strong> Posted accounting entries are not changed or deleted; corrections are additional entries.</p>
+<h3 id="decision-3-how-do-we-read-balances-quickly">Decision 3 — How Do We Read Balances Quickly?</h3>
+<p><strong>Option A:</strong> Calculate balances from all journal entries. This is reliable but may become expensive for large accounts.</p>
+<p><strong>Option B:</strong> Maintain a balance table together with each journal posting.</p>
+<pre><code>Ledger Posting
+      |
+      +--&gt; Append journal entries
+      |
+      +--&gt; Update account balances
+      |
+      v
+Commit together</code></pre>
+<p><strong>Choice:</strong> Option B. The journal remains the source of truth; balances are transactionally maintained projections that are independently checked against it.</p>
+<h3 id="decision-4-how-do-we-prevent-duplicate-postings">Decision 4 — How Do We Prevent Duplicate Postings?</h3>
+<p>A clearing event can arrive more than once. Give the logical business posting a stable, properly scoped unique identity.</p>
+<pre><code>Receive posting
+      |
+      v
+Already posted?
+   /       \
+ Yes        No
+  |          |
+  v          v
+Return     Validate and
+existing   post journal
+result</code></pre>
+<p>The database unique constraint is the final protection against simultaneous duplicates.</p>
+<p><strong>Remember:</strong> Exactly-once business effect comes from durable idempotency, not a guarantee that the message is delivered only once.</p>
+<h3 id="decision-5-how-do-we-handle-concurrency">Decision 5 — How Do We Handle Concurrency?</h3>
+<p>A prepaid account with $100 must not approve two simultaneous $80 withdrawals. Double-entry accounting by itself does not prevent overdrafts.</p>
+<p>Use an <strong>atomic balance condition</strong> or appropriate row locks within the posting transaction. This enforces spending rules as well as balanced accounting.</p>
+<h3 id="decision-6-how-do-we-scale">Decision 6 — How Do We Scale?</h3>
+<p>First scale stateless API workers and optimize queries, indexes, connection pools, and database capacity.</p>
+<p>Shard only when necessary. A journal entry may move value between accounts, so naive account-ID sharding can split one posting across databases. Prefer keeping related accounts in one accounting partition or using a database with the required cross-partition atomic transactions.</p>
+<h2 id="5-end-to-end-request-flow">5. End-to-End Request Flow</h2>
+<pre><code>1. Receive financial posting request
+              |
+              v
+2. Validate transaction and accounts
+              |
+              v
+3. Check idempotency
+              |
+              v
+4. Build debit and credit entries
+              |
+              v
+5. Verify debits = credits
+              |
+              v
+6. Begin ACID transaction
+              |
+              v
+7. Insert journal entries
+   Update balances
+   Save idempotency + outbox
+              |
+              v
+8. Commit transaction
+              |
+              v
+9. Return posting confirmation
+              |
+              v
+10. Publish events asynchronously</code></pre>
+<p><strong>Critical:</strong> Balance checks, journal entries, and authoritative balance updates must be coordinated within one transaction where they enforce financial invariants.</p>
+<p>For multi-currency transactions, define FX conversion and dedicated balancing/clearing accounts. A USD debit and EUR credit do not directly balance numerically.</p>
+<h2 id="6-failure-handling-scalability-security">6. Failure Handling, Scalability &amp; Security</h2>
+<table><thead><tr><th>Scenario</th><th>Design response</th><th>Why</th></tr></thead><tbody><tr><td>Failure after first journal entry</td><td>Roll back entire transaction</td><td>Avoid partial posting.</td></tr><tr><td>Duplicate request</td><td>Durable idempotency</td><td>Avoid double posting.</td></tr><tr><td>Response lost after commit</td><td>Return stored result on retry</td><td>Preserve one business effect.</td></tr><tr><td>Broker unavailable</td><td>Transactional outbox</td><td>Retain event for later delivery.</td></tr><tr><td>Incorrect posting</td><td>New reversal/correction entries</td><td>Preserve the audit history.</td></tr><tr><td>Concurrent withdrawals</td><td>Atomic balance enforcement</td><td>Prevent invalid negative balances.</td></tr><tr><td>Database or region failure</td><td>Durable replication and fenced failover</td><td>Avoid lost/conflicting writes.</td></tr><tr><td>Balance mismatch</td><td>Reconcile against journal and external sources</td><td>Detect discrepancies.</td></tr></tbody></table>
+<p><strong>Security and operations</strong></p>
+<ul><li>Encrypt sensitive data and restrict posting permissions.</li><li>Separate ledger writers from reporting readers.</li><li>Preserve tamper-evident audit trails.</li><li>Test backups, restoration, and reconciliation.</li><li>Define recovery point and recovery time objectives.</li><li>Avoid independently writable regional replicas without correct coordination.</li></ul>
+<p><strong>Concept — reconciliation:</strong> Comparing financial records or balances with another authoritative source to detect missing, duplicated, incorrect, or unmatched transactions.</p>
+<p><strong>Important:</strong> A balanced journal can still be <em>economically wrong</em>. Equal debit and credit totals are necessary, not sufficient, for correctness.</p>
+<h2 id="7-key-points-to-remember">7. Key Points to Remember</h2>
+<ol start="1"><li><strong>Double-entry:</strong> For each posted journal, total debits equal total credits.</li><li><strong>ACID:</strong> Entries and authoritative balance updates commit together.</li><li><strong>Immutability:</strong> Do not rewrite posted entries; reverse and correct them.</li><li><strong>Idempotency:</strong> Retries must not create duplicate financial postings.</li><li><strong>Source of truth:</strong> The journal is authoritative; materialized balances  improve performance and must be reconciled.</li></ol>
+<h2 id="8-interview-closing-summary">8. Interview Closing Summary</h2>
+<blockquote><p>I would design the financial ledger using double-entry accounting backed by a transactional database. Every posting has balanced debit and credit entries committed atomically with balance updates. Posted entries are immutable, and corrections use reversing entries. Durable idempotency prevents duplicate postings. I would maintain materialized balances for fast reads and use a transactional outbox for downstream events. For scale, I would partition carefully without breaking journal atomicity. Reconciliation, strict access controls, and tested recovery protect financial correctness and auditability.</p></blockquote>
+<h3 id="connection-to-design-2-authorization">Connection to Design 2: Authorization</h3>
+<table><thead><tr><th>Authorization system</th><th>Financial ledger</th></tr></thead><tbody><tr><td>Decides whether to approve a purchase.</td><td>Records financial/accounting effects.</td></tr><tr><td>Creates an authorization hold.</td><td>Creates balanced journal entries.</td></tr><tr><td>Prioritizes low-latency risk and credit checks.</td><td>Prioritizes posting integrity and auditability.</td></tr><tr><td>Handles authorization reversal/expiration.</td><td>Handles financial reversal/correction.</td></tr></tbody></table>
+<p>An authorization hold is <strong>not automatically</strong> a posted ledger entry.</p>
+<p><strong>Next design:</strong> Payment Clearing, Settlement &amp; Reconciliation.</p></main></body></html>
