@@ -1,0 +1,574 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>System Design #10: Change Data Capture (CDC) Pipeline</title><style>
+/* The original PDF skill style sheet is embedded below. */
+/* Architect's Field Notes — original study-guide design recreation.
+   Standalone builder embeds this file into its generated HTML. */
+:root {
+  --navy: #112c3a;
+  --header: #193a4b;
+  --ink: #273944;
+  --heading: #17313e;
+  --muted: #75838d;
+  --line: #d9e2e7;
+  --zebra: #f6f8f9;
+  --accent: #64c8e6;
+  --accent-soft: #eaf8fc;
+}
+@page {
+  size: A4;
+  margin: 19mm 19mm 19mm;
+  @top-left {
+    content: "INTERVIEW / FIELD GUIDE";
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  @top-right {
+    content: string(running-topic);
+    color: #75838d;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 7pt;
+    letter-spacing: .02em;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+    color: #9aa5ae;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-size: 6.3pt;
+    letter-spacing: .03em;
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page, decimal-leading-zero);
+    color: #394b56;
+    font-family: "Inter", "DejaVu Sans", sans-serif;
+    font-weight: 700;
+    font-size: 7pt;
+    vertical-align: middle;
+  }
+}
+@page cover {
+  size: A4;
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Inter", "DejaVu Sans", sans-serif;
+  font-size: 9.4pt;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: #fff;
+  overflow-wrap: break-word;
+}
+.cover {
+  page: cover;
+  break-after: page;
+  height: 297mm;
+  width: 210mm;
+  overflow: hidden;
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 29.6mm 26mm;
+}
+.cover::before, .cover::after {
+  content: "";
+  position: absolute;
+  border: .55pt solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
+.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
+.cover-brand {
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: .31em;
+  text-transform: uppercase;
+  color: #dceaf0;
+}
+.cover-series {
+  font-size: 8pt;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #98b3c1;
+  margin-top: 7mm;
+}
+.cover-accent-bar {
+  position: absolute;
+  left: 26mm; top: 80mm;
+  height: 3.5mm; width: 21mm;
+  background: var(--accent);
+}
+.cover-title {
+  position: absolute;
+  left: 25.5mm; right: 25mm; top: 97mm;
+  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+  font-size: 42pt;
+  font-weight: 800;
+  letter-spacing: -.043em;
+  line-height: 1.08;
+  color: #fff;
+}
+.cover-title .second { display: block; color: var(--accent); }
+.cover-title.long { font-size: 37pt; }
+.cover-sub {
+  position: absolute;
+  left: 26mm; right: 31mm; top: 173.5mm;
+  color: #bdcdd5;
+  font-size: 11.5pt;
+  line-height: 1.7;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.cover-note {
+  color: #91aab7;
+  text-transform: none;
+  font-size: 9pt;
+  letter-spacing: .01em;
+  margin-top: 7mm;
+  line-height: 1.6;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 31mm; left: 26mm;
+  font-size: 7.8pt;
+  line-height: 1.9;
+  letter-spacing: .065em;
+  color: #cfdae0;
+}
+.cover-rule {
+  position: absolute;
+  bottom: 62mm; height: .35pt;
+  left: 26mm; right: 26mm;
+  background: rgba(255,255,255,.15);
+}
+.cover-number {
+  position: absolute;
+  bottom: 29mm; right: 26mm;
+  color: var(--accent);
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 39pt;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+/* Introduction + automatically generated navigable contents. */
+.preface { break-after: page; }
+.preface-label, .toc-overline {
+  color: var(--accent);
+  font-size: 7.6pt;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+.preface h1 { display: none; }
+.preface h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 14pt;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  color: var(--heading);
+  margin: 5mm 0 5mm;
+  border-bottom: .5pt solid var(--line);
+  padding-bottom: 2.5mm;
+}
+.preface p { font-size: 9.5pt; line-height: 1.6; }
+.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
+.toc h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 21pt;
+  letter-spacing: -.03em;
+  margin: 2mm 0 5mm;
+  border: 0;
+  padding: 0;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li {
+  display: flex;
+  align-items: baseline;
+  gap: 5mm;
+  font-size: 9.1pt;
+  padding: 2.7mm 1mm;
+  border-top: .5pt solid #e7ecef;
+  break-inside: avoid;
+}
+.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
+.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
+.toc a { color: var(--ink); text-decoration: none; }
+/* Continuous editorial body: sections can flow across pages. */
+.content { padding: 0; }
+.content h2 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 17.2pt;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.28;
+  letter-spacing: -.024em;
+  margin: 11mm 0 5mm;
+  padding-top: 5.5mm;
+  border-top: .6pt solid var(--line);
+  break-after: avoid;
+}
+.content h2::before {
+  content: "CHAPTER";
+  display: block;
+  color: var(--accent);
+  font-size: 7pt;
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .19em;
+  margin-bottom: 2.2mm;
+}
+.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.content h3 {
+  font-family: "Inter Display", "Inter", sans-serif;
+  font-size: 11.6pt;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  color: var(--heading);
+  margin: 7mm 0 2.5mm;
+  break-after: avoid;
+}
+.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #1a3341; }
+a { color: #23778e; text-decoration: none; }
+hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
+ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
+li { padding-left: .5mm; margin: 1.5mm 0; }
+li::marker { color: var(--accent); }
+li p { margin: 0; }
+blockquote {
+  background: var(--accent-soft);
+  border-left: 2.5pt solid var(--accent);
+  margin: 4mm 0 6mm;
+  padding: 4mm 5.2mm;
+  color: #2b4654;
+  font-size: 9.4pt;
+  line-height: 1.56;
+}
+blockquote p { margin-bottom: 2.3mm; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: #143743; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 8pt;
+  line-height: 1.42;
+  color: var(--ink);
+  margin: 3.6mm 0 4.8mm;
+  overflow-wrap: anywhere;
+}
+thead { display: table-header-group; }
+thead th {
+  background: var(--header);
+  color: #fff;
+  text-align: left;
+  font-weight: 700;
+  padding: 2.2mm 2.4mm;
+  vertical-align: top;
+  border-right: 1pt solid rgba(255,255,255,.04);
+}
+thead th strong { color: #fff; }
+tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--zebra); }
+tr { break-inside: avoid; }
+table.wide { font-size: 7.15pt; }
+table.wide th, table.wide td { padding: 1.8mm; }
+code {
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: .91em;
+  color: #22445a;
+}
+pre {
+  color: #dce9f0;
+  background: #173746;
+  padding: 4mm 5mm;
+  font-size: 8.3pt;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 4mm 0;
+}
+pre code { color: inherit; }
+.task-list-item { list-style: none; margin-left: -5mm; }
+.task-box {
+  display: inline-block;
+  border: .85pt solid #7b8b93;
+  width: 2.6mm; height: 2.6mm;
+  margin-right: 3mm;
+  vertical-align: baseline;
+}
+.task-box.checked { background: var(--accent); border-color: var(--accent); }
+img { max-width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 7.8pt; }
+@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+
+
+:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"SYSTEM DESIGN #10: CHANGE DATA CAPTURE (CDC) PIPELINE";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
+@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 01 OF 01</div><div class="cover-accent-bar"></div><div class="cover-title long">System Design #10: Change<span class="second">Data Capture (CDC) Pipeline</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">01</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>A beginner-friendly, decision-by-decision walkthrough</strong> <strong>Scenario:</strong> A financial-services transaction application <strong>Example implementation:</strong> PostgreSQL + Debezium + Kafka <strong>Purpose:</strong> Solution Architect interview preparation. This is a generic design, not a claim about American Express internal systems.</p>
+<nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-the-problem-one-database-several-teams-that-need-its-data">1. The problem: one database, several teams that need its data</a></li><li><span class="toc-num">02</span><a href="#2-start-with-the-simplest-design-let-every-consumer-query-the-database">2. Start with the simplest design: let every consumer query the database</a></li><li><span class="toc-num">03</span><a href="#3-how-the-database-knows-a-change-happened">3. How the database knows a change happened</a></li><li><span class="toc-num">04</span><a href="#4-the-first-surprise-what-about-rows-that-already-exist">4. The first surprise: what about rows that already exist?</a></li><li><span class="toc-num">05</span><a href="#5-one-change-stream-but-three-independent-destinations">5. One change stream, but three independent destinations</a></li><li><span class="toc-num">06</span><a href="#6-decide-what-an-event-should-look-like">6. Decide what an event should look like</a></li><li><span class="toc-num">07</span><a href="#7-build-the-first-real-downstream-copy">7. Build the first real downstream copy</a></li><li><span class="toc-num">08</span><a href="#8-what-happens-when-something-fails">8. What happens when something fails?</a></li><li><span class="toc-num">09</span><a href="#9-protect-the-data-and-keep-its-meaning-stable">9. Protect the data and keep its meaning stable</a></li><li><span class="toc-num">10</span><a href="#10-size-the-system-before-choosing-capacity">10. Size the system before choosing capacity</a></li><li><span class="toc-num">11</span><a href="#11-final-design-built-one-decision-at-a-time">11. Final design, built one decision at a time</a></li><li><span class="toc-num">12</span><a href="#12-operations-what-must-be-visible-in-production">12. Operations: what must be visible in production?</a></li><li><span class="toc-num">13</span><a href="#13-when-would-we-choose-another-design">13. When would we choose another design?</a></li><li><span class="toc-num">14</span><a href="#14-the-short-interview-explanation">14. The short interview explanation</a></li><li><span class="toc-num">15</span><a href="#official-references">Official references</a></li></ol></nav></section><main class="content"><h2 id="1-the-problem-one-database-several-teams-that-need-its-data">1. The problem: one database, several teams that need its data</h2>
+<p>Imagine a customer buys something for <strong>$25.00</strong>. The payment application stores a record in a PostgreSQL database:</p>
+<table><thead><tr><th>transaction_id</th><th>amount</th><th>status</th><th>updated_at</th></tr></thead><tbody><tr><td><code>txn_1042</code></td><td>$25.00</td><td><code>PENDING</code></td><td>10:00:00</td></tr></tbody></table>
+<p>A few seconds later, the payment decision arrives and the application changes the row:</p>
+<table><thead><tr><th>transaction_id</th><th>amount</th><th>status</th><th>updated_at</th></tr></thead><tbody><tr><td><code>txn_1042</code></td><td>$25.00</td><td><code>APPROVED</code></td><td>10:00:03</td></tr></tbody></table>
+<p>The <strong>payment application</strong> is the source of truth. But three other systems also need this change:</p>
+<ol start="1"><li>A <strong>customer-support dashboard</strong> should show <code>APPROVED</code> instead of <code>PENDING</code>.</li><li>An <strong>analytics warehouse</strong> should analyze transaction-status changes over time.</li><li>A <strong>search index</strong> should let support staff find the latest transaction quickly.</li></ol>
+<p>Today, these systems keep asking the payment database for updates. As more consumers arrive, the primary transaction database gets extra queries, and each team has to build its own update-detection logic.</p>
+<p><strong>Our design problem:</strong> How do we send committed database changes to several independent systems, with low delay, without putting the critical payment database at unnecessary risk?</p>
+<p><strong>What CDC means:</strong> <em>Change Data Capture</em> is a way to observe changes in stored data (such as row inserts, updates, and deletes) and send those changes elsewhere. CDC copies information about changes; it does <strong>not</strong> decide whether a payment should be approved.</p>
+<h3 id="requirements-we-will-assume">Requirements we will assume</h3>
+<p>These are <strong>illustrative interview assumptions</strong>, not product guarantees:</p>
+<ul><li>Detect committed <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code> operations on approved transaction tables.</li><li>New changes should usually reach downstream systems in seconds; use <strong>10 seconds for 99%</strong> of healthy-path updates as an example freshness target.</li><li>Each consumer may fail or become slow without blocking payment processing.</li><li>A new consumer must be able to load existing records, not just future changes.</li><li>A consumer must be able to recover from a temporary outage, even if it processes some changes twice.</li><li>Restrict access to sensitive information; avoid distributing cardholder data unnecessarily.</li></ul>
+<p><strong>Outside scope:</strong> This is not a payment authorization engine, a double-entry ledger, or a synchronous source of financial truth. The downstream copies are allowed to be temporarily behind.</p>
+<hr>
+<h2 id="2-start-with-the-simplest-design-let-every-consumer-query-the-database">2. Start with the simplest design: let every consumer query the database</h2>
+<pre><code>                     +------------------------+
+                     | Payment PostgreSQL DB  |
+                     +-----------+------------+
+                                 |
+                +----------------+----------------+
+                |                |                |
+                v                v                v
+         Support service    Analytics job     Search updater
+         (polls DB)        (polls DB)        (polls DB)</code></pre>
+<p><strong>How it works:</strong> Every service periodically runs a query such as:</p>
+<pre><code>SELECT transaction_id, amount, status, updated_at
+FROM transactions
+WHERE updated_at &gt; :last_seen_time;</code></pre>
+<p><strong>New concept — polling:</strong> Checking repeatedly to see whether something changed. It is easy to build, but the database does work even when nothing changed.</p>
+<h3 id="decision-1-how-should-we-detect-changes">Decision 1 — How should we detect changes?</h3>
+<ul><li><strong>Choose:</strong> <strong>Log-based CDC</strong> rather than repeated database polling.</li><li><strong>Why:</strong> We want to observe committed changes continuously and avoid making every consumer scan the primary database. Log-based capture can also represent deletes explicitly.</li><li><strong>Rejected alternative:</strong> Timestamp polling is simpler and can be enough for a small, low-risk application. Here it is a poor default: it adds read traffic, requires careful high-watermark logic, may miss intermediate updates, and does not detect hard deletes without extra design.</li></ul>
+<p><strong>A subtle point:</strong> A correctly engineered polling process can be reliable under restricted assumptions. Polling is not inherently broken; it just becomes more complex when we require multiple consumers, deletes, and good recovery behavior.</p>
+<p>Our revised shape is:</p>
+<pre><code>Payment DB --&gt; One change-capture service --&gt; Other systems</code></pre>
+<p>We have solved <em>how to notice a change</em>, but not yet <em>how to read the database's log safely</em>.</p>
+<hr>
+<h2 id="3-how-the-database-knows-a-change-happened">3. How the database knows a change happened</h2>
+<p>PostgreSQL uses a <strong>write-ahead log (WAL)</strong> to record changes needed for recovery. When the application commits a database transaction, PostgreSQL has already recorded the information required for that commit. PostgreSQL <strong>logical decoding</strong> can translate relevant WAL information into a stream of logical row changes. [1, 2]</p>
+<p>Think of the layers this way:</p>
+<pre><code>Application: UPDATE transactions SET status='APPROVED' ...
+                      |
+                      v
+           PostgreSQL commits write
+                      |
+                      v
+               WAL records
+                      |
+                      v
+          Logical decoding output
+                      |
+                      v
+       'txn_1042 changed to APPROVED'</code></pre>
+<p><strong>New concept — a committed change:</strong> A transaction's writes are treated as complete only when the database commits them. We do not want to publish a change from a transaction that later rolls back.</p>
+<p><strong>New concept — logical replication slot:</strong> PostgreSQL can maintain a position for a logical change stream. This helps the CDC reader continue from where it left off. An inactive or lagging slot can cause PostgreSQL to retain WAL files and consume disk space. [2]</p>
+<h3 id="decision-2-read-the-database-log-or-add-application-triggers">Decision 2 — Read the database log or add application triggers?</h3>
+<ul><li><strong>Choose:</strong> PostgreSQL logical decoding of the WAL.</li><li><strong>Why:</strong> We can capture committed row changes without editing every business write path. It centralizes the change-detection mechanism.</li><li><strong>Rejected alternative:</strong> Database triggers could write change rows to an audit table, but they add logic to transactions, require careful maintenance, and change source-database write behavior. Triggers can still be valid when log-based CDC is unavailable.</li></ul>
+<h3 id="decision-3-build-a-custom-wal-reader-or-use-a-cdc-connector">Decision 3 — Build a custom WAL reader or use a CDC connector?</h3>
+<ul><li><strong>Choose:</strong> <strong>Debezium's PostgreSQL connector</strong>, hosted in Kafka Connect for this example. [1]</li><li><strong>Why:</strong> Debezium already implements PostgreSQL CDC, initial snapshots, change-event envelopes, and ongoing streaming. We would rather operate a supported connector than invent database-specific replication logic.</li><li><strong>Rejected alternative:</strong> A custom WAL reader would give us control, but we would own protocol handling, schema changes, snapshots, offsets, and recovery. That is unnecessary complexity for this case.</li></ul>
+<p><strong>New concept — Kafka Connect:</strong> A framework that runs data connectors and manages their tasks and configurations. <strong>Debezium</strong> is the component that reads PostgreSQL changes; <strong>Kafka Connect</strong> is the runtime hosting it. A single Debezium PostgreSQL connector uses one capture task, so adding Kafka Connect workers does not automatically make one source connector read the WAL in parallel. [1]</p>
+<hr>
+<h2 id="4-the-first-surprise-what-about-rows-that-already-exist">4. The first surprise: what about rows that already exist?</h2>
+<p>Suppose the transactions table has <strong>20 million rows</strong> before we install CDC. Watching future updates is not enough; a new support database also needs today's existing transactions.</p>
+<p>Our first idea might be:</p>
+<pre><code>Step A: SELECT * FROM transactions
+Step B: Start reading new WAL changes</code></pre>
+<p>The gap is dangerous. If <code>txn_1042</code> changes between A and B, the new system may retain the old status forever.</p>
+<p><strong>New concept — snapshot:</strong> A point-in-time view of existing rows, used to create a starting state for a new downstream system.</p>
+<h3 id="decision-4-how-do-we-bootstrap-existing-data-without-missing-the-handoff">Decision 4 — How do we bootstrap existing data without missing the handoff?</h3>
+<ul><li><strong>Choose:</strong> Debezium's coordinated <strong>initial snapshot plus continuous streaming</strong>. It establishes a consistent starting view and streams later changes from an appropriate log position. [1]</li><li><strong>Why:</strong> A consumer needs both <em>the rows that already existed</em> and <em>changes that happen while the initial copy is in progress</em>.</li><li><strong>Rejected alternative:</strong> An unrelated bulk <code>SELECT *</code> followed by starting CDC later has a race window in which changes can disappear from the new copy.</li></ul>
+<pre><code>Time --------------------------------------------------&gt;
+      Snapshot starts       Snapshot ends
+            |====================|
+Source:        writes may continue throughout
+CDC:      [read current rows] -&gt; [stream from saved log position]
+Result:   existing state + subsequent changes, no handoff gap</code></pre>
+<p><strong>Trade-off:</strong> A large snapshot can create read and I/O pressure on PostgreSQL. Throttle it, scope it to approved tables, and plan for source capacity. Debezium also supports incremental-snapshot approaches for appropriate backfill needs. [1]</p>
+<hr>
+<h2 id="5-one-change-stream-but-three-independent-destinations">5. One change stream, but three independent destinations</h2>
+<p>We can now read changes. Should Debezium send each event directly to support, search, and analytics?</p>
+<p>That seems simple, until the warehouse is unavailable. Then the capture service needs separate retry queues, progress tracking, and failure handling for every destination.</p>
+<h3 id="decision-5-send-directly-to-consumers-or-place-a-broker-in-the-middle">Decision 5 — Send directly to consumers or place a broker in the middle?</h3>
+<ul><li><strong>Choose:</strong> <strong>Apache Kafka</strong> as a durable, replayable event stream between capture and consumers. [3]</li><li><strong>Why:</strong> Kafka stores events for a configured period. Each downstream team can read independently, stop, restart, and catch up within the retention window. One slow consumer does not need to block the others.</li><li><strong>Rejected alternative:</strong> Direct connector-to-warehouse integration is simpler when there is only one destination and no need to replay or fan out data. We reject it here because we have several independent destinations.</li></ul>
+<p><strong>New concept — broker:</strong> A system that stores and distributes messages between producers and consumers. Kafka is an event-streaming platform that uses <strong>topics</strong> to organize records.</p>
+<pre><code>PostgreSQL --&gt; Debezium --&gt; Kafka topic
+                                 |
+                 +---------------+---------------+
+                 |               |               |
+                 v               v               v
+              Support         Analytics        Search
+              consumer        consumer         consumer</code></pre>
+<p><strong>New concept — consumer group:</strong> Consumers using the same group share processing of a topic's partitions. Independent applications use <strong>different groups</strong>, so support, analytics, and search each receive the complete stream. [3]</p>
+<p><strong>Important boundary:</strong> Kafka buffers work after a change is committed. A prolonged connector or Kafka outage can still build up WAL in PostgreSQL. Kafka does not eliminate source-side CDC risks.</p>
+<hr>
+<h2 id="6-decide-what-an-event-should-look-like">6. Decide what an event should look like</h2>
+<p>Let's capture the approval of <code>txn_1042</code>.</p>
+<p>This is a <strong>simplified teaching example</strong>, not the exact complete Debezium wire format:</p>
+<pre><code>{
+  "key": { "transaction_id": "txn_1042" },
+  "value": {
+    "op": "u",
+    "before": { "status": "PENDING" },
+    "after": {
+      "transaction_id": "txn_1042",
+      "amount_minor": 2500,
+      "currency": "USD",
+      "status": "APPROVED"
+    },
+    "source": { "table": "transactions" }
+  }
+}</code></pre>
+<p><strong>Reading it:</strong> <code>op = u</code> means an update. <code>before</code> is information about the earlier row; <code>after</code> is the newer state. Actual field availability, especially <code>before</code>, depends on PostgreSQL replica identity and connector settings. <code>amount_minor = 2500</code> represents $25.00 if the currency uses two decimal places. [1]</p>
+<p>Debezium's common operation labels include <code>r</code> for snapshot read, <code>c</code> for create, <code>u</code> for update, and <code>d</code> for delete. [1]</p>
+<h3 id="decision-6-raw-database-rows-or-meaningful-business-events">Decision 6 — Raw database rows or meaningful business events?</h3>
+<ul><li><strong>Choose:</strong> For this problem, publish <strong>row-change events</strong> describing what changed in the approved source tables.</li><li><strong>Why:</strong> Search indexing and read-model synchronization need the latest database state; a row-change record directly serves that purpose.</li><li><strong>Rejected alternative:</strong> Publishing only business events such as <code>PaymentAuthorized</code> would require the payment application to define and reliably write those events. That is better for business workflows but is a different contract.</li></ul>
+<p><strong>Critical difference:</strong> <code>status</code> changing to <code>APPROVED</code> is a database fact. <code>PaymentAuthorized</code> is a <em>business statement</em> whose meaning must be explicitly owned. CDC does not magically turn one into the other.</p>
+<h3 id="decision-7-how-should-we-organize-and-order-kafka-events">Decision 7 — How should we organize and order Kafka events?</h3>
+<ul><li><strong>Choose:</strong> Initially use one governed topic per captured table and the stable <code>transaction_id</code> as the record key.</li><li><strong>Why:</strong> Updates to the same transaction usually map to the same Kafka partition. Kafka preserves order <strong>within a partition</strong>, which makes a latest-state consumer easier to implement. [3]</li><li><strong>Rejected alternative:</strong> Random record keys may distribute traffic evenly but can send two updates for the same transaction to different partitions, with no per-transaction processing order.</li></ul>
+<p><strong>New concept — partition:</strong> A topic is split into ordered logs called partitions. Partitioning allows consumer parallelism, but <strong>Kafka does not provide one global order across every partition or topic</strong>. Changing partition counts can also change key routing, so it needs planning.</p>
+<p>For deletes, consumers must interpret Debezium's delete event and any accompanying <strong>tombstone</strong> correctly. A Kafka tombstone (a key with a null value) is useful for log compaction; it is not a substitute for defining sink-deletion behavior. [1, 3]</p>
+<hr>
+<h2 id="7-build-the-first-real-downstream-copy">7. Build the first real downstream copy</h2>
+<p>The support dashboard needs the <strong>latest state</strong> of each transaction. Its consumer reads Kafka events and writes to a small support-facing database.</p>
+<pre><code>Kafka event for txn_1042
+          |
+          v
+Support projector (consumer)
+          |
+          v
+UPSERT transaction txn_1042 = APPROVED
+          |
+          v
+Support read-model database</code></pre>
+<p><strong>New concept — projection/read model:</strong> A database or index built for a particular query need. It is a copy derived from the authoritative source. <strong>Upsert</strong> means insert if absent, otherwise update.</p>
+<h3 id="decision-8-share-one-downstream-database-or-create-independent-projections">Decision 8 — Share one downstream database or create independent projections?</h3>
+<ul><li><strong>Choose:</strong> Give support, search, and analytics separate consumers and storage optimized for their own queries.</li><li><strong>Why:</strong> Support needs fast lookups, search needs an index, and analytics needs historical and aggregate queries. They can scale and recover separately.</li><li><strong>Rejected alternative:</strong> One shared downstream database would reduce the number of stores but couple teams, workloads, access controls, and deployment schedules.</li></ul>
+<p><strong>Example flows:</strong> Support updates its latest-state SQL table; search updates a search index; analytics appends approved changes to an object store or warehouse. None of these sinks replaces the payment database.</p>
+<h3 id="decision-9-how-do-we-survive-receiving-the-same-event-twice">Decision 9 — How do we survive receiving the same event twice?</h3>
+<p>Imagine this sequence:</p>
+<ol start="1"><li>The support consumer reads the <code>APPROVED</code> event.</li><li>It updates its support database successfully.</li><li>It crashes <strong>before saving its Kafka progress</strong>.</li><li>On restart it receives the same event again.</li></ol>
+<p><strong>New concept — offset:</strong> A Kafka partition position representing how far a consumer has read. An offset is like a bookmark; a crash can happen between writing the sink and moving the bookmark.</p>
+<ul><li><strong>Choose:</strong> Design for <strong>at-least-once processing</strong> with an <strong>idempotent sink</strong>. Record progress only after a durable sink write, or store the sink update and processed position together when the sink supports a single transaction.</li><li><strong>Why:</strong> At-least-once means a record may be retried. An idempotent operation can be repeated without changing the final result beyond applying it once.</li><li><strong>Rejected alternative:</strong> Assume universal end-to-end exactly-once processing. Broker/connector features do not automatically make arbitrary external database writes or financial side effects exactly once.</li></ul>
+<p>For the latest-state support table, applying <code>status = APPROVED</code> twice is normally harmless. For a <em>money transfer</em>, doing the transfer twice would be disastrous; use durable event IDs, uniqueness constraints, and a properly designed financial workflow instead.</p>
+<p><strong>Ordering safeguard:</strong> An older replayed event must not overwrite a newer state. Preserve each key's processing order and, when offsets/state are stored separately or parallel processing is used, use a trustworthy version or source-position strategy. Do not rely on wall-clock timestamps alone.</p>
+<hr>
+<h2 id="8-what-happens-when-something-fails">8. What happens when something fails?</h2>
+<p>A good system design must explain <strong>where data waits, what retries, and who is at risk</strong>.</p>
+<h3 id="failure-a-the-analytics-consumer-stops">Failure A — The analytics consumer stops</h3>
+<p>Kafka still holds events during the configured retention period. The support and search consumer groups keep running. The analytics consumer later reads from its last safe offset.</p>
+<p><strong>Choose:</strong> Retry and catch up from Kafka; <strong>why:</strong> consumers are independent; <strong>rejected:</strong> pause all consumers and block the payment database.</p>
+<h3 id="failure-b-debezium-or-kafka-becomes-unavailable">Failure B — Debezium or Kafka becomes unavailable</h3>
+<p>PostgreSQL continues to process normal database transactions as long as its own resources remain healthy, but the replication slot may retain WAL because the CDC reader is behind. If WAL grows until the source runs out of disk, the <strong>primary system is endangered</strong>. [2]</p>
+<p><strong>Choose:</strong> Monitor replication slot lag, retained WAL bytes, source disk space, connector state, and Kafka availability; recover the capture path before capacity runs out. <strong>Rejected:</strong> treat Kafka outages as a downstream-only issue.</p>
+<h3 id="failure-c-postgresql-fails-over-to-another-primary">Failure C — PostgreSQL fails over to another primary</h3>
+<p>The new primary must support continuity of the logical replication slot or a documented recovery/re-snapshot procedure. Slot failover behavior depends on PostgreSQL version, deployment, and configuration. [1, 2]</p>
+<p><strong>Choose:</strong> Validate failover support and rehearse the recovery plan. <strong>Rejected:</strong> assume every managed PostgreSQL failover transparently preserves the CDC stream.</p>
+<h3 id="failure-d-a-malformed-event-or-schema-change-breaks-a-consumer">Failure D — A malformed event or schema change breaks a consumer</h3>
+<p><strong>Choose:</strong> Fail visibly, alert, place a rejected event in a controlled quarantine/dead-letter process when suitable, fix the consumer or event, then replay in order. <strong>Rejected:</strong> silently skip it and claim the data is consistent.</p>
+<p><strong>New concept — dead-letter queue (DLQ):</strong> A separate place to investigate events that cannot be processed normally. A DLQ is not proof of correctness; it needs ownership and a repair procedure.</p>
+<h3 id="decision-10-what-is-our-recovery-contract">Decision 10 — What is our recovery contract?</h3>
+<ul><li><strong>Choose:</strong> Retain Kafka events for a tested recovery window and keep a controlled snapshot/rebuild path if older history is unavailable.</li><li><strong>Why:</strong> A consumer behind Kafka's retention limit cannot read deleted historical records from Kafka. Separate durable archives may extend recoverability.</li><li><strong>Rejected alternative:</strong> Assume Kafka keeps all events forever or that an old offset can always be resumed.</li></ul>
+<p><strong>Two retention budgets:</strong> Kafka retention controls <em>how long consumers can replay</em>. PostgreSQL WAL retention controls <em>how much source log the connector has not yet consumed</em>. They are different and both need monitoring.</p>
+<hr>
+<h2 id="9-protect-the-data-and-keep-its-meaning-stable">9. Protect the data and keep its meaning stable</h2>
+<p>A CDC system can accidentally copy private database columns to many teams. That increases security and compliance scope.</p>
+<h3 id="decision-11-what-data-and-schemas-may-appear-in-the-stream">Decision 11 — What data and schemas may appear in the stream?</h3>
+<ul><li><strong>Choose:</strong> An explicit allowlist of source tables and fields, versioned event contracts, topic permissions, transport encryption, and approved consumers.</li><li><strong>Why:</strong> Downstream systems need predictable event shapes and should receive only the information they actually need.</li><li><strong>Rejected alternative:</strong> Publish every table and column as unrestricted JSON. This makes schema changes surprising and sensitive data hard to control.</li></ul>
+<p><strong>New concept — schema evolution:</strong> A table can gain a new column or change a data type over time. Consumers need a tested policy for old and new event shapes. A schema registry plus a chosen format can help enforce compatibility, but a registry is optional if equivalent governance exists.</p>
+<p>For a financial-services example, <strong>do not copy full card numbers or security codes</strong> into general Kafka topics. Use minimization and tokenization where appropriate. Topic retention, replay, logging, and backups affect where protected data might live.</p>
+<h3 id="decision-12-should-every-business-action-be-driven-by-cdc-rows">Decision 12 — Should every business action be driven by CDC rows?</h3>
+<ul><li><strong>Choose:</strong> Keep CDC for read-model synchronization. If a downstream service must react to a business event such as <code>PaymentAuthorized</code>, use a <strong>transactional outbox</strong> when appropriate. [4]</li><li><strong>Why:</strong> The payment service can write its business state and an <code>outbox_event</code> row in the <strong>same database transaction</strong>. CDC then delivers the outbox row. This avoids a fragile database-then-Kafka dual write and gives the event a controlled business meaning and stable event ID.</li><li><strong>Rejected alternative:</strong> Trigger non-idempotent business actions directly from arbitrary changes to a <code>transactions.status</code> column.</li></ul>
+<pre><code>          Payment application
+                 |
+       one database transaction
+                 |
+       +---------+----------+
+       |                    |
+       v                    v
+  Update payment       Insert outbox row
+       |                    |
+       +---------+----------+
+                 |
+          commit together
+                 |
+         Debezium -&gt; Kafka
+                 |
+       Business-event consumer</code></pre>
+<p><strong>What the outbox does not solve by itself:</strong> The consumer must still handle retries and duplicates. The outbox makes writing the business state and the event record atomic; it does not make every downstream side effect automatically exactly once.</p>
+<hr>
+<h2 id="10-size-the-system-before-choosing-capacity">10. Size the system before choosing capacity</h2>
+<p>Let's size a <strong>small illustrative starting point</strong>. These are assumptions for learning, <strong>not real American Express traffic or vendor limits</strong>.</p>
+<table><thead><tr><th>Item</th><th>Example assumption</th><th>Result</th></tr></thead><tbody><tr><td>Average changes</td><td>100 events/second</td><td>—</td></tr><tr><td>Peak changes</td><td>1,000 events/second</td><td>10x burst</td></tr><tr><td>Average Kafka event size</td><td>1 KB</td><td>—</td></tr><tr><td>Daily event count</td><td>100 × 86,400</td><td>8.64 million</td></tr><tr><td>Data per day, before overhead</td><td>8.64 million × 1 KB</td><td>~8.64 GB</td></tr><tr><td>Seven-day logical retention</td><td>8.64 GB × 7</td><td>~60.5 GB</td></tr><tr><td>Three Kafka copies, before overhead</td><td>60.5 GB × 3</td><td>~181.4 GB</td></tr></tbody></table>
+<p>Actual capacity needs compression, topic metadata, safety headroom, growth, partition count, snapshot demand, and consumer catch-up planning.</p>
+<h3 id="decision-13-where-should-we-scale-first">Decision 13 — Where should we scale first?</h3>
+<ul><li><strong>Choose:</strong> Start with measured source CDC throughput, Kafka broker capacity, and independent consumer scaling. Partition topics for expected consumer concurrency.</li><li><strong>Why:</strong> Adding more consumer instances helps only when there are enough partitions to divide the work. One PostgreSQL Debezium connector has a single capture task, so extra Kafka Connect workers do not multiply its capture throughput. [1, 3]</li><li><strong>Rejected alternative:</strong> Add dozens of consumers or Connect workers before measuring the actual bottleneck.</li></ul>
+<p>For initial snapshots, protect the payment database with bounded load. For continued streaming, verify the connector can keep up with the sustained WAL change rate.</p>
+<hr>
+<h2 id="11-final-design-built-one-decision-at-a-time">11. Final design, built one decision at a time</h2>
+<p>We can now assemble the final design. Each box exists for a specific reason.</p>
+<pre><code>  Payment application
+          |
+          v
+  +-------------------------+
+  | PostgreSQL (source)     |
+  | transactions table      |
+  | WAL + logical slot      |
+  +------------+------------+
+               | committed row changes
+               v
+  +-------------------------+
+  | Debezium on Kafka       |
+  | Connect: snapshot +     |
+  | ongoing WAL capture     |
+  +------------+------------+
+               |
+               v
+  +-------------------------+
+  | Kafka CDC topic         |
+  | transaction_id as key   |
+  | retention + partitions  |
+  +-----+---------+---------+
+        |         |         |
+        v         v         v
+   Support     Analytics   Search
+   consumer    consumer    consumer
+        |         |         |
+        v         v         v
+   Read model  Warehouse   Search index
+
+  Across all parts: permissions, encryption,
+  schema management, lag alerts, replay, reconciliation</code></pre>
+<h3 id="walk-through-txn1042-from-start-to-finish">Walk through <code>txn_1042</code> from start to finish</h3>
+<ol start="1"><li>The payment application commits <code>txn_1042: PENDING -&gt; APPROVED</code> in PostgreSQL.</li><li>The change is available through WAL logical decoding; the replication slot tracks progress.</li><li>Debezium turns the committed update into a structured change event.</li><li>Kafka stores that event in the partition selected by <code>transaction_id</code>.</li><li>The support consumer updates the support read model to <code>APPROVED</code>.</li><li>The search consumer updates its index; the analytics consumer stores the change for reports.</li><li>If analytics is down, it catches up later from Kafka within the configured retention window.</li><li>Monitoring checks whether source-to-sink freshness and CDC source safety are within limits.</li></ol>
+<p><strong>Consistency we promise:</strong> The payment database is authoritative. Downstream views are <strong>eventually consistent</strong>, meaning they can briefly show older values. Ordering is per Kafka partition/key, not global across every system. Sink writes are designed for at-least-once delivery and safe replay.</p>
+<hr>
+<h2 id="12-operations-what-must-be-visible-in-production">12. Operations: what must be visible in production?</h2>
+<table><thead><tr><th>Signal</th><th>Simple question it answers</th></tr></thead><tbody><tr><td>End-to-end freshness</td><td>How many seconds until a committed change is visible in the sink?</td></tr><tr><td>Debezium connector/task state</td><td>Is change capture running?</td></tr><tr><td>PostgreSQL replication-slot/WAL lag</td><td>Is the source retaining too much WAL?</td></tr><tr><td>PostgreSQL free disk space</td><td>Could CDC lag threaten the source database?</td></tr><tr><td>Kafka topic/broker health</td><td>Can we reliably accept and retain changes?</td></tr><tr><td>Consumer lag</td><td>How far behind is support, search, or analytics?</td></tr><tr><td>Failed event count / DLQ</td><td>Are some events being rejected?</td></tr><tr><td>Source-to-sink reconciliation</td><td>Did a downstream copy silently diverge?</td></tr></tbody></table>
+<p><strong>Choose:</strong> Monitor both <em>business freshness</em> and <em>infrastructure safety</em>. <strong>Why:</strong> Consumer lag can harm user experience, while growing retained WAL can threaten source availability. <strong>Rejected:</strong> monitor only whether the Kafka cluster is online.</p>
+<p><strong>Recovery runbooks to prepare:</strong> connector restart, Kafka outage, PostgreSQL primary failover, consumer replay, re-snapshot after retention loss, schema rollback, and data reconciliation. Validate these using real failure tests, not only a diagram.</p>
+<hr>
+<h2 id="13-when-would-we-choose-another-design">13. When would we choose another design?</h2>
+<table><thead><tr><th>Requirement</th><th>Better-fit approach</th><th>Why not our default CDC + Kafka design?</th></tr></thead><tbody><tr><td>Small table, hourly updates, no deletes</td><td>Timestamp polling</td><td>Simpler, potentially enough for modest requirements</td></tr><tr><td>Only one warehouse needs nightly data</td><td>Batch ETL or a managed direct sink</td><td>Kafka adds unnecessary components</td></tr><tr><td>Another PostgreSQL database needs a replica</td><td>Native logical replication</td><td>A full multi-consumer integration platform may be unnecessary</td></tr><tr><td>Business consumers require <code>PaymentAuthorized</code></td><td>Transactional outbox + CDC</td><td>A database row update lacks a complete business contract</td></tr><tr><td>Need immediate read-after-write correctness</td><td>Query the authoritative service/database</td><td>CDC is asynchronous, so the projection may lag</td></tr><tr><td>Need a legally complete long-term audit record</td><td>Governed append-only audit design</td><td>Compacted or time-limited Kafka topics are not a legal audit store</td></tr></tbody></table>
+<hr>
+<h2 id="14-the-short-interview-explanation">14. The short interview explanation</h2>
+<blockquote><p>A payment database stores transaction changes, but support, search, and analytics need their own copies. I would keep PostgreSQL as the source of truth. Rather than have every service poll it, I would use Debezium to capture committed changes from PostgreSQL's WAL. An initial snapshot provides existing records, and streaming then provides new changes without a gap. I would send events to Kafka so each downstream consumer can process independently and replay after failures. I would key records by transaction ID for per-key ordering, and make sink updates idempotent because retries can duplicate events. The operational risks are CDC lag retaining source WAL, schema changes, and consumer drift, so I would monitor and test those explicitly. If the requirement is a true business event, I would use a transactional outbox instead of treating a row change as the event itself.</p></blockquote>
+<h3 id="key-points-to-remember">Key points to remember</h3>
+<ul><li><strong>CDC answers:</strong> What committed database rows changed?</li><li><strong>WAL answers:</strong> Where can PostgreSQL expose these changes efficiently?</li><li><strong>Debezium answers:</strong> Who reads those changes and converts them into events?</li><li><strong>Kafka answers:</strong> How can many consumers receive, buffer, and replay events independently?</li><li><strong>Snapshot answers:</strong> How do we copy existing data before watching future changes?</li><li><strong>Idempotency answers:</strong> How do retries avoid damaging results?</li><li><strong>Outbox answers:</strong> How do we reliably publish <em>business events</em>, not just row mutations?</li><li><strong>Operational safety answers:</strong> How do we stop a stalled CDC reader from endangering the source database?</li></ul>
+<hr>
+<h2 id="official-references">Official references</h2>
+<p>The design's implementation details should be checked against the exact product versions deployed. These references are maintained by the relevant projects.</p>
+<ol start="1"><li><strong>Debezium, PostgreSQL connector:</strong> https://debezium.io/documentation/reference/stable/connectors/postgresql.html — snapshots, events, connector operation, PostgreSQL integration.</li><li><strong>PostgreSQL, logical decoding concepts:</strong> https://www.postgresql.org/docs/current/logicaldecoding-explanation.html — WAL decoding, replication slots, repeats after crash, source-log considerations.</li><li><strong>Apache Kafka, design documentation:</strong> https://kafka.apache.org/42/design/design/ — topics, partitions, consumer groups, delivery and persistence concepts.</li><li><strong>Debezium, outbox event router:</strong> https://debezium.io/documentation/reference/stable/transformations/outbox-event-router.html — outbox event pattern and transformation.</li></ol>
+<p><strong>Final takeaway:</strong> Build a CDC pipeline by solving one real problem at a time: detect committed changes, bootstrap existing data, distribute updates, preserve per-key order, survive retries, protect sensitive data, and keep the source database safe.</p></main></body></html>
