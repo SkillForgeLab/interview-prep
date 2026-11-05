@@ -290,7 +290,7 @@ junit.xml
 *.tar
 *.tar.gz
 *.rar
-*.zip
+# *.zip
 
 ########################################
 # MISC / TOOLS
@@ -316,3 +316,5 @@ deploy_*
 
 #!*.sqlite
 #!*.sql
+#!*.zip
+
