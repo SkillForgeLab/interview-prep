@@ -459,10 +459,13 @@ suitably strong distributed consistency mechanism.
 > payment intent and provider attempt before calling an external processor, then
 > stores the result using guarded state transitions. The most important design
 > choice is handling uncertain provider outcomes: I would never blindly retry
-> through a second provider after a timeout. Instead, I would resolve the original
-> attempt and reconcile it. ACID transactions protect local state, a transactional
+> through a second provider after a timeout. Instead, I would resolve the
+> original
+> attempt and reconcile it. ACID transactions protect local state, a
+> transactional
 > outbox and durable broker support asynchronous processing, and signed
-> at-least-once webhooks notify merchants. Stateless services scale horizontally,
+> at-least-once webhooks notify merchants. Stateless services scale
+> horizontally,
 > while controlled payment ownership prevents conflicting multi-region attempts.
 > Tokenization, audit controls, and provider reconciliation protect security and
 > financial correctness.

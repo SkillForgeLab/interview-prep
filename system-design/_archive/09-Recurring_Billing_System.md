@@ -391,7 +391,8 @@ outbox backlog, reconciliation mismatches, and DLQ depth.
 > I would design recurring billing around a durable subscription database,
 > distributed scheduler, invoice service, and idempotent payment orchestration.
 > The key principle is that scheduler jobs may run more than once, but each
-> billing period must produce only its intended invoice and payment obligations. I
+> billing period must produce only its intended invoice and payment obligations.
+> I
 > would use SQL transactions and unique constraints for local correctness,
 > Saga-based workflows across payment and ledger services, and a transactional
 > outbox for reliable events. Payment failures require bounded retries, dunning,

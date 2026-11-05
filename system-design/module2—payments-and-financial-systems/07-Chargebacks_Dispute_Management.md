@@ -371,12 +371,15 @@ evidence retention/disposal under applicable legal and business obligations.
 > and a relational case database. Since disputes are long-running and
 > deadline-sensitive, orchestration provides controlled state transitions,
 > persistent timers, and reliable recovery. I would store evidence in secure
-> object storage, integrate with payment networks through dedicated adapters, and
+> object storage, integrate with payment networks through dedicated adapters,
+> and
 > use events for notifications and downstream processing. Financial adjustments
 > would be executed through an authoritative ledger with durable idempotency to
-> prevent duplicate chargebacks or reversals. Finally, I would implement deadline
+> prevent duplicate chargebacks or reversals. Finally, I would implement
+> deadline
 > reconciliation, immutable audit history, role-based access control, and
-> operational monitoring to ensure financial correctness, compliance, and reliable
+> operational monitoring to ensure financial correctness, compliance, and
+> reliable
 > case resolution.
 
 ---

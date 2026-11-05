@@ -1,331 +1,647 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Credit Card Authorization System — 10-Minute System Design Answer</title><style>
-/* The original PDF skill style sheet is embedded below. */
-/* Architect's Field Notes — original study-guide design recreation.
-   Standalone builder embeds this file into its generated HTML. */
-:root {
-  --navy: #112c3a;
-  --header: #193a4b;
-  --ink: #273944;
-  --heading: #17313e;
-  --muted: #75838d;
-  --line: #d9e2e7;
-  --zebra: #f6f8f9;
-  --accent: #64c8e6;
-  --accent-soft: #eaf8fc;
-}
-@page {
-  size: A4;
-  margin: 19mm 19mm 19mm;
-  @top-left {
-    content: "INTERVIEW / FIELD GUIDE";
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .05em;
-    vertical-align: middle;
-  }
-  @top-right {
-    content: string(running-topic);
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .02em;
-    vertical-align: middle;
-  }
-  @bottom-left {
-    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
-    color: #9aa5ae;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 6.3pt;
-    letter-spacing: .03em;
-    vertical-align: middle;
-  }
-  @bottom-right {
-    content: counter(page, decimal-leading-zero);
-    color: #394b56;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-weight: 700;
-    font-size: 7pt;
-    vertical-align: middle;
-  }
-}
-@page cover {
-  size: A4;
-  margin: 0;
-  @top-left { content: none; }
-  @top-right { content: none; }
-  @bottom-left { content: none; }
-  @bottom-right { content: none; }
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: "Inter", "DejaVu Sans", sans-serif;
-  font-size: 9.4pt;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--ink);
-  background: #fff;
-  overflow-wrap: break-word;
-}
-.cover {
-  page: cover;
-  break-after: page;
-  height: 297mm;
-  width: 210mm;
-  overflow: hidden;
-  position: relative;
-  background: var(--navy);
-  color: #fff;
-  padding: 29.6mm 26mm;
-}
-.cover::before, .cover::after {
-  content: "";
-  position: absolute;
-  border: .55pt solid rgba(255,255,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
-.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
-.cover-brand {
-  font-size: 9.5pt;
-  font-weight: 800;
-  letter-spacing: .31em;
-  text-transform: uppercase;
-  color: #dceaf0;
-}
-.cover-series {
-  font-size: 8pt;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #98b3c1;
-  margin-top: 7mm;
-}
-.cover-accent-bar {
-  position: absolute;
-  left: 26mm; top: 80mm;
-  height: 3.5mm; width: 21mm;
-  background: var(--accent);
-}
-.cover-title {
-  position: absolute;
-  left: 25.5mm; right: 25mm; top: 97mm;
-  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
-  font-size: 42pt;
-  font-weight: 800;
-  letter-spacing: -.043em;
-  line-height: 1.08;
-  color: #fff;
-}
-.cover-title .second { display: block; color: var(--accent); }
-.cover-title.long { font-size: 37pt; }
-.cover-sub {
-  position: absolute;
-  left: 26mm; right: 31mm; top: 173.5mm;
-  color: #bdcdd5;
-  font-size: 11.5pt;
-  line-height: 1.7;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.cover-note {
-  color: #91aab7;
-  text-transform: none;
-  font-size: 9pt;
-  letter-spacing: .01em;
-  margin-top: 7mm;
-  line-height: 1.6;
-}
-.cover-bottom {
-  position: absolute;
-  bottom: 31mm; left: 26mm;
-  font-size: 7.8pt;
-  line-height: 1.9;
-  letter-spacing: .065em;
-  color: #cfdae0;
-}
-.cover-rule {
-  position: absolute;
-  bottom: 62mm; height: .35pt;
-  left: 26mm; right: 26mm;
-  background: rgba(255,255,255,.15);
-}
-.cover-number {
-  position: absolute;
-  bottom: 29mm; right: 26mm;
-  color: var(--accent);
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 39pt;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-/* Introduction + automatically generated navigable contents. */
-.preface { break-after: page; }
-.preface-label, .toc-overline {
-  color: var(--accent);
-  font-size: 7.6pt;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-top: 0;
-}
-.preface h1 { display: none; }
-.preface h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 14pt;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.02em;
-  color: var(--heading);
-  margin: 5mm 0 5mm;
-  border-bottom: .5pt solid var(--line);
-  padding-bottom: 2.5mm;
-}
-.preface p { font-size: 9.5pt; line-height: 1.6; }
-.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
-.toc h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 21pt;
-  letter-spacing: -.03em;
-  margin: 2mm 0 5mm;
-  border: 0;
-  padding: 0;
-}
-.toc ol { list-style: none; margin: 0; padding: 0; }
-.toc li {
-  display: flex;
-  align-items: baseline;
-  gap: 5mm;
-  font-size: 9.1pt;
-  padding: 2.7mm 1mm;
-  border-top: .5pt solid #e7ecef;
-  break-inside: avoid;
-}
-.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
-.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
-.toc a { color: var(--ink); text-decoration: none; }
-/* Continuous editorial body: sections can flow across pages. */
-.content { padding: 0; }
-.content h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 17.2pt;
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1.28;
-  letter-spacing: -.024em;
-  margin: 11mm 0 5mm;
-  padding-top: 5.5mm;
-  border-top: .6pt solid var(--line);
-  break-after: avoid;
-}
-.content h2::before {
-  content: "CHAPTER";
-  display: block;
-  color: var(--accent);
-  font-size: 7pt;
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-bottom: 2.2mm;
-}
-.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
-.content h3 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 11.6pt;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -.012em;
-  color: var(--heading);
-  margin: 7mm 0 2.5mm;
-  break-after: avoid;
-}
-.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
-p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
-strong, b { font-weight: 700; color: #1a3341; }
-a { color: #23778e; text-decoration: none; }
-hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
-ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
-li { padding-left: .5mm; margin: 1.5mm 0; }
-li::marker { color: var(--accent); }
-li p { margin: 0; }
-blockquote {
-  background: var(--accent-soft);
-  border-left: 2.5pt solid var(--accent);
-  margin: 4mm 0 6mm;
-  padding: 4mm 5.2mm;
-  color: #2b4654;
-  font-size: 9.4pt;
-  line-height: 1.56;
-}
-blockquote p { margin-bottom: 2.3mm; }
-blockquote p:last-child { margin-bottom: 0; }
-blockquote strong { color: #143743; }
-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  font-size: 8pt;
-  line-height: 1.42;
-  color: var(--ink);
-  margin: 3.6mm 0 4.8mm;
-  overflow-wrap: anywhere;
-}
-thead { display: table-header-group; }
-thead th {
-  background: var(--header);
-  color: #fff;
-  text-align: left;
-  font-weight: 700;
-  padding: 2.2mm 2.4mm;
-  vertical-align: top;
-  border-right: 1pt solid rgba(255,255,255,.04);
-}
-thead th strong { color: #fff; }
-tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
-tbody tr:nth-child(even) { background: var(--zebra); }
-tr { break-inside: avoid; }
-table.wide { font-size: 7.15pt; }
-table.wide th, table.wide td { padding: 1.8mm; }
-code {
-  font-family: "DejaVu Sans Mono", monospace;
-  font-size: .91em;
-  color: #22445a;
-}
-pre {
-  color: #dce9f0;
-  background: #173746;
-  padding: 4mm 5mm;
-  font-size: 8.3pt;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin: 4mm 0;
-}
-pre code { color: inherit; }
-.task-list-item { list-style: none; margin-left: -5mm; }
-.task-box {
-  display: inline-block;
-  border: .85pt solid #7b8b93;
-  width: 2.6mm; height: 2.6mm;
-  margin-right: 3mm;
-  vertical-align: baseline;
-}
-.task-box.checked { background: var(--accent); border-color: var(--accent); }
-img { max-width: 100%; height: auto; }
-.caption { color: var(--muted); font-size: 7.8pt; }
-@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Credit Card Authorization System — 10-Minute System Design
+        Answer</title>
+    <style>
+        /* The original PDF skill style sheet is embedded below. */
+        /* Architect's Field Notes — original study-guide design recreation.
+           Standalone builder embeds this file into its generated HTML. */
+        :root {
+            --navy: #112c3a;
+            --header: #193a4b;
+            --ink: #273944;
+            --heading: #17313e;
+            --muted: #75838d;
+            --line: #d9e2e7;
+            --zebra: #f6f8f9;
+            --accent: #64c8e6;
+            --accent-soft: #eaf8fc;
+        }
+
+        @page {
+            size: A4;
+            margin: 19mm 19mm 19mm;
+            @top-left {
+                content: "INTERVIEW / FIELD GUIDE";
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .05em;
+                vertical-align: middle;
+            }
+            @top-right {
+                content: string(running-topic);
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .02em;
+                vertical-align: middle;
+            }
+            @bottom-left {
+                content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+                color: #9aa5ae;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 6.3pt;
+                letter-spacing: .03em;
+                vertical-align: middle;
+            }
+            @bottom-right {
+                content: counter(page, decimal-leading-zero);
+                color: #394b56;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-weight: 700;
+                font-size: 7pt;
+                vertical-align: middle;
+            }
+        }
+
+        @page cover {
+            size: A4;
+            margin: 0;
+            @top-left {
+                content: none;
+            }
+            @top-right {
+                content: none;
+            }
+            @bottom-left {
+                content: none;
+            }
+            @bottom-right {
+                content: none;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", "DejaVu Sans", sans-serif;
+            font-size: 9.4pt;
+            font-weight: 400;
+            line-height: 1.55;
+            color: var(--ink);
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        .cover {
+            page: cover;
+            break-after: page;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy);
+            color: #fff;
+            padding: 29.6mm 26mm;
+        }
+
+        .cover::before, .cover::after {
+            content: "";
+            position: absolute;
+            border: .55pt solid rgba(255, 255, 255, .08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover::before {
+            width: 158mm;
+            height: 158mm;
+            right: -84mm;
+            top: -61mm;
+        }
+
+        .cover::after {
+            width: 108mm;
+            height: 108mm;
+            right: -28mm;
+            bottom: -75mm;
+        }
+
+        .cover-brand {
+            font-size: 9.5pt;
+            font-weight: 800;
+            letter-spacing: .31em;
+            text-transform: uppercase;
+            color: #dceaf0;
+        }
+
+        .cover-series {
+            font-size: 8pt;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #98b3c1;
+            margin-top: 7mm;
+        }
+
+        .cover-accent-bar {
+            position: absolute;
+            left: 26mm;
+            top: 80mm;
+            height: 3.5mm;
+            width: 21mm;
+            background: var(--accent);
+        }
+
+        .cover-title {
+            position: absolute;
+            left: 25.5mm;
+            right: 25mm;
+            top: 97mm;
+            font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -.043em;
+            line-height: 1.08;
+            color: #fff;
+        }
+
+        .cover-title .second {
+            display: block;
+            color: var(--accent);
+        }
+
+        .cover-title.long {
+            font-size: 37pt;
+        }
+
+        .cover-sub {
+            position: absolute;
+            left: 26mm;
+            right: 31mm;
+            top: 173.5mm;
+            color: #bdcdd5;
+            font-size: 11.5pt;
+            line-height: 1.7;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .cover-note {
+            color: #91aab7;
+            text-transform: none;
+            font-size: 9pt;
+            letter-spacing: .01em;
+            margin-top: 7mm;
+            line-height: 1.6;
+        }
+
+        .cover-bottom {
+            position: absolute;
+            bottom: 31mm;
+            left: 26mm;
+            font-size: 7.8pt;
+            line-height: 1.9;
+            letter-spacing: .065em;
+            color: #cfdae0;
+        }
+
+        .cover-rule {
+            position: absolute;
+            bottom: 62mm;
+            height: .35pt;
+            left: 26mm;
+            right: 26mm;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .cover-number {
+            position: absolute;
+            bottom: 29mm;
+            right: 26mm;
+            color: var(--accent);
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 39pt;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        /* Introduction + automatically generated navigable contents. */
+        .preface {
+            break-after: page;
+        }
+
+        .preface-label, .toc-overline {
+            color: var(--accent);
+            font-size: 7.6pt;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .preface h1 {
+            display: none;
+        }
+
+        .preface h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 14pt;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -.02em;
+            color: var(--heading);
+            margin: 5mm 0 5mm;
+            border-bottom: .5pt solid var(--line);
+            padding-bottom: 2.5mm;
+        }
+
+        .preface p {
+            font-size: 9.5pt;
+            line-height: 1.6;
+        }
+
+        .toc {
+            border-top: .5pt solid var(--line);
+            margin-top: 8mm;
+            padding-top: 6.5mm;
+        }
+
+        .toc h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 21pt;
+            letter-spacing: -.03em;
+            margin: 2mm 0 5mm;
+            border: 0;
+            padding: 0;
+        }
+
+        .toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            gap: 5mm;
+            font-size: 9.1pt;
+            padding: 2.7mm 1mm;
+            border-top: .5pt solid #e7ecef;
+            break-inside: avoid;
+        }
+
+        .toc li:last-child {
+            border-bottom: .5pt solid #e7ecef;
+        }
+
+        .toc .toc-num {
+            width: 8mm;
+            flex: 0 0 8mm;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .toc a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        /* Continuous editorial body: sections can flow across pages. */
+        .content {
+            padding: 0;
+        }
+
+        .content h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 17.2pt;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.28;
+            letter-spacing: -.024em;
+            margin: 11mm 0 5mm;
+            padding-top: 5.5mm;
+            border-top: .6pt solid var(--line);
+            break-after: avoid;
+        }
+
+        .content h2::before {
+            content: "CHAPTER";
+            display: block;
+            color: var(--accent);
+            font-size: 7pt;
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .19em;
+            margin-bottom: 2.2mm;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 11.6pt;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -.012em;
+            color: var(--heading);
+            margin: 7mm 0 2.5mm;
+            break-after: avoid;
+        }
+
+        .content h4, .preface h3 {
+            font-size: 10pt;
+            color: var(--heading);
+            margin: 5mm 0 2mm;
+            break-after: avoid;
+        }
+
+        p {
+            margin: 0 0 3.15mm;
+            orphans: 2;
+            widows: 2;
+        }
+
+        strong, b {
+            font-weight: 700;
+            color: #1a3341;
+        }
+
+        a {
+            color: #23778e;
+            text-decoration: none;
+        }
+
+        hr {
+            height: 0;
+            border: none;
+            border-top: .55pt solid #d9e2e7;
+            margin: 7mm 0;
+        }
+
+        ul, ol {
+            margin: 2.5mm 0 4mm;
+            padding-left: 6mm;
+        }
+
+        li {
+            padding-left: .5mm;
+            margin: 1.5mm 0;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        li p {
+            margin: 0;
+        }
+
+        blockquote {
+            background: var(--accent-soft);
+            border-left: 2.5pt solid var(--accent);
+            margin: 4mm 0 6mm;
+            padding: 4mm 5.2mm;
+            color: #2b4654;
+            font-size: 9.4pt;
+            line-height: 1.56;
+        }
+
+        blockquote p {
+            margin-bottom: 2.3mm;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        blockquote strong {
+            color: #143743;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            font-size: 8pt;
+            line-height: 1.42;
+            color: var(--ink);
+            margin: 3.6mm 0 4.8mm;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        thead th {
+            background: var(--header);
+            color: #fff;
+            text-align: left;
+            font-weight: 700;
+            padding: 2.2mm 2.4mm;
+            vertical-align: top;
+            border-right: 1pt solid rgba(255, 255, 255, .04);
+        }
+
+        thead th strong {
+            color: #fff;
+        }
+
+        tbody td {
+            border-bottom: .35pt solid #e3e9ed;
+            padding: 2.3mm 2.4mm;
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--zebra);
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        table.wide {
+            font-size: 7.15pt;
+        }
+
+        table.wide th, table.wide td {
+            padding: 1.8mm;
+        }
+
+        code {
+            font-family: "DejaVu Sans Mono", monospace;
+            font-size: .91em;
+            color: #22445a;
+        }
+
+        pre {
+            color: #dce9f0;
+            background: #173746;
+            padding: 4mm 5mm;
+            font-size: 8.3pt;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 4mm 0;
+        }
+
+        pre code {
+            color: inherit;
+        }
+
+        .task-list-item {
+            list-style: none;
+            margin-left: -5mm;
+        }
+
+        .task-box {
+            display: inline-block;
+            border: .85pt solid #7b8b93;
+            width: 2.6mm;
+            height: 2.6mm;
+            margin-right: 3mm;
+            vertical-align: baseline;
+        }
+
+        .task-box.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 7.8pt;
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 25px #ddd;
+            }
+        }
 
 
-:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"CREDIT CARD AUTHORIZATION SYSTEM — 10-MINUTE SYSTEM DESIGN ANSWER";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
-@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 04 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title long">Credit Card Authorization System<span class="second">— 10-Minute System Design Answer</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">04</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>Role focus:</strong> Solution Architect <strong>Scope:</strong> Issuer-side credit card authorization <strong>Focus:</strong> Key architectural decisions, reasons, failure handling, and points to remember</p><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-problem-and-requirements">1. Problem and requirements</a></li><li><span class="toc-num">02</span><a href="#2-high-level-architecture">2. High-level architecture</a></li><li><span class="toc-num">03</span><a href="#3-key-architectural-decisions-and-reasons">3. Key architectural decisions and reasons</a></li><li><span class="toc-num">04</span><a href="#4-end-to-end-flow">4. End-to-end flow</a></li><li><span class="toc-num">05</span><a href="#5-failure-handling">5. Failure handling</a></li><li><span class="toc-num">06</span><a href="#6-authorization-vs-clearing-vs-settlement">6. Authorization vs. clearing vs. settlement</a></li><li><span class="toc-num">07</span><a href="#7-key-points-to-remember">7. Key points to remember</a></li><li><span class="toc-num">08</span><a href="#8-interview-closing-statement">8. Interview closing statement</a></li></ol></nav></section><main class="content"><h2 id="1-problem-and-requirements">1. Problem and requirements</h2>
-<p>Design a system that receives a payment-network authorization request and quickly returns <strong>Approve</strong> or <strong>Decline</strong>. It must validate the card, assess fraud risk, check available credit, and durably reserve credit if approved.</p>
-<p><strong>Key non-functional requirements</strong></p>
-<ul><li><strong>Low latency:</strong> The merchant needs an immediate response.</li><li><strong>High availability:</strong> Component failures should not unnecessarily stop purchases.</li><li><strong>Strong consistency for credit reservation:</strong> Prevent unintended credit overcommitment.</li><li><strong>Idempotency:</strong> A retried authorization must not create a duplicate hold.</li><li><strong>Security:</strong> Protect card credentials, sensitive data, and cryptographic operations.</li></ul>
-<p><strong>Illustrative scale assumption:</strong> 5,000–10,000 peak authorization requests per second. This is a design exercise assumption, not an American Express production figure.</p>
-<h2 id="2-high-level-architecture">2. High-level architecture</h2>
-<pre><code>                 Card Network
+        :root {
+            --accent: #64C8E6;
+            --accent-soft: #EAF8FC;
+        }
+
+        @page {
+            @top-right {
+                content: "CREDIT CARD AUTHORIZATION SYSTEM — 10-MINUTE SYSTEM DESIGN ANSWER";
+            }@bottom-left {
+            content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+        }
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 20px #dce2e6;
+            }
+        }</style>
+</head>
+<body>
+<section class="cover">
+    <div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div>
+    <div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 04
+        OF 07
+    </div>
+    <div class="cover-accent-bar"></div>
+    <div class="cover-title long">Credit Card Authorization System<span
+            class="second">— 10-Minute System Design Answer</span></div>
+    <div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH
+        CONFIDENCE.
+        <div class="cover-note">Evidence-based STAR answers, senior-level
+            judgment, and focused interview rehearsal.
+        </div>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT
+        INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE
+    </div>
+    <div class="cover-number">04</div>
+</section>
+<section class="preface">
+    <div class="preface-label">YOUR STUDY COMPANION</div>
+    <p><strong>Role focus:</strong> Solution Architect <strong>Scope:</strong>
+        Issuer-side credit card authorization <strong>Focus:</strong> Key
+        architectural decisions, reasons, failure handling, and points to
+        remember</p>
+    <nav class="toc">
+        <div class="toc-overline">NAVIGATION</div>
+        <h2>Inside this guide</h2>
+        <ol>
+            <li><span class="toc-num">01</span><a
+                    href="#1-problem-and-requirements">1. Problem and
+                requirements</a></li>
+            <li><span class="toc-num">02</span><a
+                    href="#2-high-level-architecture">2. High-level
+                architecture</a></li>
+            <li><span class="toc-num">03</span><a
+                    href="#3-key-architectural-decisions-and-reasons">3. Key
+                architectural decisions and reasons</a></li>
+            <li><span class="toc-num">04</span><a href="#4-end-to-end-flow">4.
+                End-to-end flow</a></li>
+            <li><span class="toc-num">05</span><a href="#5-failure-handling">5.
+                Failure handling</a></li>
+            <li><span class="toc-num">06</span><a
+                    href="#6-authorization-vs-clearing-vs-settlement">6.
+                Authorization vs. clearing vs. settlement</a></li>
+            <li><span class="toc-num">07</span><a
+                    href="#7-key-points-to-remember">7. Key points to
+                remember</a></li>
+            <li><span class="toc-num">08</span><a
+                    href="#8-interview-closing-statement">8. Interview closing
+                statement</a></li>
+        </ol>
+    </nav>
+</section>
+<main class="content"><h2 id="1-problem-and-requirements">1. Problem and
+    requirements</h2>
+    <p>Design a system that receives a payment-network authorization request and
+        quickly returns <strong>Approve</strong> or <strong>Decline</strong>. It
+        must validate the card, assess fraud risk, check available credit, and
+        durably reserve credit if approved.</p>
+    <p><strong>Key non-functional requirements</strong></p>
+    <ul>
+        <li><strong>Low latency:</strong> The merchant needs an immediate
+            response.
+        </li>
+        <li><strong>High availability:</strong> Component failures should not
+            unnecessarily stop purchases.
+        </li>
+        <li><strong>Strong consistency for credit reservation:</strong> Prevent
+            unintended credit overcommitment.
+        </li>
+        <li><strong>Idempotency:</strong> A retried authorization must not
+            create a duplicate hold.
+        </li>
+        <li><strong>Security:</strong> Protect card credentials, sensitive data,
+            and cryptographic operations.
+        </li>
+    </ul>
+    <p><strong>Illustrative scale assumption:</strong> 5,000–10,000 peak
+        authorization requests per second. This is a design exercise assumption,
+        not an American Express production figure.</p>
+    <h2 id="2-high-level-architecture">2. High-level architecture</h2>
+    <pre><code>                 Card Network
                       |
                       v
             Network Protocol Adapter
@@ -362,36 +678,152 @@ img { max-width: 100%; height: auto; }
                       |      |      |
                       v      v      v
                     Alerts  BI    Fraud updates</code></pre>
-<p><strong>Core idea:</strong> Keep the <strong>approval path synchronous</strong>; move noncritical downstream work to <strong>durable asynchronous processing</strong>. Logical boxes do not necessarily require separate microservices.</p>
-<h2 id="3-key-architectural-decisions-and-reasons">3. Key architectural decisions and reasons</h2>
-<table><thead><tr><th>Decision</th><th>Choice</th><th>Reason</th></tr></thead><tbody><tr><td>Network integration</td><td>Protocol adapter and canonical internal request</td><td>Isolates network-specific message formats from business logic</td></tr><tr><td>Authorization</td><td>Synchronous request/response</td><td>The merchant requires a decision now</td></tr><tr><td>Authoritative storage</td><td>Transactional relational database</td><td>ACID transactions, constraints, and coordinated writes</td></tr><tr><td>Credit hold</td><td>Atomic conditional update</td><td>Prevents concurrent approvals from consuming the same available credit</td></tr><tr><td>Duplicate protection</td><td>Durable request identity and unique constraint</td><td>Safe retries without duplicate holds</td></tr><tr><td>Fraud decision</td><td>Synchronous required checks using rules and ML</td><td>Evaluate risk <strong>before</strong> approval</td></tr><tr><td>Fraud features</td><td>Low-latency feature store where suitable</td><td>Avoid expensive analytical queries on the critical path</td></tr><tr><td>Caching</td><td>Only for appropriately stale-tolerant information</td><td>Cached available credit is not authoritative</td></tr><tr><td>Async integration</td><td>Durable event broker, e.g., Kafka</td><td>Decouple notifications, analytics, and supporting updates</td></tr><tr><td>Event correctness</td><td>Transactional outbox + idempotent consumers</td><td>Avoid lost events after DB commit; tolerate redelivery</td></tr><tr><td>Scaling</td><td>Stateless workers; partition by credit account if necessary</td><td>Independent application scale; coordinated same-account writes</td></tr><tr><td>Multi-region</td><td>Single authoritative writer per credit account</td><td>Avoid conflicting reservations and split-brain approvals</td></tr></tbody></table>
-<h3 id="a-why-a-relational-database">A. Why a relational database?</h3>
-<p>Credit authorization requires a single transaction that:</p>
-<ol start="1"><li>Establishes the identity of the logical request.</li><li>Atomically checks and reserves available credit.</li><li>Saves the authorization and hold.</li><li>Saves the response decision and outbox event.</li></ol>
-<p>A relational database is a good baseline because it offers transactions, unique constraints, and concurrency controls. Other databases can work if they supply equivalent guarantees.</p>
-<h3 id="b-how-do-we-prevent-concurrent-overcommitment">B. How do we prevent concurrent overcommitment?</h3>
-<p><strong>Example:</strong> Available credit is $100. Two distinct $80 authorizations arrive together.</p>
-<pre><code>Without coordination:
+    <p><strong>Core idea:</strong> Keep the <strong>approval path
+        synchronous</strong>; move noncritical downstream work to <strong>durable
+        asynchronous processing</strong>. Logical boxes do not necessarily
+        require separate microservices.</p>
+    <h2 id="3-key-architectural-decisions-and-reasons">3. Key architectural
+        decisions and reasons</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Decision</th>
+            <th>Choice</th>
+            <th>Reason</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Network integration</td>
+            <td>Protocol adapter and canonical internal request</td>
+            <td>Isolates network-specific message formats from business logic
+            </td>
+        </tr>
+        <tr>
+            <td>Authorization</td>
+            <td>Synchronous request/response</td>
+            <td>The merchant requires a decision now</td>
+        </tr>
+        <tr>
+            <td>Authoritative storage</td>
+            <td>Transactional relational database</td>
+            <td>ACID transactions, constraints, and coordinated writes</td>
+        </tr>
+        <tr>
+            <td>Credit hold</td>
+            <td>Atomic conditional update</td>
+            <td>Prevents concurrent approvals from consuming the same available
+                credit
+            </td>
+        </tr>
+        <tr>
+            <td>Duplicate protection</td>
+            <td>Durable request identity and unique constraint</td>
+            <td>Safe retries without duplicate holds</td>
+        </tr>
+        <tr>
+            <td>Fraud decision</td>
+            <td>Synchronous required checks using rules and ML</td>
+            <td>Evaluate risk <strong>before</strong> approval</td>
+        </tr>
+        <tr>
+            <td>Fraud features</td>
+            <td>Low-latency feature store where suitable</td>
+            <td>Avoid expensive analytical queries on the critical path</td>
+        </tr>
+        <tr>
+            <td>Caching</td>
+            <td>Only for appropriately stale-tolerant information</td>
+            <td>Cached available credit is not authoritative</td>
+        </tr>
+        <tr>
+            <td>Async integration</td>
+            <td>Durable event broker, e.g., Kafka</td>
+            <td>Decouple notifications, analytics, and supporting updates</td>
+        </tr>
+        <tr>
+            <td>Event correctness</td>
+            <td>Transactional outbox + idempotent consumers</td>
+            <td>Avoid lost events after DB commit; tolerate redelivery</td>
+        </tr>
+        <tr>
+            <td>Scaling</td>
+            <td>Stateless workers; partition by credit account if necessary</td>
+            <td>Independent application scale; coordinated same-account writes
+            </td>
+        </tr>
+        <tr>
+            <td>Multi-region</td>
+            <td>Single authoritative writer per credit account</td>
+            <td>Avoid conflicting reservations and split-brain approvals</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="a-why-a-relational-database">A. Why a relational database?</h3>
+    <p>Credit authorization requires a single transaction that:</p>
+    <ol start="1">
+        <li>Establishes the identity of the logical request.</li>
+        <li>Atomically checks and reserves available credit.</li>
+        <li>Saves the authorization and hold.</li>
+        <li>Saves the response decision and outbox event.</li>
+    </ol>
+    <p>A relational database is a good baseline because it offers transactions,
+        unique constraints, and concurrency controls. Other databases can work
+        if they supply equivalent guarantees.</p>
+    <h3 id="b-how-do-we-prevent-concurrent-overcommitment">B. How do we prevent
+        concurrent overcommitment?</h3>
+    <p><strong>Example:</strong> Available credit is $100. Two distinct $80
+        authorizations arrive together.</p>
+    <pre><code>Without coordination:
 Request A reads $100       Request B reads $100
 A approves $80             B approves $80
 Total reserved = $160       WRONG</code></pre>
-<p><strong>Solution:</strong> An atomic, conditional update against the authoritative account state:</p>
-<pre><code>UPDATE account_credit
+    <p><strong>Solution:</strong> An atomic, conditional update against the
+        authoritative account state:</p>
+    <pre><code>UPDATE account_credit
 SET reserved_minor = reserved_minor + :amount
 WHERE account_id = :account_id
   AND credit_limit_minor - posted_minor - reserved_minor &gt;= :amount;</code></pre>
-<p>The database coordinates conflicting writes. Only one of the $80 requests can reserve credit under this example's rules. Create the corresponding authorization and hold <strong>in the same transaction</strong>.</p>
-<p><strong>Remember:</strong> Checking credit and reserving it must be one atomic operation, not a read followed by an unrelated write.</p>
-<h3 id="c-how-do-we-handle-duplicate-network-requests">C. How do we handle duplicate network requests?</h3>
-<p>An issuer may commit an approval, but the network response may be lost. The network retries.</p>
-<ul><li>Derive a stable request identity using the applicable network-defined transaction identifiers.</li><li>Persist that identity with a <strong>unique constraint</strong>.</li><li>If the same logical request returns, recover its prior decision; do not add another hold.</li><li>Compare a canonical request fingerprint so a conflicting request cannot silently reuse the identity.</li><li>Treat legitimate incremental authorizations and reversals as separate operations.</li></ul>
-<p><strong>Remember:</strong> A timeout does <strong>not</strong> prove the original authorization failed.</p>
-<h3 id="d-why-synchronous-fraud-detection">D. Why synchronous fraud detection?</h3>
-<p>If a risk check is mandatory for approval, it must happen before the decision. Use rules and low-latency model inference with suitable online features such as recent spending velocity.</p>
-<p>If the risk dependency fails, follow an explicit issuer-approved degraded-operation policy. Never assume it is safe to approve everything or decline everything. Hard fraud or account limits may require authoritative coordination, not stale feature-cache values.</p>
-<h3 id="e-why-a-broker-and-transactional-outbox">E. Why a broker and transactional outbox?</h3>
-<p>Notifications and analytics should not block checkout.</p>
-<pre><code>Commit authorization + outbox event in one DB transaction
+    <p>The database coordinates conflicting writes. Only one of the $80 requests
+        can reserve credit under this example's rules. Create the corresponding
+        authorization and hold <strong>in the same transaction</strong>.</p>
+    <p><strong>Remember:</strong> Checking credit and reserving it must be one
+        atomic operation, not a read followed by an unrelated write.</p>
+    <h3 id="c-how-do-we-handle-duplicate-network-requests">C. How do we handle
+        duplicate network requests?</h3>
+    <p>An issuer may commit an approval, but the network response may be lost.
+        The network retries.</p>
+    <ul>
+        <li>Derive a stable request identity using the applicable
+            network-defined transaction identifiers.
+        </li>
+        <li>Persist that identity with a <strong>unique constraint</strong>.
+        </li>
+        <li>If the same logical request returns, recover its prior decision; do
+            not add another hold.
+        </li>
+        <li>Compare a canonical request fingerprint so a conflicting request
+            cannot silently reuse the identity.
+        </li>
+        <li>Treat legitimate incremental authorizations and reversals as
+            separate operations.
+        </li>
+    </ul>
+    <p><strong>Remember:</strong> A timeout does <strong>not</strong> prove the
+        original authorization failed.</p>
+    <h3 id="d-why-synchronous-fraud-detection">D. Why synchronous fraud
+        detection?</h3>
+    <p>If a risk check is mandatory for approval, it must happen before the
+        decision. Use rules and low-latency model inference with suitable online
+        features such as recent spending velocity.</p>
+    <p>If the risk dependency fails, follow an explicit issuer-approved
+        degraded-operation policy. Never assume it is safe to approve everything
+        or decline everything. Hard fraud or account limits may require
+        authoritative coordination, not stale feature-cache values.</p>
+    <h3 id="e-why-a-broker-and-transactional-outbox">E. Why a broker and
+        transactional outbox?</h3>
+    <p>Notifications and analytics should not block checkout.</p>
+    <pre><code>Commit authorization + outbox event in one DB transaction
                          |
                          v
                    Outbox publisher
@@ -403,11 +835,32 @@ WHERE account_id = :account_id
                   |             |
                   v             v
              Notifications   Analytics</code></pre>
-<p>Without an outbox, a crash after committing the authorization but before publishing the event can permanently lose a downstream update. Consumers must be idempotent because the publisher may resend events.</p>
-<h3 id="f-how-do-we-scale-and-make-it-available">F. How do we scale and make it available?</h3>
-<ul><li><strong>Stateless authorization workers:</strong> Horizontal scale behind resilient network ingress.</li><li><strong>Credit database:</strong> Optimize indexes and transactions first; partition by the <strong>underlying credit account</strong>, not individual card, if scale demands it.</li><li><strong>Risk services:</strong> Independently scale feature reads, rules, and model serving.</li><li><strong>Availability:</strong> Use redundant instances and durable database replication with tested failover.</li><li><strong>Multi-region:</strong> Prevent simultaneous conflicting writers for one credit account; use ownership/fencing and verified recovery procedures.</li></ul>
-<h2 id="4-end-to-end-flow">4. End-to-end flow</h2>
-<pre><code>1. Receive payment-network authorization request
+    <p>Without an outbox, a crash after committing the authorization but before
+        publishing the event can permanently lose a downstream update. Consumers
+        must be idempotent because the publisher may resend events.</p>
+    <h3 id="f-how-do-we-scale-and-make-it-available">F. How do we scale and make
+        it available?</h3>
+    <ul>
+        <li><strong>Stateless authorization workers:</strong> Horizontal scale
+            behind resilient network ingress.
+        </li>
+        <li><strong>Credit database:</strong> Optimize indexes and transactions
+            first; partition by the <strong>underlying credit account</strong>,
+            not individual card, if scale demands it.
+        </li>
+        <li><strong>Risk services:</strong> Independently scale feature reads,
+            rules, and model serving.
+        </li>
+        <li><strong>Availability:</strong> Use redundant instances and durable
+            database replication with tested failover.
+        </li>
+        <li><strong>Multi-region:</strong> Prevent simultaneous conflicting
+            writers for one credit account; use ownership/fencing and verified
+            recovery procedures.
+        </li>
+    </ul>
+    <h2 id="4-end-to-end-flow">4. End-to-end flow</h2>
+    <pre><code>1. Receive payment-network authorization request
            |
 2. Validate message; derive stable request identity
            |
@@ -428,15 +881,127 @@ WHERE account_id = :account_id
 10. Return approve/decline via network adapter
            |
 11. Deliver downstream events asynchronously</code></pre>
-<p><strong>Critical detail:</strong> Do not hold a financial database lock while waiting for slow external risk calls. Recheck essential account/card conditions before commit when they could have changed.</p>
-<h2 id="5-failure-handling">5. Failure handling</h2>
-<table><thead><tr><th>Failure</th><th>Handling</th></tr></thead><tbody><tr><td>Duplicate authorization</td><td>Return previous decision; no extra hold</td></tr><tr><td>Concurrent purchases</td><td>Atomic credit reservation serializes conflicting account updates</td></tr><tr><td>Database crash before commit</td><td>Roll back; no normal approval</td></tr><tr><td>Committed approval but response lost</td><td>Retrieve stored decision on retry; apply network recovery/reversal rules</td></tr><tr><td>Fraud service unavailable</td><td>Use explicitly approved degradation policy</td></tr><tr><td>Broker unavailable</td><td>Retain durable event in outbox until publisher recovers</td></tr><tr><td>Duplicate reversal</td><td>Release only the eligible remaining hold, once</td></tr><tr><td>Late or partial clearing</td><td>Match to authorization; post exposure and adjust holds under explicit rules</td></tr><tr><td>Region failover</td><td>Ensure old primary is fenced before new ownership begins</td></tr></tbody></table>
-<h2 id="6-authorization-vs-clearing-vs-settlement">6. Authorization vs. clearing vs. settlement</h2>
-<ul><li><strong>Authorization:</strong> Decide whether to approve and, if approved, reserve credit.</li><li><strong>Clearing:</strong> Process/present the financial transaction and post the corresponding obligation.</li><li><strong>Settlement:</strong> Complete the applicable movement of funds between participating institutions.</li></ul>
-<p><strong>Example:</strong> A $100 authorized hold becomes a $100 posted obligation. To avoid counting the same amount twice, the corresponding hold must be released/consumed as the posting is recorded. Partial or mismatched clearing requires explicit matching and adjustment rules.</p>
-<h2 id="7-key-points-to-remember">7. Key points to remember</h2>
-<ol start="1"><li><strong>Correctness first:</strong> Credit check and reservation must be atomic.</li><li><strong>Idempotency is non-negotiable:</strong> Retried requests must not create duplicate  holds.</li><li><strong>Critical path is synchronous:</strong> Required card, risk, and credit checks  precede approval.</li><li><strong>Downstream work is asynchronous:</strong> Notifications and analytics should not  block checkout.</li><li><strong>Authoritative credit cannot come from a stale cache.</strong></li><li><strong>Timeout ≠ failure:</strong> Persist decisions and handle uncertain network  outcomes.</li><li><strong>Authorization ≠ settlement:</strong> Holds and posted obligations are different  financial states.</li><li><strong>Shard on the credit-account boundary:</strong> Multiple cards may share one credit  line.</li><li><strong>Single-writer account ownership simplifies correctness</strong> during  multi-region operation.</li><li><strong>Security is architectural:</strong> Sensitive card data and cryptography need   protected boundaries.</li></ol>
-<h2 id="8-interview-closing-statement">8. Interview closing statement</h2>
-<blockquote><p>My design prioritizes financial correctness and low latency. I use synchronous processing for card validation, fraud decisions, and atomic credit reservation. A relational database provides transactional consistency, while durable idempotency prevents duplicate holds. I publish noncritical downstream events using a transactional outbox and a durable broker. For scale, I horizontally scale stateless services and partition authoritative state by credit account when required. For resilience, I use redundant services, controlled failover, and single-writer account ownership to prevent conflicting reservations.</p></blockquote>
-<hr>
-<p><strong>Note:</strong> Throughput figures, latency targets, and component choices here are illustrative design assumptions, not verified internal American Express systems or requirements. Actual network response semantics, authentication rules, and recovery workflows depend on the applicable network agreements and product rules.</p></main></body></html>
+    <p><strong>Critical detail:</strong> Do not hold a financial database lock
+        while waiting for slow external risk calls. Recheck essential
+        account/card conditions before commit when they could have changed.</p>
+    <h2 id="5-failure-handling">5. Failure handling</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Failure</th>
+            <th>Handling</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Duplicate authorization</td>
+            <td>Return previous decision; no extra hold</td>
+        </tr>
+        <tr>
+            <td>Concurrent purchases</td>
+            <td>Atomic credit reservation serializes conflicting account
+                updates
+            </td>
+        </tr>
+        <tr>
+            <td>Database crash before commit</td>
+            <td>Roll back; no normal approval</td>
+        </tr>
+        <tr>
+            <td>Committed approval but response lost</td>
+            <td>Retrieve stored decision on retry; apply network
+                recovery/reversal rules
+            </td>
+        </tr>
+        <tr>
+            <td>Fraud service unavailable</td>
+            <td>Use explicitly approved degradation policy</td>
+        </tr>
+        <tr>
+            <td>Broker unavailable</td>
+            <td>Retain durable event in outbox until publisher recovers</td>
+        </tr>
+        <tr>
+            <td>Duplicate reversal</td>
+            <td>Release only the eligible remaining hold, once</td>
+        </tr>
+        <tr>
+            <td>Late or partial clearing</td>
+            <td>Match to authorization; post exposure and adjust holds under
+                explicit rules
+            </td>
+        </tr>
+        <tr>
+            <td>Region failover</td>
+            <td>Ensure old primary is fenced before new ownership begins</td>
+        </tr>
+        </tbody>
+    </table>
+    <h2 id="6-authorization-vs-clearing-vs-settlement">6. Authorization vs.
+        clearing vs. settlement</h2>
+    <ul>
+        <li><strong>Authorization:</strong> Decide whether to approve and, if
+            approved, reserve credit.
+        </li>
+        <li><strong>Clearing:</strong> Process/present the financial transaction
+            and post the corresponding obligation.
+        </li>
+        <li><strong>Settlement:</strong> Complete the applicable movement of
+            funds between participating institutions.
+        </li>
+    </ul>
+    <p><strong>Example:</strong> A $100 authorized hold becomes a $100 posted
+        obligation. To avoid counting the same amount twice, the corresponding
+        hold must be released/consumed as the posting is recorded. Partial or
+        mismatched clearing requires explicit matching and adjustment rules.</p>
+    <h2 id="7-key-points-to-remember">7. Key points to remember</h2>
+    <ol start="1">
+        <li><strong>Correctness first:</strong> Credit check and reservation
+            must be atomic.
+        </li>
+        <li><strong>Idempotency is non-negotiable:</strong> Retried requests
+            must not create duplicate holds.
+        </li>
+        <li><strong>Critical path is synchronous:</strong> Required card, risk,
+            and credit checks precede approval.
+        </li>
+        <li><strong>Downstream work is asynchronous:</strong> Notifications and
+            analytics should not block checkout.
+        </li>
+        <li><strong>Authoritative credit cannot come from a stale
+            cache.</strong></li>
+        <li><strong>Timeout ≠ failure:</strong> Persist decisions and handle
+            uncertain network outcomes.
+        </li>
+        <li><strong>Authorization ≠ settlement:</strong> Holds and posted
+            obligations are different financial states.
+        </li>
+        <li><strong>Shard on the credit-account boundary:</strong> Multiple
+            cards may share one credit line.
+        </li>
+        <li><strong>Single-writer account ownership simplifies
+            correctness</strong> during multi-region operation.
+        </li>
+        <li><strong>Security is architectural:</strong> Sensitive card data and
+            cryptography need protected boundaries.
+        </li>
+    </ol>
+    <h2 id="8-interview-closing-statement">8. Interview closing statement</h2>
+    <blockquote><p>My design prioritizes financial correctness and low latency.
+        I use synchronous processing for card validation, fraud decisions, and
+        atomic credit reservation. A relational database provides transactional
+        consistency, while durable idempotency prevents duplicate holds. I
+        publish noncritical downstream events using a transactional outbox and a
+        durable broker. For scale, I horizontally scale stateless services and
+        partition authoritative state by credit account when required. For
+        resilience, I use redundant services, controlled failover, and
+        single-writer account ownership to prevent conflicting reservations.</p>
+    </blockquote>
+    <hr>
+    <p><strong>Note:</strong> Throughput figures, latency targets, and component
+        choices here are illustrative design assumptions, not verified internal
+        American Express systems or requirements. Actual network response
+        semantics, authentication rules, and recovery workflows depend on the
+        applicable network agreements and product rules.</p></main>
+</body>
+</html>

@@ -4,7 +4,8 @@
 **Lesson 1: Requirements → Architecture → Trade-offs**
 
 > **Scope:** This is a worked design exercise and general architecture guidance,
-> not a description of American Express's internal architecture. Numbers, service
+> not a description of American Express's internal architecture. Numbers,
+> service
 > interfaces, and workloads are illustrative assumptions.
 
 ## 1. The most important principle

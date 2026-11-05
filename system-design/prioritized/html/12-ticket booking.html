@@ -1,331 +1,656 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>#12 — Ticket Booking System Design</title><style>
-/* The original PDF skill style sheet is embedded below. */
-/* Architect's Field Notes — original study-guide design recreation.
-   Standalone builder embeds this file into its generated HTML. */
-:root {
-  --navy: #112c3a;
-  --header: #193a4b;
-  --ink: #273944;
-  --heading: #17313e;
-  --muted: #75838d;
-  --line: #d9e2e7;
-  --zebra: #f6f8f9;
-  --accent: #64c8e6;
-  --accent-soft: #eaf8fc;
-}
-@page {
-  size: A4;
-  margin: 19mm 19mm 19mm;
-  @top-left {
-    content: "INTERVIEW / FIELD GUIDE";
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .05em;
-    vertical-align: middle;
-  }
-  @top-right {
-    content: string(running-topic);
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .02em;
-    vertical-align: middle;
-  }
-  @bottom-left {
-    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
-    color: #9aa5ae;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 6.3pt;
-    letter-spacing: .03em;
-    vertical-align: middle;
-  }
-  @bottom-right {
-    content: counter(page, decimal-leading-zero);
-    color: #394b56;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-weight: 700;
-    font-size: 7pt;
-    vertical-align: middle;
-  }
-}
-@page cover {
-  size: A4;
-  margin: 0;
-  @top-left { content: none; }
-  @top-right { content: none; }
-  @bottom-left { content: none; }
-  @bottom-right { content: none; }
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: "Inter", "DejaVu Sans", sans-serif;
-  font-size: 9.4pt;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--ink);
-  background: #fff;
-  overflow-wrap: break-word;
-}
-.cover {
-  page: cover;
-  break-after: page;
-  height: 297mm;
-  width: 210mm;
-  overflow: hidden;
-  position: relative;
-  background: var(--navy);
-  color: #fff;
-  padding: 29.6mm 26mm;
-}
-.cover::before, .cover::after {
-  content: "";
-  position: absolute;
-  border: .55pt solid rgba(255,255,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
-.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
-.cover-brand {
-  font-size: 9.5pt;
-  font-weight: 800;
-  letter-spacing: .31em;
-  text-transform: uppercase;
-  color: #dceaf0;
-}
-.cover-series {
-  font-size: 8pt;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #98b3c1;
-  margin-top: 7mm;
-}
-.cover-accent-bar {
-  position: absolute;
-  left: 26mm; top: 80mm;
-  height: 3.5mm; width: 21mm;
-  background: var(--accent);
-}
-.cover-title {
-  position: absolute;
-  left: 25.5mm; right: 25mm; top: 97mm;
-  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
-  font-size: 42pt;
-  font-weight: 800;
-  letter-spacing: -.043em;
-  line-height: 1.08;
-  color: #fff;
-}
-.cover-title .second { display: block; color: var(--accent); }
-.cover-title.long { font-size: 37pt; }
-.cover-sub {
-  position: absolute;
-  left: 26mm; right: 31mm; top: 173.5mm;
-  color: #bdcdd5;
-  font-size: 11.5pt;
-  line-height: 1.7;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.cover-note {
-  color: #91aab7;
-  text-transform: none;
-  font-size: 9pt;
-  letter-spacing: .01em;
-  margin-top: 7mm;
-  line-height: 1.6;
-}
-.cover-bottom {
-  position: absolute;
-  bottom: 31mm; left: 26mm;
-  font-size: 7.8pt;
-  line-height: 1.9;
-  letter-spacing: .065em;
-  color: #cfdae0;
-}
-.cover-rule {
-  position: absolute;
-  bottom: 62mm; height: .35pt;
-  left: 26mm; right: 26mm;
-  background: rgba(255,255,255,.15);
-}
-.cover-number {
-  position: absolute;
-  bottom: 29mm; right: 26mm;
-  color: var(--accent);
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 39pt;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-/* Introduction + automatically generated navigable contents. */
-.preface { break-after: page; }
-.preface-label, .toc-overline {
-  color: var(--accent);
-  font-size: 7.6pt;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-top: 0;
-}
-.preface h1 { display: none; }
-.preface h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 14pt;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.02em;
-  color: var(--heading);
-  margin: 5mm 0 5mm;
-  border-bottom: .5pt solid var(--line);
-  padding-bottom: 2.5mm;
-}
-.preface p { font-size: 9.5pt; line-height: 1.6; }
-.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
-.toc h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 21pt;
-  letter-spacing: -.03em;
-  margin: 2mm 0 5mm;
-  border: 0;
-  padding: 0;
-}
-.toc ol { list-style: none; margin: 0; padding: 0; }
-.toc li {
-  display: flex;
-  align-items: baseline;
-  gap: 5mm;
-  font-size: 9.1pt;
-  padding: 2.7mm 1mm;
-  border-top: .5pt solid #e7ecef;
-  break-inside: avoid;
-}
-.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
-.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
-.toc a { color: var(--ink); text-decoration: none; }
-/* Continuous editorial body: sections can flow across pages. */
-.content { padding: 0; }
-.content h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 17.2pt;
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1.28;
-  letter-spacing: -.024em;
-  margin: 11mm 0 5mm;
-  padding-top: 5.5mm;
-  border-top: .6pt solid var(--line);
-  break-after: avoid;
-}
-.content h2::before {
-  content: "CHAPTER";
-  display: block;
-  color: var(--accent);
-  font-size: 7pt;
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-bottom: 2.2mm;
-}
-.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
-.content h3 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 11.6pt;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -.012em;
-  color: var(--heading);
-  margin: 7mm 0 2.5mm;
-  break-after: avoid;
-}
-.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
-p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
-strong, b { font-weight: 700; color: #1a3341; }
-a { color: #23778e; text-decoration: none; }
-hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
-ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
-li { padding-left: .5mm; margin: 1.5mm 0; }
-li::marker { color: var(--accent); }
-li p { margin: 0; }
-blockquote {
-  background: var(--accent-soft);
-  border-left: 2.5pt solid var(--accent);
-  margin: 4mm 0 6mm;
-  padding: 4mm 5.2mm;
-  color: #2b4654;
-  font-size: 9.4pt;
-  line-height: 1.56;
-}
-blockquote p { margin-bottom: 2.3mm; }
-blockquote p:last-child { margin-bottom: 0; }
-blockquote strong { color: #143743; }
-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  font-size: 8pt;
-  line-height: 1.42;
-  color: var(--ink);
-  margin: 3.6mm 0 4.8mm;
-  overflow-wrap: anywhere;
-}
-thead { display: table-header-group; }
-thead th {
-  background: var(--header);
-  color: #fff;
-  text-align: left;
-  font-weight: 700;
-  padding: 2.2mm 2.4mm;
-  vertical-align: top;
-  border-right: 1pt solid rgba(255,255,255,.04);
-}
-thead th strong { color: #fff; }
-tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
-tbody tr:nth-child(even) { background: var(--zebra); }
-tr { break-inside: avoid; }
-table.wide { font-size: 7.15pt; }
-table.wide th, table.wide td { padding: 1.8mm; }
-code {
-  font-family: "DejaVu Sans Mono", monospace;
-  font-size: .91em;
-  color: #22445a;
-}
-pre {
-  color: #dce9f0;
-  background: #173746;
-  padding: 4mm 5mm;
-  font-size: 8.3pt;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin: 4mm 0;
-}
-pre code { color: inherit; }
-.task-list-item { list-style: none; margin-left: -5mm; }
-.task-box {
-  display: inline-block;
-  border: .85pt solid #7b8b93;
-  width: 2.6mm; height: 2.6mm;
-  margin-right: 3mm;
-  vertical-align: baseline;
-}
-.task-box.checked { background: var(--accent); border-color: var(--accent); }
-img { max-width: 100%; height: auto; }
-.caption { color: var(--muted); font-size: 7.8pt; }
-@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>#12 — Ticket Booking System Design</title>
+    <style>
+        /* The original PDF skill style sheet is embedded below. */
+        /* Architect's Field Notes — original study-guide design recreation.
+           Standalone builder embeds this file into its generated HTML. */
+        :root {
+            --navy: #112c3a;
+            --header: #193a4b;
+            --ink: #273944;
+            --heading: #17313e;
+            --muted: #75838d;
+            --line: #d9e2e7;
+            --zebra: #f6f8f9;
+            --accent: #64c8e6;
+            --accent-soft: #eaf8fc;
+        }
+
+        @page {
+            size: A4;
+            margin: 19mm 19mm 19mm;
+            @top-left {
+                content: "INTERVIEW / FIELD GUIDE";
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .05em;
+                vertical-align: middle;
+            }
+            @top-right {
+                content: string(running-topic);
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .02em;
+                vertical-align: middle;
+            }
+            @bottom-left {
+                content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+                color: #9aa5ae;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 6.3pt;
+                letter-spacing: .03em;
+                vertical-align: middle;
+            }
+            @bottom-right {
+                content: counter(page, decimal-leading-zero);
+                color: #394b56;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-weight: 700;
+                font-size: 7pt;
+                vertical-align: middle;
+            }
+        }
+
+        @page cover {
+            size: A4;
+            margin: 0;
+            @top-left {
+                content: none;
+            }
+            @top-right {
+                content: none;
+            }
+            @bottom-left {
+                content: none;
+            }
+            @bottom-right {
+                content: none;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", "DejaVu Sans", sans-serif;
+            font-size: 9.4pt;
+            font-weight: 400;
+            line-height: 1.55;
+            color: var(--ink);
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        .cover {
+            page: cover;
+            break-after: page;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy);
+            color: #fff;
+            padding: 29.6mm 26mm;
+        }
+
+        .cover::before, .cover::after {
+            content: "";
+            position: absolute;
+            border: .55pt solid rgba(255, 255, 255, .08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover::before {
+            width: 158mm;
+            height: 158mm;
+            right: -84mm;
+            top: -61mm;
+        }
+
+        .cover::after {
+            width: 108mm;
+            height: 108mm;
+            right: -28mm;
+            bottom: -75mm;
+        }
+
+        .cover-brand {
+            font-size: 9.5pt;
+            font-weight: 800;
+            letter-spacing: .31em;
+            text-transform: uppercase;
+            color: #dceaf0;
+        }
+
+        .cover-series {
+            font-size: 8pt;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #98b3c1;
+            margin-top: 7mm;
+        }
+
+        .cover-accent-bar {
+            position: absolute;
+            left: 26mm;
+            top: 80mm;
+            height: 3.5mm;
+            width: 21mm;
+            background: var(--accent);
+        }
+
+        .cover-title {
+            position: absolute;
+            left: 25.5mm;
+            right: 25mm;
+            top: 97mm;
+            font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -.043em;
+            line-height: 1.08;
+            color: #fff;
+        }
+
+        .cover-title .second {
+            display: block;
+            color: var(--accent);
+        }
+
+        .cover-title.long {
+            font-size: 37pt;
+        }
+
+        .cover-sub {
+            position: absolute;
+            left: 26mm;
+            right: 31mm;
+            top: 173.5mm;
+            color: #bdcdd5;
+            font-size: 11.5pt;
+            line-height: 1.7;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .cover-note {
+            color: #91aab7;
+            text-transform: none;
+            font-size: 9pt;
+            letter-spacing: .01em;
+            margin-top: 7mm;
+            line-height: 1.6;
+        }
+
+        .cover-bottom {
+            position: absolute;
+            bottom: 31mm;
+            left: 26mm;
+            font-size: 7.8pt;
+            line-height: 1.9;
+            letter-spacing: .065em;
+            color: #cfdae0;
+        }
+
+        .cover-rule {
+            position: absolute;
+            bottom: 62mm;
+            height: .35pt;
+            left: 26mm;
+            right: 26mm;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .cover-number {
+            position: absolute;
+            bottom: 29mm;
+            right: 26mm;
+            color: var(--accent);
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 39pt;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        /* Introduction + automatically generated navigable contents. */
+        .preface {
+            break-after: page;
+        }
+
+        .preface-label, .toc-overline {
+            color: var(--accent);
+            font-size: 7.6pt;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .preface h1 {
+            display: none;
+        }
+
+        .preface h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 14pt;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -.02em;
+            color: var(--heading);
+            margin: 5mm 0 5mm;
+            border-bottom: .5pt solid var(--line);
+            padding-bottom: 2.5mm;
+        }
+
+        .preface p {
+            font-size: 9.5pt;
+            line-height: 1.6;
+        }
+
+        .toc {
+            border-top: .5pt solid var(--line);
+            margin-top: 8mm;
+            padding-top: 6.5mm;
+        }
+
+        .toc h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 21pt;
+            letter-spacing: -.03em;
+            margin: 2mm 0 5mm;
+            border: 0;
+            padding: 0;
+        }
+
+        .toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            gap: 5mm;
+            font-size: 9.1pt;
+            padding: 2.7mm 1mm;
+            border-top: .5pt solid #e7ecef;
+            break-inside: avoid;
+        }
+
+        .toc li:last-child {
+            border-bottom: .5pt solid #e7ecef;
+        }
+
+        .toc .toc-num {
+            width: 8mm;
+            flex: 0 0 8mm;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .toc a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        /* Continuous editorial body: sections can flow across pages. */
+        .content {
+            padding: 0;
+        }
+
+        .content h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 17.2pt;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.28;
+            letter-spacing: -.024em;
+            margin: 11mm 0 5mm;
+            padding-top: 5.5mm;
+            border-top: .6pt solid var(--line);
+            break-after: avoid;
+        }
+
+        .content h2::before {
+            content: "CHAPTER";
+            display: block;
+            color: var(--accent);
+            font-size: 7pt;
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .19em;
+            margin-bottom: 2.2mm;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 11.6pt;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -.012em;
+            color: var(--heading);
+            margin: 7mm 0 2.5mm;
+            break-after: avoid;
+        }
+
+        .content h4, .preface h3 {
+            font-size: 10pt;
+            color: var(--heading);
+            margin: 5mm 0 2mm;
+            break-after: avoid;
+        }
+
+        p {
+            margin: 0 0 3.15mm;
+            orphans: 2;
+            widows: 2;
+        }
+
+        strong, b {
+            font-weight: 700;
+            color: #1a3341;
+        }
+
+        a {
+            color: #23778e;
+            text-decoration: none;
+        }
+
+        hr {
+            height: 0;
+            border: none;
+            border-top: .55pt solid #d9e2e7;
+            margin: 7mm 0;
+        }
+
+        ul, ol {
+            margin: 2.5mm 0 4mm;
+            padding-left: 6mm;
+        }
+
+        li {
+            padding-left: .5mm;
+            margin: 1.5mm 0;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        li p {
+            margin: 0;
+        }
+
+        blockquote {
+            background: var(--accent-soft);
+            border-left: 2.5pt solid var(--accent);
+            margin: 4mm 0 6mm;
+            padding: 4mm 5.2mm;
+            color: #2b4654;
+            font-size: 9.4pt;
+            line-height: 1.56;
+        }
+
+        blockquote p {
+            margin-bottom: 2.3mm;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        blockquote strong {
+            color: #143743;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            font-size: 8pt;
+            line-height: 1.42;
+            color: var(--ink);
+            margin: 3.6mm 0 4.8mm;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        thead th {
+            background: var(--header);
+            color: #fff;
+            text-align: left;
+            font-weight: 700;
+            padding: 2.2mm 2.4mm;
+            vertical-align: top;
+            border-right: 1pt solid rgba(255, 255, 255, .04);
+        }
+
+        thead th strong {
+            color: #fff;
+        }
+
+        tbody td {
+            border-bottom: .35pt solid #e3e9ed;
+            padding: 2.3mm 2.4mm;
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--zebra);
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        table.wide {
+            font-size: 7.15pt;
+        }
+
+        table.wide th, table.wide td {
+            padding: 1.8mm;
+        }
+
+        code {
+            font-family: "DejaVu Sans Mono", monospace;
+            font-size: .91em;
+            color: #22445a;
+        }
+
+        pre {
+            color: #dce9f0;
+            background: #173746;
+            padding: 4mm 5mm;
+            font-size: 8.3pt;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 4mm 0;
+        }
+
+        pre code {
+            color: inherit;
+        }
+
+        .task-list-item {
+            list-style: none;
+            margin-left: -5mm;
+        }
+
+        .task-box {
+            display: inline-block;
+            border: .85pt solid #7b8b93;
+            width: 2.6mm;
+            height: 2.6mm;
+            margin-right: 3mm;
+            vertical-align: baseline;
+        }
+
+        .task-box.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 7.8pt;
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 25px #ddd;
+            }
+        }
 
 
-:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"#12 — TICKET BOOKING SYSTEM DESIGN";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
-@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 04 OF 04</div><div class="cover-accent-bar"></div><div class="cover-title">#12 — Ticket Booking<span class="second">System Design</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">04</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><h2>Step-by-step explanation: how to stop double booking</h2>
-<p><strong>Goal:</strong> Design a ticket booking system for concerts, sports events, or movies where multiple customers can attempt to reserve the <strong>same seat at the same time</strong>.</p>
-<p><strong>Recommended baseline:</strong> Relational database as the <strong>source of truth</strong>, short-lived <strong>seat holds</strong>, <strong>row-level locking or conditional atomic updates</strong>, a reliable <strong>payment state machine</strong>, and <strong>asynchronous notifications</strong>.</p>
-<p><strong>How to read this guide:</strong> Start with sections 1–7. They explain the whole system with one example. Sections 8–14 add implementation details, failures, scale, and trade-offs. All numbers are <strong>teaching assumptions</strong>, not performance guarantees.</p>
-<nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-understand-the-problem-with-one-seat">1. Understand the problem with one seat</a></li><li><span class="toc-num">02</span><a href="#2-why-checking-availability-and-then-updating-is-broken">2. Why checking availability and then updating is broken</a></li><li><span class="toc-num">03</span><a href="#3-decide-when-a-seat-becomes-unavailable-temporary-holds">3. Decide when a seat becomes unavailable: temporary holds</a></li><li><span class="toc-num">04</span><a href="#4-high-level-system-architecture">4. High-level system architecture</a></li><li><span class="toc-num">05</span><a href="#5-the-core-solution-one-database-transaction-prevents-two-winners">5. The core solution: one database transaction prevents two winners</a></li><li><span class="toc-num">06</span><a href="#6-seat-holds-expiry-and-releasing-abandoned-inventory">6. Seat holds, expiry, and releasing abandoned inventory</a></li><li><span class="toc-num">07</span><a href="#7-payment-and-booking-why-this-is-the-hardest-part-after-locking">7. Payment and booking: why this is the hardest part after locking</a></li><li><span class="toc-num">08</span><a href="#8-data-model-minimum-tables-and-integrity-rules">8. Data model: minimum tables and integrity rules</a></li><li><span class="toc-num">09</span><a href="#9-api-design-what-the-client-actually-calls">9. API design — what the client actually calls</a></li><li><span class="toc-num">10</span><a href="#10-handle-very-popular-events-without-corrupting-inventory">10. Handle very popular events without corrupting inventory</a></li><li><span class="toc-num">11</span><a href="#11-failure-scenarios-and-how-to-respond">11. Failure scenarios and how to respond</a></li><li><span class="toc-num">12</span><a href="#12-compare-alternative-designs-what-we-reject-and-when">12. Compare alternative designs — what we reject and when</a></li><li><span class="toc-num">13</span><a href="#13-variations-general-admission-and-multi-region-booking">13. Variations: general admission and multi-region booking</a></li><li><span class="toc-num">14</span><a href="#14-operational-readiness-and-interview-ready-recap">14. Operational readiness and interview-ready recap</a></li><li><span class="toc-num">15</span><a href="#official-sources-used-for-implementation-choices">Official sources used for implementation choices</a></li></ol></nav></section><main class="content"><h2 id="1-understand-the-problem-with-one-seat">1. Understand the problem with one seat</h2>
-<p>A concert has <strong>Seat A12</strong>. Alice and Bob both see it as available. They click <strong>Book</strong> almost together.</p>
-<pre><code>                  Seat A12: AVAILABLE
+        :root {
+            --accent: #64C8E6;
+            --accent-soft: #EAF8FC;
+        }
+
+        @page {
+            @top-right {
+                content: "#12 — TICKET BOOKING SYSTEM DESIGN";
+            }@bottom-left {
+            content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+        }
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 20px #dce2e6;
+            }
+        }</style>
+</head>
+<body>
+<section class="cover">
+    <div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div>
+    <div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 04
+        OF 04
+    </div>
+    <div class="cover-accent-bar"></div>
+    <div class="cover-title">#12 — Ticket Booking<span class="second">System Design</span>
+    </div>
+    <div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH
+        CONFIDENCE.
+        <div class="cover-note">Evidence-based STAR answers, senior-level
+            judgment, and focused interview rehearsal.
+        </div>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT
+        INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE
+    </div>
+    <div class="cover-number">04</div>
+</section>
+<section class="preface">
+    <div class="preface-label">YOUR STUDY COMPANION</div>
+    <h2>Step-by-step explanation: how to stop double booking</h2>
+    <p><strong>Goal:</strong> Design a ticket booking system for concerts,
+        sports events, or movies where multiple customers can attempt to reserve
+        the <strong>same seat at the same time</strong>.</p>
+    <p><strong>Recommended baseline:</strong> Relational database as the
+        <strong>source of truth</strong>, short-lived <strong>seat
+            holds</strong>, <strong>row-level locking or conditional atomic
+            updates</strong>, a reliable <strong>payment state machine</strong>,
+        and <strong>asynchronous notifications</strong>.</p>
+    <p><strong>How to read this guide:</strong> Start with sections 1–7. They
+        explain the whole system with one example. Sections 8–14 add
+        implementation details, failures, scale, and trade-offs. All numbers are
+        <strong>teaching assumptions</strong>, not performance guarantees.</p>
+    <nav class="toc">
+        <div class="toc-overline">NAVIGATION</div>
+        <h2>Inside this guide</h2>
+        <ol>
+            <li><span class="toc-num">01</span><a
+                    href="#1-understand-the-problem-with-one-seat">1. Understand
+                the problem with one seat</a></li>
+            <li><span class="toc-num">02</span><a
+                    href="#2-why-checking-availability-and-then-updating-is-broken">2.
+                Why checking availability and then updating is broken</a></li>
+            <li><span class="toc-num">03</span><a
+                    href="#3-decide-when-a-seat-becomes-unavailable-temporary-holds">3.
+                Decide when a seat becomes unavailable: temporary holds</a></li>
+            <li><span class="toc-num">04</span><a
+                    href="#4-high-level-system-architecture">4. High-level
+                system architecture</a></li>
+            <li><span class="toc-num">05</span><a
+                    href="#5-the-core-solution-one-database-transaction-prevents-two-winners">5.
+                The core solution: one database transaction prevents two
+                winners</a></li>
+            <li><span class="toc-num">06</span><a
+                    href="#6-seat-holds-expiry-and-releasing-abandoned-inventory">6.
+                Seat holds, expiry, and releasing abandoned inventory</a></li>
+            <li><span class="toc-num">07</span><a
+                    href="#7-payment-and-booking-why-this-is-the-hardest-part-after-locking">7.
+                Payment and booking: why this is the hardest part after
+                locking</a></li>
+            <li><span class="toc-num">08</span><a
+                    href="#8-data-model-minimum-tables-and-integrity-rules">8.
+                Data model: minimum tables and integrity rules</a></li>
+            <li><span class="toc-num">09</span><a
+                    href="#9-api-design-what-the-client-actually-calls">9. API
+                design — what the client actually calls</a></li>
+            <li><span class="toc-num">10</span><a
+                    href="#10-handle-very-popular-events-without-corrupting-inventory">10.
+                Handle very popular events without corrupting inventory</a></li>
+            <li><span class="toc-num">11</span><a
+                    href="#11-failure-scenarios-and-how-to-respond">11. Failure
+                scenarios and how to respond</a></li>
+            <li><span class="toc-num">12</span><a
+                    href="#12-compare-alternative-designs-what-we-reject-and-when">12.
+                Compare alternative designs — what we reject and when</a></li>
+            <li><span class="toc-num">13</span><a
+                    href="#13-variations-general-admission-and-multi-region-booking">13.
+                Variations: general admission and multi-region booking</a></li>
+            <li><span class="toc-num">14</span><a
+                    href="#14-operational-readiness-and-interview-ready-recap">14.
+                Operational readiness and interview-ready recap</a></li>
+            <li><span class="toc-num">15</span><a
+                    href="#official-sources-used-for-implementation-choices">Official
+                sources used for implementation choices</a></li>
+        </ol>
+    </nav>
+</section>
+<main class="content"><h2 id="1-understand-the-problem-with-one-seat">1.
+    Understand the problem with one seat</h2>
+    <p>A concert has <strong>Seat A12</strong>. Alice and Bob both see it as
+        available. They click <strong>Book</strong> almost together.</p>
+    <pre><code>                  Seat A12: AVAILABLE
                            |
                   +--------+--------+
                   |                 |
@@ -335,29 +660,142 @@ img { max-width: 100%; height: auto; }
                   +--------+--------+
                            |
                     Who gets A12?</code></pre>
-<p><strong>Correct business outcome:</strong> Exactly <strong>one</strong> of them can reserve and eventually own A12. The other must receive <strong>seat no longer available</strong>. A slow page refresh cannot change that rule.</p>
-<p>A booking system has two different jobs:</p>
-<ol start="1"><li><strong>Show availability</strong> quickly to many users. It is acceptable if this display is briefly stale.</li><li><strong>Allocate a seat</strong> correctly. This <strong>must not</strong> sell the same seat to two buyers.</li></ol>
-<p><strong>Central distinction: <code>Showing available</code> is not <code>owning a seat</code>.</strong> Final ownership must be decided by an authoritative write, not by whatever the UI last displayed.</p>
-<h3 id="example-requirements">Example requirements</h3>
-<table><thead><tr><th>Requirement</th><th>In plain English</th></tr></thead><tbody><tr><td>Show event and seat map</td><td>Browse events and see seats / prices.</td></tr><tr><td>Select specific seats</td><td>Reserve A12, A13, etc., not just a ticket count.</td></tr><tr><td>Hold seats temporarily</td><td>Allow customers a short checkout window, e.g., <strong>5 minutes</strong>.</td></tr><tr><td>Avoid double booking</td><td>At most one active owner per <code>(event_id, seat_id)</code>.</td></tr><tr><td>Make payment</td><td>Payment may be slow, fail, or return an uncertain result.</td></tr><tr><td>Confirm booking</td><td>Issue a ticket <strong>after</strong> the chosen payment-success conditions are met.</td></tr><tr><td>Recover from errors</td><td>Expire abandoned holds, retry safely, never create duplicate charges/tickets.</td></tr><tr><td>Handle popular events</td><td>Keep heavy browsing traffic away from critical seat-locking operations.</td></tr></tbody></table>
-<p><strong>Assumptions for our design:</strong> Assigned seats; one organizer controls authoritative inventory; the payment provider supports <strong>separate authorization and capture</strong> for the chosen payment method. For general-admission tickets, section 13 explains the different inventory model.</p>
-<hr>
-<h2 id="2-why-checking-availability-and-then-updating-is-broken">2. Why checking availability and then updating is broken</h2>
-<p>A naive API does this:</p>
-<pre><code>1. SELECT status FROM seats WHERE seat = 'A12';
+    <p><strong>Correct business outcome:</strong> Exactly <strong>one</strong>
+        of them can reserve and eventually own A12. The other must receive
+        <strong>seat no longer available</strong>. A slow page refresh cannot
+        change that rule.</p>
+    <p>A booking system has two different jobs:</p>
+    <ol start="1">
+        <li><strong>Show availability</strong> quickly to many users. It is
+            acceptable if this display is briefly stale.
+        </li>
+        <li><strong>Allocate a seat</strong> correctly. This <strong>must
+            not</strong> sell the same seat to two buyers.
+        </li>
+    </ol>
+    <p><strong>Central distinction: <code>Showing available</code> is not <code>owning
+        a seat</code>.</strong> Final ownership must be decided by an
+        authoritative write, not by whatever the UI last displayed.</p>
+    <h3 id="example-requirements">Example requirements</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>In plain English</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Show event and seat map</td>
+            <td>Browse events and see seats / prices.</td>
+        </tr>
+        <tr>
+            <td>Select specific seats</td>
+            <td>Reserve A12, A13, etc., not just a ticket count.</td>
+        </tr>
+        <tr>
+            <td>Hold seats temporarily</td>
+            <td>Allow customers a short checkout window, e.g., <strong>5
+                minutes</strong>.
+            </td>
+        </tr>
+        <tr>
+            <td>Avoid double booking</td>
+            <td>At most one active owner per <code>(event_id, seat_id)</code>.
+            </td>
+        </tr>
+        <tr>
+            <td>Make payment</td>
+            <td>Payment may be slow, fail, or return an uncertain result.</td>
+        </tr>
+        <tr>
+            <td>Confirm booking</td>
+            <td>Issue a ticket <strong>after</strong> the chosen payment-success
+                conditions are met.
+            </td>
+        </tr>
+        <tr>
+            <td>Recover from errors</td>
+            <td>Expire abandoned holds, retry safely, never create duplicate
+                charges/tickets.
+            </td>
+        </tr>
+        <tr>
+            <td>Handle popular events</td>
+            <td>Keep heavy browsing traffic away from critical seat-locking
+                operations.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Assumptions for our design:</strong> Assigned seats; one
+        organizer controls authoritative inventory; the payment provider
+        supports <strong>separate authorization and capture</strong> for the
+        chosen payment method. For general-admission tickets, section 13
+        explains the different inventory model.</p>
+    <hr>
+    <h2 id="2-why-checking-availability-and-then-updating-is-broken">2. Why
+        checking availability and then updating is broken</h2>
+    <p>A naive API does this:</p>
+    <pre><code>1. SELECT status FROM seats WHERE seat = 'A12';
 2. If AVAILABLE, accept booking.
 3. UPDATE seats SET status = 'BOOKED' WHERE seat = 'A12';</code></pre>
-<p>Two requests can both pass step 1 before either reaches step 3:</p>
-<table><thead><tr><th>Moment</th><th>Alice's request</th><th>Bob's request</th></tr></thead><tbody><tr><td>1</td><td>Reads A12 = AVAILABLE</td><td>—</td></tr><tr><td>2</td><td>—</td><td>Reads A12 = AVAILABLE</td></tr><tr><td>3</td><td>Decides “I can book”</td><td>Decides “I can book”</td></tr><tr><td>4</td><td>Sets A12 = BOOKED</td><td>Sets A12 = BOOKED</td></tr><tr><td><strong>Problem</strong></td><td><strong>Both could be told booking succeeded</strong></td><td><strong>Same seat sold twice</strong></td></tr></tbody></table>
-<p>This is a <strong>race condition</strong>: the result depends on the timing of concurrent operations.</p>
-<p><strong>Design principle:</strong> The availability <strong>check</strong> and seat <strong>reservation change</strong> must be <strong>one protected database operation</strong>, or one short database transaction with locking. A Java <code>synchronized</code> block on one application server is not enough because there are many server instances.</p>
-<hr>
-<h2 id="3-decide-when-a-seat-becomes-unavailable-temporary-holds">3. Decide when a seat becomes unavailable: temporary holds</h2>
-<p>We should <strong>not</strong> permanently sell the seat the moment a user clicks it. The user still needs to pay.</p>
-<p><strong>Choose a temporary seat hold:</strong> The server reserves A12 for Alice for <strong>5 minutes</strong>. While held, Bob cannot reserve it. If Alice abandons checkout, the hold expires and A12 becomes available again.</p>
-<h3 id="seat-state-progression">Seat state progression</h3>
-<pre><code>    AVAILABLE
+    <p>Two requests can both pass step 1 before either reaches step 3:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Moment</th>
+            <th>Alice's request</th>
+            <th>Bob's request</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>Reads A12 = AVAILABLE</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>—</td>
+            <td>Reads A12 = AVAILABLE</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Decides “I can book”</td>
+            <td>Decides “I can book”</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Sets A12 = BOOKED</td>
+            <td>Sets A12 = BOOKED</td>
+        </tr>
+        <tr>
+            <td><strong>Problem</strong></td>
+            <td><strong>Both could be told booking succeeded</strong></td>
+            <td><strong>Same seat sold twice</strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <p>This is a <strong>race condition</strong>: the result depends on the
+        timing of concurrent operations.</p>
+    <p><strong>Design principle:</strong> The availability
+        <strong>check</strong> and seat <strong>reservation change</strong> must
+        be <strong>one protected database operation</strong>, or one short
+        database transaction with locking. A Java <code>synchronized</code>
+        block on one application server is not enough because there are many
+        server instances.</p>
+    <hr>
+    <h2 id="3-decide-when-a-seat-becomes-unavailable-temporary-holds">3. Decide
+        when a seat becomes unavailable: temporary holds</h2>
+    <p>We should <strong>not</strong> permanently sell the seat the moment a
+        user clicks it. The user still needs to pay.</p>
+    <p><strong>Choose a temporary seat hold:</strong> The server reserves A12
+        for Alice for <strong>5 minutes</strong>. While held, Bob cannot reserve
+        it. If Alice abandons checkout, the hold expires and A12 becomes
+        available again.</p>
+    <h3 id="seat-state-progression">Seat state progression</h3>
+    <pre><code>    AVAILABLE
         |
         | create hold (atomic DB transaction)
         v
@@ -378,19 +816,29 @@ img { max-width: 100%; height: auto; }
         | ticket issued through reliable workflow
         v
    CONFIRMED BOOKING</code></pre>
-<p><code>BOOKED</code> means the seat is permanently allocated in our inventory. <code>CONFIRMED BOOKING</code> means payment is complete and ticket fulfillment can be performed. <strong>Capture uncertainty must not automatically release a seat that might already be paid for.</strong></p>
-<h3 id="alice-and-bob-example">Alice and Bob example</h3>
-<pre><code>12:00:00  A12 available
+    <p><code>BOOKED</code> means the seat is permanently allocated in our
+        inventory. <code>CONFIRMED BOOKING</code> means payment is complete and
+        ticket fulfillment can be performed. <strong>Capture uncertainty must
+            not automatically release a seat that might already be paid
+            for.</strong></p>
+    <h3 id="alice-and-bob-example">Alice and Bob example</h3>
+    <pre><code>12:00:00  A12 available
 12:00:01  Alice holds A12 until 12:05:01  -&gt; success
 12:00:02  Bob tries to hold A12          -&gt; conflict, cannot hold
 12:03:00  Alice starts protected payment workflow
 12:03:20  Payment completes and booking is confirmed
 12:03:21  Bob still cannot reserve A12: it is now BOOKED</code></pre>
-<p><strong>Why holds, not immediate booking?</strong> Holds protect the seat during a slow or interrupted checkout without making abandoned selections permanent.</p>
-<p><strong>Why not use a 30-minute hold?</strong> Long holds make popular events appear sold out even when users never complete payment. Hold duration is a product decision balanced against payment completion time, fairness, and abandonment.</p>
-<hr>
-<h2 id="4-high-level-system-architecture">4. High-level system architecture</h2>
-<pre><code>                             Customers
+    <p><strong>Why holds, not immediate booking?</strong> Holds protect the seat
+        during a slow or interrupted checkout without making abandoned
+        selections permanent.</p>
+    <p><strong>Why not use a 30-minute hold?</strong> Long holds make popular
+        events appear sold out even when users never complete payment. Hold
+        duration is a product decision balanced against payment completion time,
+        fairness, and abandonment.</p>
+    <hr>
+    <h2 id="4-high-level-system-architecture">4. High-level system
+        architecture</h2>
+    <pre><code>                             Customers
                                 |
                         CDN / WAF / Queue
                                 |
@@ -420,16 +868,87 @@ img { max-width: 100%; height: auto; }
                               |                  |
                         Ticket issuer     Email / Push
                         &amp; validation      notifications</code></pre>
-<h3 id="what-each-component-does-and-why">What each component does — and why</h3>
-<table><thead><tr><th>Component</th><th>Responsibility</th><th>Why we include it</th></tr></thead><tbody><tr><td><strong>CDN/cache</strong></td><td>Serve event descriptions and seat-map snapshots quickly</td><td>Popular events generate far more reads than successful purchases.</td></tr><tr><td><strong>WAF / waiting room</strong></td><td>Filter bots and admit buyers at a controlled rate</td><td>Prevent an on-sale spike from overwhelming booking and database capacity.</td></tr><tr><td><strong>API Gateway</strong></td><td>Authenticate, route, rate-limit</td><td>One entry point and protection layer.</td></tr><tr><td><strong>Booking Service</strong></td><td>Own seat lifecycle and booking rules</td><td>Keeps the critical invariant in one domain boundary.</td></tr><tr><td><strong>Relational DB</strong></td><td>Authoritative seat ownership and transactions</td><td>Provides row locks, constraints, and atomic updates.</td></tr><tr><td><strong>Payment provider</strong></td><td>Authorize, capture, void or refund payments</td><td>External financial work cannot be inside the DB transaction.</td></tr><tr><td><strong>Outbox + broker</strong></td><td>Publish booking events reliably after commits</td><td>Email/ticket workers can run asynchronously without losing committed events.</td></tr><tr><td><strong>Ticket issuer</strong></td><td>Generate unique ticket and entry credential</td><td>Tickets should follow confirmed payment, not a speculative UI action.</td></tr></tbody></table>
-<p><strong>Important:</strong> Redis is <strong>optional</strong>, and useful for caching or a waiting room. It is <strong>not</strong> our final authority for assigning A12. A stale or lost Redis lock must never create a second sold ticket.</p>
-<hr>
-<h2 id="5-the-core-solution-one-database-transaction-prevents-two-winners">5. The core solution: one database transaction prevents two winners</h2>
-<p>A relational database can lock the row representing <code>(concert-7, A12)</code> while one request changes it.</p>
-<h3 id="decision-pessimistic-row-level-locking">Decision: pessimistic row-level locking</h3>
-<p><strong>Pessimistic locking</strong> means “assume conflict is possible; lock the seat while deciding.” PostgreSQL provides <code>SELECT ... FOR UPDATE</code>, which prevents another transaction from modifying or locking the same row until the first transaction ends.</p>
-<p>For a simple <strong>single-seat hold</strong>, an even shorter approach is an <strong>atomic conditional UPDATE</strong>. The database updates only if the seat is available or has an expired ordinary hold:</p>
-<pre><code>BEGIN;
+    <h3 id="what-each-component-does-and-why">What each component does — and
+        why</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Component</th>
+            <th>Responsibility</th>
+            <th>Why we include it</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>CDN/cache</strong></td>
+            <td>Serve event descriptions and seat-map snapshots quickly</td>
+            <td>Popular events generate far more reads than successful
+                purchases.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>WAF / waiting room</strong></td>
+            <td>Filter bots and admit buyers at a controlled rate</td>
+            <td>Prevent an on-sale spike from overwhelming booking and database
+                capacity.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>API Gateway</strong></td>
+            <td>Authenticate, route, rate-limit</td>
+            <td>One entry point and protection layer.</td>
+        </tr>
+        <tr>
+            <td><strong>Booking Service</strong></td>
+            <td>Own seat lifecycle and booking rules</td>
+            <td>Keeps the critical invariant in one domain boundary.</td>
+        </tr>
+        <tr>
+            <td><strong>Relational DB</strong></td>
+            <td>Authoritative seat ownership and transactions</td>
+            <td>Provides row locks, constraints, and atomic updates.</td>
+        </tr>
+        <tr>
+            <td><strong>Payment provider</strong></td>
+            <td>Authorize, capture, void or refund payments</td>
+            <td>External financial work cannot be inside the DB transaction.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Outbox + broker</strong></td>
+            <td>Publish booking events reliably after commits</td>
+            <td>Email/ticket workers can run asynchronously without losing
+                committed events.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Ticket issuer</strong></td>
+            <td>Generate unique ticket and entry credential</td>
+            <td>Tickets should follow confirmed payment, not a speculative UI
+                action.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Important:</strong> Redis is <strong>optional</strong>, and
+        useful for caching or a waiting room. It is <strong>not</strong> our
+        final authority for assigning A12. A stale or lost Redis lock must never
+        create a second sold ticket.</p>
+    <hr>
+    <h2 id="5-the-core-solution-one-database-transaction-prevents-two-winners">
+        5. The core solution: one database transaction prevents two winners</h2>
+    <p>A relational database can lock the row representing <code>(concert-7,
+        A12)</code> while one request changes it.</p>
+    <h3 id="decision-pessimistic-row-level-locking">Decision: pessimistic
+        row-level locking</h3>
+    <p><strong>Pessimistic locking</strong> means “assume conflict is possible;
+        lock the seat while deciding.” PostgreSQL provides <code>SELECT ... FOR
+            UPDATE</code>, which prevents another transaction from modifying or
+        locking the same row until the first transaction ends.</p>
+    <p>For a simple <strong>single-seat hold</strong>, an even shorter approach
+        is an <strong>atomic conditional UPDATE</strong>. The database updates
+        only if the seat is available or has an expired ordinary hold:</p>
+    <pre><code>BEGIN;
 
 UPDATE event_seats
 SET state = 'HELD',
@@ -446,43 +965,126 @@ RETURNING event_id, seat_id;
 -- Success only when exactly ONE row was returned.
 -- In the same transaction, insert the hold record and outbox event.
 COMMIT;</code></pre>
-<p><strong>What happens to Alice and Bob?</strong> The first <code>UPDATE</code> that wins the row lock moves A12 to HELD. The second request waits and then re-checks the row; it no longer satisfies the <code>WHERE</code> condition, so it updates <strong>zero</strong> rows. <strong>Zero rows = no seat allocated.</strong></p>
-<p><strong>Important implementation details:</strong> Generate a unique hold ID; authenticate the buyer; create the <code>holds</code> row in the <strong>same</strong> transaction; if a prior expired hold is reclaimed, mark its record expired consistently. Handle lock timeouts, transaction retries, and expected conflicts separately. The SQL is illustrative, not a complete API implementation.</p>
-<h3 id="what-if-someone-books-3-seats-together">What if someone books 3 seats together?</h3>
-<p>A customer wants A12, A13, and A14 <strong>together</strong>. We must either hold <strong>all three</strong> or <strong>none</strong>.</p>
-<pre><code>BEGIN TRANSACTION
+    <p><strong>What happens to Alice and Bob?</strong> The first
+        <code>UPDATE</code> that wins the row lock moves A12 to HELD. The second
+        request waits and then re-checks the row; it no longer satisfies the
+        <code>WHERE</code> condition, so it updates <strong>zero</strong> rows.
+        <strong>Zero rows = no seat allocated.</strong></p>
+    <p><strong>Important implementation details:</strong> Generate a unique hold
+        ID; authenticate the buyer; create the <code>holds</code> row in the
+        <strong>same</strong> transaction; if a prior expired hold is reclaimed,
+        mark its record expired consistently. Handle lock timeouts, transaction
+        retries, and expected conflicts separately. The SQL is illustrative, not
+        a complete API implementation.</p>
+    <h3 id="what-if-someone-books-3-seats-together">What if someone books 3
+        seats together?</h3>
+    <p>A customer wants A12, A13, and A14 <strong>together</strong>. We must
+        either hold <strong>all three</strong> or <strong>none</strong>.</p>
+    <pre><code>BEGIN TRANSACTION
     Lock A12, A13, A14 in a consistent sorted order
     Verify all three are available or safely expired
     If any seat is unavailable: ROLLBACK
     Otherwise: mark all three HELD for one hold_id
                insert hold and outbox record
 COMMIT</code></pre>
-<p><strong>Concept — ACID atomicity:</strong> The transaction fully commits or fully rolls back. The customer does not get A12 and A13 if A14 was unavailable. Always acquire seat locks in a consistent order to reduce deadlocks; use a bounded lock wait.</p>
-<p><strong>Why not <code>SKIP LOCKED</code> for a specific chosen seat?</strong> It can hide a temporarily locked seat from the query, producing an inconsistent view. It is useful for queues, but for exact seat selection use short waits, <code>NOWAIT</code>, or a clear conflict response instead.</p>
-<hr>
-<h2 id="6-seat-holds-expiry-and-releasing-abandoned-inventory">6. Seat holds, expiry, and releasing abandoned inventory</h2>
-<p><strong>Store the expiry timestamp in the authoritative database.</strong> A hold is not valid just because a background worker has not yet deleted it.</p>
-<p>Example row:</p>
-<pre><code>Event: concert-7   Seat: A12
+    <p><strong>Concept — ACID atomicity:</strong> The transaction fully commits
+        or fully rolls back. The customer does not get A12 and A13 if A14 was
+        unavailable. Always acquire seat locks in a consistent order to reduce
+        deadlocks; use a bounded lock wait.</p>
+    <p><strong>Why not <code>SKIP LOCKED</code> for a specific chosen
+        seat?</strong> It can hide a temporarily locked seat from the query,
+        producing an inconsistent view. It is useful for queues, but for exact
+        seat selection use short waits, <code>NOWAIT</code>, or a clear conflict
+        response instead.</p>
+    <hr>
+    <h2 id="6-seat-holds-expiry-and-releasing-abandoned-inventory">6. Seat
+        holds, expiry, and releasing abandoned inventory</h2>
+    <p><strong>Store the expiry timestamp in the authoritative
+        database.</strong> A hold is not valid just because a background worker
+        has not yet deleted it.</p>
+    <p>Example row:</p>
+    <pre><code>Event: concert-7   Seat: A12
 state: HELD
 hold_id: hold-901
 hold_expires_at: 12:05:01</code></pre>
-<h3 id="two-ways-to-recover-expired-seats">Two ways to recover expired seats</h3>
-<ol start="1"><li><strong>Lazy expiry (on demand):</strong> When another user tries to hold A12, the booking transaction sees an expired <code>HELD</code> row and atomically takes it. This protects correctness even if background jobs are delayed.</li><li><strong>Background sweeper:</strong> Periodically finds expired holds, re-checks the current state inside a transaction, and releases still-expired seats. This helps refresh availability displays and cleans old records.</li></ol>
-<p><strong>Why both?</strong> A cleanup worker can be delayed or fail. Expiry correctness must come from the state and timestamp checked during the authoritative transaction—not from the worker running exactly on time.</p>
-<h3 id="avoid-an-important-expiry-race">Avoid an important expiry race</h3>
-<p>Once Alice begins payment, we transition her seat from <code>HELD</code> to <strong><code>PAYMENT_PENDING</code></strong> inside a DB transaction and set a <strong>bounded payment deadline</strong>. Ordinary hold reclamation must <strong>never</strong> take <code>PAYMENT_PENDING</code> inventory. If payment becomes uncertain, reconciliation decides whether to confirm, void, or release the seat.</p>
-<p><strong>Do not blindly release a seat at 5 minutes if payment is already being processed.</strong> Otherwise a late payment could succeed after another customer has received the seat.</p>
-<hr>
-<h2 id="7-payment-and-booking-why-this-is-the-hardest-part-after-locking">7. Payment and booking: why this is the hardest part after locking</h2>
-<p>We have <strong>two independent systems</strong>:</p>
-<ul><li>Our database decides who owns Seat A12.</li><li>A payment provider decides whether money was authorized or captured.</li></ul>
-<p>We cannot wrap both systems in one normal SQL transaction. A network timeout is especially dangerous: <strong>the payment might have succeeded even if our service never received the response</strong>.</p>
-<h3 id="chosen-approach-authorize-first-finalize-allocation-then-capture">Chosen approach: authorize first, finalize allocation, then capture</h3>
-<p>This design assumes the payment method/provider supports <strong>separate authorization and capture</strong>. Provider-specific constraints must be checked before using this flow.</p>
-<p><strong>Step-by-step successful flow:</strong></p>
-<ol start="1"><li>Alice creates a <strong>5-minute hold</strong> on A12 in our database.</li><li>Alice clicks Pay. In a <strong>short DB transaction</strong>, we verify the hold is hers and not expired, change it to <code>PAYMENT_PENDING</code>, and grant a <strong>bounded payment-processing window</strong>. Commit. <strong>Do not hold a SQL row lock while calling the payment provider.</strong></li><li>Call the payment provider to <strong>authorize</strong> the charge using a stable payment-operation ID / idempotency key. An authorization reserves funds but is not a final capture.</li><li>Once authorization is known to have succeeded, use another <strong>short DB transaction</strong> to verify that the seat still belongs to Alice and her payment deadline is valid. Set <code>BOOKED_PENDING_CAPTURE</code>, create a booking/payment record, and commit.</li><li>Call the payment provider to <strong>capture</strong> the authorized amount with an idempotent operation ID. If capture completes, change booking to <code>CONFIRMED</code> and seat to <code>BOOKED</code> in the DB. Write a <code>BookingConfirmed</code> outbox event <strong>in the same transaction</strong>.</li><li>The outbox relay publishes the event. Ticket issuance and notifications happen asynchronously and idempotently.</li></ol>
-<pre><code>Alice           Booking DB           Payment provider
+    <h3 id="two-ways-to-recover-expired-seats">Two ways to recover expired
+        seats</h3>
+    <ol start="1">
+        <li><strong>Lazy expiry (on demand):</strong> When another user tries to
+            hold A12, the booking transaction sees an expired <code>HELD</code>
+            row and atomically takes it. This protects correctness even if
+            background jobs are delayed.
+        </li>
+        <li><strong>Background sweeper:</strong> Periodically finds expired
+            holds, re-checks the current state inside a transaction, and
+            releases still-expired seats. This helps refresh availability
+            displays and cleans old records.
+        </li>
+    </ol>
+    <p><strong>Why both?</strong> A cleanup worker can be delayed or fail.
+        Expiry correctness must come from the state and timestamp checked during
+        the authoritative transaction—not from the worker running exactly on
+        time.</p>
+    <h3 id="avoid-an-important-expiry-race">Avoid an important expiry race</h3>
+    <p>Once Alice begins payment, we transition her seat from <code>HELD</code>
+        to <strong><code>PAYMENT_PENDING</code></strong> inside a DB transaction
+        and set a <strong>bounded payment deadline</strong>. Ordinary hold
+        reclamation must <strong>never</strong> take
+        <code>PAYMENT_PENDING</code> inventory. If payment becomes uncertain,
+        reconciliation decides whether to confirm, void, or release the seat.
+    </p>
+    <p><strong>Do not blindly release a seat at 5 minutes if payment is already
+        being processed.</strong> Otherwise a late payment could succeed after
+        another customer has received the seat.</p>
+    <hr>
+    <h2 id="7-payment-and-booking-why-this-is-the-hardest-part-after-locking">7.
+        Payment and booking: why this is the hardest part after locking</h2>
+    <p>We have <strong>two independent systems</strong>:</p>
+    <ul>
+        <li>Our database decides who owns Seat A12.</li>
+        <li>A payment provider decides whether money was authorized or
+            captured.
+        </li>
+    </ul>
+    <p>We cannot wrap both systems in one normal SQL transaction. A network
+        timeout is especially dangerous: <strong>the payment might have
+            succeeded even if our service never received the response</strong>.
+    </p>
+    <h3 id="chosen-approach-authorize-first-finalize-allocation-then-capture">
+        Chosen approach: authorize first, finalize allocation, then capture</h3>
+    <p>This design assumes the payment method/provider supports <strong>separate
+        authorization and capture</strong>. Provider-specific constraints must
+        be checked before using this flow.</p>
+    <p><strong>Step-by-step successful flow:</strong></p>
+    <ol start="1">
+        <li>Alice creates a <strong>5-minute hold</strong> on A12 in our
+            database.
+        </li>
+        <li>Alice clicks Pay. In a <strong>short DB transaction</strong>, we
+            verify the hold is hers and not expired, change it to <code>PAYMENT_PENDING</code>,
+            and grant a <strong>bounded payment-processing window</strong>.
+            Commit. <strong>Do not hold a SQL row lock while calling the payment
+                provider.</strong></li>
+        <li>Call the payment provider to <strong>authorize</strong> the charge
+            using a stable payment-operation ID / idempotency key. An
+            authorization reserves funds but is not a final capture.
+        </li>
+        <li>Once authorization is known to have succeeded, use another <strong>short
+            DB transaction</strong> to verify that the seat still belongs to
+            Alice and her payment deadline is valid. Set <code>BOOKED_PENDING_CAPTURE</code>,
+            create a booking/payment record, and commit.
+        </li>
+        <li>Call the payment provider to <strong>capture</strong> the authorized
+            amount with an idempotent operation ID. If capture completes, change
+            booking to <code>CONFIRMED</code> and seat to <code>BOOKED</code> in
+            the DB. Write a <code>BookingConfirmed</code> outbox event <strong>in
+                the same transaction</strong>.
+        </li>
+        <li>The outbox relay publishes the event. Ticket issuance and
+            notifications happen asynchronously and idempotently.
+        </li>
+    </ol>
+    <pre><code>Alice           Booking DB           Payment provider
   |                  |                       |
   |-- hold A12 -----&gt;|                       |
   |&lt;-- hold ID ------|                       |
@@ -498,20 +1100,153 @@ hold_expires_at: 12:05:01</code></pre>
   |                  |-- confirm + outbox    |
   |&lt;-- confirmed ----|                       |
   |                  |-- async issue ticket  |</code></pre>
-<p><strong>Why separate authorization and capture?</strong> If the seat allocation fails after authorization, we can usually <strong>void/cancel the authorization</strong> instead of needing to refund an already captured payment. This choice is not available for every payment method.</p>
-<h3 id="payment-failure-and-compensation-rules">Payment failure and compensation rules</h3>
-<table><thead><tr><th>Situation</th><th>Correct next step</th></tr></thead><tbody><tr><td>Authorization definitively declined</td><td>Mark payment failed; release the seat atomically, if no other protected process owns it.</td></tr><tr><td>Authorization succeeded but hold lost / deadline expired</td><td>Do <strong>not</strong> confirm the booking; void the authorization and reconcile the provider result.</td></tr><tr><td>Capture definitively failed</td><td>Void remaining authorization if applicable; cancel pending booking and release the seat in a controlled transaction.</td></tr><tr><td>Payment / capture timed out; final outcome unknown</td><td>Keep seat in protected pending state, query the provider/webhooks, and reconcile <strong>before</strong> releasing or selling it.</td></tr><tr><td>Capture succeeded, DB confirmation failed</td><td>Retry DB confirmation idempotently; keep the seat protected. Do <strong>not</strong> create another payment.</td></tr><tr><td>DB confirmed but email delivery failed</td><td>Retry asynchronous event delivery; booking and payment remain confirmed.</td></tr></tbody></table>
-<p><strong>Critical rule:</strong> Never treat an <strong>HTTP timeout</strong> as proof of <strong>payment failure</strong>. Never sell a seat that is in an unresolved paid-or-unpaid state. Use bounded reconciliation and escalation so seats do not remain stuck indefinitely.</p>
-<p><strong>Concept — Saga:</strong> This is a distributed business workflow with steps and <strong>compensations</strong>. A failure cannot roll back an external payment call with SQL <code>ROLLBACK</code>. We must perform a compensating action, such as voiding an authorization or issuing a refund where necessary.</p>
-<hr>
-<h2 id="8-data-model-minimum-tables-and-integrity-rules">8. Data model: minimum tables and integrity rules</h2>
-<p>Keep the first version small. Use one authoritative seat row, separate history records, and a durable outbox.</p>
-<table><thead><tr><th>Table</th><th>Important columns</th><th>Purpose</th></tr></thead><tbody><tr><td><code>events</code></td><td><code>event_id</code>, <code>name</code>, <code>starts_at</code>, <code>status</code></td><td>Event information.</td></tr><tr><td><code>event_seats</code></td><td><code>(event_id, seat_id)</code> <strong>PK</strong>, <code>state</code>, <code>hold_id</code>, <code>hold_expires_at</code>, <code>booking_id</code></td><td><strong>Current owner and state of each seat. Source of truth.</strong></td></tr><tr><td><code>holds</code></td><td><code>hold_id</code> <strong>PK</strong>, <code>customer_id</code>, <code>status</code>, <code>expires_at</code>, <code>created_at</code></td><td>Who started a temporary reservation.</td></tr><tr><td><code>hold_seats</code></td><td><code>hold_id</code>, <code>event_id</code>, <code>seat_id</code></td><td>Supports multi-seat reservations.</td></tr><tr><td><code>bookings</code></td><td><code>booking_id</code> <strong>PK</strong>, <code>customer_id</code>, <code>status</code>, <code>amount</code>, <code>currency</code></td><td>Booking lifecycle and audit history.</td></tr><tr><td><code>payments</code></td><td><code>payment_id</code>, <code>booking_id/hold_id</code>, <code>provider_ref</code>, <code>status</code>, <code>operation_key</code> <strong>UNIQUE</strong></td><td>Authorization, capture, reconciliation.</td></tr><tr><td><code>tickets</code></td><td><code>ticket_id</code> <strong>PK</strong>, <code>booking_id</code>, <code>event_id</code>, <code>seat_id</code>, <code>status</code></td><td>Issued ticket records.</td></tr><tr><td><code>outbox</code></td><td><code>event_id</code> <strong>PK</strong>, <code>aggregate_id</code>, <code>event_type</code>, <code>payload</code>, <code>published_at</code></td><td>Reliable event publication after commit.</td></tr></tbody></table>
-<h3 id="the-most-important-invariant">The most important invariant</h3>
-<blockquote><p>For each <code>(event_id, seat_id)</code>, there is <strong>at most one current active reservation or booking</strong>.</p></blockquote>
-<p>We enforce that using the <strong>single authoritative row</strong> in <code>event_seats</code>, updated transactionally. The composite primary key prevents two different inventory rows for the same seat.</p>
-<p>Ticket records may need a <strong>unique partial index on active tickets</strong> so a cancelled historical ticket does not block a legitimate future reissue/resale. Exact ticket transfer and resale rules depend on the business.</p>
-<pre><code>CREATE TABLE event_seats (
+    <p><strong>Why separate authorization and capture?</strong> If the seat
+        allocation fails after authorization, we can usually <strong>void/cancel
+            the authorization</strong> instead of needing to refund an already
+        captured payment. This choice is not available for every payment method.
+    </p>
+    <h3 id="payment-failure-and-compensation-rules">Payment failure and
+        compensation rules</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Situation</th>
+            <th>Correct next step</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Authorization definitively declined</td>
+            <td>Mark payment failed; release the seat atomically, if no other
+                protected process owns it.
+            </td>
+        </tr>
+        <tr>
+            <td>Authorization succeeded but hold lost / deadline expired</td>
+            <td>Do <strong>not</strong> confirm the booking; void the
+                authorization and reconcile the provider result.
+            </td>
+        </tr>
+        <tr>
+            <td>Capture definitively failed</td>
+            <td>Void remaining authorization if applicable; cancel pending
+                booking and release the seat in a controlled transaction.
+            </td>
+        </tr>
+        <tr>
+            <td>Payment / capture timed out; final outcome unknown</td>
+            <td>Keep seat in protected pending state, query the
+                provider/webhooks, and reconcile <strong>before</strong>
+                releasing or selling it.
+            </td>
+        </tr>
+        <tr>
+            <td>Capture succeeded, DB confirmation failed</td>
+            <td>Retry DB confirmation idempotently; keep the seat protected. Do
+                <strong>not</strong> create another payment.
+            </td>
+        </tr>
+        <tr>
+            <td>DB confirmed but email delivery failed</td>
+            <td>Retry asynchronous event delivery; booking and payment remain
+                confirmed.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Critical rule:</strong> Never treat an <strong>HTTP
+        timeout</strong> as proof of <strong>payment failure</strong>. Never
+        sell a seat that is in an unresolved paid-or-unpaid state. Use bounded
+        reconciliation and escalation so seats do not remain stuck indefinitely.
+    </p>
+    <p><strong>Concept — Saga:</strong> This is a distributed business workflow
+        with steps and <strong>compensations</strong>. A failure cannot roll
+        back an external payment call with SQL <code>ROLLBACK</code>. We must
+        perform a compensating action, such as voiding an authorization or
+        issuing a refund where necessary.</p>
+    <hr>
+    <h2 id="8-data-model-minimum-tables-and-integrity-rules">8. Data model:
+        minimum tables and integrity rules</h2>
+    <p>Keep the first version small. Use one authoritative seat row, separate
+        history records, and a durable outbox.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Table</th>
+            <th>Important columns</th>
+            <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>events</code></td>
+            <td><code>event_id</code>, <code>name</code>, <code>starts_at</code>,
+                <code>status</code></td>
+            <td>Event information.</td>
+        </tr>
+        <tr>
+            <td><code>event_seats</code></td>
+            <td><code>(event_id, seat_id)</code> <strong>PK</strong>, <code>state</code>,
+                <code>hold_id</code>, <code>hold_expires_at</code>, <code>booking_id</code>
+            </td>
+            <td><strong>Current owner and state of each seat. Source of
+                truth.</strong></td>
+        </tr>
+        <tr>
+            <td><code>holds</code></td>
+            <td><code>hold_id</code> <strong>PK</strong>,
+                <code>customer_id</code>, <code>status</code>,
+                <code>expires_at</code>, <code>created_at</code></td>
+            <td>Who started a temporary reservation.</td>
+        </tr>
+        <tr>
+            <td><code>hold_seats</code></td>
+            <td><code>hold_id</code>, <code>event_id</code>,
+                <code>seat_id</code></td>
+            <td>Supports multi-seat reservations.</td>
+        </tr>
+        <tr>
+            <td><code>bookings</code></td>
+            <td><code>booking_id</code> <strong>PK</strong>,
+                <code>customer_id</code>, <code>status</code>,
+                <code>amount</code>, <code>currency</code></td>
+            <td>Booking lifecycle and audit history.</td>
+        </tr>
+        <tr>
+            <td><code>payments</code></td>
+            <td><code>payment_id</code>, <code>booking_id/hold_id</code>, <code>provider_ref</code>,
+                <code>status</code>, <code>operation_key</code>
+                <strong>UNIQUE</strong></td>
+            <td>Authorization, capture, reconciliation.</td>
+        </tr>
+        <tr>
+            <td><code>tickets</code></td>
+            <td><code>ticket_id</code> <strong>PK</strong>,
+                <code>booking_id</code>, <code>event_id</code>,
+                <code>seat_id</code>, <code>status</code></td>
+            <td>Issued ticket records.</td>
+        </tr>
+        <tr>
+            <td><code>outbox</code></td>
+            <td><code>event_id</code> <strong>PK</strong>,
+                <code>aggregate_id</code>, <code>event_type</code>, <code>payload</code>,
+                <code>published_at</code></td>
+            <td>Reliable event publication after commit.</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="the-most-important-invariant">The most important invariant</h3>
+    <blockquote><p>For each <code>(event_id, seat_id)</code>, there is <strong>at
+        most one current active reservation or booking</strong>.</p>
+    </blockquote>
+    <p>We enforce that using the <strong>single authoritative row</strong> in
+        <code>event_seats</code>, updated transactionally. The composite primary
+        key prevents two different inventory rows for the same seat.</p>
+    <p>Ticket records may need a <strong>unique partial index on active
+        tickets</strong> so a cancelled historical ticket does not block a
+        legitimate future reissue/resale. Exact ticket transfer and resale rules
+        depend on the business.</p>
+    <pre><code>CREATE TABLE event_seats (
   event_id       BIGINT NOT NULL,
   seat_id        TEXT NOT NULL,
   state          TEXT NOT NULL CHECK (
@@ -522,30 +1257,98 @@ hold_expires_at: 12:05:01</code></pre>
   booking_id     UUID NULL,
   PRIMARY KEY (event_id, seat_id)
 );</code></pre>
-<p><strong>Note:</strong> This is a teaching schema. Real production constraints would check valid combinations of state and ownership, and the payment-processing deadline would be stored explicitly. A separate booking state machine tracks capture and refund/void activity.</p>
-<hr>
-<h2 id="9-api-design-what-the-client-actually-calls">9. API design — what the client actually calls</h2>
-<table><thead><tr><th>Request</th><th>What it does</th><th>Important response</th></tr></thead><tbody><tr><td><code>GET /events/{id}/seats</code></td><td>Reads a cached snapshot of seats and prices</td><td>Fast, may be slightly stale.</td></tr><tr><td><code>POST /holds</code></td><td>Atomically holds selected seat IDs</td><td><code>201</code> + hold ID and expiry; or <code>409</code> if a seat is unavailable.</td></tr><tr><td><code>GET /holds/{id}</code></td><td>Returns authoritative hold state</td><td>Available, held, pending, expired, etc.</td></tr><tr><td><code>POST /holds/{id}/checkout</code></td><td>Starts an idempotent payment workflow</td><td>Booking/payment operation ID; may return pending.</td></tr><tr><td><code>GET /bookings/{id}</code></td><td>Returns final or pending booking state</td><td>Clients should poll or subscribe without resubmitting payment.</td></tr><tr><td><code>POST /webhooks/payment-provider</code></td><td>Processes verified provider events</td><td>Idempotent event processing; not a public client endpoint.</td></tr></tbody></table>
-<h3 id="why-idempotency-is-mandatory">Why idempotency is mandatory</h3>
-<p>Alice presses <strong>Pay</strong>. The request times out. She presses Pay again. Without safeguards, two payment requests might be created.</p>
-<p><strong>Choose an <code>Idempotency-Key</code> per checkout operation</strong> and store the unique operation record in the database. Repeating the same operation should return the existing booking/payment state rather than creating another one. Pass a stable key to the payment provider too, <strong>following that provider's actual idempotency contract</strong>.</p>
-<p><strong>Idempotency ≠ locking:</strong></p>
-<ul><li><strong>Locking</strong> prevents <strong>two different customers</strong> from owning A12.</li><li><strong>Idempotency</strong> prevents <strong>one customer's retry</strong> from creating a duplicate payment or booking.</li></ul>
-<p>We need <strong>both</strong>.</p>
-<hr>
-<h2 id="10-handle-very-popular-events-without-corrupting-inventory">10. Handle very popular events without corrupting inventory</h2>
-<p>A large event might have <strong>50,000 seats</strong> and <strong>hundreds of thousands of interested users</strong>. Most users are browsing and refreshing. Only a small portion are successfully booking.</p>
-<h3 id="separate-reads-from-writes">Separate reads from writes</h3>
-<pre><code>Seat-map requests (very many) -&gt; CDN / cache / read replicas
+    <p><strong>Note:</strong> This is a teaching schema. Real production
+        constraints would check valid combinations of state and ownership, and
+        the payment-processing deadline would be stored explicitly. A separate
+        booking state machine tracks capture and refund/void activity.</p>
+    <hr>
+    <h2 id="9-api-design-what-the-client-actually-calls">9. API design — what
+        the client actually calls</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Request</th>
+            <th>What it does</th>
+            <th>Important response</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>GET /events/{id}/seats</code></td>
+            <td>Reads a cached snapshot of seats and prices</td>
+            <td>Fast, may be slightly stale.</td>
+        </tr>
+        <tr>
+            <td><code>POST /holds</code></td>
+            <td>Atomically holds selected seat IDs</td>
+            <td><code>201</code> + hold ID and expiry; or <code>409</code> if a
+                seat is unavailable.
+            </td>
+        </tr>
+        <tr>
+            <td><code>GET /holds/{id}</code></td>
+            <td>Returns authoritative hold state</td>
+            <td>Available, held, pending, expired, etc.</td>
+        </tr>
+        <tr>
+            <td><code>POST /holds/{id}/checkout</code></td>
+            <td>Starts an idempotent payment workflow</td>
+            <td>Booking/payment operation ID; may return pending.</td>
+        </tr>
+        <tr>
+            <td><code>GET /bookings/{id}</code></td>
+            <td>Returns final or pending booking state</td>
+            <td>Clients should poll or subscribe without resubmitting payment.
+            </td>
+        </tr>
+        <tr>
+            <td><code>POST /webhooks/payment-provider</code></td>
+            <td>Processes verified provider events</td>
+            <td>Idempotent event processing; not a public client endpoint.</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="why-idempotency-is-mandatory">Why idempotency is mandatory</h3>
+    <p>Alice presses <strong>Pay</strong>. The request times out. She presses
+        Pay again. Without safeguards, two payment requests might be created.
+    </p>
+    <p><strong>Choose an <code>Idempotency-Key</code> per checkout
+        operation</strong> and store the unique operation record in the
+        database. Repeating the same operation should return the existing
+        booking/payment state rather than creating another one. Pass a stable
+        key to the payment provider too, <strong>following that provider's
+            actual idempotency contract</strong>.</p>
+    <p><strong>Idempotency ≠ locking:</strong></p>
+    <ul>
+        <li><strong>Locking</strong> prevents <strong>two different
+            customers</strong> from owning A12.
+        </li>
+        <li><strong>Idempotency</strong> prevents <strong>one customer's
+            retry</strong> from creating a duplicate payment or booking.
+        </li>
+    </ul>
+    <p>We need <strong>both</strong>.</p>
+    <hr>
+    <h2 id="10-handle-very-popular-events-without-corrupting-inventory">10.
+        Handle very popular events without corrupting inventory</h2>
+    <p>A large event might have <strong>50,000 seats</strong> and <strong>hundreds
+        of thousands of interested users</strong>. Most users are browsing and
+        refreshing. Only a small portion are successfully booking.</p>
+    <h3 id="separate-reads-from-writes">Separate reads from writes</h3>
+    <pre><code>Seat-map requests (very many) -&gt; CDN / cache / read replicas
                                       |
                             cached availability
 
 Hold and checkout requests -&gt; Booking Service -&gt; Primary DB
                                       |
                               authoritative lock</code></pre>
-<p><strong>Why?</strong> The seat map can tolerate minor staleness; the allocation cannot. Even when a cached map says A12 is free, the final <code>POST /holds</code> must re-check in the authoritative database.</p>
-<h3 id="use-a-waiting-room-for-extreme-on-sale-spikes">Use a waiting room for extreme on-sale spikes</h3>
-<pre><code>100,000 interested customers
+    <p><strong>Why?</strong> The seat map can tolerate minor staleness; the
+        allocation cannot. Even when a cached map says A12 is free, the final
+        <code>POST /holds</code> must re-check in the authoritative database.
+    </p>
+    <h3 id="use-a-waiting-room-for-extreme-on-sale-spikes">Use a waiting room
+        for extreme on-sale spikes</h3>
+    <pre><code>100,000 interested customers
              |
           Waiting room
          /           \
@@ -554,18 +1357,119 @@ Hold and checkout requests -&gt; Booking Service -&gt; Primary DB
       Booking API
          |
       Inventory DB</code></pre>
-<p>The waiting room caps how many buyers reach the booking service at once. It improves stability, but <strong>does not replace DB correctness</strong>. Fairness and bot resistance are separate product/security concerns.</p>
-<h3 id="simple-illustrative-capacity-math">Simple illustrative capacity math</h3>
-<p>Assume <strong>60,000 active browsers</strong>, each refreshing the seat map every <strong>5 seconds</strong>. That creates about <strong>12,000 seat-map reads/second</strong> (<code>60,000 / 5</code>). We should serve most of these from caches rather than one primary database.</p>
-<p>Suppose only <strong>1,000 hold attempts/second</strong> reach the booking service. Our critical write sizing and lock-contention analysis starts there. Both numbers are <strong>examples, not predictions</strong>; benchmark actual distributions, including everyone trying to grab the same premium seat.</p>
-<p><strong>Scaling progression:</strong> Begin with well-indexed SQL transactions. Add caching and admission control. Then partition inventory by event/section if measured pressure justifies it—while maintaining atomic multi-seat allocation within one transactional boundary. Sharding different requested seats across independent databases complicates all-or-none bookings.</p>
-<hr>
-<h2 id="11-failure-scenarios-and-how-to-respond">11. Failure scenarios and how to respond</h2>
-<table><thead><tr><th>What fails?</th><th>What could go wrong?</th><th>Required behavior</th></tr></thead><tbody><tr><td>Two users choose A12</td><td>Overselling</td><td>One DB transaction wins; the other gets conflict/no seat.</td></tr><tr><td>App crashes after creating a hold</td><td>Seat stays unavailable</td><td>Hold TTL + lazy expiry + cleanup worker.</td></tr><tr><td>Worker runs late</td><td>Stale expired holds persist</td><td>Checkout/hold transaction checks expiry itself.</td></tr><tr><td>Payment succeeds after expiry</td><td>Charged user without seat</td><td>Verify ownership/deadline before confirmation; void/refund late payment.</td></tr><tr><td>Payment result unknown</td><td>Duplicate capture or early release</td><td>Query/reconcile provider outcome using stable operation ID; keep seat protected.</td></tr><tr><td>Client retries checkout</td><td>Duplicate booking or charge</td><td>Durable idempotency record at API and provider.</td></tr><tr><td>DB transaction deadlocks</td><td>Slow or failed attempt</td><td>Lock seats in stable order, bound wait, retry safe DB transactions.</td></tr><tr><td>DB primary fails</td><td>Lost/uncertain writes</td><td>Recovery plan with tested replication, durable commits and reconciliation. Do not promise zero data loss without an architecture supporting it.</td></tr><tr><td>Event broker fails</td><td>Ticket email never sent</td><td>Transactional outbox, retry relay, idempotent consumers.</td></tr><tr><td>Cached seat map is stale</td><td>User clicks already held seat</td><td>Authoritative hold returns <code>409</code>; refresh affected seats.</td></tr><tr><td>Payment captured but confirmation write fails</td><td>Paid but booking uncertain</td><td>Retry confirmation against protected seat; reconcile before release.</td></tr></tbody></table>
-<h3 id="transactional-outbox-explained-simply">Transactional outbox explained simply</h3>
-<p>A booking is confirmed in the database, but the service crashes <strong>before</strong> publishing <code>BookingConfirmed</code> to the broker. Without an outbox, ticket issuance and notifications may never happen.</p>
-<p><strong>Fix:</strong> In the <strong>same DB transaction</strong> that confirms the booking, insert a row in <code>outbox</code>. An independent relay later sends it to the broker. The relay may publish more than once, so consumers must deduplicate by event/ticket ID.</p>
-<pre><code>ONE DB TRANSACTION
+    <p>The waiting room caps how many buyers reach the booking service at once.
+        It improves stability, but <strong>does not replace DB
+            correctness</strong>. Fairness and bot resistance are separate
+        product/security concerns.</p>
+    <h3 id="simple-illustrative-capacity-math">Simple illustrative capacity
+        math</h3>
+    <p>Assume <strong>60,000 active browsers</strong>, each refreshing the seat
+        map every <strong>5 seconds</strong>. That creates about <strong>12,000
+            seat-map reads/second</strong> (<code>60,000 / 5</code>). We should
+        serve most of these from caches rather than one primary database.</p>
+    <p>Suppose only <strong>1,000 hold attempts/second</strong> reach the
+        booking service. Our critical write sizing and lock-contention analysis
+        starts there. Both numbers are <strong>examples, not
+            predictions</strong>; benchmark actual distributions, including
+        everyone trying to grab the same premium seat.</p>
+    <p><strong>Scaling progression:</strong> Begin with well-indexed SQL
+        transactions. Add caching and admission control. Then partition
+        inventory by event/section if measured pressure justifies it—while
+        maintaining atomic multi-seat allocation within one transactional
+        boundary. Sharding different requested seats across independent
+        databases complicates all-or-none bookings.</p>
+    <hr>
+    <h2 id="11-failure-scenarios-and-how-to-respond">11. Failure scenarios and
+        how to respond</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>What fails?</th>
+            <th>What could go wrong?</th>
+            <th>Required behavior</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Two users choose A12</td>
+            <td>Overselling</td>
+            <td>One DB transaction wins; the other gets conflict/no seat.</td>
+        </tr>
+        <tr>
+            <td>App crashes after creating a hold</td>
+            <td>Seat stays unavailable</td>
+            <td>Hold TTL + lazy expiry + cleanup worker.</td>
+        </tr>
+        <tr>
+            <td>Worker runs late</td>
+            <td>Stale expired holds persist</td>
+            <td>Checkout/hold transaction checks expiry itself.</td>
+        </tr>
+        <tr>
+            <td>Payment succeeds after expiry</td>
+            <td>Charged user without seat</td>
+            <td>Verify ownership/deadline before confirmation; void/refund late
+                payment.
+            </td>
+        </tr>
+        <tr>
+            <td>Payment result unknown</td>
+            <td>Duplicate capture or early release</td>
+            <td>Query/reconcile provider outcome using stable operation ID; keep
+                seat protected.
+            </td>
+        </tr>
+        <tr>
+            <td>Client retries checkout</td>
+            <td>Duplicate booking or charge</td>
+            <td>Durable idempotency record at API and provider.</td>
+        </tr>
+        <tr>
+            <td>DB transaction deadlocks</td>
+            <td>Slow or failed attempt</td>
+            <td>Lock seats in stable order, bound wait, retry safe DB
+                transactions.
+            </td>
+        </tr>
+        <tr>
+            <td>DB primary fails</td>
+            <td>Lost/uncertain writes</td>
+            <td>Recovery plan with tested replication, durable commits and
+                reconciliation. Do not promise zero data loss without an
+                architecture supporting it.
+            </td>
+        </tr>
+        <tr>
+            <td>Event broker fails</td>
+            <td>Ticket email never sent</td>
+            <td>Transactional outbox, retry relay, idempotent consumers.</td>
+        </tr>
+        <tr>
+            <td>Cached seat map is stale</td>
+            <td>User clicks already held seat</td>
+            <td>Authoritative hold returns <code>409</code>; refresh affected
+                seats.
+            </td>
+        </tr>
+        <tr>
+            <td>Payment captured but confirmation write fails</td>
+            <td>Paid but booking uncertain</td>
+            <td>Retry confirmation against protected seat; reconcile before
+                release.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="transactional-outbox-explained-simply">Transactional outbox
+        explained simply</h3>
+    <p>A booking is confirmed in the database, but the service crashes <strong>before</strong>
+        publishing <code>BookingConfirmed</code> to the broker. Without an
+        outbox, ticket issuance and notifications may never happen.</p>
+    <p><strong>Fix:</strong> In the <strong>same DB transaction</strong> that
+        confirms the booking, insert a row in <code>outbox</code>. An
+        independent relay later sends it to the broker. The relay may publish
+        more than once, so consumers must deduplicate by event/ticket ID.</p>
+    <pre><code>ONE DB TRANSACTION
    Update booking = CONFIRMED
    Update seat = BOOKED
    Insert outbox(BookingConfirmed)
@@ -576,32 +1480,268 @@ COMMIT
         Message broker
            |
       Ticket issuer / email (idempotent)</code></pre>
-<hr>
-<h2 id="12-compare-alternative-designs-what-we-reject-and-when">12. Compare alternative designs — what we reject and when</h2>
-<table><thead><tr><th>Option</th><th>Why consider it?</th><th>Why not default for this design?</th></tr></thead><tbody><tr><td><strong>SQL row lock / conditional UPDATE</strong></td><td>Correctness, easy transaction boundary</td><td><strong>Chosen.</strong> Contention on one hot seat is unavoidable, but guarantees are clear.</td></tr><tr><td>Optimistic locking with version</td><td>Good when conflicts are rare; <code>UPDATE ... WHERE version = x</code></td><td>For heavily contested seats, many retries and poor customer experience. Still valid if measured contention is low.</td></tr><tr><td>Redis <code>SET NX</code> hold lock</td><td>Extremely fast, TTL built in</td><td>Lock expiry/failover alone cannot prove durable ownership; still need DB transaction and fencing/validation.</td></tr><tr><td>Distributed lock service</td><td>Cross-process coordination</td><td>Adds complexity; a correctly modeled database row can already arbitrate ownership.</td></tr><tr><td>Queue all hold requests</td><td>Smooth bursts and preserve an ordering policy</td><td>Added latency; still need authoritative allocation and retries. Best as admission control for extreme demand.</td></tr><tr><td>Event-driven eventual booking only</td><td>Great for notifications and workflows</td><td><strong>Not</strong> appropriate for two customers claiming one specific seat without a synchronous authoritative conflict decision.</td></tr><tr><td>Multi-region active-active writes</td><td>Local low-latency booking globally</td><td>Conflicting concurrent seat sales require coordination; choose an event/home-region inventory writer for safety.</td></tr></tbody></table>
-<h3 id="pessimistic-vs-optimistic-locking-in-one-sentence">Pessimistic vs. optimistic locking in one sentence</h3>
-<ul><li><strong>Pessimistic:</strong> lock first, then decide; good under high conflict.</li><li><strong>Optimistic:</strong> read a version, then commit only if unchanged; good when conflicts are uncommon.</li></ul>
-<p>Both rely on an <strong>atomic database write</strong> to enforce the final ownership invariant.</p>
-<hr>
-<h2 id="13-variations-general-admission-and-multi-region-booking">13. Variations: general admission and multi-region booking</h2>
-<h3 id="a-general-admission-no-assigned-seats">A. General admission (no assigned seats)</h3>
-<p>Instead of a unique A12, an event has <strong>500 tickets remaining</strong>. The invariant becomes:</p>
-<blockquote><p>Confirmed tickets + valid holds must never exceed capacity.</p></blockquote>
-<p>Use an <strong>atomic inventory decrement / reservation</strong> (<code>UPDATE inventory SET available = available - :qty WHERE available &gt;= :qty RETURNING ...</code>) in a transaction. Store hold quantity and restore it on safe cancellation/expiry. Beware a single hot inventory row for very popular events; introduce partitioned allocations or bounded quota leases only when necessary, with exact aggregate-capacity accounting.</p>
-<h3 id="b-multi-region-deployment">B. Multi-region deployment</h3>
-<p>If a buyer in Europe and a buyer in the US both request <strong>A12</strong>, independently writable regional databases might each accept the booking. <strong>Asynchronous replication does not prevent double selling.</strong></p>
-<p><strong>Safer baseline:</strong> Pick an <strong>authoritative inventory region per event</strong>. Reads can be regional and cached, but <strong>all seat-hold writes for that event</strong> go to its designated writer. After a regional failure, only promote a replacement if inventory state is recovered consistently and old writers are fenced off. This adds cross-region latency, but preserves one authority for a seat.</p>
-<h3 id="c-reservations-across-several-rowssections">C. Reservations across several rows/sections</h3>
-<p>If a booking spans many seats, lock them in deterministic order and commit them as a single transaction. If those seats live in <strong>different databases</strong>, the all-or-none guarantee becomes significantly harder. Prefer inventory partitioning that keeps a normal group booking in one transaction boundary, or explicitly redesign the requirement and compensation logic.</p>
-<hr>
-<h2 id="14-operational-readiness-and-interview-ready-recap">14. Operational readiness and interview-ready recap</h2>
-<h3 id="what-to-measure">What to measure</h3>
-<ul><li><strong>Hold success/conflict rate</strong> per event and section; popular seats have legitimate contention.</li><li><strong>Seat-lock wait time, DB deadlocks, connection pool usage</strong>; watch hot-seat pressure.</li><li><strong>Expired holds and their release delay</strong>; too many stale holds reduce sellable capacity.</li><li><strong>Payment pending / uncertain counts and age</strong>; no unresolved payment should be ignored.</li><li><strong>Captures without confirmed bookings, bookings without captures</strong>; reconcile automatically and alert.</li><li><strong>Outbox backlog and ticket issuance delay</strong>; booking confirmation and ticket delivery are separate.</li><li><strong>Overbooking invariant violations</strong>; treat any such event as a critical incident.</li></ul>
-<h3 id="the-key-decisions-in-one-table">The key decisions in one table</h3>
-<table><thead><tr><th>Interview question</th><th>Answer</th><th>Reason</th></tr></thead><tbody><tr><td>How do we stop double booking?</td><td>Atomic SQL update or row lock</td><td>One seat, one authoritative winner.</td></tr><tr><td>Why temporary holds?</td><td>Give user a bounded checkout window</td><td>Avoid permanently locking inventory during abandoned checkout.</td></tr><tr><td>Why SQL over only Redis?</td><td>Durable ownership and ACID transactions</td><td>A lost/expired cache lock must not sell the seat twice.</td></tr><tr><td>How to book 3 seats together?</td><td>One transaction; lock rows in sorted order</td><td>All-or-none inventory allocation.</td></tr><tr><td>What about payment failure?</td><td>Saga-like state machine + compensation</td><td>Payment provider and booking DB are different systems.</td></tr><tr><td>What about timeout?</td><td>Idempotency + reconciliation</td><td>A timeout is not proof of payment failure.</td></tr><tr><td>How do we scale reads?</td><td>CDN/cache/read model</td><td>Browsing can be eventually consistent.</td></tr><tr><td>How do we scale peak writes?</td><td>Admission control + benchmark + partition carefully</td><td>Avoid overwhelming the authoritative DB.</td></tr><tr><td>Why outbox?</td><td>Reliable async publication after booking commit</td><td>No lost confirmation event during service crash.</td></tr><tr><td>Multi-region?</td><td>One authoritative writer per event</td><td>Prevent independent regions selling the same seat.</td></tr></tbody></table>
-<h3 id="a-strong-two-minute-design-explanation">A strong two-minute design explanation</h3>
-<blockquote><p>“The key invariant is that one seat can have only one active reservation or confirmed owner. I would keep seat inventory in a relational database and use a short transaction with row locking or a conditional update to atomically create a temporary hold. A five-minute hold allows checkout without making abandoned seats permanently unavailable. For multi-seat requests, all rows must be allocated in one transaction or none are allocated. The public seat map can come from a cache, but every hold must be checked against the authoritative database. For payment I would move the hold to a protected payment-pending state, authorize through the provider using an idempotency key, confirm allocation, then capture and issue the ticket when payment is known to have completed. I would not keep database locks open over network calls. If payment times out, I would reconcile before releasing the seat. A transactional outbox makes confirmed booking events reliable. For flash sales, I would add a waiting room, bot protection and cached reads. Across regions, I would assign each event one authoritative inventory writer to avoid double selling.”</p></blockquote>
-<hr>
-<h2 id="official-sources-used-for-implementation-choices">Official sources used for implementation choices</h2>
-<ol start="1"><li><a href="https://www.postgresql.org/docs/current/explicit-locking.html" target="_blank" rel="noopener">PostgreSQL: Explicit Locking</a> — <code>SELECT FOR UPDATE</code>, row locks, deadlock considerations.</li><li><a href="https://www.postgresql.org/docs/current/sql-select.html" target="_blank" rel="noopener">PostgreSQL: SELECT locking clause</a> — <code>NOWAIT</code>, <code>SKIP LOCKED</code>, and locking behavior.</li><li><a href="https://www.postgresql.org/docs/current/ddl-constraints.html" target="_blank" rel="noopener">PostgreSQL: Constraints</a> — primary keys, unique constraints, and partial unique indexes.</li><li><a href="https://docs.stripe.com/payments/place-a-hold-on-a-payment-method" target="_blank" rel="noopener">Stripe: Place a hold on a payment method</a> — separate authorization and capture; support varies by payment method.</li><li><a href="https://docs.stripe.com/api/idempotent<em>requests" target="</em>blank" rel="noopener">Stripe: Idempotent requests</a> — safe retries and idempotency keys.</li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html" target="_blank" rel="noopener">AWS Prescriptive Guidance: Transactional outbox pattern</a> — publish events reliably after database commits.</li></ol>
-<p><strong>Note:</strong> PostgreSQL, Stripe, and AWS are <strong>reference implementations</strong>, not required products or claims about any particular employer's stack. The core design patterns apply to equivalent technologies.</p></main></body></html>
+    <hr>
+    <h2 id="12-compare-alternative-designs-what-we-reject-and-when">12. Compare
+        alternative designs — what we reject and when</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Option</th>
+            <th>Why consider it?</th>
+            <th>Why not default for this design?</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>SQL row lock / conditional UPDATE</strong></td>
+            <td>Correctness, easy transaction boundary</td>
+            <td><strong>Chosen.</strong> Contention on one hot seat is
+                unavoidable, but guarantees are clear.
+            </td>
+        </tr>
+        <tr>
+            <td>Optimistic locking with version</td>
+            <td>Good when conflicts are rare; <code>UPDATE ... WHERE version =
+                x</code></td>
+            <td>For heavily contested seats, many retries and poor customer
+                experience. Still valid if measured contention is low.
+            </td>
+        </tr>
+        <tr>
+            <td>Redis <code>SET NX</code> hold lock</td>
+            <td>Extremely fast, TTL built in</td>
+            <td>Lock expiry/failover alone cannot prove durable ownership; still
+                need DB transaction and fencing/validation.
+            </td>
+        </tr>
+        <tr>
+            <td>Distributed lock service</td>
+            <td>Cross-process coordination</td>
+            <td>Adds complexity; a correctly modeled database row can already
+                arbitrate ownership.
+            </td>
+        </tr>
+        <tr>
+            <td>Queue all hold requests</td>
+            <td>Smooth bursts and preserve an ordering policy</td>
+            <td>Added latency; still need authoritative allocation and retries.
+                Best as admission control for extreme demand.
+            </td>
+        </tr>
+        <tr>
+            <td>Event-driven eventual booking only</td>
+            <td>Great for notifications and workflows</td>
+            <td><strong>Not</strong> appropriate for two customers claiming one
+                specific seat without a synchronous authoritative conflict
+                decision.
+            </td>
+        </tr>
+        <tr>
+            <td>Multi-region active-active writes</td>
+            <td>Local low-latency booking globally</td>
+            <td>Conflicting concurrent seat sales require coordination; choose
+                an event/home-region inventory writer for safety.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="pessimistic-vs-optimistic-locking-in-one-sentence">Pessimistic vs.
+        optimistic locking in one sentence</h3>
+    <ul>
+        <li><strong>Pessimistic:</strong> lock first, then decide; good under
+            high conflict.
+        </li>
+        <li><strong>Optimistic:</strong> read a version, then commit only if
+            unchanged; good when conflicts are uncommon.
+        </li>
+    </ul>
+    <p>Both rely on an <strong>atomic database write</strong> to enforce the
+        final ownership invariant.</p>
+    <hr>
+    <h2 id="13-variations-general-admission-and-multi-region-booking">13.
+        Variations: general admission and multi-region booking</h2>
+    <h3 id="a-general-admission-no-assigned-seats">A. General admission (no
+        assigned seats)</h3>
+    <p>Instead of a unique A12, an event has <strong>500 tickets
+        remaining</strong>. The invariant becomes:</p>
+    <blockquote><p>Confirmed tickets + valid holds must never exceed
+        capacity.</p></blockquote>
+    <p>Use an <strong>atomic inventory decrement / reservation</strong> (<code>UPDATE
+        inventory SET available = available - :qty WHERE available &gt;= :qty
+        RETURNING ...</code>) in a transaction. Store hold quantity and restore
+        it on safe cancellation/expiry. Beware a single hot inventory row for
+        very popular events; introduce partitioned allocations or bounded quota
+        leases only when necessary, with exact aggregate-capacity accounting.
+    </p>
+    <h3 id="b-multi-region-deployment">B. Multi-region deployment</h3>
+    <p>If a buyer in Europe and a buyer in the US both request
+        <strong>A12</strong>, independently writable regional databases might
+        each accept the booking. <strong>Asynchronous replication does not
+            prevent double selling.</strong></p>
+    <p><strong>Safer baseline:</strong> Pick an <strong>authoritative inventory
+        region per event</strong>. Reads can be regional and cached, but
+        <strong>all seat-hold writes for that event</strong> go to its
+        designated writer. After a regional failure, only promote a replacement
+        if inventory state is recovered consistently and old writers are fenced
+        off. This adds cross-region latency, but preserves one authority for a
+        seat.</p>
+    <h3 id="c-reservations-across-several-rowssections">C. Reservations across
+        several rows/sections</h3>
+    <p>If a booking spans many seats, lock them in deterministic order and
+        commit them as a single transaction. If those seats live in <strong>different
+            databases</strong>, the all-or-none guarantee becomes significantly
+        harder. Prefer inventory partitioning that keeps a normal group booking
+        in one transaction boundary, or explicitly redesign the requirement and
+        compensation logic.</p>
+    <hr>
+    <h2 id="14-operational-readiness-and-interview-ready-recap">14. Operational
+        readiness and interview-ready recap</h2>
+    <h3 id="what-to-measure">What to measure</h3>
+    <ul>
+        <li><strong>Hold success/conflict rate</strong> per event and section;
+            popular seats have legitimate contention.
+        </li>
+        <li><strong>Seat-lock wait time, DB deadlocks, connection pool
+            usage</strong>; watch hot-seat pressure.
+        </li>
+        <li><strong>Expired holds and their release delay</strong>; too many
+            stale holds reduce sellable capacity.
+        </li>
+        <li><strong>Payment pending / uncertain counts and age</strong>; no
+            unresolved payment should be ignored.
+        </li>
+        <li><strong>Captures without confirmed bookings, bookings without
+            captures</strong>; reconcile automatically and alert.
+        </li>
+        <li><strong>Outbox backlog and ticket issuance delay</strong>; booking
+            confirmation and ticket delivery are separate.
+        </li>
+        <li><strong>Overbooking invariant violations</strong>; treat any such
+            event as a critical incident.
+        </li>
+    </ul>
+    <h3 id="the-key-decisions-in-one-table">The key decisions in one table</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Interview question</th>
+            <th>Answer</th>
+            <th>Reason</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>How do we stop double booking?</td>
+            <td>Atomic SQL update or row lock</td>
+            <td>One seat, one authoritative winner.</td>
+        </tr>
+        <tr>
+            <td>Why temporary holds?</td>
+            <td>Give user a bounded checkout window</td>
+            <td>Avoid permanently locking inventory during abandoned checkout.
+            </td>
+        </tr>
+        <tr>
+            <td>Why SQL over only Redis?</td>
+            <td>Durable ownership and ACID transactions</td>
+            <td>A lost/expired cache lock must not sell the seat twice.</td>
+        </tr>
+        <tr>
+            <td>How to book 3 seats together?</td>
+            <td>One transaction; lock rows in sorted order</td>
+            <td>All-or-none inventory allocation.</td>
+        </tr>
+        <tr>
+            <td>What about payment failure?</td>
+            <td>Saga-like state machine + compensation</td>
+            <td>Payment provider and booking DB are different systems.</td>
+        </tr>
+        <tr>
+            <td>What about timeout?</td>
+            <td>Idempotency + reconciliation</td>
+            <td>A timeout is not proof of payment failure.</td>
+        </tr>
+        <tr>
+            <td>How do we scale reads?</td>
+            <td>CDN/cache/read model</td>
+            <td>Browsing can be eventually consistent.</td>
+        </tr>
+        <tr>
+            <td>How do we scale peak writes?</td>
+            <td>Admission control + benchmark + partition carefully</td>
+            <td>Avoid overwhelming the authoritative DB.</td>
+        </tr>
+        <tr>
+            <td>Why outbox?</td>
+            <td>Reliable async publication after booking commit</td>
+            <td>No lost confirmation event during service crash.</td>
+        </tr>
+        <tr>
+            <td>Multi-region?</td>
+            <td>One authoritative writer per event</td>
+            <td>Prevent independent regions selling the same seat.</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="a-strong-two-minute-design-explanation">A strong two-minute design
+        explanation</h3>
+    <blockquote><p>“The key invariant is that one seat can have only one active
+        reservation or confirmed owner. I would keep seat inventory in a
+        relational database and use a short transaction with row locking or a
+        conditional update to atomically create a temporary hold. A five-minute
+        hold allows checkout without making abandoned seats permanently
+        unavailable. For multi-seat requests, all rows must be allocated in one
+        transaction or none are allocated. The public seat map can come from a
+        cache, but every hold must be checked against the authoritative
+        database. For payment I would move the hold to a protected
+        payment-pending state, authorize through the provider using an
+        idempotency key, confirm allocation, then capture and issue the ticket
+        when payment is known to have completed. I would not keep database locks
+        open over network calls. If payment times out, I would reconcile before
+        releasing the seat. A transactional outbox makes confirmed booking
+        events reliable. For flash sales, I would add a waiting room, bot
+        protection and cached reads. Across regions, I would assign each event
+        one authoritative inventory writer to avoid double selling.”</p>
+    </blockquote>
+    <hr>
+    <h2 id="official-sources-used-for-implementation-choices">Official sources
+        used for implementation choices</h2>
+    <ol start="1">
+        <li>
+            <a href="https://www.postgresql.org/docs/current/explicit-locking.html"
+               target="_blank" rel="noopener">PostgreSQL: Explicit Locking</a> —
+            <code>SELECT FOR UPDATE</code>, row locks, deadlock considerations.
+        </li>
+        <li><a href="https://www.postgresql.org/docs/current/sql-select.html"
+               target="_blank" rel="noopener">PostgreSQL: SELECT locking
+            clause</a> — <code>NOWAIT</code>, <code>SKIP LOCKED</code>, and
+            locking behavior.
+        </li>
+        <li>
+            <a href="https://www.postgresql.org/docs/current/ddl-constraints.html"
+               target="_blank" rel="noopener">PostgreSQL: Constraints</a> —
+            primary keys, unique constraints, and partial unique indexes.
+        </li>
+        <li>
+            <a href="https://docs.stripe.com/payments/place-a-hold-on-a-payment-method"
+               target="_blank" rel="noopener">Stripe: Place a hold on a payment
+                method</a> — separate authorization and capture; support varies
+            by payment method.
+        </li>
+        <li><a href="https://docs.stripe.com/api/idempotent<em>requests"
+               target="</em>blank" rel="noopener">Stripe: Idempotent
+            requests</a> — safe retries and idempotency keys.
+        </li>
+        <li>
+            <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html"
+               target="_blank" rel="noopener">AWS Prescriptive Guidance:
+                Transactional outbox pattern</a> — publish events reliably after
+            database commits.
+        </li>
+    </ol>
+    <p><strong>Note:</strong> PostgreSQL, Stripe, and AWS are <strong>reference
+        implementations</strong>, not required products or claims about any
+        particular employer's stack. The core design patterns apply to
+        equivalent technologies.</p></main>
+</body>
+</html>

@@ -683,14 +683,18 @@ only a diagram.
 ## 14. The short interview explanation
 
 > A payment database stores transaction changes, but support, search, and
-> analytics need their own copies. I would keep PostgreSQL as the source of truth.
+> analytics need their own copies. I would keep PostgreSQL as the source of
+> truth.
 > Rather than have every service poll it, I would use Debezium to capture
 > committed changes from PostgreSQL's WAL. An initial snapshot provides existing
 > records, and streaming then provides new changes without a gap. I would send
-> events to Kafka so each downstream consumer can process independently and replay
-> after failures. I would key records by transaction ID for per-key ordering, and
+> events to Kafka so each downstream consumer can process independently and
+> replay
+> after failures. I would key records by transaction ID for per-key ordering,
+> and
 > make sink updates idempotent because retries can duplicate events. The
-> operational risks are CDC lag retaining source WAL, schema changes, and consumer
+> operational risks are CDC lag retaining source WAL, schema changes, and
+> consumer
 > drift, so I would monitor and test those explicitly. If the requirement is a
 > true business event, I would use a transactional outbox instead of treating a
 > row change as the event itself.

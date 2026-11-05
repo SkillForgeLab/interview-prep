@@ -250,11 +250,13 @@ policy overrides, and model drift.
 > I would use a synchronous fraud engine with deterministic rules, ML inference,
 > and a low-latency online feature store. Kafka and stream processing would
 > maintain recent behavior features and feed historical data for training, while
-> the current authorization decision remains synchronous. I would use coordinated
+> the current authorization decision remains synchronous. I would use
+> coordinated
 > state for hard velocity constraints because asynchronous features can lag. I
 > would scale scoring services independently, implement risk-approved fallback
 > policies, and monitor latency, feature freshness, model drift, and false
-> declines. This balances fraud prevention, customer experience, and reliability.
+> declines. This balances fraud prevention, customer experience, and
+> reliability.
 
 ---
 

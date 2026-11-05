@@ -1,348 +1,717 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Distributed Rate Limiter</title><style>
-/* The original PDF skill style sheet is embedded below. */
-/* Architect's Field Notes — original study-guide design recreation.
-   Standalone builder embeds this file into its generated HTML. */
-:root {
-  --navy: #112c3a;
-  --header: #193a4b;
-  --ink: #273944;
-  --heading: #17313e;
-  --muted: #75838d;
-  --line: #d9e2e7;
-  --zebra: #f6f8f9;
-  --accent: #64c8e6;
-  --accent-soft: #eaf8fc;
-}
-@page {
-  size: A4;
-  margin: 19mm 19mm 19mm;
-  @top-left {
-    content: "INTERVIEW / FIELD GUIDE";
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .05em;
-    vertical-align: middle;
-  }
-  @top-right {
-    content: string(running-topic);
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .02em;
-    vertical-align: middle;
-  }
-  @bottom-left {
-    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
-    color: #9aa5ae;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 6.3pt;
-    letter-spacing: .03em;
-    vertical-align: middle;
-  }
-  @bottom-right {
-    content: counter(page, decimal-leading-zero);
-    color: #394b56;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-weight: 700;
-    font-size: 7pt;
-    vertical-align: middle;
-  }
-}
-@page cover {
-  size: A4;
-  margin: 0;
-  @top-left { content: none; }
-  @top-right { content: none; }
-  @bottom-left { content: none; }
-  @bottom-right { content: none; }
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: "Inter", "DejaVu Sans", sans-serif;
-  font-size: 9.4pt;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--ink);
-  background: #fff;
-  overflow-wrap: break-word;
-}
-.cover {
-  page: cover;
-  break-after: page;
-  height: 297mm;
-  width: 210mm;
-  overflow: hidden;
-  position: relative;
-  background: var(--navy);
-  color: #fff;
-  padding: 29.6mm 26mm;
-}
-.cover::before, .cover::after {
-  content: "";
-  position: absolute;
-  border: .55pt solid rgba(255,255,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
-.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
-.cover-brand {
-  font-size: 9.5pt;
-  font-weight: 800;
-  letter-spacing: .31em;
-  text-transform: uppercase;
-  color: #dceaf0;
-}
-.cover-series {
-  font-size: 8pt;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #98b3c1;
-  margin-top: 7mm;
-}
-.cover-accent-bar {
-  position: absolute;
-  left: 26mm; top: 80mm;
-  height: 3.5mm; width: 21mm;
-  background: var(--accent);
-}
-.cover-title {
-  position: absolute;
-  left: 25.5mm; right: 25mm; top: 97mm;
-  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
-  font-size: 42pt;
-  font-weight: 800;
-  letter-spacing: -.043em;
-  line-height: 1.08;
-  color: #fff;
-}
-.cover-title .second { display: block; color: var(--accent); }
-.cover-title.long { font-size: 37pt; }
-.cover-sub {
-  position: absolute;
-  left: 26mm; right: 31mm; top: 173.5mm;
-  color: #bdcdd5;
-  font-size: 11.5pt;
-  line-height: 1.7;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.cover-note {
-  color: #91aab7;
-  text-transform: none;
-  font-size: 9pt;
-  letter-spacing: .01em;
-  margin-top: 7mm;
-  line-height: 1.6;
-}
-.cover-bottom {
-  position: absolute;
-  bottom: 31mm; left: 26mm;
-  font-size: 7.8pt;
-  line-height: 1.9;
-  letter-spacing: .065em;
-  color: #cfdae0;
-}
-.cover-rule {
-  position: absolute;
-  bottom: 62mm; height: .35pt;
-  left: 26mm; right: 26mm;
-  background: rgba(255,255,255,.15);
-}
-.cover-number {
-  position: absolute;
-  bottom: 29mm; right: 26mm;
-  color: var(--accent);
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 39pt;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-/* Introduction + automatically generated navigable contents. */
-.preface { break-after: page; }
-.preface-label, .toc-overline {
-  color: var(--accent);
-  font-size: 7.6pt;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-top: 0;
-}
-.preface h1 { display: none; }
-.preface h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 14pt;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.02em;
-  color: var(--heading);
-  margin: 5mm 0 5mm;
-  border-bottom: .5pt solid var(--line);
-  padding-bottom: 2.5mm;
-}
-.preface p { font-size: 9.5pt; line-height: 1.6; }
-.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
-.toc h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 21pt;
-  letter-spacing: -.03em;
-  margin: 2mm 0 5mm;
-  border: 0;
-  padding: 0;
-}
-.toc ol { list-style: none; margin: 0; padding: 0; }
-.toc li {
-  display: flex;
-  align-items: baseline;
-  gap: 5mm;
-  font-size: 9.1pt;
-  padding: 2.7mm 1mm;
-  border-top: .5pt solid #e7ecef;
-  break-inside: avoid;
-}
-.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
-.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
-.toc a { color: var(--ink); text-decoration: none; }
-/* Continuous editorial body: sections can flow across pages. */
-.content { padding: 0; }
-.content h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 17.2pt;
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1.28;
-  letter-spacing: -.024em;
-  margin: 11mm 0 5mm;
-  padding-top: 5.5mm;
-  border-top: .6pt solid var(--line);
-  break-after: avoid;
-}
-.content h2::before {
-  content: "CHAPTER";
-  display: block;
-  color: var(--accent);
-  font-size: 7pt;
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-bottom: 2.2mm;
-}
-.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
-.content h3 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 11.6pt;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -.012em;
-  color: var(--heading);
-  margin: 7mm 0 2.5mm;
-  break-after: avoid;
-}
-.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
-p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
-strong, b { font-weight: 700; color: #1a3341; }
-a { color: #23778e; text-decoration: none; }
-hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
-ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
-li { padding-left: .5mm; margin: 1.5mm 0; }
-li::marker { color: var(--accent); }
-li p { margin: 0; }
-blockquote {
-  background: var(--accent-soft);
-  border-left: 2.5pt solid var(--accent);
-  margin: 4mm 0 6mm;
-  padding: 4mm 5.2mm;
-  color: #2b4654;
-  font-size: 9.4pt;
-  line-height: 1.56;
-}
-blockquote p { margin-bottom: 2.3mm; }
-blockquote p:last-child { margin-bottom: 0; }
-blockquote strong { color: #143743; }
-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  font-size: 8pt;
-  line-height: 1.42;
-  color: var(--ink);
-  margin: 3.6mm 0 4.8mm;
-  overflow-wrap: anywhere;
-}
-thead { display: table-header-group; }
-thead th {
-  background: var(--header);
-  color: #fff;
-  text-align: left;
-  font-weight: 700;
-  padding: 2.2mm 2.4mm;
-  vertical-align: top;
-  border-right: 1pt solid rgba(255,255,255,.04);
-}
-thead th strong { color: #fff; }
-tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
-tbody tr:nth-child(even) { background: var(--zebra); }
-tr { break-inside: avoid; }
-table.wide { font-size: 7.15pt; }
-table.wide th, table.wide td { padding: 1.8mm; }
-code {
-  font-family: "DejaVu Sans Mono", monospace;
-  font-size: .91em;
-  color: #22445a;
-}
-pre {
-  color: #dce9f0;
-  background: #173746;
-  padding: 4mm 5mm;
-  font-size: 8.3pt;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin: 4mm 0;
-}
-pre code { color: inherit; }
-.task-list-item { list-style: none; margin-left: -5mm; }
-.task-box {
-  display: inline-block;
-  border: .85pt solid #7b8b93;
-  width: 2.6mm; height: 2.6mm;
-  margin-right: 3mm;
-  vertical-align: baseline;
-}
-.task-box.checked { background: var(--accent); border-color: var(--accent); }
-img { max-width: 100%; height: auto; }
-.caption { color: var(--muted); font-size: 7.8pt; }
-@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Distributed Rate Limiter</title>
+    <style>
+        /* The original PDF skill style sheet is embedded below. */
+        /* Architect's Field Notes — original study-guide design recreation.
+           Standalone builder embeds this file into its generated HTML. */
+        :root {
+            --navy: #112c3a;
+            --header: #193a4b;
+            --ink: #273944;
+            --heading: #17313e;
+            --muted: #75838d;
+            --line: #d9e2e7;
+            --zebra: #f6f8f9;
+            --accent: #64c8e6;
+            --accent-soft: #eaf8fc;
+        }
+
+        @page {
+            size: A4;
+            margin: 19mm 19mm 19mm;
+            @top-left {
+                content: "INTERVIEW / FIELD GUIDE";
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .05em;
+                vertical-align: middle;
+            }
+            @top-right {
+                content: string(running-topic);
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .02em;
+                vertical-align: middle;
+            }
+            @bottom-left {
+                content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+                color: #9aa5ae;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 6.3pt;
+                letter-spacing: .03em;
+                vertical-align: middle;
+            }
+            @bottom-right {
+                content: counter(page, decimal-leading-zero);
+                color: #394b56;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-weight: 700;
+                font-size: 7pt;
+                vertical-align: middle;
+            }
+        }
+
+        @page cover {
+            size: A4;
+            margin: 0;
+            @top-left {
+                content: none;
+            }
+            @top-right {
+                content: none;
+            }
+            @bottom-left {
+                content: none;
+            }
+            @bottom-right {
+                content: none;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", "DejaVu Sans", sans-serif;
+            font-size: 9.4pt;
+            font-weight: 400;
+            line-height: 1.55;
+            color: var(--ink);
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        .cover {
+            page: cover;
+            break-after: page;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy);
+            color: #fff;
+            padding: 29.6mm 26mm;
+        }
+
+        .cover::before, .cover::after {
+            content: "";
+            position: absolute;
+            border: .55pt solid rgba(255, 255, 255, .08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover::before {
+            width: 158mm;
+            height: 158mm;
+            right: -84mm;
+            top: -61mm;
+        }
+
+        .cover::after {
+            width: 108mm;
+            height: 108mm;
+            right: -28mm;
+            bottom: -75mm;
+        }
+
+        .cover-brand {
+            font-size: 9.5pt;
+            font-weight: 800;
+            letter-spacing: .31em;
+            text-transform: uppercase;
+            color: #dceaf0;
+        }
+
+        .cover-series {
+            font-size: 8pt;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #98b3c1;
+            margin-top: 7mm;
+        }
+
+        .cover-accent-bar {
+            position: absolute;
+            left: 26mm;
+            top: 80mm;
+            height: 3.5mm;
+            width: 21mm;
+            background: var(--accent);
+        }
+
+        .cover-title {
+            position: absolute;
+            left: 25.5mm;
+            right: 25mm;
+            top: 97mm;
+            font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -.043em;
+            line-height: 1.08;
+            color: #fff;
+        }
+
+        .cover-title .second {
+            display: block;
+            color: var(--accent);
+        }
+
+        .cover-title.long {
+            font-size: 37pt;
+        }
+
+        .cover-sub {
+            position: absolute;
+            left: 26mm;
+            right: 31mm;
+            top: 173.5mm;
+            color: #bdcdd5;
+            font-size: 11.5pt;
+            line-height: 1.7;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .cover-note {
+            color: #91aab7;
+            text-transform: none;
+            font-size: 9pt;
+            letter-spacing: .01em;
+            margin-top: 7mm;
+            line-height: 1.6;
+        }
+
+        .cover-bottom {
+            position: absolute;
+            bottom: 31mm;
+            left: 26mm;
+            font-size: 7.8pt;
+            line-height: 1.9;
+            letter-spacing: .065em;
+            color: #cfdae0;
+        }
+
+        .cover-rule {
+            position: absolute;
+            bottom: 62mm;
+            height: .35pt;
+            left: 26mm;
+            right: 26mm;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .cover-number {
+            position: absolute;
+            bottom: 29mm;
+            right: 26mm;
+            color: var(--accent);
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 39pt;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        /* Introduction + automatically generated navigable contents. */
+        .preface {
+            break-after: page;
+        }
+
+        .preface-label, .toc-overline {
+            color: var(--accent);
+            font-size: 7.6pt;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .preface h1 {
+            display: none;
+        }
+
+        .preface h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 14pt;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -.02em;
+            color: var(--heading);
+            margin: 5mm 0 5mm;
+            border-bottom: .5pt solid var(--line);
+            padding-bottom: 2.5mm;
+        }
+
+        .preface p {
+            font-size: 9.5pt;
+            line-height: 1.6;
+        }
+
+        .toc {
+            border-top: .5pt solid var(--line);
+            margin-top: 8mm;
+            padding-top: 6.5mm;
+        }
+
+        .toc h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 21pt;
+            letter-spacing: -.03em;
+            margin: 2mm 0 5mm;
+            border: 0;
+            padding: 0;
+        }
+
+        .toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            gap: 5mm;
+            font-size: 9.1pt;
+            padding: 2.7mm 1mm;
+            border-top: .5pt solid #e7ecef;
+            break-inside: avoid;
+        }
+
+        .toc li:last-child {
+            border-bottom: .5pt solid #e7ecef;
+        }
+
+        .toc .toc-num {
+            width: 8mm;
+            flex: 0 0 8mm;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .toc a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        /* Continuous editorial body: sections can flow across pages. */
+        .content {
+            padding: 0;
+        }
+
+        .content h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 17.2pt;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.28;
+            letter-spacing: -.024em;
+            margin: 11mm 0 5mm;
+            padding-top: 5.5mm;
+            border-top: .6pt solid var(--line);
+            break-after: avoid;
+        }
+
+        .content h2::before {
+            content: "CHAPTER";
+            display: block;
+            color: var(--accent);
+            font-size: 7pt;
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .19em;
+            margin-bottom: 2.2mm;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 11.6pt;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -.012em;
+            color: var(--heading);
+            margin: 7mm 0 2.5mm;
+            break-after: avoid;
+        }
+
+        .content h4, .preface h3 {
+            font-size: 10pt;
+            color: var(--heading);
+            margin: 5mm 0 2mm;
+            break-after: avoid;
+        }
+
+        p {
+            margin: 0 0 3.15mm;
+            orphans: 2;
+            widows: 2;
+        }
+
+        strong, b {
+            font-weight: 700;
+            color: #1a3341;
+        }
+
+        a {
+            color: #23778e;
+            text-decoration: none;
+        }
+
+        hr {
+            height: 0;
+            border: none;
+            border-top: .55pt solid #d9e2e7;
+            margin: 7mm 0;
+        }
+
+        ul, ol {
+            margin: 2.5mm 0 4mm;
+            padding-left: 6mm;
+        }
+
+        li {
+            padding-left: .5mm;
+            margin: 1.5mm 0;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        li p {
+            margin: 0;
+        }
+
+        blockquote {
+            background: var(--accent-soft);
+            border-left: 2.5pt solid var(--accent);
+            margin: 4mm 0 6mm;
+            padding: 4mm 5.2mm;
+            color: #2b4654;
+            font-size: 9.4pt;
+            line-height: 1.56;
+        }
+
+        blockquote p {
+            margin-bottom: 2.3mm;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        blockquote strong {
+            color: #143743;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            font-size: 8pt;
+            line-height: 1.42;
+            color: var(--ink);
+            margin: 3.6mm 0 4.8mm;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        thead th {
+            background: var(--header);
+            color: #fff;
+            text-align: left;
+            font-weight: 700;
+            padding: 2.2mm 2.4mm;
+            vertical-align: top;
+            border-right: 1pt solid rgba(255, 255, 255, .04);
+        }
+
+        thead th strong {
+            color: #fff;
+        }
+
+        tbody td {
+            border-bottom: .35pt solid #e3e9ed;
+            padding: 2.3mm 2.4mm;
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--zebra);
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        table.wide {
+            font-size: 7.15pt;
+        }
+
+        table.wide th, table.wide td {
+            padding: 1.8mm;
+        }
+
+        code {
+            font-family: "DejaVu Sans Mono", monospace;
+            font-size: .91em;
+            color: #22445a;
+        }
+
+        pre {
+            color: #dce9f0;
+            background: #173746;
+            padding: 4mm 5mm;
+            font-size: 8.3pt;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 4mm 0;
+        }
+
+        pre code {
+            color: inherit;
+        }
+
+        .task-list-item {
+            list-style: none;
+            margin-left: -5mm;
+        }
+
+        .task-box {
+            display: inline-block;
+            border: .85pt solid #7b8b93;
+            width: 2.6mm;
+            height: 2.6mm;
+            margin-right: 3mm;
+            vertical-align: baseline;
+        }
+
+        .task-box.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 7.8pt;
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 25px #ddd;
+            }
+        }
 
 
-:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"DISTRIBUTED RATE LIMITER";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
-@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 02 OF 04</div><div class="cover-accent-bar"></div><div class="cover-title">Distributed<span class="second">Rate Limiter</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">02</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><h2>A clear, step-by-step system design guide</h2>
-<p><strong>Purpose:</strong> Prepare for a Solution Architect system design discussion. <strong>Approach:</strong> Understand the problem first. Add one component at a time. For every decision, explain <strong>what</strong>, <strong>why</strong>, and <strong>what could go wrong</strong>. <strong>Design chosen:</strong> API Gateway + shared Redis + Token Bucket + atomic update.</p>
-<nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-start-with-the-problem-not-the-tools">1. Start with the problem, not the tools</a></li><li><span class="toc-num">02</span><a href="#2-the-final-design-in-one-picture">2. The final design in one picture</a></li><li><span class="toc-num">03</span><a href="#3-understand-the-token-bucket-using-real-numbers">3. Understand the Token Bucket using real numbers</a></li><li><span class="toc-num">04</span><a href="#4-build-the-solution-one-decision-at-a-time">4. Build the solution one decision at a time</a></li><li><span class="toc-num">05</span><a href="#5-one-request-from-start-to-finish">5. One request from start to finish</a></li><li><span class="toc-num">06</span><a href="#6-other-algorithms-when-would-we-choose-them-instead">6. Other algorithms — when would we choose them instead?</a></li><li><span class="toc-num">07</span><a href="#7-what-happens-when-redis-or-a-gateway-fails">7. What happens when Redis or a gateway fails?</a></li><li><span class="toc-num">08</span><a href="#8-what-changes-when-we-have-multiple-regions">8. What changes when we have multiple regions?</a></li><li><span class="toc-num">09</span><a href="#9-scaling-capacity-security-and-monitoring">9. Scaling, capacity, security, and monitoring</a></li><li><span class="toc-num">10</span><a href="#10-very-small-technical-appendix-optional-on-first-reading">10. Very small technical appendix (optional on first reading)</a></li><li><span class="toc-num">11</span><a href="#11-decisions-and-trade-offs-quick-recap">11. Decisions and trade-offs — quick recap</a></li><li><span class="toc-num">12</span><a href="#12-the-interview-explanation-in-one-minute">12. The interview explanation in one minute</a></li><li><span class="toc-num">13</span><a href="#official-references">Official references</a></li></ol></nav></section><main class="content"><h2 id="1-start-with-the-problem-not-the-tools">1. Start with the problem, not the tools</h2>
-<p>Imagine we run a payment API used by many merchants. One merchant sends far more requests than allowed. We want to protect our backend without blocking normal users.</p>
-<p><strong>Business rule (example):</strong> Each merchant can send requests at an average rate of <strong>2 per second</strong>, and can send a short burst of <strong>up to 5 at once</strong>.</p>
-<p>A rate limiter answers one question for each incoming request:</p>
-<blockquote><p><strong>Should this request enter the system now, or should we reject it and ask the client to retry later?</strong></p></blockquote>
-<p>The rate limiter does <strong>not</strong> process a payment. It only protects the API from too much traffic.</p>
-<h3 id="why-is-it-called-distributed">Why is it called <em>distributed</em>?</h3>
-<p>Our API runs on three gateway instances behind a load balancer. A merchant's requests can arrive at any instance.</p>
-<pre><code>                     Merchant requests
+        :root {
+            --accent: #64C8E6;
+            --accent-soft: #EAF8FC;
+        }
+
+        @page {
+            @top-right {
+                content: "DISTRIBUTED RATE LIMITER";
+            }@bottom-left {
+            content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+        }
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 20px #dce2e6;
+            }
+        }</style>
+</head>
+<body>
+<section class="cover">
+    <div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div>
+    <div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 02
+        OF 04
+    </div>
+    <div class="cover-accent-bar"></div>
+    <div class="cover-title">Distributed<span class="second">Rate Limiter</span>
+    </div>
+    <div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH
+        CONFIDENCE.
+        <div class="cover-note">Evidence-based STAR answers, senior-level
+            judgment, and focused interview rehearsal.
+        </div>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT
+        INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE
+    </div>
+    <div class="cover-number">02</div>
+</section>
+<section class="preface">
+    <div class="preface-label">YOUR STUDY COMPANION</div>
+    <h2>A clear, step-by-step system design guide</h2>
+    <p><strong>Purpose:</strong> Prepare for a Solution Architect system design
+        discussion. <strong>Approach:</strong> Understand the problem first. Add
+        one component at a time. For every decision, explain
+        <strong>what</strong>, <strong>why</strong>, and <strong>what could go
+            wrong</strong>. <strong>Design chosen:</strong> API Gateway + shared
+        Redis + Token Bucket + atomic update.</p>
+    <nav class="toc">
+        <div class="toc-overline">NAVIGATION</div>
+        <h2>Inside this guide</h2>
+        <ol>
+            <li><span class="toc-num">01</span><a
+                    href="#1-start-with-the-problem-not-the-tools">1. Start with
+                the problem, not the tools</a></li>
+            <li><span class="toc-num">02</span><a
+                    href="#2-the-final-design-in-one-picture">2. The final
+                design in one picture</a></li>
+            <li><span class="toc-num">03</span><a
+                    href="#3-understand-the-token-bucket-using-real-numbers">3.
+                Understand the Token Bucket using real numbers</a></li>
+            <li><span class="toc-num">04</span><a
+                    href="#4-build-the-solution-one-decision-at-a-time">4. Build
+                the solution one decision at a time</a></li>
+            <li><span class="toc-num">05</span><a
+                    href="#5-one-request-from-start-to-finish">5. One request
+                from start to finish</a></li>
+            <li><span class="toc-num">06</span><a
+                    href="#6-other-algorithms-when-would-we-choose-them-instead">6.
+                Other algorithms — when would we choose them instead?</a></li>
+            <li><span class="toc-num">07</span><a
+                    href="#7-what-happens-when-redis-or-a-gateway-fails">7. What
+                happens when Redis or a gateway fails?</a></li>
+            <li><span class="toc-num">08</span><a
+                    href="#8-what-changes-when-we-have-multiple-regions">8. What
+                changes when we have multiple regions?</a></li>
+            <li><span class="toc-num">09</span><a
+                    href="#9-scaling-capacity-security-and-monitoring">9.
+                Scaling, capacity, security, and monitoring</a></li>
+            <li><span class="toc-num">10</span><a
+                    href="#10-very-small-technical-appendix-optional-on-first-reading">10.
+                Very small technical appendix (optional on first reading)</a>
+            </li>
+            <li><span class="toc-num">11</span><a
+                    href="#11-decisions-and-trade-offs-quick-recap">11.
+                Decisions and trade-offs — quick recap</a></li>
+            <li><span class="toc-num">12</span><a
+                    href="#12-the-interview-explanation-in-one-minute">12. The
+                interview explanation in one minute</a></li>
+            <li><span class="toc-num">13</span><a href="#official-references">Official
+                references</a></li>
+        </ol>
+    </nav>
+</section>
+<main class="content"><h2 id="1-start-with-the-problem-not-the-tools">1. Start
+    with the problem, not the tools</h2>
+    <p>Imagine we run a payment API used by many merchants. One merchant sends
+        far more requests than allowed. We want to protect our backend without
+        blocking normal users.</p>
+    <p><strong>Business rule (example):</strong> Each merchant can send requests
+        at an average rate of <strong>2 per second</strong>, and can send a
+        short burst of <strong>up to 5 at once</strong>.</p>
+    <p>A rate limiter answers one question for each incoming request:</p>
+    <blockquote><p><strong>Should this request enter the system now, or should
+        we reject it and ask the client to retry later?</strong></p>
+    </blockquote>
+    <p>The rate limiter does <strong>not</strong> process a payment. It only
+        protects the API from too much traffic.</p>
+    <h3 id="why-is-it-called-distributed">Why is it called <em>distributed</em>?
+    </h3>
+    <p>Our API runs on three gateway instances behind a load balancer. A
+        merchant's requests can arrive at any instance.</p>
+    <pre><code>                     Merchant requests
                              |
                        Load balancer
                         /     |     \
                        v      v      v
                   Gateway A  B      C</code></pre>
-<p><strong>The broken design:</strong> Give each gateway its own counter. If the intended allowance is 5 requests, each gateway might allow 5. The merchant could then send <strong>15</strong> requests across the three gateways. The limit is no longer shared.</p>
-<p><strong>What we need:</strong> All gateways must consult the <strong>same logical quota state</strong> for a given merchant.</p>
-<p><strong>Requirement summary</strong></p>
-<table><thead><tr><th>Must support</th><th>Meaning</th></tr></thead><tbody><tr><td>Per-merchant rate limits</td><td>Merchant A and Merchant B should have separate allowances.</td></tr><tr><td>Burst allowance</td><td>A short spike is acceptable, but sustained overload is not.</td></tr><tr><td>Multiple gateways</td><td>A caller must not bypass the limit by reaching another gateway.</td></tr><tr><td>Fast decisions</td><td>Check happens before the backend call, so it should add little latency.</td></tr><tr><td>Graceful denial</td><td>Return HTTP <code>429 Too Many Requests</code>, optionally with <code>Retry-After</code>.</td></tr><tr><td>Failure behavior</td><td>Decide in advance what happens if the limiter's storage is unavailable.</td></tr></tbody></table>
-<p><strong>Assumptions:</strong> These are example requirements for teaching, not American Express production figures. Exact limits, SLA, and regional scope would come from the actual interview prompt.</p>
-<hr>
-<h2 id="2-the-final-design-in-one-picture">2. The final design in one picture</h2>
-<pre><code>                              +----------------------+
+    <p><strong>The broken design:</strong> Give each gateway its own counter. If
+        the intended allowance is 5 requests, each gateway might allow 5. The
+        merchant could then send <strong>15</strong> requests across the three
+        gateways. The limit is no longer shared.</p>
+    <p><strong>What we need:</strong> All gateways must consult the <strong>same
+        logical quota state</strong> for a given merchant.</p>
+    <p><strong>Requirement summary</strong></p>
+    <table>
+        <thead>
+        <tr>
+            <th>Must support</th>
+            <th>Meaning</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Per-merchant rate limits</td>
+            <td>Merchant A and Merchant B should have separate allowances.</td>
+        </tr>
+        <tr>
+            <td>Burst allowance</td>
+            <td>A short spike is acceptable, but sustained overload is not.</td>
+        </tr>
+        <tr>
+            <td>Multiple gateways</td>
+            <td>A caller must not bypass the limit by reaching another
+                gateway.
+            </td>
+        </tr>
+        <tr>
+            <td>Fast decisions</td>
+            <td>Check happens before the backend call, so it should add little
+                latency.
+            </td>
+        </tr>
+        <tr>
+            <td>Graceful denial</td>
+            <td>Return HTTP <code>429 Too Many Requests</code>, optionally with
+                <code>Retry-After</code>.
+            </td>
+        </tr>
+        <tr>
+            <td>Failure behavior</td>
+            <td>Decide in advance what happens if the limiter's storage is
+                unavailable.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Assumptions:</strong> These are example requirements for
+        teaching, not American Express production figures. Exact limits, SLA,
+        and regional scope would come from the actual interview prompt.</p>
+    <hr>
+    <h2 id="2-the-final-design-in-one-picture">2. The final design in one
+        picture</h2>
+    <pre><code>                              +----------------------+
                               | Rate-limit policy    |
                               | 2 tokens/sec         |
                               | Burst capacity = 5   |
@@ -372,93 +741,297 @@ img { max-width: 100%; height: auto; }
                    ALLOW                           DENY
                     |                               |
                Backend API                    HTTP 429</code></pre>
-<p>Read this diagram from top to bottom:</p>
-<ol start="1"><li>The <strong>API gateway</strong> receives requests before the application.</li><li>It identifies the merchant using <strong>verified authentication</strong> (not a user-supplied merchant name).</li><li>It looks up that merchant's <strong>rate-limit policy</strong> in its local policy cache.</li><li>It asks <strong>Redis</strong>, the shared state store, whether the request can spend a token.</li><li>Redis performs <strong>one atomic check-and-update</strong> and says <strong>allow</strong> or <strong>deny</strong>.</li><li>Only allowed requests reach the backend.</li></ol>
-<p><strong>Why not put the limiter inside every application service?</strong> A gateway can reject requests <em>before</em> they consume application resources. Services can still apply extra limits for expensive operations. The gateway is the common first line of enforcement.</p>
-<hr>
-<h2 id="3-understand-the-token-bucket-using-real-numbers">3. Understand the Token Bucket using real numbers</h2>
-<p>Think of a bucket that holds up to <strong>5 tokens</strong>.</p>
-<ul><li>Every incoming request needs <strong>1 token</strong>.</li><li>The bucket starts <strong>full: 5 tokens</strong>.</li><li>It refills at <strong>2 tokens per second</strong>.</li><li>It never holds more than <strong>5 tokens</strong>.</li><li>If there is not enough token balance, <strong>reject</strong> the request.</li></ul>
-<p><strong>Two important settings:</strong></p>
-<table><thead><tr><th>Setting</th><th>In this example</th><th>Controls</th></tr></thead><tbody><tr><td><strong>Capacity</strong></td><td>5 tokens</td><td>Maximum immediate burst</td></tr><tr><td><strong>Refill rate</strong></td><td>2 tokens/second</td><td>Long-run request rate</td></tr></tbody></table>
-<h3 id="walk-through-the-requests">Walk through the requests</h3>
-<p>Assume all gateways use <strong>one shared bucket</strong> for Merchant A. Every request costs one token.</p>
-<table class="wide"><thead><tr><th>Time</th><th>Request arrives at</th><th>Tokens before decision</th><th>Result</th><th>Tokens afterward</th></tr></thead><tbody><tr><td><code>0.00s</code></td><td>Gateway A</td><td>5</td><td>Allow</td><td>4</td></tr><tr><td><code>0.00s</code></td><td>Gateway B</td><td>4</td><td>Allow</td><td>3</td></tr><tr><td><code>0.00s</code></td><td>Gateway C</td><td>3</td><td>Allow</td><td>2</td></tr><tr><td><code>0.00s</code></td><td>Gateway A</td><td>2</td><td>Allow</td><td>1</td></tr><tr><td><code>0.00s</code></td><td>Gateway B</td><td>1</td><td>Allow</td><td>0</td></tr><tr><td><code>0.00s</code></td><td>Gateway C</td><td>0</td><td><strong>Deny (429)</strong></td><td>0</td></tr><tr><td><code>0.25s</code></td><td>Gateway A</td><td>0.5 (refilled)</td><td><strong>Deny (429)</strong></td><td>0.5</td></tr><tr><td><code>0.50s</code></td><td>Gateway B</td><td>1 (refilled)</td><td>Allow</td><td>0</td></tr><tr><td><code>1.00s</code></td><td>Gateway C</td><td>1 (refilled)</td><td>Allow</td><td>0</td></tr></tbody></table>
-<p><strong>What this proves:</strong> It does not matter which gateway receives a request. They all spend from the same bucket, so the six simultaneous requests do <strong>not</strong> produce six separate allowances.</p>
-<p><strong>Why fractional tokens?</strong> Refilling 2 tokens every second means 0.5 token arrives in 0.25 seconds. The limiter can track partial refill, but the request is only allowed once at least 1 full token is available.</p>
-<h3 id="the-refill-formula-explained-simply">The refill formula, explained simply</h3>
-<pre><code>elapsed_seconds = now - last_checked_time
+    <p>Read this diagram from top to bottom:</p>
+    <ol start="1">
+        <li>The <strong>API gateway</strong> receives requests before the
+            application.
+        </li>
+        <li>It identifies the merchant using <strong>verified
+            authentication</strong> (not a user-supplied merchant name).
+        </li>
+        <li>It looks up that merchant's <strong>rate-limit policy</strong> in
+            its local policy cache.
+        </li>
+        <li>It asks <strong>Redis</strong>, the shared state store, whether the
+            request can spend a token.
+        </li>
+        <li>Redis performs <strong>one atomic check-and-update</strong> and says
+            <strong>allow</strong> or <strong>deny</strong>.
+        </li>
+        <li>Only allowed requests reach the backend.</li>
+    </ol>
+    <p><strong>Why not put the limiter inside every application
+        service?</strong> A gateway can reject requests <em>before</em> they
+        consume application resources. Services can still apply extra limits for
+        expensive operations. The gateway is the common first line of
+        enforcement.</p>
+    <hr>
+    <h2 id="3-understand-the-token-bucket-using-real-numbers">3. Understand the
+        Token Bucket using real numbers</h2>
+    <p>Think of a bucket that holds up to <strong>5 tokens</strong>.</p>
+    <ul>
+        <li>Every incoming request needs <strong>1 token</strong>.</li>
+        <li>The bucket starts <strong>full: 5 tokens</strong>.</li>
+        <li>It refills at <strong>2 tokens per second</strong>.</li>
+        <li>It never holds more than <strong>5 tokens</strong>.</li>
+        <li>If there is not enough token balance, <strong>reject</strong> the
+            request.
+        </li>
+    </ul>
+    <p><strong>Two important settings:</strong></p>
+    <table>
+        <thead>
+        <tr>
+            <th>Setting</th>
+            <th>In this example</th>
+            <th>Controls</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Capacity</strong></td>
+            <td>5 tokens</td>
+            <td>Maximum immediate burst</td>
+        </tr>
+        <tr>
+            <td><strong>Refill rate</strong></td>
+            <td>2 tokens/second</td>
+            <td>Long-run request rate</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="walk-through-the-requests">Walk through the requests</h3>
+    <p>Assume all gateways use <strong>one shared bucket</strong> for Merchant
+        A. Every request costs one token.</p>
+    <table class="wide">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Request arrives at</th>
+            <th>Tokens before decision</th>
+            <th>Result</th>
+            <th>Tokens afterward</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>0.00s</code></td>
+            <td>Gateway A</td>
+            <td>5</td>
+            <td>Allow</td>
+            <td>4</td>
+        </tr>
+        <tr>
+            <td><code>0.00s</code></td>
+            <td>Gateway B</td>
+            <td>4</td>
+            <td>Allow</td>
+            <td>3</td>
+        </tr>
+        <tr>
+            <td><code>0.00s</code></td>
+            <td>Gateway C</td>
+            <td>3</td>
+            <td>Allow</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td><code>0.00s</code></td>
+            <td>Gateway A</td>
+            <td>2</td>
+            <td>Allow</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td><code>0.00s</code></td>
+            <td>Gateway B</td>
+            <td>1</td>
+            <td>Allow</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td><code>0.00s</code></td>
+            <td>Gateway C</td>
+            <td>0</td>
+            <td><strong>Deny (429)</strong></td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td><code>0.25s</code></td>
+            <td>Gateway A</td>
+            <td>0.5 (refilled)</td>
+            <td><strong>Deny (429)</strong></td>
+            <td>0.5</td>
+        </tr>
+        <tr>
+            <td><code>0.50s</code></td>
+            <td>Gateway B</td>
+            <td>1 (refilled)</td>
+            <td>Allow</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td><code>1.00s</code></td>
+            <td>Gateway C</td>
+            <td>1 (refilled)</td>
+            <td>Allow</td>
+            <td>0</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>What this proves:</strong> It does not matter which gateway
+        receives a request. They all spend from the same bucket, so the six
+        simultaneous requests do <strong>not</strong> produce six separate
+        allowances.</p>
+    <p><strong>Why fractional tokens?</strong> Refilling 2 tokens every second
+        means 0.5 token arrives in 0.25 seconds. The limiter can track partial
+        refill, but the request is only allowed once at least 1 full token is
+        available.</p>
+    <h3 id="the-refill-formula-explained-simply">The refill formula, explained
+        simply</h3>
+    <pre><code>elapsed_seconds = now - last_checked_time
 new_tokens = min(capacity, old_tokens + elapsed_seconds * refill_rate)
 
 if new_tokens &gt;= request_cost:
     allow the request and subtract its cost
 else:
     deny the request</code></pre>
-<ul><li><code>min(capacity, ...)</code> prevents unlimited accumulation during idle periods.</li><li><code>elapsed_seconds * refill_rate</code> calculates how many tokens returned.</li><li>The current count <strong>must be updated atomically</strong>, or simultaneous gateways could each spend the same token.</li></ul>
-<p><strong>Important distinction:</strong> Token Bucket means an <em>average rate with permitted bursts</em>. It does <strong>not</strong> mean “at most two requests in every possible one-second interval.” If the interviewer needs a strict rolling-window guarantee, choose a different algorithm.</p>
-<hr>
-<h2 id="4-build-the-solution-one-decision-at-a-time">4. Build the solution one decision at a time</h2>
-<h3 id="decision-1-where-should-we-check-the-limit">Decision 1 — Where should we check the limit?</h3>
-<p><strong>Choose: API Gateway.</strong></p>
-<p><strong>Why:</strong> The gateway sees incoming API traffic before forwarding to the application. It can reject excessive traffic without loading payment services or databases.</p>
-<p><strong>Alternative:</strong> A limit within an individual service is useful when that service needs a <em>second</em>, specialized limit, such as a maximum number of expensive fraud checks running simultaneously.</p>
-<h3 id="decision-2-how-do-we-identify-whose-quota-is-used">Decision 2 — How do we identify whose quota is used?</h3>
-<p><strong>Choose: trusted <code>merchant_id</code> from authentication, plus a route group.</strong></p>
-<p>Examples of independent keys:</p>
-<pre><code>ratelimit:merchant-42:payments-read
+    <ul>
+        <li><code>min(capacity, ...)</code> prevents unlimited accumulation
+            during idle periods.
+        </li>
+        <li><code>elapsed_seconds * refill_rate</code> calculates how many
+            tokens returned.
+        </li>
+        <li>The current count <strong>must be updated atomically</strong>, or
+            simultaneous gateways could each spend the same token.
+        </li>
+    </ul>
+    <p><strong>Important distinction:</strong> Token Bucket means an <em>average
+        rate with permitted bursts</em>. It does <strong>not</strong> mean “at
+        most two requests in every possible one-second interval.” If the
+        interviewer needs a strict rolling-window guarantee, choose a different
+        algorithm.</p>
+    <hr>
+    <h2 id="4-build-the-solution-one-decision-at-a-time">4. Build the solution
+        one decision at a time</h2>
+    <h3 id="decision-1-where-should-we-check-the-limit">Decision 1 — Where
+        should we check the limit?</h3>
+    <p><strong>Choose: API Gateway.</strong></p>
+    <p><strong>Why:</strong> The gateway sees incoming API traffic before
+        forwarding to the application. It can reject excessive traffic without
+        loading payment services or databases.</p>
+    <p><strong>Alternative:</strong> A limit within an individual service is
+        useful when that service needs a <em>second</em>, specialized limit,
+        such as a maximum number of expensive fraud checks running
+        simultaneously.</p>
+    <h3 id="decision-2-how-do-we-identify-whose-quota-is-used">Decision 2 — How
+        do we identify whose quota is used?</h3>
+    <p><strong>Choose: trusted <code>merchant_id</code> from authentication,
+        plus a route group.</strong></p>
+    <p>Examples of independent keys:</p>
+    <pre><code>ratelimit:merchant-42:payments-read
 ratelimit:merchant-42:payments-write
 ratelimit:merchant-73:payments-read</code></pre>
-<p>Merchant 42 does not consume Merchant 73's allowance. Read-heavy endpoints can have a different policy from write endpoints.</p>
-<p><strong>Why not only IP address?</strong> Many real users can share an IP address (office networks, mobile providers), and a caller can change IPs. IP-based rules are still useful for unauthenticated abuse protection. Do not trust <code>merchant_id</code> supplied directly by the caller without validating it.</p>
-<h3 id="decision-3-where-should-the-quota-state-live">Decision 3 — Where should the quota state live?</h3>
-<p><strong>Choose: shared Redis.</strong></p>
-<p>A limiter needs small, frequently updated state: <strong>current tokens and the last refill timestamp</strong>. Redis is well suited to this in-memory access pattern.</p>
-<p><strong>Why not local memory?</strong> Each gateway would give its own allowance.</p>
-<p><strong>Why not a relational database as the default?</strong> A database could be made correct, but updating a row on <em>every request</em> introduces avoidable contention and additional load for an ephemeral counter. We can still use a durable database to store <strong>policy definitions</strong>, which do not change on every request.</p>
-<p><strong>Start simple:</strong> One Redis primary plus a replica can serve a small deployment. Use Redis Cluster when benchmarks or availability requirements justify sharding. Cluster is <strong>not automatically required</strong> just because there are multiple gateways.</p>
-<h3 id="decision-4-how-do-we-prevent-two-gateways-spending-the-same-token">Decision 4 — How do we prevent two gateways spending the same token?</h3>
-<p>Imagine Merchant A has only <strong>1 token</strong> left:</p>
-<pre><code>Gateway A: READ 1 token --&gt; thinks ALLOW
+    <p>Merchant 42 does not consume Merchant 73's allowance. Read-heavy
+        endpoints can have a different policy from write endpoints.</p>
+    <p><strong>Why not only IP address?</strong> Many real users can share an IP
+        address (office networks, mobile providers), and a caller can change
+        IPs. IP-based rules are still useful for unauthenticated abuse
+        protection. Do not trust <code>merchant_id</code> supplied directly by
+        the caller without validating it.</p>
+    <h3 id="decision-3-where-should-the-quota-state-live">Decision 3 — Where
+        should the quota state live?</h3>
+    <p><strong>Choose: shared Redis.</strong></p>
+    <p>A limiter needs small, frequently updated state: <strong>current tokens
+        and the last refill timestamp</strong>. Redis is well suited to this
+        in-memory access pattern.</p>
+    <p><strong>Why not local memory?</strong> Each gateway would give its own
+        allowance.</p>
+    <p><strong>Why not a relational database as the default?</strong> A database
+        could be made correct, but updating a row on <em>every request</em>
+        introduces avoidable contention and additional load for an ephemeral
+        counter. We can still use a durable database to store <strong>policy
+            definitions</strong>, which do not change on every request.</p>
+    <p><strong>Start simple:</strong> One Redis primary plus a replica can serve
+        a small deployment. Use Redis Cluster when benchmarks or availability
+        requirements justify sharding. Cluster is <strong>not automatically
+            required</strong> just because there are multiple gateways.</p>
+    <h3 id="decision-4-how-do-we-prevent-two-gateways-spending-the-same-token">
+        Decision 4 — How do we prevent two gateways spending the same
+        token?</h3>
+    <p>Imagine Merchant A has only <strong>1 token</strong> left:</p>
+    <pre><code>Gateway A: READ 1 token --&gt; thinks ALLOW
 Gateway B: READ 1 token --&gt; thinks ALLOW
 Gateway A: WRITE 0
 Gateway B: WRITE 0
 
 Outcome: 2 requests allowed using 1 available token (WRONG)</code></pre>
-<p>This is a <strong>race condition</strong>: two operations see the same old state before either update is complete.</p>
-<p><strong>Choose: one atomic Redis script.</strong> The script must do all of this as one unit: read state → refill → decide → deduct → save.</p>
-<p>Redis runs a Lua script atomically, so another request cannot interleave its update while this script is executing. Keep it short to avoid blocking other Redis work. Redis's official scripting documentation confirms this behavior.</p>
-<pre><code>Gateway A ----&gt;
+    <p>This is a <strong>race condition</strong>: two operations see the same
+        old state before either update is complete.</p>
+    <p><strong>Choose: one atomic Redis script.</strong> The script must do all
+        of this as one unit: read state → refill → decide → deduct → save.</p>
+    <p>Redis runs a Lua script atomically, so another request cannot interleave
+        its update while this script is executing. Keep it short to avoid
+        blocking other Redis work. Redis's official scripting documentation
+        confirms this behavior.</p>
+    <pre><code>Gateway A ----&gt;
                  [Redis atomic operation] ----&gt; Allow A, remaining = 0
 Gateway B ----&gt;
                  [Redis atomic operation] ----&gt; Deny B, remaining = 0</code></pre>
-<p><strong>Concept — Atomicity:</strong> Other callers cannot observe or modify an operation halfway through. Atomicity here applies to the Redis check-and-update, <strong>not</strong> to the entire later payment transaction.</p>
-<h3 id="decision-5-what-do-we-send-back-to-the-client">Decision 5 — What do we send back to the client?</h3>
-<p>If Redis says <strong>allow</strong>, forward the request and let the application produce its normal response.</p>
-<p>If Redis says <strong>deny</strong>, do not call the backend:</p>
-<pre><code>HTTP/1.1 429 Too Many Requests
+    <p><strong>Concept — Atomicity:</strong> Other callers cannot observe or
+        modify an operation halfway through. Atomicity here applies to the Redis
+        check-and-update, <strong>not</strong> to the entire later payment
+        transaction.</p>
+    <h3 id="decision-5-what-do-we-send-back-to-the-client">Decision 5 — What do
+        we send back to the client?</h3>
+    <p>If Redis says <strong>allow</strong>, forward the request and let the
+        application produce its normal response.</p>
+    <p>If Redis says <strong>deny</strong>, do not call the backend:</p>
+    <pre><code>HTTP/1.1 429 Too Many Requests
 Content-Type: application/json
 Retry-After: 1
 
 {"error":"RATE_LIMIT_EXCEEDED","message":"Please retry later"}</code></pre>
-<p><code>Retry-After: 1</code> means wait at least one second. The server should calculate this from the refill rate and round up to whole seconds. HTTP <code>429</code> and the optional <code>Retry-After</code> header are defined by <strong>RFC 6585</strong>.</p>
-<h3 id="decision-6-how-do-we-avoid-stale-state-and-waste">Decision 6 — How do we avoid stale state and waste?</h3>
-<p><strong>Choose: an expiry time (TTL) on inactive bucket keys.</strong></p>
-<p>A merchant who stops sending requests should not keep an empty/unused counter in Redis forever. An expired bucket can be treated as full when the merchant returns <strong>only after enough idle time has passed to refill it completely</strong>.</p>
-<p>Example: capacity 5 and refill rate 2/s → an empty bucket needs <strong>2.5 seconds</strong> to refill. Set idle TTL <strong>longer than this</strong> with safety margin. This is an eviction policy for temporary state, not a business data-retention rule.</p>
-<h3 id="decision-7-how-do-we-change-limits-by-customer-tier">Decision 7 — How do we change limits by customer tier?</h3>
-<p><strong>Choose: durable policy store + cached policy in gateways.</strong></p>
-<pre><code>Policy database / Admin API
+    <p><code>Retry-After: 1</code> means wait at least one second. The server
+        should calculate this from the refill rate and round up to whole
+        seconds. HTTP <code>429</code> and the optional <code>Retry-After</code>
+        header are defined by <strong>RFC 6585</strong>.</p>
+    <h3 id="decision-6-how-do-we-avoid-stale-state-and-waste">Decision 6 — How
+        do we avoid stale state and waste?</h3>
+    <p><strong>Choose: an expiry time (TTL) on inactive bucket keys.</strong>
+    </p>
+    <p>A merchant who stops sending requests should not keep an empty/unused
+        counter in Redis forever. An expired bucket can be treated as full when
+        the merchant returns <strong>only after enough idle time has passed to
+            refill it completely</strong>.</p>
+    <p>Example: capacity 5 and refill rate 2/s → an empty bucket needs <strong>2.5
+        seconds</strong> to refill. Set idle TTL <strong>longer than
+        this</strong> with safety margin. This is an eviction policy for
+        temporary state, not a business data-retention rule.</p>
+    <h3 id="decision-7-how-do-we-change-limits-by-customer-tier">Decision 7 —
+        How do we change limits by customer tier?</h3>
+    <p><strong>Choose: durable policy store + cached policy in
+        gateways.</strong></p>
+    <pre><code>Policy database / Admin API
           |
       versioned update
           |
    Gateway policy caches
           |
    Redis checks use the current settings</code></pre>
-<p>The policy is <strong>configuration</strong> (e.g., premium merchant = 20/s). Tokens are <strong>runtime state</strong> (e.g., 3.5 currently available). Do not query a durable configuration database on every request.</p>
-<p><strong>Important:</strong> Changing capacity or refill rate can make old token state inconsistent with the new policy. Clamp tokens to the new capacity; plan how policy changes take effect. Avoid silently resetting all buckets to full during a version rollout if that matters.</p>
-<hr>
-<h2 id="5-one-request-from-start-to-finish">5. One request from start to finish</h2>
-<pre><code>(1) Merchant sends POST /api/orders
+    <p>The policy is <strong>configuration</strong> (e.g., premium merchant =
+        20/s). Tokens are <strong>runtime state</strong> (e.g., 3.5 currently
+        available). Do not query a durable configuration database on every
+        request.</p>
+    <p><strong>Important:</strong> Changing capacity or refill rate can make old
+        token state inconsistent with the new policy. Clamp tokens to the new
+        capacity; plan how policy changes take effect. Avoid silently resetting
+        all buckets to full during a version rollout if that matters.</p>
+    <hr>
+    <h2 id="5-one-request-from-start-to-finish">5. One request from start to
+        finish</h2>
+    <pre><code>(1) Merchant sends POST /api/orders
                    |
                    v
 (2) Gateway verifies identity: merchant-42
@@ -490,63 +1063,246 @@ Retry-After: 1
      to backend        Retry-After
             |
 (8) Application returns its own response</code></pre>
-<p>**Notice what is <em>not</em> in the critical path:** policy administration, log aggregation, analytics databases, and dashboards. Those should not slow every API request.</p>
-<hr>
-<h2 id="6-other-algorithms-when-would-we-choose-them-instead">6. Other algorithms — when would we choose them instead?</h2>
-<p>The <strong>business rule determines the algorithm</strong>. These are not interchangeable.</p>
-<table><thead><tr><th>Algorithm</th><th>Simple idea</th><th>Best for</th><th>Weak point</th></tr></thead><tbody><tr><td><strong>Fixed window</strong></td><td>Count requests in a calendar window, e.g., each minute</td><td>Very simple quotas</td><td>Boundary spike: a user may send many requests at the end of one minute and start of the next.</td></tr><tr><td><strong>Sliding-window log</strong></td><td>Keep timestamps of requests within the last 60 seconds</td><td>Strict “N requests in <em>any</em> 60 seconds”</td><td>More memory and maintenance per key.</td></tr><tr><td><strong>Sliding-window counter</strong></td><td>Blend counts from the current and previous windows</td><td>Low-memory approximation of a rolling limit</td><td>Approximate, not exact.</td></tr><tr><td><strong>Token bucket</strong></td><td>Spend tokens, refill at a steady rate</td><td><strong>Allow bursts but cap long-run rate</strong></td><td>Does not enforce an exact rolling-window maximum.</td></tr><tr><td><strong>Leaky bucket / paced queue</strong></td><td>Smooth work at a set departure rate</td><td>Smooth downstream processing</td><td>May delay requests and require queue management.</td></tr></tbody></table>
-<p><strong>Interview rule:</strong> If asked “Why Token Bucket instead of Fixed Window?”, answer: <strong>We need to allow small legitimate bursts without letting requests stay above the sustained rate. Fixed Window has sharp boundaries that cause unfair spikes.</strong></p>
-<hr>
-<h2 id="7-what-happens-when-redis-or-a-gateway-fails">7. What happens when Redis or a gateway fails?</h2>
-<p>A working design is not enough. The architect must define <strong>failure behavior</strong>.</p>
-<h3 id="case-a-one-gateway-crashes">Case A — One gateway crashes</h3>
-<p>The load balancer routes new requests to other healthy gateways. The shared quota remains in Redis. <strong>No quota reset</strong> occurs just because a gateway dies.</p>
-<h3 id="case-b-redis-is-slow-or-unavailable">Case B — Redis is slow or unavailable</h3>
-<p>The gateway cannot know the latest shared token balance. Two common policies:</p>
-<table><thead><tr><th>Mode</th><th>Behavior</th><th>Example rationale</th></tr></thead><tbody><tr><td><strong>Fail-open</strong></td><td>Let requests through, perhaps with a small local emergency limit</td><td>Availability is more important than exact temporary enforcement for a low-risk API.</td></tr><tr><td><strong>Fail-closed</strong></td><td>Reject requests while the limiter is unavailable</td><td>Protect a costly or sensitive endpoint from uncontrolled traffic.</td></tr></tbody></table>
-<p><strong>No single mode is always correct.</strong> Document the choice per endpoint, give Redis calls a short timeout, and monitor how often the fallback is used.</p>
-<h3 id="case-c-redis-primary-fails-over-to-a-replica">Case C — Redis primary fails over to a replica</h3>
-<p>The new primary might not have the latest token deductions. Redis Cluster uses asynchronous replication, so <strong>some acknowledged limiter updates can be lost</strong> during failover. This can briefly admit more requests than planned.</p>
-<p><strong>Meaning:</strong> Atomic checks on the current Redis primary do <strong>not</strong> imply permanently exact quota accounting. For ordinary protective rate limiting, a small temporary overshoot may be acceptable. For billing or a strict contractual quota, this architecture alone is not enough.</p>
-<h3 id="case-d-thousands-of-requests-from-one-merchant">Case D — Thousands of requests from one merchant</h3>
-<p>Even with Redis Cluster, <strong>one hot merchant key</strong> lives on one shard and can saturate it.</p>
-<p>Possible solutions, in increasing complexity:</p>
-<ol start="1"><li>Block obvious abuse earlier at the WAF / edge.</li><li>Isolate a high-volume tenant on a dedicated quota partition.</li><li>Give gateways <strong>bounded token leases</strong> from an authoritative coordinator (fewer central checks, but some possible overshoot).</li></ol>
-<p>Do <strong>not</strong> split one strict 5-token quota into unrestricted counters on multiple shards: that repeats the original problem.</p>
-<hr>
-<h2 id="8-what-changes-when-we-have-multiple-regions">8. What changes when we have multiple regions?</h2>
-<p>Suppose the same merchant's requests reach the US and Europe simultaneously.</p>
-<pre><code>                   Merchant
+    <p>**Notice what is <em>not</em> in the critical path:** policy
+        administration, log aggregation, analytics databases, and dashboards.
+        Those should not slow every API request.</p>
+    <hr>
+    <h2 id="6-other-algorithms-when-would-we-choose-them-instead">6. Other
+        algorithms — when would we choose them instead?</h2>
+    <p>The <strong>business rule determines the algorithm</strong>. These are
+        not interchangeable.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Algorithm</th>
+            <th>Simple idea</th>
+            <th>Best for</th>
+            <th>Weak point</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Fixed window</strong></td>
+            <td>Count requests in a calendar window, e.g., each minute</td>
+            <td>Very simple quotas</td>
+            <td>Boundary spike: a user may send many requests at the end of one
+                minute and start of the next.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Sliding-window log</strong></td>
+            <td>Keep timestamps of requests within the last 60 seconds</td>
+            <td>Strict “N requests in <em>any</em> 60 seconds”</td>
+            <td>More memory and maintenance per key.</td>
+        </tr>
+        <tr>
+            <td><strong>Sliding-window counter</strong></td>
+            <td>Blend counts from the current and previous windows</td>
+            <td>Low-memory approximation of a rolling limit</td>
+            <td>Approximate, not exact.</td>
+        </tr>
+        <tr>
+            <td><strong>Token bucket</strong></td>
+            <td>Spend tokens, refill at a steady rate</td>
+            <td><strong>Allow bursts but cap long-run rate</strong></td>
+            <td>Does not enforce an exact rolling-window maximum.</td>
+        </tr>
+        <tr>
+            <td><strong>Leaky bucket / paced queue</strong></td>
+            <td>Smooth work at a set departure rate</td>
+            <td>Smooth downstream processing</td>
+            <td>May delay requests and require queue management.</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Interview rule:</strong> If asked “Why Token Bucket instead of
+        Fixed Window?”, answer: <strong>We need to allow small legitimate bursts
+            without letting requests stay above the sustained rate. Fixed Window
+            has sharp boundaries that cause unfair spikes.</strong></p>
+    <hr>
+    <h2 id="7-what-happens-when-redis-or-a-gateway-fails">7. What happens when
+        Redis or a gateway fails?</h2>
+    <p>A working design is not enough. The architect must define <strong>failure
+        behavior</strong>.</p>
+    <h3 id="case-a-one-gateway-crashes">Case A — One gateway crashes</h3>
+    <p>The load balancer routes new requests to other healthy gateways. The
+        shared quota remains in Redis. <strong>No quota reset</strong> occurs
+        just because a gateway dies.</p>
+    <h3 id="case-b-redis-is-slow-or-unavailable">Case B — Redis is slow or
+        unavailable</h3>
+    <p>The gateway cannot know the latest shared token balance. Two common
+        policies:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Mode</th>
+            <th>Behavior</th>
+            <th>Example rationale</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Fail-open</strong></td>
+            <td>Let requests through, perhaps with a small local emergency
+                limit
+            </td>
+            <td>Availability is more important than exact temporary enforcement
+                for a low-risk API.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Fail-closed</strong></td>
+            <td>Reject requests while the limiter is unavailable</td>
+            <td>Protect a costly or sensitive endpoint from uncontrolled
+                traffic.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>No single mode is always correct.</strong> Document the choice
+        per endpoint, give Redis calls a short timeout, and monitor how often
+        the fallback is used.</p>
+    <h3 id="case-c-redis-primary-fails-over-to-a-replica">Case C — Redis primary
+        fails over to a replica</h3>
+    <p>The new primary might not have the latest token deductions. Redis Cluster
+        uses asynchronous replication, so <strong>some acknowledged limiter
+            updates can be lost</strong> during failover. This can briefly admit
+        more requests than planned.</p>
+    <p><strong>Meaning:</strong> Atomic checks on the current Redis primary do
+        <strong>not</strong> imply permanently exact quota accounting. For
+        ordinary protective rate limiting, a small temporary overshoot may be
+        acceptable. For billing or a strict contractual quota, this architecture
+        alone is not enough.</p>
+    <h3 id="case-d-thousands-of-requests-from-one-merchant">Case D — Thousands
+        of requests from one merchant</h3>
+    <p>Even with Redis Cluster, <strong>one hot merchant key</strong> lives on
+        one shard and can saturate it.</p>
+    <p>Possible solutions, in increasing complexity:</p>
+    <ol start="1">
+        <li>Block obvious abuse earlier at the WAF / edge.</li>
+        <li>Isolate a high-volume tenant on a dedicated quota partition.</li>
+        <li>Give gateways <strong>bounded token leases</strong> from an
+            authoritative coordinator (fewer central checks, but some possible
+            overshoot).
+        </li>
+    </ol>
+    <p>Do <strong>not</strong> split one strict 5-token quota into unrestricted
+        counters on multiple shards: that repeats the original problem.</p>
+    <hr>
+    <h2 id="8-what-changes-when-we-have-multiple-regions">8. What changes when
+        we have multiple regions?</h2>
+    <p>Suppose the same merchant's requests reach the US and Europe
+        simultaneously.</p>
+    <pre><code>                   Merchant
                   /        \
                  v          v
            US Gateway    EU Gateway
                 |             |
              US Redis      EU Redis
               tokens         tokens</code></pre>
-<p>If both regions independently start with <strong>5 tokens</strong>, the merchant might use <strong>10 tokens</strong>. Regional replicas do not magically create a strict worldwide allowance.</p>
-<p><strong>Three practical designs:</strong></p>
-<table><thead><tr><th>Requirement</th><th>Approach</th><th>Trade-off</th></tr></thead><tbody><tr><td>Low latency, approximate global limit</td><td>Allocate fixed budgets to regions (e.g., US 3, EU 2)</td><td>Uneven demand wastes unused regional capacity unless rebalanced.</td></tr><tr><td>Strict per-merchant decisions</td><td>Assign the merchant one <strong>home/authoritative region</strong> for its checks</td><td>Other regions pay cross-region latency; loss of home region affects enforcement.</td></tr><tr><td>Fast regional checks with bounded overshoot</td><td>Lease limited token blocks to regions/gateways</td><td>More coordination and non-zero potential overshoot.</td></tr></tbody></table>
-<p><strong>Architecture point to say in an interview:</strong> “We must choose whether we prefer strict global consistency or low-latency regional availability. Independent regional Redis stores cannot provide both.”</p>
-<hr>
-<h2 id="9-scaling-capacity-security-and-monitoring">9. Scaling, capacity, security, and monitoring</h2>
-<h3 id="capacity-calculate-the-right-thing">Capacity: calculate the right thing</h3>
-<p>If we receive <strong>20,000 requests/second</strong> and make <strong>one rate-limit check per request</strong>, Redis must handle approximately <strong>20,000 limiter decisions per second</strong>. Rejected requests still need a decision. If each request checks three separate rules, work can approach <strong>60,000 checks per second</strong>.</p>
-<p>These are <strong>illustrative calculations</strong>, not Redis throughput guarantees. Actual capacity depends on hardware, network, scripts, key distribution, and failover headroom. Benchmark the workload and add shards only when measurements justify them.</p>
-<h3 id="security-essentials">Security essentials</h3>
-<ul><li>Use a verified identity for authenticated quotas; separately protect pre-auth endpoints with IP and edge-based safeguards.</li><li>Keep Redis private; use network controls, TLS where supported, restricted credentials, and key rotation.</li><li>Do not put access tokens, card numbers, or personal data into Redis key names.</li><li>Rate limiting is <strong>not</strong> authentication, authorization, fraud detection, or payment idempotency.</li></ul>
-<h3 id="monitor-these-signals">Monitor these signals</h3>
-<ul><li><strong>Allowed vs. denied requests:</strong> Are we blocking the expected traffic?</li><li><strong>Redis check latency and errors:</strong> Is the limiter slowing every request?</li><li><strong>Redis CPU, memory, evictions, and hot keys:</strong> Are shards overloaded or losing state?</li><li><strong>Fail-open / fail-closed counts:</strong> Are we exposing APIs or rejecting valid traffic during outages?</li><li><strong>Policy-version consistency:</strong> Are all gateways enforcing the same current policy?</li></ul>
-<hr>
-<h2 id="10-very-small-technical-appendix-optional-on-first-reading">10. Very small technical appendix (optional on first reading)</h2>
-<h3 id="what-exactly-is-stored-in-redis">What exactly is stored in Redis?</h3>
-<pre><code>Key:     rate:merchant-42:orders-write
+    <p>If both regions independently start with <strong>5 tokens</strong>, the
+        merchant might use <strong>10 tokens</strong>. Regional replicas do not
+        magically create a strict worldwide allowance.</p>
+    <p><strong>Three practical designs:</strong></p>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>Approach</th>
+            <th>Trade-off</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Low latency, approximate global limit</td>
+            <td>Allocate fixed budgets to regions (e.g., US 3, EU 2)</td>
+            <td>Uneven demand wastes unused regional capacity unless
+                rebalanced.
+            </td>
+        </tr>
+        <tr>
+            <td>Strict per-merchant decisions</td>
+            <td>Assign the merchant one <strong>home/authoritative
+                region</strong> for its checks
+            </td>
+            <td>Other regions pay cross-region latency; loss of home region
+                affects enforcement.
+            </td>
+        </tr>
+        <tr>
+            <td>Fast regional checks with bounded overshoot</td>
+            <td>Lease limited token blocks to regions/gateways</td>
+            <td>More coordination and non-zero potential overshoot.</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Architecture point to say in an interview:</strong> “We must
+        choose whether we prefer strict global consistency or low-latency
+        regional availability. Independent regional Redis stores cannot provide
+        both.”</p>
+    <hr>
+    <h2 id="9-scaling-capacity-security-and-monitoring">9. Scaling, capacity,
+        security, and monitoring</h2>
+    <h3 id="capacity-calculate-the-right-thing">Capacity: calculate the right
+        thing</h3>
+    <p>If we receive <strong>20,000 requests/second</strong> and make <strong>one
+        rate-limit check per request</strong>, Redis must handle approximately
+        <strong>20,000 limiter decisions per second</strong>. Rejected requests
+        still need a decision. If each request checks three separate rules, work
+        can approach <strong>60,000 checks per second</strong>.</p>
+    <p>These are <strong>illustrative calculations</strong>, not Redis
+        throughput guarantees. Actual capacity depends on hardware, network,
+        scripts, key distribution, and failover headroom. Benchmark the workload
+        and add shards only when measurements justify them.</p>
+    <h3 id="security-essentials">Security essentials</h3>
+    <ul>
+        <li>Use a verified identity for authenticated quotas; separately protect
+            pre-auth endpoints with IP and edge-based safeguards.
+        </li>
+        <li>Keep Redis private; use network controls, TLS where supported,
+            restricted credentials, and key rotation.
+        </li>
+        <li>Do not put access tokens, card numbers, or personal data into Redis
+            key names.
+        </li>
+        <li>Rate limiting is <strong>not</strong> authentication, authorization,
+            fraud detection, or payment idempotency.
+        </li>
+    </ul>
+    <h3 id="monitor-these-signals">Monitor these signals</h3>
+    <ul>
+        <li><strong>Allowed vs. denied requests:</strong> Are we blocking the
+            expected traffic?
+        </li>
+        <li><strong>Redis check latency and errors:</strong> Is the limiter
+            slowing every request?
+        </li>
+        <li><strong>Redis CPU, memory, evictions, and hot keys:</strong> Are
+            shards overloaded or losing state?
+        </li>
+        <li><strong>Fail-open / fail-closed counts:</strong> Are we exposing
+            APIs or rejecting valid traffic during outages?
+        </li>
+        <li><strong>Policy-version consistency:</strong> Are all gateways
+            enforcing the same current policy?
+        </li>
+    </ul>
+    <hr>
+    <h2 id="10-very-small-technical-appendix-optional-on-first-reading">10. Very
+        small technical appendix (optional on first reading)</h2>
+    <h3 id="what-exactly-is-stored-in-redis">What exactly is stored in
+        Redis?</h3>
+    <pre><code>Key:     rate:merchant-42:orders-write
 Value:   tokens = 2.5
          last_refill_ms = 1730000000000  (example timestamp)
 TTL:     longer than full-refill time, with safety margin</code></pre>
-<p>The limiter needs <strong>two values per bucket</strong>. It does not need to store every request or a complete customer profile.</p>
-<h3 id="atomic-check-and-update-pseudocode">Atomic check-and-update pseudocode</h3>
-<p>The gateway sends <code>key</code>, <code>capacity</code>, <code>refill_rate</code>, and <code>cost</code> to <strong>one Redis script</strong>.</p>
-<pre><code>ATOMIC_CHECK(key, capacity, refill_rate, cost):
+    <p>The limiter needs <strong>two values per bucket</strong>. It does not
+        need to store every request or a complete customer profile.</p>
+    <h3 id="atomic-check-and-update-pseudocode">Atomic check-and-update
+        pseudocode</h3>
+    <p>The gateway sends <code>key</code>, <code>capacity</code>, <code>refill_rate</code>,
+        and <code>cost</code> to <strong>one Redis script</strong>.</p>
+    <pre><code>ATOMIC_CHECK(key, capacity, refill_rate, cost):
     now = Redis server time
     state = load bucket(key) or start with a full bucket
 
@@ -563,23 +1319,126 @@ TTL:     longer than full-refill time, with safety margin</code></pre>
 
     save bucket(available, now) and idle TTL
     return decision, retry_after</code></pre>
-<p><strong>Why one script, not separate Redis calls?</strong> The check and write must be atomic. If two gateways read the same old value in separate operations, both might allow a request that should only have been allowed once.</p>
-<p><strong>Clock detail:</strong> Use Redis server time so different gateway clocks do not change refill calculations. Host clocks still need synchronization, especially around failover.</p>
-<h3 id="http-example">HTTP example</h3>
-<pre><code>GET /api/transactions HTTP/1.1
+    <p><strong>Why one script, not separate Redis calls?</strong> The check and
+        write must be atomic. If two gateways read the same old value in
+        separate operations, both might allow a request that should only have
+        been allowed once.</p>
+    <p><strong>Clock detail:</strong> Use Redis server time so different gateway
+        clocks do not change refill calculations. Host clocks still need
+        synchronization, especially around failover.</p>
+    <h3 id="http-example">HTTP example</h3>
+    <pre><code>GET /api/transactions HTTP/1.1
 Authorization: Bearer &lt;redacted&gt;</code></pre>
-<p>When over the quota:</p>
-<pre><code>HTTP/1.1 429 Too Many Requests
+    <p>When over the quota:</p>
+    <pre><code>HTTP/1.1 429 Too Many Requests
 Retry-After: 1
 Content-Type: application/json
 
 {"code":"RATE_LIMITED","message":"Try again later"}</code></pre>
-<p>For production, the implementation must additionally validate policy values, handle script reloads, and define the behavior for multiple rate-limit rules on one request.</p>
-<hr>
-<h2 id="11-decisions-and-trade-offs-quick-recap">11. Decisions and trade-offs — quick recap</h2>
-<table><thead><tr><th>Question</th><th>Answer</th><th>Why</th></tr></thead><tbody><tr><td>Where do we reject?</td><td>Gateway</td><td>Protect the backend early.</td></tr><tr><td>Which algorithm?</td><td>Token Bucket</td><td>Permits bursts while controlling sustained rate.</td></tr><tr><td>Where is state?</td><td>Shared Redis</td><td>All gateway replicas see one logical merchant bucket.</td></tr><tr><td>Why atomic Lua?</td><td>Avoid race conditions</td><td>Two gateways cannot spend the same token.</td></tr><tr><td>Why TTL?</td><td>Remove idle buckets</td><td>Prevent unbounded state growth.</td></tr><tr><td>How to scale?</td><td>Measure first; shard Redis if needed</td><td>Independent keys can be distributed across primaries.</td></tr><tr><td>What about Redis failure?</td><td>Explicit fail-open/closed policy</td><td>Availability and protection have different trade-offs.</td></tr><tr><td>Is the quota exact globally?</td><td>Not with separate regional buckets</td><td>Strict global quotas require a single authority or coordination.</td></tr></tbody></table>
-<h2 id="12-the-interview-explanation-in-one-minute">12. The interview explanation in one minute</h2>
-<blockquote><p>“I would enforce limits at the API gateway so excessive requests are rejected before reaching the backend. Since gateways run on multiple instances, local counters would be incorrect. I would use Redis as shared state, with one token bucket per authenticated merchant and route group. A token bucket fits our requirement because we want a sustained rate with a small allowed burst. Each gateway executes one short atomic Redis script to refill, check, and spend tokens. Allowed requests go to the backend; denied requests receive HTTP 429 and a retry delay. I would add TTLs for idle buckets, monitor Redis latency and hot keys, and define explicit fail-open or fail-closed behavior for Redis outages. For multi-region traffic, I would state that independent counters are not globally exact, then choose regional budgets or a single authoritative region according to the required consistency.”</p></blockquote>
-<hr>
-<h2 id="official-references">Official references</h2>
-<ol start="1"><li><strong>Redis:</strong> <a href="https://redis.io/docs/latest/develop/use-cases/rate-limiter/" target="_blank" rel="noopener">Rate limiter use case</a> — why shared state is needed and supported algorithm types.</li><li><strong>Redis:</strong> <a href="https://redis.io/docs/latest/develop/programmability/eval-intro/" target="_blank" rel="noopener">Scripting with Lua</a> — atomic execution and script caching behavior.</li><li><strong>Redis:</strong> <a href="https://redis.io/docs/latest/operate/oss<em>and</em>stack/reference/cluster-spec/" target="_blank" rel="noopener">Redis Cluster specification</a> — sharding, failover, and asynchronous replication.</li><li><strong>Redis:</strong> <a href="https://redis.io/docs/latest/commands/TIME/" target="_blank" rel="noopener">TIME command</a> — server time used for refill calculations.</li><li><strong>IETF RFC 6585:</strong> <a href="https://www.rfc-editor.org/rfc/rfc6585.html#section-4" target="_blank" rel="noopener">HTTP 429 Too Many Requests</a> — response status and optional <code>Retry-After</code>.</li></ol></main></body></html>
+    <p>For production, the implementation must additionally validate policy
+        values, handle script reloads, and define the behavior for multiple
+        rate-limit rules on one request.</p>
+    <hr>
+    <h2 id="11-decisions-and-trade-offs-quick-recap">11. Decisions and
+        trade-offs — quick recap</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Where do we reject?</td>
+            <td>Gateway</td>
+            <td>Protect the backend early.</td>
+        </tr>
+        <tr>
+            <td>Which algorithm?</td>
+            <td>Token Bucket</td>
+            <td>Permits bursts while controlling sustained rate.</td>
+        </tr>
+        <tr>
+            <td>Where is state?</td>
+            <td>Shared Redis</td>
+            <td>All gateway replicas see one logical merchant bucket.</td>
+        </tr>
+        <tr>
+            <td>Why atomic Lua?</td>
+            <td>Avoid race conditions</td>
+            <td>Two gateways cannot spend the same token.</td>
+        </tr>
+        <tr>
+            <td>Why TTL?</td>
+            <td>Remove idle buckets</td>
+            <td>Prevent unbounded state growth.</td>
+        </tr>
+        <tr>
+            <td>How to scale?</td>
+            <td>Measure first; shard Redis if needed</td>
+            <td>Independent keys can be distributed across primaries.</td>
+        </tr>
+        <tr>
+            <td>What about Redis failure?</td>
+            <td>Explicit fail-open/closed policy</td>
+            <td>Availability and protection have different trade-offs.</td>
+        </tr>
+        <tr>
+            <td>Is the quota exact globally?</td>
+            <td>Not with separate regional buckets</td>
+            <td>Strict global quotas require a single authority or
+                coordination.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h2 id="12-the-interview-explanation-in-one-minute">12. The interview
+        explanation in one minute</h2>
+    <blockquote><p>“I would enforce limits at the API gateway so excessive
+        requests are rejected before reaching the backend. Since gateways run on
+        multiple instances, local counters would be incorrect. I would use Redis
+        as shared state, with one token bucket per authenticated merchant and
+        route group. A token bucket fits our requirement because we want a
+        sustained rate with a small allowed burst. Each gateway executes one
+        short atomic Redis script to refill, check, and spend tokens. Allowed
+        requests go to the backend; denied requests receive HTTP 429 and a retry
+        delay. I would add TTLs for idle buckets, monitor Redis latency and hot
+        keys, and define explicit fail-open or fail-closed behavior for Redis
+        outages. For multi-region traffic, I would state that independent
+        counters are not globally exact, then choose regional budgets or a
+        single authoritative region according to the required consistency.”</p>
+    </blockquote>
+    <hr>
+    <h2 id="official-references">Official references</h2>
+    <ol start="1">
+        <li><strong>Redis:</strong> <a
+                href="https://redis.io/docs/latest/develop/use-cases/rate-limiter/"
+                target="_blank" rel="noopener">Rate limiter use case</a> — why
+            shared state is needed and supported algorithm types.
+        </li>
+        <li><strong>Redis:</strong> <a
+                href="https://redis.io/docs/latest/develop/programmability/eval-intro/"
+                target="_blank" rel="noopener">Scripting with Lua</a> — atomic
+            execution and script caching behavior.
+        </li>
+        <li><strong>Redis:</strong> <a
+                href="https://redis.io/docs/latest/operate/oss<em>and</em>stack/reference/cluster-spec/"
+                target="_blank" rel="noopener">Redis Cluster specification</a> —
+            sharding, failover, and asynchronous replication.
+        </li>
+        <li><strong>Redis:</strong> <a
+                href="https://redis.io/docs/latest/commands/TIME/"
+                target="_blank" rel="noopener">TIME command</a> — server time
+            used for refill calculations.
+        </li>
+        <li><strong>IETF RFC 6585:</strong> <a
+                href="https://www.rfc-editor.org/rfc/rfc6585.html#section-4"
+                target="_blank" rel="noopener">HTTP 429 Too Many Requests</a> —
+            response status and optional <code>Retry-After</code>.
+        </li>
+    </ol>
+</main>
+</body>
+</html>

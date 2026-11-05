@@ -175,7 +175,7 @@ Instead, precompute frequently needed features.
 Use a low-latency online store for scoring and a historical store for model
 training.
 
-AWS SageMaker Feature Store, for example, distinguishes 
+AWS SageMaker Feature Store, for example, distinguishes
 online low-latency feature access from offline historical feature storage.
 
 **Important limitation:** Stream-updated features can lag behind the latest

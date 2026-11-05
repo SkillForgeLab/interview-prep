@@ -1,400 +1,947 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>System Design Interview — Architecture Fundamentals Primer</title><style>
-/* The original PDF skill style sheet is embedded below. */
-/* Architect's Field Notes — original study-guide design recreation.
-   Standalone builder embeds this file into its generated HTML. */
-:root {
-  --navy: #112c3a;
-  --header: #193a4b;
-  --ink: #273944;
-  --heading: #17313e;
-  --muted: #75838d;
-  --line: #d9e2e7;
-  --zebra: #f6f8f9;
-  --accent: #64c8e6;
-  --accent-soft: #eaf8fc;
-}
-@page {
-  size: A4;
-  margin: 19mm 19mm 19mm;
-  @top-left {
-    content: "INTERVIEW / FIELD GUIDE";
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .05em;
-    vertical-align: middle;
-  }
-  @top-right {
-    content: string(running-topic);
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .02em;
-    vertical-align: middle;
-  }
-  @bottom-left {
-    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
-    color: #9aa5ae;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 6.3pt;
-    letter-spacing: .03em;
-    vertical-align: middle;
-  }
-  @bottom-right {
-    content: counter(page, decimal-leading-zero);
-    color: #394b56;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-weight: 700;
-    font-size: 7pt;
-    vertical-align: middle;
-  }
-}
-@page cover {
-  size: A4;
-  margin: 0;
-  @top-left { content: none; }
-  @top-right { content: none; }
-  @bottom-left { content: none; }
-  @bottom-right { content: none; }
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: "Inter", "DejaVu Sans", sans-serif;
-  font-size: 9.4pt;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--ink);
-  background: #fff;
-  overflow-wrap: break-word;
-}
-.cover {
-  page: cover;
-  break-after: page;
-  height: 297mm;
-  width: 210mm;
-  overflow: hidden;
-  position: relative;
-  background: var(--navy);
-  color: #fff;
-  padding: 29.6mm 26mm;
-}
-.cover::before, .cover::after {
-  content: "";
-  position: absolute;
-  border: .55pt solid rgba(255,255,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
-.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
-.cover-brand {
-  font-size: 9.5pt;
-  font-weight: 800;
-  letter-spacing: .31em;
-  text-transform: uppercase;
-  color: #dceaf0;
-}
-.cover-series {
-  font-size: 8pt;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #98b3c1;
-  margin-top: 7mm;
-}
-.cover-accent-bar {
-  position: absolute;
-  left: 26mm; top: 80mm;
-  height: 3.5mm; width: 21mm;
-  background: var(--accent);
-}
-.cover-title {
-  position: absolute;
-  left: 25.5mm; right: 25mm; top: 97mm;
-  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
-  font-size: 42pt;
-  font-weight: 800;
-  letter-spacing: -.043em;
-  line-height: 1.08;
-  color: #fff;
-}
-.cover-title .second { display: block; color: var(--accent); }
-.cover-title.long { font-size: 37pt; }
-.cover-sub {
-  position: absolute;
-  left: 26mm; right: 31mm; top: 173.5mm;
-  color: #bdcdd5;
-  font-size: 11.5pt;
-  line-height: 1.7;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.cover-note {
-  color: #91aab7;
-  text-transform: none;
-  font-size: 9pt;
-  letter-spacing: .01em;
-  margin-top: 7mm;
-  line-height: 1.6;
-}
-.cover-bottom {
-  position: absolute;
-  bottom: 31mm; left: 26mm;
-  font-size: 7.8pt;
-  line-height: 1.9;
-  letter-spacing: .065em;
-  color: #cfdae0;
-}
-.cover-rule {
-  position: absolute;
-  bottom: 62mm; height: .35pt;
-  left: 26mm; right: 26mm;
-  background: rgba(255,255,255,.15);
-}
-.cover-number {
-  position: absolute;
-  bottom: 29mm; right: 26mm;
-  color: var(--accent);
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 39pt;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-/* Introduction + automatically generated navigable contents. */
-.preface { break-after: page; }
-.preface-label, .toc-overline {
-  color: var(--accent);
-  font-size: 7.6pt;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-top: 0;
-}
-.preface h1 { display: none; }
-.preface h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 14pt;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.02em;
-  color: var(--heading);
-  margin: 5mm 0 5mm;
-  border-bottom: .5pt solid var(--line);
-  padding-bottom: 2.5mm;
-}
-.preface p { font-size: 9.5pt; line-height: 1.6; }
-.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
-.toc h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 21pt;
-  letter-spacing: -.03em;
-  margin: 2mm 0 5mm;
-  border: 0;
-  padding: 0;
-}
-.toc ol { list-style: none; margin: 0; padding: 0; }
-.toc li {
-  display: flex;
-  align-items: baseline;
-  gap: 5mm;
-  font-size: 9.1pt;
-  padding: 2.7mm 1mm;
-  border-top: .5pt solid #e7ecef;
-  break-inside: avoid;
-}
-.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
-.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
-.toc a { color: var(--ink); text-decoration: none; }
-/* Continuous editorial body: sections can flow across pages. */
-.content { padding: 0; }
-.content h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 17.2pt;
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1.28;
-  letter-spacing: -.024em;
-  margin: 11mm 0 5mm;
-  padding-top: 5.5mm;
-  border-top: .6pt solid var(--line);
-  break-after: avoid;
-}
-.content h2::before {
-  content: "CHAPTER";
-  display: block;
-  color: var(--accent);
-  font-size: 7pt;
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-bottom: 2.2mm;
-}
-.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
-.content h3 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 11.6pt;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -.012em;
-  color: var(--heading);
-  margin: 7mm 0 2.5mm;
-  break-after: avoid;
-}
-.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
-p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
-strong, b { font-weight: 700; color: #1a3341; }
-a { color: #23778e; text-decoration: none; }
-hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
-ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
-li { padding-left: .5mm; margin: 1.5mm 0; }
-li::marker { color: var(--accent); }
-li p { margin: 0; }
-blockquote {
-  background: var(--accent-soft);
-  border-left: 2.5pt solid var(--accent);
-  margin: 4mm 0 6mm;
-  padding: 4mm 5.2mm;
-  color: #2b4654;
-  font-size: 9.4pt;
-  line-height: 1.56;
-}
-blockquote p { margin-bottom: 2.3mm; }
-blockquote p:last-child { margin-bottom: 0; }
-blockquote strong { color: #143743; }
-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  font-size: 8pt;
-  line-height: 1.42;
-  color: var(--ink);
-  margin: 3.6mm 0 4.8mm;
-  overflow-wrap: anywhere;
-}
-thead { display: table-header-group; }
-thead th {
-  background: var(--header);
-  color: #fff;
-  text-align: left;
-  font-weight: 700;
-  padding: 2.2mm 2.4mm;
-  vertical-align: top;
-  border-right: 1pt solid rgba(255,255,255,.04);
-}
-thead th strong { color: #fff; }
-tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
-tbody tr:nth-child(even) { background: var(--zebra); }
-tr { break-inside: avoid; }
-table.wide { font-size: 7.15pt; }
-table.wide th, table.wide td { padding: 1.8mm; }
-code {
-  font-family: "DejaVu Sans Mono", monospace;
-  font-size: .91em;
-  color: #22445a;
-}
-pre {
-  color: #dce9f0;
-  background: #173746;
-  padding: 4mm 5mm;
-  font-size: 8.3pt;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin: 4mm 0;
-}
-pre code { color: inherit; }
-.task-list-item { list-style: none; margin-left: -5mm; }
-.task-box {
-  display: inline-block;
-  border: .85pt solid #7b8b93;
-  width: 2.6mm; height: 2.6mm;
-  margin-right: 3mm;
-  vertical-align: baseline;
-}
-.task-box.checked { background: var(--accent); border-color: var(--accent); }
-img { max-width: 100%; height: auto; }
-.caption { color: var(--muted); font-size: 7.8pt; }
-@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>System Design Interview — Architecture Fundamentals Primer</title>
+    <style>
+        /* The original PDF skill style sheet is embedded below. */
+        /* Architect's Field Notes — original study-guide design recreation.
+           Standalone builder embeds this file into its generated HTML. */
+        :root {
+            --navy: #112c3a;
+            --header: #193a4b;
+            --ink: #273944;
+            --heading: #17313e;
+            --muted: #75838d;
+            --line: #d9e2e7;
+            --zebra: #f6f8f9;
+            --accent: #64c8e6;
+            --accent-soft: #eaf8fc;
+        }
+
+        @page {
+            size: A4;
+            margin: 19mm 19mm 19mm;
+            @top-left {
+                content: "INTERVIEW / FIELD GUIDE";
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .05em;
+                vertical-align: middle;
+            }
+            @top-right {
+                content: string(running-topic);
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .02em;
+                vertical-align: middle;
+            }
+            @bottom-left {
+                content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+                color: #9aa5ae;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 6.3pt;
+                letter-spacing: .03em;
+                vertical-align: middle;
+            }
+            @bottom-right {
+                content: counter(page, decimal-leading-zero);
+                color: #394b56;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-weight: 700;
+                font-size: 7pt;
+                vertical-align: middle;
+            }
+        }
+
+        @page cover {
+            size: A4;
+            margin: 0;
+            @top-left {
+                content: none;
+            }
+            @top-right {
+                content: none;
+            }
+            @bottom-left {
+                content: none;
+            }
+            @bottom-right {
+                content: none;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", "DejaVu Sans", sans-serif;
+            font-size: 9.4pt;
+            font-weight: 400;
+            line-height: 1.55;
+            color: var(--ink);
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        .cover {
+            page: cover;
+            break-after: page;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy);
+            color: #fff;
+            padding: 29.6mm 26mm;
+        }
+
+        .cover::before, .cover::after {
+            content: "";
+            position: absolute;
+            border: .55pt solid rgba(255, 255, 255, .08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover::before {
+            width: 158mm;
+            height: 158mm;
+            right: -84mm;
+            top: -61mm;
+        }
+
+        .cover::after {
+            width: 108mm;
+            height: 108mm;
+            right: -28mm;
+            bottom: -75mm;
+        }
+
+        .cover-brand {
+            font-size: 9.5pt;
+            font-weight: 800;
+            letter-spacing: .31em;
+            text-transform: uppercase;
+            color: #dceaf0;
+        }
+
+        .cover-series {
+            font-size: 8pt;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #98b3c1;
+            margin-top: 7mm;
+        }
+
+        .cover-accent-bar {
+            position: absolute;
+            left: 26mm;
+            top: 80mm;
+            height: 3.5mm;
+            width: 21mm;
+            background: var(--accent);
+        }
+
+        .cover-title {
+            position: absolute;
+            left: 25.5mm;
+            right: 25mm;
+            top: 97mm;
+            font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -.043em;
+            line-height: 1.08;
+            color: #fff;
+        }
+
+        .cover-title .second {
+            display: block;
+            color: var(--accent);
+        }
+
+        .cover-title.long {
+            font-size: 37pt;
+        }
+
+        .cover-sub {
+            position: absolute;
+            left: 26mm;
+            right: 31mm;
+            top: 173.5mm;
+            color: #bdcdd5;
+            font-size: 11.5pt;
+            line-height: 1.7;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .cover-note {
+            color: #91aab7;
+            text-transform: none;
+            font-size: 9pt;
+            letter-spacing: .01em;
+            margin-top: 7mm;
+            line-height: 1.6;
+        }
+
+        .cover-bottom {
+            position: absolute;
+            bottom: 31mm;
+            left: 26mm;
+            font-size: 7.8pt;
+            line-height: 1.9;
+            letter-spacing: .065em;
+            color: #cfdae0;
+        }
+
+        .cover-rule {
+            position: absolute;
+            bottom: 62mm;
+            height: .35pt;
+            left: 26mm;
+            right: 26mm;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .cover-number {
+            position: absolute;
+            bottom: 29mm;
+            right: 26mm;
+            color: var(--accent);
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 39pt;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        /* Introduction + automatically generated navigable contents. */
+        .preface {
+            break-after: page;
+        }
+
+        .preface-label, .toc-overline {
+            color: var(--accent);
+            font-size: 7.6pt;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .preface h1 {
+            display: none;
+        }
+
+        .preface h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 14pt;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -.02em;
+            color: var(--heading);
+            margin: 5mm 0 5mm;
+            border-bottom: .5pt solid var(--line);
+            padding-bottom: 2.5mm;
+        }
+
+        .preface p {
+            font-size: 9.5pt;
+            line-height: 1.6;
+        }
+
+        .toc {
+            border-top: .5pt solid var(--line);
+            margin-top: 8mm;
+            padding-top: 6.5mm;
+        }
+
+        .toc h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 21pt;
+            letter-spacing: -.03em;
+            margin: 2mm 0 5mm;
+            border: 0;
+            padding: 0;
+        }
+
+        .toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            gap: 5mm;
+            font-size: 9.1pt;
+            padding: 2.7mm 1mm;
+            border-top: .5pt solid #e7ecef;
+            break-inside: avoid;
+        }
+
+        .toc li:last-child {
+            border-bottom: .5pt solid #e7ecef;
+        }
+
+        .toc .toc-num {
+            width: 8mm;
+            flex: 0 0 8mm;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .toc a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        /* Continuous editorial body: sections can flow across pages. */
+        .content {
+            padding: 0;
+        }
+
+        .content h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 17.2pt;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.28;
+            letter-spacing: -.024em;
+            margin: 11mm 0 5mm;
+            padding-top: 5.5mm;
+            border-top: .6pt solid var(--line);
+            break-after: avoid;
+        }
+
+        .content h2::before {
+            content: "CHAPTER";
+            display: block;
+            color: var(--accent);
+            font-size: 7pt;
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .19em;
+            margin-bottom: 2.2mm;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 11.6pt;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -.012em;
+            color: var(--heading);
+            margin: 7mm 0 2.5mm;
+            break-after: avoid;
+        }
+
+        .content h4, .preface h3 {
+            font-size: 10pt;
+            color: var(--heading);
+            margin: 5mm 0 2mm;
+            break-after: avoid;
+        }
+
+        p {
+            margin: 0 0 3.15mm;
+            orphans: 2;
+            widows: 2;
+        }
+
+        strong, b {
+            font-weight: 700;
+            color: #1a3341;
+        }
+
+        a {
+            color: #23778e;
+            text-decoration: none;
+        }
+
+        hr {
+            height: 0;
+            border: none;
+            border-top: .55pt solid #d9e2e7;
+            margin: 7mm 0;
+        }
+
+        ul, ol {
+            margin: 2.5mm 0 4mm;
+            padding-left: 6mm;
+        }
+
+        li {
+            padding-left: .5mm;
+            margin: 1.5mm 0;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        li p {
+            margin: 0;
+        }
+
+        blockquote {
+            background: var(--accent-soft);
+            border-left: 2.5pt solid var(--accent);
+            margin: 4mm 0 6mm;
+            padding: 4mm 5.2mm;
+            color: #2b4654;
+            font-size: 9.4pt;
+            line-height: 1.56;
+        }
+
+        blockquote p {
+            margin-bottom: 2.3mm;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        blockquote strong {
+            color: #143743;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            font-size: 8pt;
+            line-height: 1.42;
+            color: var(--ink);
+            margin: 3.6mm 0 4.8mm;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        thead th {
+            background: var(--header);
+            color: #fff;
+            text-align: left;
+            font-weight: 700;
+            padding: 2.2mm 2.4mm;
+            vertical-align: top;
+            border-right: 1pt solid rgba(255, 255, 255, .04);
+        }
+
+        thead th strong {
+            color: #fff;
+        }
+
+        tbody td {
+            border-bottom: .35pt solid #e3e9ed;
+            padding: 2.3mm 2.4mm;
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--zebra);
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        table.wide {
+            font-size: 7.15pt;
+        }
+
+        table.wide th, table.wide td {
+            padding: 1.8mm;
+        }
+
+        code {
+            font-family: "DejaVu Sans Mono", monospace;
+            font-size: .91em;
+            color: #22445a;
+        }
+
+        pre {
+            color: #dce9f0;
+            background: #173746;
+            padding: 4mm 5mm;
+            font-size: 8.3pt;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 4mm 0;
+        }
+
+        pre code {
+            color: inherit;
+        }
+
+        .task-list-item {
+            list-style: none;
+            margin-left: -5mm;
+        }
+
+        .task-box {
+            display: inline-block;
+            border: .85pt solid #7b8b93;
+            width: 2.6mm;
+            height: 2.6mm;
+            margin-right: 3mm;
+            vertical-align: baseline;
+        }
+
+        .task-box.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 7.8pt;
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 25px #ddd;
+            }
+        }
 
 
-:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"SYSTEM DESIGN INTERVIEW — ARCHITECTURE FUNDAMENTALS PRIMER";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
-@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 01 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title long">System Design Interview —<span class="second">Architecture Fundamentals Primer</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">01</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>American Express · Solution Architect · Module 1</strong></p>
-<p><strong>Purpose:</strong> Learn the essential concepts and architectural decisions before studying the system design examples.</p>
-<p>This primer focuses on <strong>why we choose a design</strong>, not memorizing definitions. We use payment processing as the running example.</p><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-the-most-important-principle">1. The most important principle</a></li><li><span class="toc-num">02</span><a href="#2-start-with-requirements">2. Start with requirements</a></li><li><span class="toc-num">03</span><a href="#3-build-the-simplest-correct-architecture">3. Build the simplest correct architecture</a></li><li><span class="toc-num">04</span><a href="#4-capacity-estimation-enough-to-guide-decisions">4. Capacity estimation — enough to guide decisions</a></li><li><span class="toc-num">05</span><a href="#5-api-and-service-communication">5. API and service communication</a></li><li><span class="toc-num">06</span><a href="#6-database-selection-sql-vs-nosql">6. Database selection — SQL vs. NoSQL</a></li><li><span class="toc-num">07</span><a href="#7-reliability-patterns-you-must-recognize">7. Reliability patterns you must recognize</a></li><li><span class="toc-num">08</span><a href="#8-distributed-transactions-the-highest-value-patterns">8. Distributed transactions: the highest-value patterns</a></li><li><span class="toc-num">09</span><a href="#9-scaling-how-to-reason-about-bottlenecks">9. Scaling: how to reason about bottlenecks</a></li><li><span class="toc-num">10</span><a href="#10-message-queue-vs-event-streaming">10. Message queue vs. event streaming</a></li><li><span class="toc-num">11</span><a href="#11-single-region-vs-multi-region-architecture">11. Single-region vs. multi-region architecture</a></li><li><span class="toc-num">12</span><a href="#12-security-is-an-architectural-constraint">12. Security is an architectural constraint</a></li><li><span class="toc-num">13</span><a href="#13-observability-and-operational-readiness">13. Observability and operational readiness</a></li><li><span class="toc-num">14</span><a href="#14-architecture-choice-cheat-sheet">14. Architecture choice cheat sheet</a></li><li><span class="toc-num">15</span><a href="#15-put-everything-together-payment-api-design">15. Put everything together: payment API design</a></li><li><span class="toc-num">16</span><a href="#16-what-distinguishes-a-solution-architect-answer">16. What distinguishes a Solution Architect answer</a></li><li><span class="toc-num">17</span><a href="#17-the-mental-model-to-remember">17. The mental model to remember</a></li><li><span class="toc-num">18</span><a href="#official-references-for-further-reading">Official references for further reading</a></li></ol></nav></section><main class="content"><h2 id="1-the-most-important-principle">1. The most important principle</h2>
-<p><strong>System design is about making trade-offs under constraints.</strong></p>
-<p>There is no universally best database, communication protocol, architecture, or cloud service.</p>
-<p>Consider three requirements:</p>
-<table><thead><tr><th>Requirement</th><th>Architectural implication</th></tr></thead><tbody><tr><td>Payment must not be processed twice</td><td>Idempotency, uniqueness, transaction state</td></tr><tr><td>Dashboard must display millions of transactions quickly</td><td>Read replicas, indexing, caching, analytical stores</td></tr><tr><td>Customer must receive a payment notification</td><td>Asynchronous messaging, retries</td></tr></tbody></table>
-<p>All three involve transaction data, but they need different solutions.</p>
-<p>A common interview mistake is starting with technology:</p>
-<blockquote><p>"I'll use microservices, Kafka, Redis, and PostgreSQL."</p></blockquote>
-<p>A better approach is:</p>
-<blockquote><p>"We need transactional correctness for payments, so I'll start with a relational database and atomic state transitions. Notifications can be asynchronous because they do not affect the payment decision."</p></blockquote>
-<p><strong>The requirement should justify the technology, not the other way around.</strong></p>
-<hr>
-<h2 id="2-start-with-requirements">2. Start with requirements</h2>
-<p>Before designing, separate three things.</p>
-<h3 id="a-functional-requirements">A. Functional requirements</h3>
-<p>What must the system do?</p>
-<p>For payment authorization:</p>
-<ul><li>Accept an authorization request.</li><li>Validate the request and customer/payment context.</li><li>Check applicable risk, account, and authorization rules.</li><li>Produce an authorization decision.</li><li>Store the transaction state.</li><li>Support duplicate requests and status lookup.</li></ul>
-<h3 id="b-non-functional-requirements-nfrs">B. Non-functional requirements (NFRs)</h3>
-<p>How well must the system operate?</p>
-<table><thead><tr><th>NFR</th><th>What it means</th><th>Design impact</th></tr></thead><tbody><tr><td>Latency</td><td>How quickly must the system respond?</td><td>Avoid slow calls in critical path</td></tr><tr><td>Availability</td><td>How often must service be usable?</td><td>Redundancy, failover</td></tr><tr><td>Scalability</td><td>Can it handle growing traffic?</td><td>Horizontal scaling, partitioning</td></tr><tr><td>Consistency</td><td>How fresh and correct must data be?</td><td>Transactions, synchronization</td></tr><tr><td>Durability</td><td>Must data survive failures?</td><td>Durable storage, recovery</td></tr><tr><td>Security</td><td>Who can access sensitive data?</td><td>IAM, encryption, isolation</td></tr><tr><td>Reliability</td><td>Can it operate correctly despite failures?</td><td>Retries, idempotency, recovery</td></tr><tr><td>Cost</td><td>What resources can the business afford?</td><td>Simplicity, managed services, capacity decisions</td></tr><tr><td>Maintainability</td><td>Can teams change it safely?</td><td>Clear boundaries, testing, observability</td></tr></tbody></table>
-<h3 id="c-business-invariants">C. Business invariants</h3>
-<p>An <strong>invariant</strong> is a rule that must remain true even when requests arrive concurrently or systems fail.</p>
-<p>Examples:</p>
-<ul><li>The same logical payment must not create two successful charges.</li><li>A financial ledger must remain balanced.</li><li>A ticket cannot be allocated to two customers.</li><li>A completed refund cannot exceed the eligible amount.</li></ul>
-<p>These rules are more important than individual technologies.</p>
-<p><strong>Design rule:</strong> Identify the invariants first. Then determine where they must be enforced.</p>
-<hr>
-<h2 id="3-build-the-simplest-correct-architecture">3. Build the simplest correct architecture</h2>
-<p>Start with a baseline, not a large distributed system.</p>
-<pre><code>              Client
+        :root {
+            --accent: #64C8E6;
+            --accent-soft: #EAF8FC;
+        }
+
+        @page {
+            @top-right {
+                content: "SYSTEM DESIGN INTERVIEW — ARCHITECTURE FUNDAMENTALS PRIMER";
+            }@bottom-left {
+            content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+        }
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 20px #dce2e6;
+            }
+        }</style>
+</head>
+<body>
+<section class="cover">
+    <div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div>
+    <div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 01
+        OF 07
+    </div>
+    <div class="cover-accent-bar"></div>
+    <div class="cover-title long">System Design Interview —<span class="second">Architecture Fundamentals Primer</span>
+    </div>
+    <div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH
+        CONFIDENCE.
+        <div class="cover-note">Evidence-based STAR answers, senior-level
+            judgment, and focused interview rehearsal.
+        </div>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT
+        INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE
+    </div>
+    <div class="cover-number">01</div>
+</section>
+<section class="preface">
+    <div class="preface-label">YOUR STUDY COMPANION</div>
+    <p><strong>American Express · Solution Architect · Module 1</strong></p>
+    <p><strong>Purpose:</strong> Learn the essential concepts and architectural
+        decisions before studying the system design examples.</p>
+    <p>This primer focuses on <strong>why we choose a design</strong>, not
+        memorizing definitions. We use payment processing as the running
+        example.</p>
+    <nav class="toc">
+        <div class="toc-overline">NAVIGATION</div>
+        <h2>Inside this guide</h2>
+        <ol>
+            <li><span class="toc-num">01</span><a
+                    href="#1-the-most-important-principle">1. The most important
+                principle</a></li>
+            <li><span class="toc-num">02</span><a
+                    href="#2-start-with-requirements">2. Start with
+                requirements</a></li>
+            <li><span class="toc-num">03</span><a
+                    href="#3-build-the-simplest-correct-architecture">3. Build
+                the simplest correct architecture</a></li>
+            <li><span class="toc-num">04</span><a
+                    href="#4-capacity-estimation-enough-to-guide-decisions">4.
+                Capacity estimation — enough to guide decisions</a></li>
+            <li><span class="toc-num">05</span><a
+                    href="#5-api-and-service-communication">5. API and service
+                communication</a></li>
+            <li><span class="toc-num">06</span><a
+                    href="#6-database-selection-sql-vs-nosql">6. Database
+                selection — SQL vs. NoSQL</a></li>
+            <li><span class="toc-num">07</span><a
+                    href="#7-reliability-patterns-you-must-recognize">7.
+                Reliability patterns you must recognize</a></li>
+            <li><span class="toc-num">08</span><a
+                    href="#8-distributed-transactions-the-highest-value-patterns">8.
+                Distributed transactions: the highest-value patterns</a></li>
+            <li><span class="toc-num">09</span><a
+                    href="#9-scaling-how-to-reason-about-bottlenecks">9.
+                Scaling: how to reason about bottlenecks</a></li>
+            <li><span class="toc-num">10</span><a
+                    href="#10-message-queue-vs-event-streaming">10. Message
+                queue vs. event streaming</a></li>
+            <li><span class="toc-num">11</span><a
+                    href="#11-single-region-vs-multi-region-architecture">11.
+                Single-region vs. multi-region architecture</a></li>
+            <li><span class="toc-num">12</span><a
+                    href="#12-security-is-an-architectural-constraint">12.
+                Security is an architectural constraint</a></li>
+            <li><span class="toc-num">13</span><a
+                    href="#13-observability-and-operational-readiness">13.
+                Observability and operational readiness</a></li>
+            <li><span class="toc-num">14</span><a
+                    href="#14-architecture-choice-cheat-sheet">14. Architecture
+                choice cheat sheet</a></li>
+            <li><span class="toc-num">15</span><a
+                    href="#15-put-everything-together-payment-api-design">15.
+                Put everything together: payment API design</a></li>
+            <li><span class="toc-num">16</span><a
+                    href="#16-what-distinguishes-a-solution-architect-answer">16.
+                What distinguishes a Solution Architect answer</a></li>
+            <li><span class="toc-num">17</span><a
+                    href="#17-the-mental-model-to-remember">17. The mental model
+                to remember</a></li>
+            <li><span class="toc-num">18</span><a
+                    href="#official-references-for-further-reading">Official
+                references for further reading</a></li>
+        </ol>
+    </nav>
+</section>
+<main class="content"><h2 id="1-the-most-important-principle">1. The most
+    important principle</h2>
+    <p><strong>System design is about making trade-offs under
+        constraints.</strong></p>
+    <p>There is no universally best database, communication protocol,
+        architecture, or cloud service.</p>
+    <p>Consider three requirements:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>Architectural implication</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Payment must not be processed twice</td>
+            <td>Idempotency, uniqueness, transaction state</td>
+        </tr>
+        <tr>
+            <td>Dashboard must display millions of transactions quickly</td>
+            <td>Read replicas, indexing, caching, analytical stores</td>
+        </tr>
+        <tr>
+            <td>Customer must receive a payment notification</td>
+            <td>Asynchronous messaging, retries</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>All three involve transaction data, but they need different
+        solutions.</p>
+    <p>A common interview mistake is starting with technology:</p>
+    <blockquote><p>"I'll use microservices, Kafka, Redis, and PostgreSQL."</p>
+    </blockquote>
+    <p>A better approach is:</p>
+    <blockquote><p>"We need transactional correctness for payments, so I'll
+        start with a relational database and atomic state transitions.
+        Notifications can be asynchronous because they do not affect the payment
+        decision."</p></blockquote>
+    <p><strong>The requirement should justify the technology, not the other way
+        around.</strong></p>
+    <hr>
+    <h2 id="2-start-with-requirements">2. Start with requirements</h2>
+    <p>Before designing, separate three things.</p>
+    <h3 id="a-functional-requirements">A. Functional requirements</h3>
+    <p>What must the system do?</p>
+    <p>For payment authorization:</p>
+    <ul>
+        <li>Accept an authorization request.</li>
+        <li>Validate the request and customer/payment context.</li>
+        <li>Check applicable risk, account, and authorization rules.</li>
+        <li>Produce an authorization decision.</li>
+        <li>Store the transaction state.</li>
+        <li>Support duplicate requests and status lookup.</li>
+    </ul>
+    <h3 id="b-non-functional-requirements-nfrs">B. Non-functional requirements
+        (NFRs)</h3>
+    <p>How well must the system operate?</p>
+    <table>
+        <thead>
+        <tr>
+            <th>NFR</th>
+            <th>What it means</th>
+            <th>Design impact</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Latency</td>
+            <td>How quickly must the system respond?</td>
+            <td>Avoid slow calls in critical path</td>
+        </tr>
+        <tr>
+            <td>Availability</td>
+            <td>How often must service be usable?</td>
+            <td>Redundancy, failover</td>
+        </tr>
+        <tr>
+            <td>Scalability</td>
+            <td>Can it handle growing traffic?</td>
+            <td>Horizontal scaling, partitioning</td>
+        </tr>
+        <tr>
+            <td>Consistency</td>
+            <td>How fresh and correct must data be?</td>
+            <td>Transactions, synchronization</td>
+        </tr>
+        <tr>
+            <td>Durability</td>
+            <td>Must data survive failures?</td>
+            <td>Durable storage, recovery</td>
+        </tr>
+        <tr>
+            <td>Security</td>
+            <td>Who can access sensitive data?</td>
+            <td>IAM, encryption, isolation</td>
+        </tr>
+        <tr>
+            <td>Reliability</td>
+            <td>Can it operate correctly despite failures?</td>
+            <td>Retries, idempotency, recovery</td>
+        </tr>
+        <tr>
+            <td>Cost</td>
+            <td>What resources can the business afford?</td>
+            <td>Simplicity, managed services, capacity decisions</td>
+        </tr>
+        <tr>
+            <td>Maintainability</td>
+            <td>Can teams change it safely?</td>
+            <td>Clear boundaries, testing, observability</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="c-business-invariants">C. Business invariants</h3>
+    <p>An <strong>invariant</strong> is a rule that must remain true even when
+        requests arrive concurrently or systems fail.</p>
+    <p>Examples:</p>
+    <ul>
+        <li>The same logical payment must not create two successful charges.
+        </li>
+        <li>A financial ledger must remain balanced.</li>
+        <li>A ticket cannot be allocated to two customers.</li>
+        <li>A completed refund cannot exceed the eligible amount.</li>
+    </ul>
+    <p>These rules are more important than individual technologies.</p>
+    <p><strong>Design rule:</strong> Identify the invariants first. Then
+        determine where they must be enforced.</p>
+    <hr>
+    <h2 id="3-build-the-simplest-correct-architecture">3. Build the simplest
+        correct architecture</h2>
+    <p>Start with a baseline, not a large distributed system.</p>
+    <pre><code>              Client
                  |
                  v
             API Service
                  |
                  v
             Database</code></pre>
-<p>This is a valid starting point.</p>
-<p>Why?</p>
-<ul><li>Fewer moving parts.</li><li>Simple deployment and debugging.</li><li>Database transactions can enforce critical rules.</li><li>Lower infrastructure complexity.</li></ul>
-<p>Now introduce requirements that force changes.</p>
-<table><thead><tr><th>If you need...</th><th>Consider...</th><th>Why</th></tr></thead><tbody><tr><td>Higher availability</td><td>Redundant application instances and load balancing</td><td>Survive individual instance failures</td></tr><tr><td>Faster repeated reads</td><td>Cache for data that can safely be stale</td><td>Reduce repeated database work</td></tr><tr><td>Slow noncritical work</td><td>Asynchronous processing with a queue</td><td>Keep background work off the critical path</td></tr><tr><td>More database capacity</td><td>Query optimization, replicas, partitioning, then possibly sharding</td><td>Address measured bottlenecks</td></tr><tr><td>Independent business ownership</td><td>Services separated along business boundaries</td><td>Support independent change and operations</td></tr></tbody></table>
-<p><strong>Key lesson:</strong> Every extra component adds operational cost and possible failure modes. Add it to solve a demonstrated requirement.</p>
-<hr>
-<h2 id="4-capacity-estimation-enough-to-guide-decisions">4. Capacity estimation — enough to guide decisions</h2>
-<p>You do not need perfect calculations. You need estimates that reveal likely bottlenecks.</p>
-<h3 id="four-quantities-matter">Four quantities matter</h3>
-<table><thead><tr><th>Metric</th><th>Why it matters</th></tr></thead><tbody><tr><td>Average requests per second (RPS)</td><td>Normal application load</td></tr><tr><td>Peak RPS</td><td>Capacity needed during spikes</td></tr><tr><td>Data volume and retention</td><td>Storage size and growth</td></tr><tr><td>Read/write ratio</td><td>Caching, replication, and database selection</td></tr></tbody></table>
-<p>Suppose a payment system expects a <strong>hypothetical</strong> peak of 10,000 requests per second.</p>
-<p>Questions to derive:</p>
-<ul><li>Can one service instance process this traffic while meeting latency targets?</li><li>How many database operations does each request generate?</li><li>Are all requests writes, or can some use cached/read-only data?</li><li>Will the database sustain the resulting write throughput?</li><li>How much historical data must stay in the primary database?</li><li>What happens if traffic doubles or a region fails?</li></ul>
-<h3 id="littles-law">Little's Law</h3>
-<p>For a stable system:</p>
-<p>$$ L = \lambda W $$</p>
-<p>Where:</p>
-<ul><li>$L$ = average concurrent requests.</li><li>$\lambda$ = average request arrival rate.</li><li>$W$ = average time each request spends in the system.</li></ul>
-<p>This helps estimate concurrency and resource requirements.</p>
-<p>A critical distinction: <strong>Average capacity does not guarantee acceptable tail latency.</strong> Even if most requests are fast, the slowest few percent can severely affect user experience.</p>
-<p>So we normally discuss p95 or p99 latency, not only the average.</p>
-<p><em>The figures above are illustrative, not American Express production requirements.</em></p>
-<hr>
-<h2 id="5-api-and-service-communication">5. API and service communication</h2>
-<p>Three communication approaches appear repeatedly in system design.</p>
-<table><thead><tr><th>Approach</th><th>Best suited for</th><th>Trade-off</th></tr></thead><tbody><tr><td>REST/HTTP</td><td>Public APIs, CRUD, partner integration</td><td>Simple, widely supported, but commonly synchronous</td></tr><tr><td>gRPC</td><td>Internal service-to-service requests</td><td>Efficient contracts, but more tooling and integration constraints</td></tr><tr><td>Events/messages</td><td>Background processing and decoupled services</td><td>Better isolation, but eventual consistency and operational complexity</td></tr></tbody></table>
-<h3 id="synchronous-communication">Synchronous communication</h3>
-<pre><code>Payment API ---&gt; Fraud Service
+    <p>This is a valid starting point.</p>
+    <p>Why?</p>
+    <ul>
+        <li>Fewer moving parts.</li>
+        <li>Simple deployment and debugging.</li>
+        <li>Database transactions can enforce critical rules.</li>
+        <li>Lower infrastructure complexity.</li>
+    </ul>
+    <p>Now introduce requirements that force changes.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>If you need...</th>
+            <th>Consider...</th>
+            <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Higher availability</td>
+            <td>Redundant application instances and load balancing</td>
+            <td>Survive individual instance failures</td>
+        </tr>
+        <tr>
+            <td>Faster repeated reads</td>
+            <td>Cache for data that can safely be stale</td>
+            <td>Reduce repeated database work</td>
+        </tr>
+        <tr>
+            <td>Slow noncritical work</td>
+            <td>Asynchronous processing with a queue</td>
+            <td>Keep background work off the critical path</td>
+        </tr>
+        <tr>
+            <td>More database capacity</td>
+            <td>Query optimization, replicas, partitioning, then possibly
+                sharding
+            </td>
+            <td>Address measured bottlenecks</td>
+        </tr>
+        <tr>
+            <td>Independent business ownership</td>
+            <td>Services separated along business boundaries</td>
+            <td>Support independent change and operations</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Key lesson:</strong> Every extra component adds operational cost
+        and possible failure modes. Add it to solve a demonstrated requirement.
+    </p>
+    <hr>
+    <h2 id="4-capacity-estimation-enough-to-guide-decisions">4. Capacity
+        estimation — enough to guide decisions</h2>
+    <p>You do not need perfect calculations. You need estimates that reveal
+        likely bottlenecks.</p>
+    <h3 id="four-quantities-matter">Four quantities matter</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Why it matters</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Average requests per second (RPS)</td>
+            <td>Normal application load</td>
+        </tr>
+        <tr>
+            <td>Peak RPS</td>
+            <td>Capacity needed during spikes</td>
+        </tr>
+        <tr>
+            <td>Data volume and retention</td>
+            <td>Storage size and growth</td>
+        </tr>
+        <tr>
+            <td>Read/write ratio</td>
+            <td>Caching, replication, and database selection</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Suppose a payment system expects a <strong>hypothetical</strong> peak of
+        10,000 requests per second.</p>
+    <p>Questions to derive:</p>
+    <ul>
+        <li>Can one service instance process this traffic while meeting latency
+            targets?
+        </li>
+        <li>How many database operations does each request generate?</li>
+        <li>Are all requests writes, or can some use cached/read-only data?</li>
+        <li>Will the database sustain the resulting write throughput?</li>
+        <li>How much historical data must stay in the primary database?</li>
+        <li>What happens if traffic doubles or a region fails?</li>
+    </ul>
+    <h3 id="littles-law">Little's Law</h3>
+    <p>For a stable system:</p>
+    <p>$$ L = \lambda W $$</p>
+    <p>Where:</p>
+    <ul>
+        <li>$L$ = average concurrent requests.</li>
+        <li>$\lambda$ = average request arrival rate.</li>
+        <li>$W$ = average time each request spends in the system.</li>
+    </ul>
+    <p>This helps estimate concurrency and resource requirements.</p>
+    <p>A critical distinction: <strong>Average capacity does not guarantee
+        acceptable tail latency.</strong> Even if most requests are fast, the
+        slowest few percent can severely affect user experience.</p>
+    <p>So we normally discuss p95 or p99 latency, not only the average.</p>
+    <p><em>The figures above are illustrative, not American Express production
+        requirements.</em></p>
+    <hr>
+    <h2 id="5-api-and-service-communication">5. API and service
+        communication</h2>
+    <p>Three communication approaches appear repeatedly in system design.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Approach</th>
+            <th>Best suited for</th>
+            <th>Trade-off</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>REST/HTTP</td>
+            <td>Public APIs, CRUD, partner integration</td>
+            <td>Simple, widely supported, but commonly synchronous</td>
+        </tr>
+        <tr>
+            <td>gRPC</td>
+            <td>Internal service-to-service requests</td>
+            <td>Efficient contracts, but more tooling and integration
+                constraints
+            </td>
+        </tr>
+        <tr>
+            <td>Events/messages</td>
+            <td>Background processing and decoupled services</td>
+            <td>Better isolation, but eventual consistency and operational
+                complexity
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="synchronous-communication">Synchronous communication</h3>
+    <pre><code>Payment API ---&gt; Fraud Service
                   |
 Payment API &lt;--- Fraud Result</code></pre>
-<p>The caller waits for a response.</p>
-<p><strong>Use when:</strong> The result is required before continuing.</p>
-<p>For example, payment authorization may need a real-time risk decision.</p>
-<p><strong>Risk:</strong> If the dependency is slow, the caller may also become slow.</p>
-<h3 id="asynchronous-communication">Asynchronous communication</h3>
-<pre><code>Payment Service
+    <p>The caller waits for a response.</p>
+    <p><strong>Use when:</strong> The result is required before continuing.</p>
+    <p>For example, payment authorization may need a real-time risk
+        decision.</p>
+    <p><strong>Risk:</strong> If the dependency is slow, the caller may also
+        become slow.</p>
+    <h3 id="asynchronous-communication">Asynchronous communication</h3>
+    <pre><code>Payment Service
        |
        v
    Message Broker
@@ -402,57 +949,188 @@ Payment API &lt;--- Fraud Result</code></pre>
        +---&gt; Notification Service
        |
        +---&gt; Analytics Service</code></pre>
-<p>The publisher does not wait for all consumers to finish.</p>
-<p><strong>Use when:</strong> Work can happen independently or later.</p>
-<p><strong>Trade-off:</strong> The system becomes eventually consistent, and the message may be delayed, duplicated, or require recovery.</p>
-<h3 id="api-design-considerations">API design considerations</h3>
-<p>A good enterprise API needs more than endpoints.</p>
-<table><thead><tr><th>Concern</th><th>Recommended approach</th></tr></thead><tbody><tr><td>Contract</td><td>Define requests, responses, errors, versions</td></tr><tr><td>Authentication</td><td>OAuth/OIDC or suitable service authentication</td></tr><tr><td>Authorization</td><td>Enforce access to resources and actions</td></tr><tr><td>Retries</td><td>Document retryable errors and backoff</td></tr><tr><td>Duplicate requests</td><td>Use idempotency keys for operations needing them</td></tr><tr><td>Long-running requests</td><td>Return an operation ID and expose status</td></tr><tr><td>Compatibility</td><td>Prefer backward-compatible API evolution</td></tr></tbody></table>
-<p>For payment creation, an idempotency key might look like:</p>
-<pre><code>POST /payments
+    <p>The publisher does not wait for all consumers to finish.</p>
+    <p><strong>Use when:</strong> Work can happen independently or later.</p>
+    <p><strong>Trade-off:</strong> The system becomes eventually consistent, and
+        the message may be delayed, duplicated, or require recovery.</p>
+    <h3 id="api-design-considerations">API design considerations</h3>
+    <p>A good enterprise API needs more than endpoints.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Concern</th>
+            <th>Recommended approach</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Contract</td>
+            <td>Define requests, responses, errors, versions</td>
+        </tr>
+        <tr>
+            <td>Authentication</td>
+            <td>OAuth/OIDC or suitable service authentication</td>
+        </tr>
+        <tr>
+            <td>Authorization</td>
+            <td>Enforce access to resources and actions</td>
+        </tr>
+        <tr>
+            <td>Retries</td>
+            <td>Document retryable errors and backoff</td>
+        </tr>
+        <tr>
+            <td>Duplicate requests</td>
+            <td>Use idempotency keys for operations needing them</td>
+        </tr>
+        <tr>
+            <td>Long-running requests</td>
+            <td>Return an operation ID and expose status</td>
+        </tr>
+        <tr>
+            <td>Compatibility</td>
+            <td>Prefer backward-compatible API evolution</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>For payment creation, an idempotency key might look like:</p>
+    <pre><code>POST /payments
 Idempotency-Key: order-123-payment-1</code></pre>
-<p>If the client retries the same logical operation, the system must not create another payment.</p>
-<p>Use a durable uniqueness constraint and persist the request identity, parameters, and result/state. A Redis cache alone is not a reliable financial deduplication boundary.</p>
-<hr>
-<h2 id="6-database-selection-sql-vs-nosql">6. Database selection — SQL vs. NoSQL</h2>
-<p>Do not start by asking which database is faster.</p>
-<p>Start with:</p>
-<p><strong>What data is stored? What queries run? What correctness guarantees are required?</strong></p>
-<h3 id="relational-databases">Relational databases</h3>
-<p>Examples: PostgreSQL, MySQL, SQL Server, Oracle.</p>
-<p>Prefer relational databases when:</p>
-<ul><li>Multiple records must change atomically.</li><li>The data has well-defined relationships.</li><li>Constraints are important.</li><li>Queries need joins and flexible filtering.</li><li>Financial correctness matters.</li></ul>
-<p><strong>Payment example:</strong> Creating ledger entries and updating a transaction record must satisfy accounting rules.</p>
-<h3 id="nosql-databases">NoSQL databases</h3>
-<p>NoSQL is a broad category, not one database architecture.</p>
-<table><thead><tr><th>Category</th><th>Typical use</th></tr></thead><tbody><tr><td>Key-value</td><td>Fast lookup, sessions, counters</td></tr><tr><td>Document</td><td>Flexible structured documents</td></tr><tr><td>Wide-column</td><td>Large distributed workloads organized around access patterns</td></tr><tr><td>Graph</td><td>Relationship traversal, connected entities</td></tr></tbody></table>
-<p>NoSQL does not automatically mean weak consistency. Guarantees depend on the database and configuration.</p>
-<p><strong>Example:</strong> Customer preference documents may suit a document database, while ledger entries may suit a transactional relational database.</p>
-<h3 id="acid-transactions">ACID transactions</h3>
-<p>ACID describes four properties:</p>
-<table><thead><tr><th>Property</th><th>Meaning</th></tr></thead><tbody><tr><td>Atomicity</td><td>All changes succeed or none commit</td></tr><tr><td>Consistency</td><td>Transaction preserves defined database rules</td></tr><tr><td>Isolation</td><td>Concurrent transactions behave according to the chosen isolation level</td></tr><tr><td>Durability</td><td>Committed data survives supported failure scenarios</td></tr></tbody></table>
-<p>A critical nuance: <strong>ACID does not automatically prevent every business race condition.</strong></p>
-<p>For example, two transactions might both observe available inventory and attempt to reserve it. The solution may need a conditional update, row lock, unique constraint, or stronger isolation.</p>
-<h3 id="strong-vs-eventual-consistency">Strong vs. eventual consistency</h3>
-<p><strong>Strong consistency:</strong> Reads observe the required latest committed state under the system's stated consistency model.</p>
-<p><em>Example:</em> Preventing two transactions from spending the same reserved funds.</p>
-<p><strong>Eventual consistency:</strong> Replicas or downstream projections may temporarily differ but converge when updates stop and delivery succeeds.</p>
-<p><em>Example:</em> Transaction analytics updating after a payment event.</p>
-<p><strong>Rule:</strong> Use strict correctness where business invariants require it. Allow eventual consistency for downstream read models where delay is acceptable.</p>
-<hr>
-<h2 id="7-reliability-patterns-you-must-recognize">7. Reliability patterns you must recognize</h2>
-<p>A distributed system must expect network failures, process crashes, dependency outages, and ambiguous results.</p>
-<h3 id="timeouts">Timeouts</h3>
-<p>Every remote request needs a bounded wait.</p>
-<p>Without timeouts, threads or connections can remain occupied indefinitely.</p>
-<p><strong>Design choice:</strong> Assign an overall request deadline and smaller budgets to dependencies.</p>
-<h3 id="retries-with-backoff-and-jitter">Retries with backoff and jitter</h3>
-<p>Retry transient failures, not every error.</p>
-<ul><li><strong>Backoff:</strong> Increase the delay between retries.</li><li><strong>Jitter:</strong> Randomize the delay to prevent many clients retrying together.</li><li><strong>Retry budget:</strong> Limit retry attempts to prevent overload.</li></ul>
-<p>A retry is safe only when the operation has appropriate idempotency or duplicate protection.</p>
-<h3 id="circuit-breaker">Circuit breaker</h3>
-<p>When a dependency repeatedly fails, stop sending requests temporarily.</p>
-<pre><code>              Request
+    <p>If the client retries the same logical operation, the system must not
+        create another payment.</p>
+    <p>Use a durable uniqueness constraint and persist the request identity,
+        parameters, and result/state. A Redis cache alone is not a reliable
+        financial deduplication boundary.</p>
+    <hr>
+    <h2 id="6-database-selection-sql-vs-nosql">6. Database selection — SQL vs.
+        NoSQL</h2>
+    <p>Do not start by asking which database is faster.</p>
+    <p>Start with:</p>
+    <p><strong>What data is stored? What queries run? What correctness
+        guarantees are required?</strong></p>
+    <h3 id="relational-databases">Relational databases</h3>
+    <p>Examples: PostgreSQL, MySQL, SQL Server, Oracle.</p>
+    <p>Prefer relational databases when:</p>
+    <ul>
+        <li>Multiple records must change atomically.</li>
+        <li>The data has well-defined relationships.</li>
+        <li>Constraints are important.</li>
+        <li>Queries need joins and flexible filtering.</li>
+        <li>Financial correctness matters.</li>
+    </ul>
+    <p><strong>Payment example:</strong> Creating ledger entries and updating a
+        transaction record must satisfy accounting rules.</p>
+    <h3 id="nosql-databases">NoSQL databases</h3>
+    <p>NoSQL is a broad category, not one database architecture.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Category</th>
+            <th>Typical use</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Key-value</td>
+            <td>Fast lookup, sessions, counters</td>
+        </tr>
+        <tr>
+            <td>Document</td>
+            <td>Flexible structured documents</td>
+        </tr>
+        <tr>
+            <td>Wide-column</td>
+            <td>Large distributed workloads organized around access patterns
+            </td>
+        </tr>
+        <tr>
+            <td>Graph</td>
+            <td>Relationship traversal, connected entities</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>NoSQL does not automatically mean weak consistency. Guarantees depend on
+        the database and configuration.</p>
+    <p><strong>Example:</strong> Customer preference documents may suit a
+        document database, while ledger entries may suit a transactional
+        relational database.</p>
+    <h3 id="acid-transactions">ACID transactions</h3>
+    <p>ACID describes four properties:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Property</th>
+            <th>Meaning</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Atomicity</td>
+            <td>All changes succeed or none commit</td>
+        </tr>
+        <tr>
+            <td>Consistency</td>
+            <td>Transaction preserves defined database rules</td>
+        </tr>
+        <tr>
+            <td>Isolation</td>
+            <td>Concurrent transactions behave according to the chosen isolation
+                level
+            </td>
+        </tr>
+        <tr>
+            <td>Durability</td>
+            <td>Committed data survives supported failure scenarios</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>A critical nuance: <strong>ACID does not automatically prevent every
+        business race condition.</strong></p>
+    <p>For example, two transactions might both observe available inventory and
+        attempt to reserve it. The solution may need a conditional update, row
+        lock, unique constraint, or stronger isolation.</p>
+    <h3 id="strong-vs-eventual-consistency">Strong vs. eventual consistency</h3>
+    <p><strong>Strong consistency:</strong> Reads observe the required latest
+        committed state under the system's stated consistency model.</p>
+    <p><em>Example:</em> Preventing two transactions from spending the same
+        reserved funds.</p>
+    <p><strong>Eventual consistency:</strong> Replicas or downstream projections
+        may temporarily differ but converge when updates stop and delivery
+        succeeds.</p>
+    <p><em>Example:</em> Transaction analytics updating after a payment event.
+    </p>
+    <p><strong>Rule:</strong> Use strict correctness where business invariants
+        require it. Allow eventual consistency for downstream read models where
+        delay is acceptable.</p>
+    <hr>
+    <h2 id="7-reliability-patterns-you-must-recognize">7. Reliability patterns
+        you must recognize</h2>
+    <p>A distributed system must expect network failures, process crashes,
+        dependency outages, and ambiguous results.</p>
+    <h3 id="timeouts">Timeouts</h3>
+    <p>Every remote request needs a bounded wait.</p>
+    <p>Without timeouts, threads or connections can remain occupied
+        indefinitely.</p>
+    <p><strong>Design choice:</strong> Assign an overall request deadline and
+        smaller budgets to dependencies.</p>
+    <h3 id="retries-with-backoff-and-jitter">Retries with backoff and
+        jitter</h3>
+    <p>Retry transient failures, not every error.</p>
+    <ul>
+        <li><strong>Backoff:</strong> Increase the delay between retries.</li>
+        <li><strong>Jitter:</strong> Randomize the delay to prevent many clients
+            retrying together.
+        </li>
+        <li><strong>Retry budget:</strong> Limit retry attempts to prevent
+            overload.
+        </li>
+    </ul>
+    <p>A retry is safe only when the operation has appropriate idempotency or
+        duplicate protection.</p>
+    <h3 id="circuit-breaker">Circuit breaker</h3>
+    <p>When a dependency repeatedly fails, stop sending requests
+        temporarily.</p>
+    <pre><code>              Request
                  |
                  v
           Circuit Breaker
@@ -460,23 +1138,50 @@ Idempotency-Key: order-123-payment-1</code></pre>
          Closed       Open
            |            |
        Call service   Fail fast</code></pre>
-<p>This prevents cascading failures.</p>
-<p>But a circuit breaker is not a correctness mechanism. If a payment provider is unavailable, do not automatically approve a transaction merely because the dependency failed.</p>
-<h3 id="bulkhead">Bulkhead</h3>
-<p>Isolate resource pools so one unhealthy workload does not consume everything.</p>
-<p>Example: Analytics jobs must not exhaust the same database connection pool used by payment authorization.</p>
-<h3 id="dead-letter-queue-dlq">Dead-letter queue (DLQ)</h3>
-<p>Messages that repeatedly fail processing are moved to a separate location for inspection and recovery.</p>
-<p>A DLQ is not a substitute for handling poison messages, alerting, or replay procedures.</p>
-<h3 id="disaster-recovery-rto-and-rpo">Disaster recovery: RTO and RPO</h3>
-<table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>RTO</td><td>Maximum acceptable recovery time</td></tr><tr><td>RPO</td><td>Maximum acceptable data loss measured in time</td></tr></tbody></table>
-<p>A business requiring a very small RPO may need stronger replication and recovery mechanisms than nightly backups.</p>
-<hr>
-<h2 id="8-distributed-transactions-the-highest-value-patterns">8. Distributed transactions: the highest-value patterns</h2>
-<p>This section matters for payments, checkout, transfers, and enterprise workflows.</p>
-<h3 id="problem-a-business-transaction-spans-services">Problem: A business transaction spans services</h3>
-<p>Suppose an order requires:</p>
-<pre><code>Create Order
+    <p>This prevents cascading failures.</p>
+    <p>But a circuit breaker is not a correctness mechanism. If a payment
+        provider is unavailable, do not automatically approve a transaction
+        merely because the dependency failed.</p>
+    <h3 id="bulkhead">Bulkhead</h3>
+    <p>Isolate resource pools so one unhealthy workload does not consume
+        everything.</p>
+    <p>Example: Analytics jobs must not exhaust the same database connection
+        pool used by payment authorization.</p>
+    <h3 id="dead-letter-queue-dlq">Dead-letter queue (DLQ)</h3>
+    <p>Messages that repeatedly fail processing are moved to a separate location
+        for inspection and recovery.</p>
+    <p>A DLQ is not a substitute for handling poison messages, alerting, or
+        replay procedures.</p>
+    <h3 id="disaster-recovery-rto-and-rpo">Disaster recovery: RTO and RPO</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Term</th>
+            <th>Meaning</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>RTO</td>
+            <td>Maximum acceptable recovery time</td>
+        </tr>
+        <tr>
+            <td>RPO</td>
+            <td>Maximum acceptable data loss measured in time</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>A business requiring a very small RPO may need stronger replication and
+        recovery mechanisms than nightly backups.</p>
+    <hr>
+    <h2 id="8-distributed-transactions-the-highest-value-patterns">8.
+        Distributed transactions: the highest-value patterns</h2>
+    <p>This section matters for payments, checkout, transfers, and enterprise
+        workflows.</p>
+    <h3 id="problem-a-business-transaction-spans-services">Problem: A business
+        transaction spans services</h3>
+    <p>Suppose an order requires:</p>
+    <pre><code>Create Order
      |
      v
 Reserve Inventory
@@ -486,20 +1191,47 @@ Process Payment
      |
      v
 Confirm Order</code></pre>
-<p>Each service owns a separate database.</p>
-<p>A normal database transaction cannot simply guarantee atomic changes across all these independent systems.</p>
-<h3 id="saga-pattern">Saga pattern</h3>
-<p>A Saga coordinates multiple local transactions and defines recovery actions.</p>
-<p>If payment fails, release the inventory reservation and cancel the order.</p>
-<p>Two common choices:</p>
-<table><thead><tr><th>Pattern</th><th>Best when</th></tr></thead><tbody><tr><td>Choreography</td><td>Few participants, simple event-based flow</td></tr><tr><td>Orchestration</td><td>Complex workflows requiring central visibility and control</td></tr></tbody></table>
-<p><strong>Important:</strong> Compensation is not the same as database rollback. A refund, for example, is a new financial operation that reverses an earlier business effect.</p>
-<h3 id="transactional-outbox">Transactional outbox</h3>
-<p>Consider this sequence:</p>
-<ol start="1"><li>Payment state is committed to the database.</li><li>The service crashes before publishing <code>PaymentCompleted</code>.</li><li>Downstream systems never receive the event.</li></ol>
-<p>This is the <strong>dual-write problem</strong>.</p>
-<p>Solution:</p>
-<pre><code>        Database Transaction
+    <p>Each service owns a separate database.</p>
+    <p>A normal database transaction cannot simply guarantee atomic changes
+        across all these independent systems.</p>
+    <h3 id="saga-pattern">Saga pattern</h3>
+    <p>A Saga coordinates multiple local transactions and defines recovery
+        actions.</p>
+    <p>If payment fails, release the inventory reservation and cancel the
+        order.</p>
+    <p>Two common choices:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Pattern</th>
+            <th>Best when</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Choreography</td>
+            <td>Few participants, simple event-based flow</td>
+        </tr>
+        <tr>
+            <td>Orchestration</td>
+            <td>Complex workflows requiring central visibility and control</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Important:</strong> Compensation is not the same as database
+        rollback. A refund, for example, is a new financial operation that
+        reverses an earlier business effect.</p>
+    <h3 id="transactional-outbox">Transactional outbox</h3>
+    <p>Consider this sequence:</p>
+    <ol start="1">
+        <li>Payment state is committed to the database.</li>
+        <li>The service crashes before publishing <code>PaymentCompleted</code>.
+        </li>
+        <li>Downstream systems never receive the event.</li>
+    </ol>
+    <p>This is the <strong>dual-write problem</strong>.</p>
+    <p>Solution:</p>
+    <pre><code>        Database Transaction
         +------------------+
         | Update Payment   |
         | Insert Outbox    |
@@ -512,31 +1244,81 @@ Confirm Order</code></pre>
                  |
                  v
             Message Broker</code></pre>
-<p>The payment update and outbox event are committed atomically in the same database.</p>
-<p>A publisher then delivers the event to the broker.</p>
-<p><strong>Trade-off:</strong> Delivery can still be duplicated. Consumers must be idempotent.</p>
-<h3 id="exactly-once-vs-effectively-once">Exactly-once vs. effectively-once</h3>
-<p>Do not casually promise end-to-end exactly-once execution.</p>
-<p>In practice, systems often combine:</p>
-<ul><li>At-least-once message delivery.</li><li>Unique transaction identifiers.</li><li>Idempotent consumers.</li><li>Atomic database updates.</li><li>Reconciliation for uncertain outcomes.</li></ul>
-<p>Together, these can deliver the required business effect once even when messages or requests are retried.</p>
-<hr>
-<h2 id="9-scaling-how-to-reason-about-bottlenecks">9. Scaling: how to reason about bottlenecks</h2>
-<h3 id="horizontal-vs-vertical-scaling">Horizontal vs. vertical scaling</h3>
-<p><strong>Vertical scaling:</strong> Increase CPU, memory, or capacity of one instance.</p>
-<p><strong>Horizontal scaling:</strong> Add instances and distribute workload.</p>
-<p>For stateless API services, horizontal scaling is usually straightforward when shared state lives outside the instances.</p>
-<pre><code>               Load Balancer
+    <p>The payment update and outbox event are committed atomically in the same
+        database.</p>
+    <p>A publisher then delivers the event to the broker.</p>
+    <p><strong>Trade-off:</strong> Delivery can still be duplicated. Consumers
+        must be idempotent.</p>
+    <h3 id="exactly-once-vs-effectively-once">Exactly-once vs.
+        effectively-once</h3>
+    <p>Do not casually promise end-to-end exactly-once execution.</p>
+    <p>In practice, systems often combine:</p>
+    <ul>
+        <li>At-least-once message delivery.</li>
+        <li>Unique transaction identifiers.</li>
+        <li>Idempotent consumers.</li>
+        <li>Atomic database updates.</li>
+        <li>Reconciliation for uncertain outcomes.</li>
+    </ul>
+    <p>Together, these can deliver the required business effect once even when
+        messages or requests are retried.</p>
+    <hr>
+    <h2 id="9-scaling-how-to-reason-about-bottlenecks">9. Scaling: how to reason
+        about bottlenecks</h2>
+    <h3 id="horizontal-vs-vertical-scaling">Horizontal vs. vertical scaling</h3>
+    <p><strong>Vertical scaling:</strong> Increase CPU, memory, or capacity of
+        one instance.</p>
+    <p><strong>Horizontal scaling:</strong> Add instances and distribute
+        workload.</p>
+    <p>For stateless API services, horizontal scaling is usually straightforward
+        when shared state lives outside the instances.</p>
+    <pre><code>               Load Balancer
                 /    |    \
                v     v     v
              API1   API2   API3
                 \    |    /
                  Database</code></pre>
-<p>But notice the remaining bottleneck: the database.</p>
-<h3 id="cache-vs-read-replica-vs-sharding">Cache vs. read replica vs. sharding</h3>
-<table><thead><tr><th>Technique</th><th>Solves</th><th>Does not automatically solve</th></tr></thead><tbody><tr><td>Cache</td><td>Repeated expensive reads</td><td>Correctness of writes</td></tr><tr><td>Read replica</td><td>Read load and some locality needs</td><td>Primary write bottleneck</td></tr><tr><td>Sharding</td><td>Data/write volume across nodes</td><td>Cross-shard transactions</td></tr><tr><td>Partitioning</td><td>Data organization and query efficiency</td><td>Every underlying capacity limit</td></tr><tr><td>CDN</td><td>Static and cacheable edge delivery</td><td>Transaction processing</td></tr></tbody></table>
-<h3 id="cache-aside-pattern">Cache-aside pattern</h3>
-<pre><code>          Read Request
+    <p>But notice the remaining bottleneck: the database.</p>
+    <h3 id="cache-vs-read-replica-vs-sharding">Cache vs. read replica vs.
+        sharding</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Technique</th>
+            <th>Solves</th>
+            <th>Does not automatically solve</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Cache</td>
+            <td>Repeated expensive reads</td>
+            <td>Correctness of writes</td>
+        </tr>
+        <tr>
+            <td>Read replica</td>
+            <td>Read load and some locality needs</td>
+            <td>Primary write bottleneck</td>
+        </tr>
+        <tr>
+            <td>Sharding</td>
+            <td>Data/write volume across nodes</td>
+            <td>Cross-shard transactions</td>
+        </tr>
+        <tr>
+            <td>Partitioning</td>
+            <td>Data organization and query efficiency</td>
+            <td>Every underlying capacity limit</td>
+        </tr>
+        <tr>
+            <td>CDN</td>
+            <td>Static and cacheable edge delivery</td>
+            <td>Transaction processing</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="cache-aside-pattern">Cache-aside pattern</h3>
+    <pre><code>          Read Request
                |
                v
             Cache
@@ -548,13 +1330,17 @@ Confirm Order</code></pre>
                 Populate
                    |
                  Return</code></pre>
-<p>The difficult part is not reading the cache. It is <strong>invalidation and freshness </strong>.</p>
-<p>For financial balances, a stale cache can be dangerous if used for authorization decisions.</p>
-<p>Prefer an authoritative transactional state when making correctness-critical decisions. A cache may still support nonauthoritative display or carefully controlled reads.</p>
-<h3 id="sharding">Sharding</h3>
-<p>Sharding splits data across multiple independent storage partitions.</p>
-<p>Example:</p>
-<pre><code>Account ID
+    <p>The difficult part is not reading the cache. It is <strong>invalidation
+        and freshness </strong>.</p>
+    <p>For financial balances, a stale cache can be dangerous if used for
+        authorization decisions.</p>
+    <p>Prefer an authoritative transactional state when making
+        correctness-critical decisions. A cache may still support
+        nonauthoritative display or carefully controlled reads.</p>
+    <h3 id="sharding">Sharding</h3>
+    <p>Sharding splits data across multiple independent storage partitions.</p>
+    <p>Example:</p>
+    <pre><code>Account ID
     |
     v
 Shard Router
@@ -562,60 +1348,340 @@ Shard Router
     +---&gt; Shard A
     +---&gt; Shard B
     +---&gt; Shard C</code></pre>
-<p>A good shard key should distribute load while keeping common operations efficient.</p>
-<p><strong>Risk:</strong> Transfers involving accounts on different shards become more complex. Hot accounts can also create uneven traffic.</p>
-<p>Do not introduce sharding merely because a system is described as large.</p>
-<hr>
-<h2 id="10-message-queue-vs-event-streaming">10. Message queue vs. event streaming</h2>
-<p>These are related, but they solve different needs.</p>
-<table><thead><tr><th>Dimension</th><th>Work queue</th><th>Event stream</th></tr></thead><tbody><tr><td>Main purpose</td><td>Distribute work</td><td>Record and distribute events</td></tr><tr><td>Consumption</td><td>Workers process jobs</td><td>Consumers process streams</td></tr><tr><td>Replay</td><td>Depends on queue design</td><td>Commonly supported via retained logs</td></tr><tr><td>Typical example</td><td>Send email</td><td>Process transaction activity</td></tr><tr><td>Technologies</td><td>SQS, RabbitMQ</td><td>Kafka, similar event log platforms</td></tr></tbody></table>
-<h3 id="kafka-concepts">Kafka concepts</h3>
-<ul><li><strong>Topic:</strong> Named event stream.</li><li><strong>Partition:</strong> Unit of parallelism and ordered storage.</li><li><strong>Producer:</strong> Writes records.</li><li><strong>Consumer group:</strong> Coordinates consumption among members.</li><li><strong>Offset:</strong> Position within a partition.</li></ul>
-<p>Kafka preserves record order within a partition, not necessarily across an entire topic.</p>
-<p><strong>Example:</strong> Partition fraud-related events by account ID when per-account ordering is required.</p>
-<p>This creates ordering within an account's partition, but a very active account could become a hot partition.</p>
-<p><strong>Decision principle:</strong> Choose a work queue for job distribution. Choose an event stream when replay, multiple independent consumers, or ordered event history is a central requirement. Both categories have overlapping capabilities.</p>
-<hr>
-<h2 id="11-single-region-vs-multi-region-architecture">11. Single-region vs. multi-region architecture</h2>
-<p>There are three important starting designs.</p>
-<table><thead><tr><th>Architecture</th><th>Advantage</th><th>Main challenge</th></tr></thead><tbody><tr><td>Single region, multi-AZ</td><td>Lower complexity, zone resilience</td><td>Regional outage</td></tr><tr><td>Active-passive regions</td><td>Disaster recovery with simpler write ownership</td><td>Failover and recovery time</td></tr><tr><td>Active-active regions</td><td>Regional availability and locality</td><td>Conflicts, coordination, replication complexity</td></tr></tbody></table>
-<p>For financial transactions, active-active writes can be particularly difficult.</p>
-<p>Example:</p>
-<ul><li>Region A sees an available balance of $100.</li><li>Region B sees the same balance.</li><li>Both approve spending $80.</li></ul>
-<p>If both independently make decisions using stale replicated data, the account can be overspent.</p>
-<p><strong>Better options:</strong> Single-writer ownership per account, strongly coordinated writes, or business-specific reservation mechanisms.</p>
-<p>These choices must be derived from latency, availability, data-loss, and consistency requirements.</p>
-<hr>
-<h2 id="12-security-is-an-architectural-constraint">12. Security is an architectural constraint</h2>
-<p>For financial services, security cannot be added at the end.</p>
-<h3 id="essential-concepts">Essential concepts</h3>
-<table><thead><tr><th>Concept</th><th>What it means</th></tr></thead><tbody><tr><td>Authentication</td><td>Verify identity</td></tr><tr><td>Authorization</td><td>Check permitted actions</td></tr><tr><td>Least privilege</td><td>Grant only necessary access</td></tr><tr><td>Encryption in transit</td><td>Protect data over networks</td></tr><tr><td>Encryption at rest</td><td>Protect stored data</td></tr><tr><td>Tokenization</td><td>Replace sensitive values with tokens</td></tr><tr><td>HSM</td><td>Hardware-backed protection and use of cryptographic keys</td></tr><tr><td>Audit logging</td><td>Record relevant security and business actions</td></tr><tr><td>Zero trust</td><td>Do not grant implicit trust based on network location</td></tr></tbody></table>
-<p>NIST's zero-trust guidance emphasizes protecting resources and verifying access rather than trusting a network boundary.</p>
-<h3 id="pci-dss-in-payment-designs">PCI DSS in payment designs</h3>
-<p>PCI DSS provides security requirements for systems that store, process, transmit, or can affect payment card account data.</p>
-<p>For a payment architecture:</p>
-<ul><li>Minimize services that handle raw card data.</li><li>Use tokenization where appropriate.</li><li>Restrict access to sensitive data.</li><li>Keep secrets out of application code.</li><li>Prevent sensitive account data from appearing in ordinary logs.</li><li>Apply approved key management and retention controls.</li><li>Treat compliance scope as a design consideration.</li></ul>
-<p><strong>Important:</strong> Tokenization alone does not guarantee that a service is outside PCI scope. The complete data flow and connected systems matter.</p>
-<hr>
-<h2 id="13-observability-and-operational-readiness">13. Observability and operational readiness</h2>
-<p>A design is incomplete if the team cannot detect or recover from problems.</p>
-<h3 id="three-main-signals">Three main signals</h3>
-<table><thead><tr><th>Signal</th><th>Purpose</th></tr></thead><tbody><tr><td>Metrics</td><td>Measure behavior and trends</td></tr><tr><td>Logs</td><td>Explain individual events and errors</td></tr><tr><td>Traces</td><td>Follow requests across services</td></tr></tbody></table>
-<h3 id="sli-slo-sla">SLI, SLO, SLA</h3>
-<ul><li><strong>SLI:</strong> What we measure, such as payment authorization latency.</li><li><strong>SLO:</strong> Internal reliability or performance target.</li><li><strong>SLA:</strong> Contractual service commitment.</li></ul>
-<p>For payment processing, monitor more than HTTP success rates.</p>
-<p>Useful business and technical signals include:</p>
-<ul><li>Authorization decision latency.</li><li>Timeout and unknown-outcome rates.</li><li>Duplicate attempts prevented.</li><li>Database transaction failures.</li><li>Event delivery lag.</li><li>Reconciliation exceptions.</li><li>Dependency error rates.</li><li>Transaction state transitions.</li></ul>
-<p><strong>Key point:</strong> An API returning HTTP 200 does not necessarily mean the financial workflow completed correctly.</p>
-<hr>
-<h2 id="14-architecture-choice-cheat-sheet">14. Architecture choice cheat sheet</h2>
-<p>This is the most valuable section for quick reference.</p>
-<table><thead><tr><th>Situation</th><th>Start with</th><th>Why</th></tr></thead><tbody><tr><td>Financial transaction correctness</td><td>Relational DB + constraints</td><td>Atomic updates and invariants</td></tr><tr><td>High read traffic</td><td>Cache or read replicas</td><td>Reduce repeated database work</td></tr><tr><td>High write volume</td><td>Optimize, partition, then shard if needed</td><td>Scale actual bottleneck</td></tr><tr><td>Immediate decision required</td><td>Synchronous request</td><td>Caller needs a result</td></tr><tr><td>Background task</td><td>Queue</td><td>Decouple execution</td></tr><tr><td>Multiple independent event consumers</td><td>Event stream/pub-sub</td><td>Independent processing</td></tr><tr><td>Cross-service business workflow</td><td>Saga</td><td>Coordinate local transactions</td></tr><tr><td>Database update + event publication</td><td>Transactional outbox</td><td>Avoid lost dual writes</td></tr><tr><td>Duplicate request risk</td><td>Durable idempotency record</td><td>Prevent duplicate effects</td></tr><tr><td>Inventory contention</td><td>Conditional write/locking</td><td>Prevent double allocation</td></tr><tr><td>Slow dependency</td><td>Timeout + circuit breaker</td><td>Limit cascading failures</td></tr><tr><td>Transient dependency error</td><td>Bounded retry + jitter</td><td>Recover without overload</td></tr><tr><td>Complex enterprise migration</td><td>Strangler pattern</td><td>Migrate incrementally</td></tr><tr><td>Regional disaster recovery</td><td>Active-passive initially</td><td>Simpler write ownership</td></tr><tr><td>Global concurrent writes</td><td>Explicit conflict/coordination design</td><td>Preserve invariants</td></tr><tr><td>Sensitive payment data</td><td>Restricted security boundary</td><td>Minimize exposure and scope</td></tr></tbody></table>
-<p>Notice that these are <strong>starting choices</strong>, not absolute rules.</p>
-<hr>
-<h2 id="15-put-everything-together-payment-api-design">15. Put everything together: payment API design</h2>
-<p>Here is how these principles combine in one architecture.</p>
-<pre><code>                  Client / Merchant
+    <p>A good shard key should distribute load while keeping common operations
+        efficient.</p>
+    <p><strong>Risk:</strong> Transfers involving accounts on different shards
+        become more complex. Hot accounts can also create uneven traffic.</p>
+    <p>Do not introduce sharding merely because a system is described as
+        large.</p>
+    <hr>
+    <h2 id="10-message-queue-vs-event-streaming">10. Message queue vs. event
+        streaming</h2>
+    <p>These are related, but they solve different needs.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Dimension</th>
+            <th>Work queue</th>
+            <th>Event stream</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Main purpose</td>
+            <td>Distribute work</td>
+            <td>Record and distribute events</td>
+        </tr>
+        <tr>
+            <td>Consumption</td>
+            <td>Workers process jobs</td>
+            <td>Consumers process streams</td>
+        </tr>
+        <tr>
+            <td>Replay</td>
+            <td>Depends on queue design</td>
+            <td>Commonly supported via retained logs</td>
+        </tr>
+        <tr>
+            <td>Typical example</td>
+            <td>Send email</td>
+            <td>Process transaction activity</td>
+        </tr>
+        <tr>
+            <td>Technologies</td>
+            <td>SQS, RabbitMQ</td>
+            <td>Kafka, similar event log platforms</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="kafka-concepts">Kafka concepts</h3>
+    <ul>
+        <li><strong>Topic:</strong> Named event stream.</li>
+        <li><strong>Partition:</strong> Unit of parallelism and ordered storage.
+        </li>
+        <li><strong>Producer:</strong> Writes records.</li>
+        <li><strong>Consumer group:</strong> Coordinates consumption among
+            members.
+        </li>
+        <li><strong>Offset:</strong> Position within a partition.</li>
+    </ul>
+    <p>Kafka preserves record order within a partition, not necessarily across
+        an entire topic.</p>
+    <p><strong>Example:</strong> Partition fraud-related events by account ID
+        when per-account ordering is required.</p>
+    <p>This creates ordering within an account's partition, but a very active
+        account could become a hot partition.</p>
+    <p><strong>Decision principle:</strong> Choose a work queue for job
+        distribution. Choose an event stream when replay, multiple independent
+        consumers, or ordered event history is a central requirement. Both
+        categories have overlapping capabilities.</p>
+    <hr>
+    <h2 id="11-single-region-vs-multi-region-architecture">11. Single-region vs.
+        multi-region architecture</h2>
+    <p>There are three important starting designs.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Architecture</th>
+            <th>Advantage</th>
+            <th>Main challenge</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Single region, multi-AZ</td>
+            <td>Lower complexity, zone resilience</td>
+            <td>Regional outage</td>
+        </tr>
+        <tr>
+            <td>Active-passive regions</td>
+            <td>Disaster recovery with simpler write ownership</td>
+            <td>Failover and recovery time</td>
+        </tr>
+        <tr>
+            <td>Active-active regions</td>
+            <td>Regional availability and locality</td>
+            <td>Conflicts, coordination, replication complexity</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>For financial transactions, active-active writes can be particularly
+        difficult.</p>
+    <p>Example:</p>
+    <ul>
+        <li>Region A sees an available balance of $100.</li>
+        <li>Region B sees the same balance.</li>
+        <li>Both approve spending $80.</li>
+    </ul>
+    <p>If both independently make decisions using stale replicated data, the
+        account can be overspent.</p>
+    <p><strong>Better options:</strong> Single-writer ownership per account,
+        strongly coordinated writes, or business-specific reservation
+        mechanisms.</p>
+    <p>These choices must be derived from latency, availability, data-loss, and
+        consistency requirements.</p>
+    <hr>
+    <h2 id="12-security-is-an-architectural-constraint">12. Security is an
+        architectural constraint</h2>
+    <p>For financial services, security cannot be added at the end.</p>
+    <h3 id="essential-concepts">Essential concepts</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Concept</th>
+            <th>What it means</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Authentication</td>
+            <td>Verify identity</td>
+        </tr>
+        <tr>
+            <td>Authorization</td>
+            <td>Check permitted actions</td>
+        </tr>
+        <tr>
+            <td>Least privilege</td>
+            <td>Grant only necessary access</td>
+        </tr>
+        <tr>
+            <td>Encryption in transit</td>
+            <td>Protect data over networks</td>
+        </tr>
+        <tr>
+            <td>Encryption at rest</td>
+            <td>Protect stored data</td>
+        </tr>
+        <tr>
+            <td>Tokenization</td>
+            <td>Replace sensitive values with tokens</td>
+        </tr>
+        <tr>
+            <td>HSM</td>
+            <td>Hardware-backed protection and use of cryptographic keys</td>
+        </tr>
+        <tr>
+            <td>Audit logging</td>
+            <td>Record relevant security and business actions</td>
+        </tr>
+        <tr>
+            <td>Zero trust</td>
+            <td>Do not grant implicit trust based on network location</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>NIST's zero-trust guidance emphasizes protecting resources and verifying
+        access rather than trusting a network boundary.</p>
+    <h3 id="pci-dss-in-payment-designs">PCI DSS in payment designs</h3>
+    <p>PCI DSS provides security requirements for systems that store, process,
+        transmit, or can affect payment card account data.</p>
+    <p>For a payment architecture:</p>
+    <ul>
+        <li>Minimize services that handle raw card data.</li>
+        <li>Use tokenization where appropriate.</li>
+        <li>Restrict access to sensitive data.</li>
+        <li>Keep secrets out of application code.</li>
+        <li>Prevent sensitive account data from appearing in ordinary logs.</li>
+        <li>Apply approved key management and retention controls.</li>
+        <li>Treat compliance scope as a design consideration.</li>
+    </ul>
+    <p><strong>Important:</strong> Tokenization alone does not guarantee that a
+        service is outside PCI scope. The complete data flow and connected
+        systems matter.</p>
+    <hr>
+    <h2 id="13-observability-and-operational-readiness">13. Observability and
+        operational readiness</h2>
+    <p>A design is incomplete if the team cannot detect or recover from
+        problems.</p>
+    <h3 id="three-main-signals">Three main signals</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Signal</th>
+            <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Metrics</td>
+            <td>Measure behavior and trends</td>
+        </tr>
+        <tr>
+            <td>Logs</td>
+            <td>Explain individual events and errors</td>
+        </tr>
+        <tr>
+            <td>Traces</td>
+            <td>Follow requests across services</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="sli-slo-sla">SLI, SLO, SLA</h3>
+    <ul>
+        <li><strong>SLI:</strong> What we measure, such as payment authorization
+            latency.
+        </li>
+        <li><strong>SLO:</strong> Internal reliability or performance target.
+        </li>
+        <li><strong>SLA:</strong> Contractual service commitment.</li>
+    </ul>
+    <p>For payment processing, monitor more than HTTP success rates.</p>
+    <p>Useful business and technical signals include:</p>
+    <ul>
+        <li>Authorization decision latency.</li>
+        <li>Timeout and unknown-outcome rates.</li>
+        <li>Duplicate attempts prevented.</li>
+        <li>Database transaction failures.</li>
+        <li>Event delivery lag.</li>
+        <li>Reconciliation exceptions.</li>
+        <li>Dependency error rates.</li>
+        <li>Transaction state transitions.</li>
+    </ul>
+    <p><strong>Key point:</strong> An API returning HTTP 200 does not
+        necessarily mean the financial workflow completed correctly.</p>
+    <hr>
+    <h2 id="14-architecture-choice-cheat-sheet">14. Architecture choice cheat
+        sheet</h2>
+    <p>This is the most valuable section for quick reference.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Situation</th>
+            <th>Start with</th>
+            <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Financial transaction correctness</td>
+            <td>Relational DB + constraints</td>
+            <td>Atomic updates and invariants</td>
+        </tr>
+        <tr>
+            <td>High read traffic</td>
+            <td>Cache or read replicas</td>
+            <td>Reduce repeated database work</td>
+        </tr>
+        <tr>
+            <td>High write volume</td>
+            <td>Optimize, partition, then shard if needed</td>
+            <td>Scale actual bottleneck</td>
+        </tr>
+        <tr>
+            <td>Immediate decision required</td>
+            <td>Synchronous request</td>
+            <td>Caller needs a result</td>
+        </tr>
+        <tr>
+            <td>Background task</td>
+            <td>Queue</td>
+            <td>Decouple execution</td>
+        </tr>
+        <tr>
+            <td>Multiple independent event consumers</td>
+            <td>Event stream/pub-sub</td>
+            <td>Independent processing</td>
+        </tr>
+        <tr>
+            <td>Cross-service business workflow</td>
+            <td>Saga</td>
+            <td>Coordinate local transactions</td>
+        </tr>
+        <tr>
+            <td>Database update + event publication</td>
+            <td>Transactional outbox</td>
+            <td>Avoid lost dual writes</td>
+        </tr>
+        <tr>
+            <td>Duplicate request risk</td>
+            <td>Durable idempotency record</td>
+            <td>Prevent duplicate effects</td>
+        </tr>
+        <tr>
+            <td>Inventory contention</td>
+            <td>Conditional write/locking</td>
+            <td>Prevent double allocation</td>
+        </tr>
+        <tr>
+            <td>Slow dependency</td>
+            <td>Timeout + circuit breaker</td>
+            <td>Limit cascading failures</td>
+        </tr>
+        <tr>
+            <td>Transient dependency error</td>
+            <td>Bounded retry + jitter</td>
+            <td>Recover without overload</td>
+        </tr>
+        <tr>
+            <td>Complex enterprise migration</td>
+            <td>Strangler pattern</td>
+            <td>Migrate incrementally</td>
+        </tr>
+        <tr>
+            <td>Regional disaster recovery</td>
+            <td>Active-passive initially</td>
+            <td>Simpler write ownership</td>
+        </tr>
+        <tr>
+            <td>Global concurrent writes</td>
+            <td>Explicit conflict/coordination design</td>
+            <td>Preserve invariants</td>
+        </tr>
+        <tr>
+            <td>Sensitive payment data</td>
+            <td>Restricted security boundary</td>
+            <td>Minimize exposure and scope</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Notice that these are <strong>starting choices</strong>, not absolute
+        rules.</p>
+    <hr>
+    <h2 id="15-put-everything-together-payment-api-design">15. Put everything
+        together: payment API design</h2>
+    <p>Here is how these principles combine in one architecture.</p>
+    <pre><code>                  Client / Merchant
                          |
                          v
                     API Gateway
@@ -639,30 +1705,98 @@ Shard Router
                     /     |      \
                    v      v       v
              Notification Audit  Reconciliation</code></pre>
-<p>This is a conceptual architecture, not a complete card-network authorization design.</p>
-<h3 id="deriving-the-choices">Deriving the choices</h3>
-<p><strong>1. Payment Service:</strong> Owns payment state transitions because the business needs one clear place to enforce lifecycle rules.</p>
-<p><strong>2. Idempotency Control:</strong> Prevents the same logical request from creating multiple operations. The enforcement uses durable state and unique constraints.</p>
-<p><strong>3. Payment State Database:</strong> Holds authoritative operation status. Transactional writes protect state transitions.</p>
-<p><strong>4. External Processor:</strong> Performs the required external payment operation. Timeouts can leave an uncertain result, which must be tracked rather than assumed to be a failure.</p>
-<p><strong>5. Transactional Outbox:</strong> Records committed state-change events without losing them during a crash.</p>
-<p><strong>6. Message Broker:</strong> Separates noncritical downstream processing from the synchronous payment path.</p>
-<p><strong>7. Notification Service:</strong> Can retry delivery without repeating the payment.</p>
-<p><strong>8. Audit and Reconciliation:</strong> Provide traceability and detect differences between internal and external records.</p>
-<p>This architecture still needs decisions about authentication, card-data boundaries, provider integration, failover, settlement, monitoring, and operational ownership.</p>
-<p>That is where the full Card Payment Authorization design will go deeper.</p>
-<hr>
-<h2 id="16-what-distinguishes-a-solution-architect-answer">16. What distinguishes a Solution Architect answer</h2>
-<p>A developer-focused design may stop after selecting services, databases, and communication patterns.</p>
-<p>A Solution Architect should also address:</p>
-<table><thead><tr><th>Dimension</th><th>What to explain</th></tr></thead><tbody><tr><td>Business alignment</td><td>Which requirements drive each choice?</td></tr><tr><td>Integration</td><td>How does the solution connect with existing systems?</td></tr><tr><td>Boundaries</td><td>Which service owns each capability and its data?</td></tr><tr><td>Migration</td><td>How do we move safely from the current system?</td></tr><tr><td>Governance</td><td>How are APIs, security, and technology choices standardized?</td></tr><tr><td>Resilience</td><td>What happens when components or regions fail?</td></tr><tr><td>Operations</td><td>Who supports the system, and how is it observed?</td></tr><tr><td>Cost</td><td>Is the complexity justified by the business need?</td></tr><tr><td>Evolution</td><td>Can the architecture change without major disruption?</td></tr></tbody></table>
-<p>For example, replacing a mainframe transaction system with microservices is not necessarily an improvement.</p>
-<p>A more appropriate approach might be to place an API layer in front of the existing system, migrate capabilities gradually, and preserve a single authoritative transaction owner during migration.</p>
-<p>This is the reasoning behind incremental modernization patterns such as the Strangler Fig pattern.</p>
-<hr>
-<h2 id="17-the-mental-model-to-remember">17. The mental model to remember</h2>
-<p>For every system design, follow this sequence:</p>
-<pre><code>          Business requirement
+    <p>This is a conceptual architecture, not a complete card-network
+        authorization design.</p>
+    <h3 id="deriving-the-choices">Deriving the choices</h3>
+    <p><strong>1. Payment Service:</strong> Owns payment state transitions
+        because the business needs one clear place to enforce lifecycle rules.
+    </p>
+    <p><strong>2. Idempotency Control:</strong> Prevents the same logical
+        request from creating multiple operations. The enforcement uses durable
+        state and unique constraints.</p>
+    <p><strong>3. Payment State Database:</strong> Holds authoritative operation
+        status. Transactional writes protect state transitions.</p>
+    <p><strong>4. External Processor:</strong> Performs the required external
+        payment operation. Timeouts can leave an uncertain result, which must be
+        tracked rather than assumed to be a failure.</p>
+    <p><strong>5. Transactional Outbox:</strong> Records committed state-change
+        events without losing them during a crash.</p>
+    <p><strong>6. Message Broker:</strong> Separates noncritical downstream
+        processing from the synchronous payment path.</p>
+    <p><strong>7. Notification Service:</strong> Can retry delivery without
+        repeating the payment.</p>
+    <p><strong>8. Audit and Reconciliation:</strong> Provide traceability and
+        detect differences between internal and external records.</p>
+    <p>This architecture still needs decisions about authentication, card-data
+        boundaries, provider integration, failover, settlement, monitoring, and
+        operational ownership.</p>
+    <p>That is where the full Card Payment Authorization design will go
+        deeper.</p>
+    <hr>
+    <h2 id="16-what-distinguishes-a-solution-architect-answer">16. What
+        distinguishes a Solution Architect answer</h2>
+    <p>A developer-focused design may stop after selecting services, databases,
+        and communication patterns.</p>
+    <p>A Solution Architect should also address:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Dimension</th>
+            <th>What to explain</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Business alignment</td>
+            <td>Which requirements drive each choice?</td>
+        </tr>
+        <tr>
+            <td>Integration</td>
+            <td>How does the solution connect with existing systems?</td>
+        </tr>
+        <tr>
+            <td>Boundaries</td>
+            <td>Which service owns each capability and its data?</td>
+        </tr>
+        <tr>
+            <td>Migration</td>
+            <td>How do we move safely from the current system?</td>
+        </tr>
+        <tr>
+            <td>Governance</td>
+            <td>How are APIs, security, and technology choices standardized?
+            </td>
+        </tr>
+        <tr>
+            <td>Resilience</td>
+            <td>What happens when components or regions fail?</td>
+        </tr>
+        <tr>
+            <td>Operations</td>
+            <td>Who supports the system, and how is it observed?</td>
+        </tr>
+        <tr>
+            <td>Cost</td>
+            <td>Is the complexity justified by the business need?</td>
+        </tr>
+        <tr>
+            <td>Evolution</td>
+            <td>Can the architecture change without major disruption?</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>For example, replacing a mainframe transaction system with microservices
+        is not necessarily an improvement.</p>
+    <p>A more appropriate approach might be to place an API layer in front of
+        the existing system, migrate capabilities gradually, and preserve a
+        single authoritative transaction owner during migration.</p>
+    <p>This is the reasoning behind incremental modernization patterns such as
+        the Strangler Fig pattern.</p>
+    <hr>
+    <h2 id="17-the-mental-model-to-remember">17. The mental model to
+        remember</h2>
+    <p>For every system design, follow this sequence:</p>
+    <pre><code>          Business requirement
                    |
                    v
      NFRs and business invariants
@@ -678,13 +1812,47 @@ Shard Router
                    |
                    v
    Trade-offs and rejected alternatives</code></pre>
-<p>The central idea is:</p>
-<p><strong>Do not say "I will use Kafka" before explaining why asynchronous events, replay, partitioned processing, or independent consumers are needed.</strong></p>
-<p><strong>Do not say "I will use microservices" before establishing why separate deployment, scaling, or ownership boundaries are worth the added complexity.</strong></p>
-<p><strong>Do not say "I will use multi-region active-active" before deciding how conflicting writes and financial correctness will be handled.</strong></p>
-<p>That reasoning is what we will apply repeatedly throughout the selected designs.</p>
-<p><strong>Next:</strong> Card Payment Authorization — full end-to-end system design, derived from requirements through final architecture, including failures and alternatives.</p>
-<hr>
-<h2 id="official-references-for-further-reading">Official references for further reading</h2>
-<p>These are optional. The primer is designed to be useful on its own.</p>
-<ul><li><a href="https://www.postgresql.org/docs/current/transaction-iso.html" target="_blank" rel="noopener">PostgreSQL — Transaction Isolation</a></li><li><a href="https://kafka.apache.org/documentation/" target="_blank" rel="noopener">Apache Kafka — Documentation</a></li><li><a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener">NIST SP 800-207 — Zero Trust Architecture</a></li><li><a href="https://www.pcisecuritystandards.org/" target="_blank" rel="noopener">PCI Security Standards Council — Official site</a></li><li><a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html" target="_blank" rel="noopener">AWS Well-Architected Framework</a></li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/introduction.html" target="_blank" rel="noopener">AWS Prescriptive Guidance — Cloud Design Patterns</a></li></ul></main></body></html>
+    <p>The central idea is:</p>
+    <p><strong>Do not say "I will use Kafka" before explaining why asynchronous
+        events, replay, partitioned processing, or independent consumers are
+        needed.</strong></p>
+    <p><strong>Do not say "I will use microservices" before establishing why
+        separate deployment, scaling, or ownership boundaries are worth the
+        added complexity.</strong></p>
+    <p><strong>Do not say "I will use multi-region active-active" before
+        deciding how conflicting writes and financial correctness will be
+        handled.</strong></p>
+    <p>That reasoning is what we will apply repeatedly throughout the selected
+        designs.</p>
+    <p><strong>Next:</strong> Card Payment Authorization — full end-to-end
+        system design, derived from requirements through final architecture,
+        including failures and alternatives.</p>
+    <hr>
+    <h2 id="official-references-for-further-reading">Official references for
+        further reading</h2>
+    <p>These are optional. The primer is designed to be useful on its own.</p>
+    <ul>
+        <li>
+            <a href="https://www.postgresql.org/docs/current/transaction-iso.html"
+               target="_blank" rel="noopener">PostgreSQL — Transaction
+                Isolation</a></li>
+        <li><a href="https://kafka.apache.org/documentation/" target="_blank"
+               rel="noopener">Apache Kafka — Documentation</a></li>
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/207/final"
+               target="_blank" rel="noopener">NIST SP 800-207 — Zero Trust
+            Architecture</a></li>
+        <li><a href="https://www.pcisecuritystandards.org/" target="_blank"
+               rel="noopener">PCI Security Standards Council — Official site</a>
+        </li>
+        <li>
+            <a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+               target="_blank" rel="noopener">AWS Well-Architected Framework</a>
+        </li>
+        <li>
+            <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/introduction.html"
+               target="_blank" rel="noopener">AWS Prescriptive Guidance — Cloud
+                Design Patterns</a></li>
+    </ul>
+</main>
+</body>
+</html>

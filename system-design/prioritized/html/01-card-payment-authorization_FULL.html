@@ -1,342 +1,718 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Design 2 — Credit Card Authorization System</title><style>
-/* The original PDF skill style sheet is embedded below. */
-/* Architect's Field Notes — original study-guide design recreation.
-   Standalone builder embeds this file into its generated HTML. */
-:root {
-  --navy: #112c3a;
-  --header: #193a4b;
-  --ink: #273944;
-  --heading: #17313e;
-  --muted: #75838d;
-  --line: #d9e2e7;
-  --zebra: #f6f8f9;
-  --accent: #64c8e6;
-  --accent-soft: #eaf8fc;
-}
-@page {
-  size: A4;
-  margin: 19mm 19mm 19mm;
-  @top-left {
-    content: "INTERVIEW / FIELD GUIDE";
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .05em;
-    vertical-align: middle;
-  }
-  @top-right {
-    content: string(running-topic);
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .02em;
-    vertical-align: middle;
-  }
-  @bottom-left {
-    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
-    color: #9aa5ae;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 6.3pt;
-    letter-spacing: .03em;
-    vertical-align: middle;
-  }
-  @bottom-right {
-    content: counter(page, decimal-leading-zero);
-    color: #394b56;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-weight: 700;
-    font-size: 7pt;
-    vertical-align: middle;
-  }
-}
-@page cover {
-  size: A4;
-  margin: 0;
-  @top-left { content: none; }
-  @top-right { content: none; }
-  @bottom-left { content: none; }
-  @bottom-right { content: none; }
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: "Inter", "DejaVu Sans", sans-serif;
-  font-size: 9.4pt;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--ink);
-  background: #fff;
-  overflow-wrap: break-word;
-}
-.cover {
-  page: cover;
-  break-after: page;
-  height: 297mm;
-  width: 210mm;
-  overflow: hidden;
-  position: relative;
-  background: var(--navy);
-  color: #fff;
-  padding: 29.6mm 26mm;
-}
-.cover::before, .cover::after {
-  content: "";
-  position: absolute;
-  border: .55pt solid rgba(255,255,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
-.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
-.cover-brand {
-  font-size: 9.5pt;
-  font-weight: 800;
-  letter-spacing: .31em;
-  text-transform: uppercase;
-  color: #dceaf0;
-}
-.cover-series {
-  font-size: 8pt;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #98b3c1;
-  margin-top: 7mm;
-}
-.cover-accent-bar {
-  position: absolute;
-  left: 26mm; top: 80mm;
-  height: 3.5mm; width: 21mm;
-  background: var(--accent);
-}
-.cover-title {
-  position: absolute;
-  left: 25.5mm; right: 25mm; top: 97mm;
-  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
-  font-size: 42pt;
-  font-weight: 800;
-  letter-spacing: -.043em;
-  line-height: 1.08;
-  color: #fff;
-}
-.cover-title .second { display: block; color: var(--accent); }
-.cover-title.long { font-size: 37pt; }
-.cover-sub {
-  position: absolute;
-  left: 26mm; right: 31mm; top: 173.5mm;
-  color: #bdcdd5;
-  font-size: 11.5pt;
-  line-height: 1.7;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.cover-note {
-  color: #91aab7;
-  text-transform: none;
-  font-size: 9pt;
-  letter-spacing: .01em;
-  margin-top: 7mm;
-  line-height: 1.6;
-}
-.cover-bottom {
-  position: absolute;
-  bottom: 31mm; left: 26mm;
-  font-size: 7.8pt;
-  line-height: 1.9;
-  letter-spacing: .065em;
-  color: #cfdae0;
-}
-.cover-rule {
-  position: absolute;
-  bottom: 62mm; height: .35pt;
-  left: 26mm; right: 26mm;
-  background: rgba(255,255,255,.15);
-}
-.cover-number {
-  position: absolute;
-  bottom: 29mm; right: 26mm;
-  color: var(--accent);
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 39pt;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-/* Introduction + automatically generated navigable contents. */
-.preface { break-after: page; }
-.preface-label, .toc-overline {
-  color: var(--accent);
-  font-size: 7.6pt;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-top: 0;
-}
-.preface h1 { display: none; }
-.preface h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 14pt;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.02em;
-  color: var(--heading);
-  margin: 5mm 0 5mm;
-  border-bottom: .5pt solid var(--line);
-  padding-bottom: 2.5mm;
-}
-.preface p { font-size: 9.5pt; line-height: 1.6; }
-.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
-.toc h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 21pt;
-  letter-spacing: -.03em;
-  margin: 2mm 0 5mm;
-  border: 0;
-  padding: 0;
-}
-.toc ol { list-style: none; margin: 0; padding: 0; }
-.toc li {
-  display: flex;
-  align-items: baseline;
-  gap: 5mm;
-  font-size: 9.1pt;
-  padding: 2.7mm 1mm;
-  border-top: .5pt solid #e7ecef;
-  break-inside: avoid;
-}
-.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
-.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
-.toc a { color: var(--ink); text-decoration: none; }
-/* Continuous editorial body: sections can flow across pages. */
-.content { padding: 0; }
-.content h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 17.2pt;
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1.28;
-  letter-spacing: -.024em;
-  margin: 11mm 0 5mm;
-  padding-top: 5.5mm;
-  border-top: .6pt solid var(--line);
-  break-after: avoid;
-}
-.content h2::before {
-  content: "CHAPTER";
-  display: block;
-  color: var(--accent);
-  font-size: 7pt;
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-bottom: 2.2mm;
-}
-.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
-.content h3 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 11.6pt;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -.012em;
-  color: var(--heading);
-  margin: 7mm 0 2.5mm;
-  break-after: avoid;
-}
-.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
-p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
-strong, b { font-weight: 700; color: #1a3341; }
-a { color: #23778e; text-decoration: none; }
-hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
-ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
-li { padding-left: .5mm; margin: 1.5mm 0; }
-li::marker { color: var(--accent); }
-li p { margin: 0; }
-blockquote {
-  background: var(--accent-soft);
-  border-left: 2.5pt solid var(--accent);
-  margin: 4mm 0 6mm;
-  padding: 4mm 5.2mm;
-  color: #2b4654;
-  font-size: 9.4pt;
-  line-height: 1.56;
-}
-blockquote p { margin-bottom: 2.3mm; }
-blockquote p:last-child { margin-bottom: 0; }
-blockquote strong { color: #143743; }
-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  font-size: 8pt;
-  line-height: 1.42;
-  color: var(--ink);
-  margin: 3.6mm 0 4.8mm;
-  overflow-wrap: anywhere;
-}
-thead { display: table-header-group; }
-thead th {
-  background: var(--header);
-  color: #fff;
-  text-align: left;
-  font-weight: 700;
-  padding: 2.2mm 2.4mm;
-  vertical-align: top;
-  border-right: 1pt solid rgba(255,255,255,.04);
-}
-thead th strong { color: #fff; }
-tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
-tbody tr:nth-child(even) { background: var(--zebra); }
-tr { break-inside: avoid; }
-table.wide { font-size: 7.15pt; }
-table.wide th, table.wide td { padding: 1.8mm; }
-code {
-  font-family: "DejaVu Sans Mono", monospace;
-  font-size: .91em;
-  color: #22445a;
-}
-pre {
-  color: #dce9f0;
-  background: #173746;
-  padding: 4mm 5mm;
-  font-size: 8.3pt;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin: 4mm 0;
-}
-pre code { color: inherit; }
-.task-list-item { list-style: none; margin-left: -5mm; }
-.task-box {
-  display: inline-block;
-  border: .85pt solid #7b8b93;
-  width: 2.6mm; height: 2.6mm;
-  margin-right: 3mm;
-  vertical-align: baseline;
-}
-.task-box.checked { background: var(--accent); border-color: var(--accent); }
-img { max-width: 100%; height: auto; }
-.caption { color: var(--muted); font-size: 7.8pt; }
-@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Design 2 — Credit Card Authorization System</title>
+    <style>
+        /* The original PDF skill style sheet is embedded below. */
+        /* Architect's Field Notes — original study-guide design recreation.
+           Standalone builder embeds this file into its generated HTML. */
+        :root {
+            --navy: #112c3a;
+            --header: #193a4b;
+            --ink: #273944;
+            --heading: #17313e;
+            --muted: #75838d;
+            --line: #d9e2e7;
+            --zebra: #f6f8f9;
+            --accent: #64c8e6;
+            --accent-soft: #eaf8fc;
+        }
+
+        @page {
+            size: A4;
+            margin: 19mm 19mm 19mm;
+            @top-left {
+                content: "INTERVIEW / FIELD GUIDE";
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .05em;
+                vertical-align: middle;
+            }
+            @top-right {
+                content: string(running-topic);
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .02em;
+                vertical-align: middle;
+            }
+            @bottom-left {
+                content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+                color: #9aa5ae;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 6.3pt;
+                letter-spacing: .03em;
+                vertical-align: middle;
+            }
+            @bottom-right {
+                content: counter(page, decimal-leading-zero);
+                color: #394b56;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-weight: 700;
+                font-size: 7pt;
+                vertical-align: middle;
+            }
+        }
+
+        @page cover {
+            size: A4;
+            margin: 0;
+            @top-left {
+                content: none;
+            }
+            @top-right {
+                content: none;
+            }
+            @bottom-left {
+                content: none;
+            }
+            @bottom-right {
+                content: none;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", "DejaVu Sans", sans-serif;
+            font-size: 9.4pt;
+            font-weight: 400;
+            line-height: 1.55;
+            color: var(--ink);
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        .cover {
+            page: cover;
+            break-after: page;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy);
+            color: #fff;
+            padding: 29.6mm 26mm;
+        }
+
+        .cover::before, .cover::after {
+            content: "";
+            position: absolute;
+            border: .55pt solid rgba(255, 255, 255, .08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover::before {
+            width: 158mm;
+            height: 158mm;
+            right: -84mm;
+            top: -61mm;
+        }
+
+        .cover::after {
+            width: 108mm;
+            height: 108mm;
+            right: -28mm;
+            bottom: -75mm;
+        }
+
+        .cover-brand {
+            font-size: 9.5pt;
+            font-weight: 800;
+            letter-spacing: .31em;
+            text-transform: uppercase;
+            color: #dceaf0;
+        }
+
+        .cover-series {
+            font-size: 8pt;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #98b3c1;
+            margin-top: 7mm;
+        }
+
+        .cover-accent-bar {
+            position: absolute;
+            left: 26mm;
+            top: 80mm;
+            height: 3.5mm;
+            width: 21mm;
+            background: var(--accent);
+        }
+
+        .cover-title {
+            position: absolute;
+            left: 25.5mm;
+            right: 25mm;
+            top: 97mm;
+            font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -.043em;
+            line-height: 1.08;
+            color: #fff;
+        }
+
+        .cover-title .second {
+            display: block;
+            color: var(--accent);
+        }
+
+        .cover-title.long {
+            font-size: 37pt;
+        }
+
+        .cover-sub {
+            position: absolute;
+            left: 26mm;
+            right: 31mm;
+            top: 173.5mm;
+            color: #bdcdd5;
+            font-size: 11.5pt;
+            line-height: 1.7;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .cover-note {
+            color: #91aab7;
+            text-transform: none;
+            font-size: 9pt;
+            letter-spacing: .01em;
+            margin-top: 7mm;
+            line-height: 1.6;
+        }
+
+        .cover-bottom {
+            position: absolute;
+            bottom: 31mm;
+            left: 26mm;
+            font-size: 7.8pt;
+            line-height: 1.9;
+            letter-spacing: .065em;
+            color: #cfdae0;
+        }
+
+        .cover-rule {
+            position: absolute;
+            bottom: 62mm;
+            height: .35pt;
+            left: 26mm;
+            right: 26mm;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .cover-number {
+            position: absolute;
+            bottom: 29mm;
+            right: 26mm;
+            color: var(--accent);
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 39pt;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        /* Introduction + automatically generated navigable contents. */
+        .preface {
+            break-after: page;
+        }
+
+        .preface-label, .toc-overline {
+            color: var(--accent);
+            font-size: 7.6pt;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .preface h1 {
+            display: none;
+        }
+
+        .preface h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 14pt;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -.02em;
+            color: var(--heading);
+            margin: 5mm 0 5mm;
+            border-bottom: .5pt solid var(--line);
+            padding-bottom: 2.5mm;
+        }
+
+        .preface p {
+            font-size: 9.5pt;
+            line-height: 1.6;
+        }
+
+        .toc {
+            border-top: .5pt solid var(--line);
+            margin-top: 8mm;
+            padding-top: 6.5mm;
+        }
+
+        .toc h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 21pt;
+            letter-spacing: -.03em;
+            margin: 2mm 0 5mm;
+            border: 0;
+            padding: 0;
+        }
+
+        .toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            gap: 5mm;
+            font-size: 9.1pt;
+            padding: 2.7mm 1mm;
+            border-top: .5pt solid #e7ecef;
+            break-inside: avoid;
+        }
+
+        .toc li:last-child {
+            border-bottom: .5pt solid #e7ecef;
+        }
+
+        .toc .toc-num {
+            width: 8mm;
+            flex: 0 0 8mm;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .toc a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        /* Continuous editorial body: sections can flow across pages. */
+        .content {
+            padding: 0;
+        }
+
+        .content h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 17.2pt;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.28;
+            letter-spacing: -.024em;
+            margin: 11mm 0 5mm;
+            padding-top: 5.5mm;
+            border-top: .6pt solid var(--line);
+            break-after: avoid;
+        }
+
+        .content h2::before {
+            content: "CHAPTER";
+            display: block;
+            color: var(--accent);
+            font-size: 7pt;
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .19em;
+            margin-bottom: 2.2mm;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 11.6pt;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -.012em;
+            color: var(--heading);
+            margin: 7mm 0 2.5mm;
+            break-after: avoid;
+        }
+
+        .content h4, .preface h3 {
+            font-size: 10pt;
+            color: var(--heading);
+            margin: 5mm 0 2mm;
+            break-after: avoid;
+        }
+
+        p {
+            margin: 0 0 3.15mm;
+            orphans: 2;
+            widows: 2;
+        }
+
+        strong, b {
+            font-weight: 700;
+            color: #1a3341;
+        }
+
+        a {
+            color: #23778e;
+            text-decoration: none;
+        }
+
+        hr {
+            height: 0;
+            border: none;
+            border-top: .55pt solid #d9e2e7;
+            margin: 7mm 0;
+        }
+
+        ul, ol {
+            margin: 2.5mm 0 4mm;
+            padding-left: 6mm;
+        }
+
+        li {
+            padding-left: .5mm;
+            margin: 1.5mm 0;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        li p {
+            margin: 0;
+        }
+
+        blockquote {
+            background: var(--accent-soft);
+            border-left: 2.5pt solid var(--accent);
+            margin: 4mm 0 6mm;
+            padding: 4mm 5.2mm;
+            color: #2b4654;
+            font-size: 9.4pt;
+            line-height: 1.56;
+        }
+
+        blockquote p {
+            margin-bottom: 2.3mm;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        blockquote strong {
+            color: #143743;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            font-size: 8pt;
+            line-height: 1.42;
+            color: var(--ink);
+            margin: 3.6mm 0 4.8mm;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        thead th {
+            background: var(--header);
+            color: #fff;
+            text-align: left;
+            font-weight: 700;
+            padding: 2.2mm 2.4mm;
+            vertical-align: top;
+            border-right: 1pt solid rgba(255, 255, 255, .04);
+        }
+
+        thead th strong {
+            color: #fff;
+        }
+
+        tbody td {
+            border-bottom: .35pt solid #e3e9ed;
+            padding: 2.3mm 2.4mm;
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--zebra);
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        table.wide {
+            font-size: 7.15pt;
+        }
+
+        table.wide th, table.wide td {
+            padding: 1.8mm;
+        }
+
+        code {
+            font-family: "DejaVu Sans Mono", monospace;
+            font-size: .91em;
+            color: #22445a;
+        }
+
+        pre {
+            color: #dce9f0;
+            background: #173746;
+            padding: 4mm 5mm;
+            font-size: 8.3pt;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 4mm 0;
+        }
+
+        pre code {
+            color: inherit;
+        }
+
+        .task-list-item {
+            list-style: none;
+            margin-left: -5mm;
+        }
+
+        .task-box {
+            display: inline-block;
+            border: .85pt solid #7b8b93;
+            width: 2.6mm;
+            height: 2.6mm;
+            margin-right: 3mm;
+            vertical-align: baseline;
+        }
+
+        .task-box.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 7.8pt;
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 25px #ddd;
+            }
+        }
 
 
-:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"DESIGN 2 — CREDIT CARD AUTHORIZATION SYSTEM";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
-@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 03 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title">Design 2 — Credit Card<span class="second">Authorization System</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">03</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>Module 2: Financial Systems — Deep Dive</strong> <strong>Focus:</strong> Low latency, financial correctness, concurrency, fraud detection, idempotency, high availability, and failure recovery.</p>
-<blockquote><p><strong>Scope:</strong> An illustrative <strong>issuer-side</strong> credit card authorization system receiving requests from a payment network. This is an educational design, <strong>not</strong> a description of American Express&#39;s internal systems. Capacity numbers and latency targets below are hypothetical.</p></blockquote>
-<nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-understand-the-payment-lifecycle">1. Understand the payment lifecycle</a></li><li><span class="toc-num">02</span><a href="#2-derive-the-requirements">2. Derive the requirements</a></li><li><span class="toc-num">03</span><a href="#3-identify-business-invariants">3. Identify business invariants</a></li><li><span class="toc-num">04</span><a href="#4-select-the-communication-protocol">4. Select the communication protocol</a></li><li><span class="toc-num">05</span><a href="#5-begin-with-the-simplest-baseline">5. Begin with the simplest baseline</a></li><li><span class="toc-num">06</span><a href="#6-solve-concurrent-authorizations">6. Solve concurrent authorizations</a></li><li><span class="toc-num">07</span><a href="#7-define-the-data-model">7. Define the data model</a></li><li><span class="toc-num">08</span><a href="#8-make-authorization-approval-atomic">8. Make authorization approval atomic</a></li><li><span class="toc-num">09</span><a href="#9-handle-duplicate-requests-idempotency">9. Handle duplicate requests: idempotency</a></li><li><span class="toc-num">10</span><a href="#10-verify-card-credentials-and-evaluate-fraud">10. Verify card credentials and evaluate fraud</a></li><li><span class="toc-num">11</span><a href="#11-end-to-end-authorization-flow">11. End-to-end authorization flow</a></li><li><span class="toc-num">12</span><a href="#12-derive-a-latency-budget">12. Derive a latency budget</a></li><li><span class="toc-num">13</span><a href="#13-model-authorization-and-hold-lifecycles">13. Model authorization and hold lifecycles</a></li><li><span class="toc-num">14</span><a href="#14-move-from-authorization-to-clearing">14. Move from authorization to clearing</a></li><li><span class="toc-num">15</span><a href="#15-handle-failures-explicitly">15. Handle failures explicitly</a></li><li><span class="toc-num">16</span><a href="#16-where-kafka-or-a-message-broker-belongs">16. Where Kafka or a message broker belongs</a></li><li><span class="toc-num">17</span><a href="#17-high-availability-and-multi-region-design">17. High availability and multi-region design</a></li><li><span class="toc-num">18</span><a href="#18-scale-authorization-capacity">18. Scale authorization capacity</a></li><li><span class="toc-num">19</span><a href="#19-security-architecture">19. Security architecture</a></li><li><span class="toc-num">20</span><a href="#20-observability-and-operations">20. Observability and operations</a></li><li><span class="toc-num">21</span><a href="#21-final-reference-architecture">21. Final reference architecture</a></li><li><span class="toc-num">22</span><a href="#22-decisions-and-rejected-alternatives">22. Decisions and rejected alternatives</a></li><li><span class="toc-num">23</span><a href="#23-variations-that-change-the-architecture">23. Variations that change the architecture</a></li><li><span class="toc-num">24</span><a href="#24-summary-key-concepts-demonstrated">24. Summary: Key concepts demonstrated</a></li><li><span class="toc-num">25</span><a href="#official-references">Official references</a></li></ol></nav></section><main class="content"><h2 id="1-understand-the-payment-lifecycle">1. Understand the payment lifecycle</h2>
-<p>Before designing the system, separate three operations:</p>
-<pre><code>Authorization
+        :root {
+            --accent: #64C8E6;
+            --accent-soft: #EAF8FC;
+        }
+
+        @page {
+            @top-right {
+                content: "DESIGN 2 — CREDIT CARD AUTHORIZATION SYSTEM";
+            }@bottom-left {
+            content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+        }
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 20px #dce2e6;
+            }
+        }</style>
+</head>
+<body>
+<section class="cover">
+    <div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div>
+    <div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 03
+        OF 07
+    </div>
+    <div class="cover-accent-bar"></div>
+    <div class="cover-title">Design 2 — Credit Card<span class="second">Authorization System</span>
+    </div>
+    <div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH
+        CONFIDENCE.
+        <div class="cover-note">Evidence-based STAR answers, senior-level
+            judgment, and focused interview rehearsal.
+        </div>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT
+        INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE
+    </div>
+    <div class="cover-number">03</div>
+</section>
+<section class="preface">
+    <div class="preface-label">YOUR STUDY COMPANION</div>
+    <p><strong>Module 2: Financial Systems — Deep Dive</strong>
+        <strong>Focus:</strong> Low latency, financial correctness, concurrency,
+        fraud detection, idempotency, high availability, and failure recovery.
+    </p>
+    <blockquote><p><strong>Scope:</strong> An illustrative
+        <strong>issuer-side</strong> credit card authorization system receiving
+        requests from a payment network. This is an educational design, <strong>not</strong>
+        a description of American Express&#39;s internal systems. Capacity
+        numbers and latency targets below are hypothetical.</p></blockquote>
+    <nav class="toc">
+        <div class="toc-overline">NAVIGATION</div>
+        <h2>Inside this guide</h2>
+        <ol>
+            <li><span class="toc-num">01</span><a
+                    href="#1-understand-the-payment-lifecycle">1. Understand the
+                payment lifecycle</a></li>
+            <li><span class="toc-num">02</span><a
+                    href="#2-derive-the-requirements">2. Derive the
+                requirements</a></li>
+            <li><span class="toc-num">03</span><a
+                    href="#3-identify-business-invariants">3. Identify business
+                invariants</a></li>
+            <li><span class="toc-num">04</span><a
+                    href="#4-select-the-communication-protocol">4. Select the
+                communication protocol</a></li>
+            <li><span class="toc-num">05</span><a
+                    href="#5-begin-with-the-simplest-baseline">5. Begin with the
+                simplest baseline</a></li>
+            <li><span class="toc-num">06</span><a
+                    href="#6-solve-concurrent-authorizations">6. Solve
+                concurrent authorizations</a></li>
+            <li><span class="toc-num">07</span><a
+                    href="#7-define-the-data-model">7. Define the data model</a>
+            </li>
+            <li><span class="toc-num">08</span><a
+                    href="#8-make-authorization-approval-atomic">8. Make
+                authorization approval atomic</a></li>
+            <li><span class="toc-num">09</span><a
+                    href="#9-handle-duplicate-requests-idempotency">9. Handle
+                duplicate requests: idempotency</a></li>
+            <li><span class="toc-num">10</span><a
+                    href="#10-verify-card-credentials-and-evaluate-fraud">10.
+                Verify card credentials and evaluate fraud</a></li>
+            <li><span class="toc-num">11</span><a
+                    href="#11-end-to-end-authorization-flow">11. End-to-end
+                authorization flow</a></li>
+            <li><span class="toc-num">12</span><a
+                    href="#12-derive-a-latency-budget">12. Derive a latency
+                budget</a></li>
+            <li><span class="toc-num">13</span><a
+                    href="#13-model-authorization-and-hold-lifecycles">13. Model
+                authorization and hold lifecycles</a></li>
+            <li><span class="toc-num">14</span><a
+                    href="#14-move-from-authorization-to-clearing">14. Move from
+                authorization to clearing</a></li>
+            <li><span class="toc-num">15</span><a
+                    href="#15-handle-failures-explicitly">15. Handle failures
+                explicitly</a></li>
+            <li><span class="toc-num">16</span><a
+                    href="#16-where-kafka-or-a-message-broker-belongs">16. Where
+                Kafka or a message broker belongs</a></li>
+            <li><span class="toc-num">17</span><a
+                    href="#17-high-availability-and-multi-region-design">17.
+                High availability and multi-region design</a></li>
+            <li><span class="toc-num">18</span><a
+                    href="#18-scale-authorization-capacity">18. Scale
+                authorization capacity</a></li>
+            <li><span class="toc-num">19</span><a
+                    href="#19-security-architecture">19. Security
+                architecture</a></li>
+            <li><span class="toc-num">20</span><a
+                    href="#20-observability-and-operations">20. Observability
+                and operations</a></li>
+            <li><span class="toc-num">21</span><a
+                    href="#21-final-reference-architecture">21. Final reference
+                architecture</a></li>
+            <li><span class="toc-num">22</span><a
+                    href="#22-decisions-and-rejected-alternatives">22. Decisions
+                and rejected alternatives</a></li>
+            <li><span class="toc-num">23</span><a
+                    href="#23-variations-that-change-the-architecture">23.
+                Variations that change the architecture</a></li>
+            <li><span class="toc-num">24</span><a
+                    href="#24-summary-key-concepts-demonstrated">24. Summary:
+                Key concepts demonstrated</a></li>
+            <li><span class="toc-num">25</span><a href="#official-references">Official
+                references</a></li>
+        </ol>
+    </nav>
+</section>
+<main class="content"><h2 id="1-understand-the-payment-lifecycle">1. Understand
+    the payment lifecycle</h2>
+    <p>Before designing the system, separate three operations:</p>
+    <pre><code>Authorization
     |
     v
 Clearing / Presentment
     |
     v
 Settlement</code></pre>
-<ul><li><strong>Authorization:</strong> The issuer decides whether a transaction can be approved and typically reserves the relevant credit.</li><li><strong>Clearing/presentment:</strong> A merchant submits the completed transaction for financial posting and processing.</li><li><strong>Settlement:</strong> The relevant parties complete financial settlement obligations under applicable arrangements.</li></ul>
-<p>These stages are distinguished in the <a href="https://www.americanexpress.com/content/dam/amex/us/merchant/new-merchant-regulations/Reference-Guide<em>EN</em>US.pdf" target="_blank" rel="noopener">American Express U.S. Merchant Reference Guide</a>.</p>
-<h3 id="example-purchase-a-100-item">Example: Purchase a $100 item</h3>
-<ol start="1"><li>The cardholder presents a card.</li><li>The merchant requests authorization for $100.</li><li>The issuer verifies card and account status, available credit, and risk.</li><li>The issuer approves and places an authorization hold.</li><li>The response returns to the merchant.</li><li>Later, the merchant submits the transaction for clearing.</li><li>The issuer posts the applicable financial obligation.</li><li>Settlement occurs under the relevant payment arrangements.</li></ol>
-<p><strong>Key point:</strong> Approval is not the same as transferring $100 to the merchant. Authorization and financial posting are distinct business events.</p>
-<h3 id="payment-participants">Payment participants</h3>
-<pre><code>Cardholder
+    <ul>
+        <li><strong>Authorization:</strong> The issuer decides whether a
+            transaction can be approved and typically reserves the relevant
+            credit.
+        </li>
+        <li><strong>Clearing/presentment:</strong> A merchant submits the
+            completed transaction for financial posting and processing.
+        </li>
+        <li><strong>Settlement:</strong> The relevant parties complete financial
+            settlement obligations under applicable arrangements.
+        </li>
+    </ul>
+    <p>These stages are distinguished in the <a
+            href="https://www.americanexpress.com/content/dam/amex/us/merchant/new-merchant-regulations/Reference-Guide<em>EN</em>US.pdf"
+            target="_blank" rel="noopener">American Express U.S. Merchant
+        Reference Guide</a>.</p>
+    <h3 id="example-purchase-a-100-item">Example: Purchase a $100 item</h3>
+    <ol start="1">
+        <li>The cardholder presents a card.</li>
+        <li>The merchant requests authorization for $100.</li>
+        <li>The issuer verifies card and account status, available credit, and
+            risk.
+        </li>
+        <li>The issuer approves and places an authorization hold.</li>
+        <li>The response returns to the merchant.</li>
+        <li>Later, the merchant submits the transaction for clearing.</li>
+        <li>The issuer posts the applicable financial obligation.</li>
+        <li>Settlement occurs under the relevant payment arrangements.</li>
+    </ol>
+    <p><strong>Key point:</strong> Approval is not the same as transferring $100
+        to the merchant. Authorization and financial posting are distinct
+        business events.</p>
+    <h3 id="payment-participants">Payment participants</h3>
+    <pre><code>Cardholder
     |
     v
 Merchant
@@ -360,26 +736,156 @@ Approval / Decline
     |
     v
 Response back through network</code></pre>
-<p><strong>Our ownership boundary:</strong> The issuer-side system. We do not redesign checkout, acquiring, the card network, or the complete clearing and settlement platform.</p>
-<hr>
-<h2 id="2-derive-the-requirements">2. Derive the requirements</h2>
-<h3 id="functional-requirements">Functional requirements</h3>
-<ol start="1"><li>Receive authorization requests from a trusted card network.</li><li>Identify the card and account.</li><li>Validate card status and required authentication information.</li><li>Enforce account and product policies.</li><li>Evaluate fraud risk.</li><li>Check available credit or product-specific spending capacity.</li><li>Create a hold on approval.</li><li>Return the correct network response.</li><li>Recognize repeated logical requests without duplicate holds.</li><li>Support reversals, adjustments, and expiry.</li><li>Retain records for audit, reconciliation, and clearing.</li></ol>
-<h3 id="non-functional-requirements">Non-functional requirements</h3>
-<table><thead><tr><th>Requirement</th><th>Priority</th><th>Why</th></tr></thead><tbody><tr><td>Correctness</td><td>Critical</td><td>Prevent unintended double reservation and overcommitment</td></tr><tr><td>Response latency</td><td>Critical</td><td>Customer and merchant are waiting</td></tr><tr><td>Availability</td><td>Critical</td><td>Outages interrupt purchases</td></tr><tr><td>Security</td><td>Critical</td><td>Sensitive payment credentials and financial data</td></tr><tr><td>Consistency</td><td>Critical for credit reservation</td><td>Concurrent approvals share credit availability</td></tr><tr><td>Scale</td><td>High</td><td>High-volume and bursty transaction traffic</td></tr><tr><td>Observability</td><td>High</td><td>Investigate uncertain outcomes and incidents</td></tr><tr><td>Auditability</td><td>High</td><td>Financial decisions require a traceable history</td></tr></tbody></table>
-<h3 id="hypothetical-scale-and-objectives">Hypothetical scale and objectives</h3>
-<table><thead><tr><th>Parameter</th><th>Illustrative assumption</th></tr></thead><tbody><tr><td>Authorizations/day</td><td>50 million</td></tr><tr><td>Average transactions/second</td><td>~579 TPS</td></tr><tr><td>Peak multiplier</td><td>10x</td></tr><tr><td>Illustrative peak</td><td>~5,800 TPS</td></tr><tr><td>Internal issuer-side p99 latency target</td><td>Under 300 ms</td></tr><tr><td>Internal service availability objective</td><td>99.99%</td></tr><tr><td>Independent active-active writes for one account</td><td>Not required initially</td></tr></tbody></table>
-<p>The 300 ms is <strong>not a verified card-network limit</strong>. Actual deadlines come from the applicable network interface agreements. We use these figures to reason about design choices.</p>
-<hr>
-<h2 id="3-identify-business-invariants">3. Identify business invariants</h2>
-<p>An <strong>invariant</strong> is a property that must remain true despite concurrency or failures.</p>
-<ol start="1"><li><strong>No duplicate credit reservation:</strong> A retry of the same logical authorization must not create a second hold.</li><li><strong>No unintended credit overcommitment:</strong> Concurrent requests cannot both spend the same remaining credit under the defined policy.</li><li><strong>Durable approval:</strong> Before returning a normal approval, persist the decision and reservation durably.</li><li><strong>Idempotent reversal:</strong> A duplicate reversal must not release credit twice.</li><li><strong>Correct lifecycle:</strong> Authorization, clearing, reversal, and settlement must not be confused.</li></ol>
-<p>Exception mechanisms such as network stand-in authorization or issuer-approved credit exceptions require separately defined policies. They are not reasons to relax the normal system's invariants accidentally.</p>
-<p><strong>Design implication:</strong> Database transactions, unique constraints, request identities, controlled ownership, and reconciliation are more important here than choosing a trendy technology.</p>
-<hr>
-<h2 id="4-select-the-communication-protocol">4. Select the communication protocol</h2>
-<p>The issuer normally receives network financial messages, not an HTTP checkout request directly from the customer.</p>
-<pre><code>Payment Network
+    <p><strong>Our ownership boundary:</strong> The issuer-side system. We do
+        not redesign checkout, acquiring, the card network, or the complete
+        clearing and settlement platform.</p>
+    <hr>
+    <h2 id="2-derive-the-requirements">2. Derive the requirements</h2>
+    <h3 id="functional-requirements">Functional requirements</h3>
+    <ol start="1">
+        <li>Receive authorization requests from a trusted card network.</li>
+        <li>Identify the card and account.</li>
+        <li>Validate card status and required authentication information.</li>
+        <li>Enforce account and product policies.</li>
+        <li>Evaluate fraud risk.</li>
+        <li>Check available credit or product-specific spending capacity.</li>
+        <li>Create a hold on approval.</li>
+        <li>Return the correct network response.</li>
+        <li>Recognize repeated logical requests without duplicate holds.</li>
+        <li>Support reversals, adjustments, and expiry.</li>
+        <li>Retain records for audit, reconciliation, and clearing.</li>
+    </ol>
+    <h3 id="non-functional-requirements">Non-functional requirements</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>Priority</th>
+            <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Correctness</td>
+            <td>Critical</td>
+            <td>Prevent unintended double reservation and overcommitment</td>
+        </tr>
+        <tr>
+            <td>Response latency</td>
+            <td>Critical</td>
+            <td>Customer and merchant are waiting</td>
+        </tr>
+        <tr>
+            <td>Availability</td>
+            <td>Critical</td>
+            <td>Outages interrupt purchases</td>
+        </tr>
+        <tr>
+            <td>Security</td>
+            <td>Critical</td>
+            <td>Sensitive payment credentials and financial data</td>
+        </tr>
+        <tr>
+            <td>Consistency</td>
+            <td>Critical for credit reservation</td>
+            <td>Concurrent approvals share credit availability</td>
+        </tr>
+        <tr>
+            <td>Scale</td>
+            <td>High</td>
+            <td>High-volume and bursty transaction traffic</td>
+        </tr>
+        <tr>
+            <td>Observability</td>
+            <td>High</td>
+            <td>Investigate uncertain outcomes and incidents</td>
+        </tr>
+        <tr>
+            <td>Auditability</td>
+            <td>High</td>
+            <td>Financial decisions require a traceable history</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="hypothetical-scale-and-objectives">Hypothetical scale and
+        objectives</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Illustrative assumption</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Authorizations/day</td>
+            <td>50 million</td>
+        </tr>
+        <tr>
+            <td>Average transactions/second</td>
+            <td>~579 TPS</td>
+        </tr>
+        <tr>
+            <td>Peak multiplier</td>
+            <td>10x</td>
+        </tr>
+        <tr>
+            <td>Illustrative peak</td>
+            <td>~5,800 TPS</td>
+        </tr>
+        <tr>
+            <td>Internal issuer-side p99 latency target</td>
+            <td>Under 300 ms</td>
+        </tr>
+        <tr>
+            <td>Internal service availability objective</td>
+            <td>99.99%</td>
+        </tr>
+        <tr>
+            <td>Independent active-active writes for one account</td>
+            <td>Not required initially</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>The 300 ms is <strong>not a verified card-network limit</strong>. Actual
+        deadlines come from the applicable network interface agreements. We use
+        these figures to reason about design choices.</p>
+    <hr>
+    <h2 id="3-identify-business-invariants">3. Identify business invariants</h2>
+    <p>An <strong>invariant</strong> is a property that must remain true despite
+        concurrency or failures.</p>
+    <ol start="1">
+        <li><strong>No duplicate credit reservation:</strong> A retry of the
+            same logical authorization must not create a second hold.
+        </li>
+        <li><strong>No unintended credit overcommitment:</strong> Concurrent
+            requests cannot both spend the same remaining credit under the
+            defined policy.
+        </li>
+        <li><strong>Durable approval:</strong> Before returning a normal
+            approval, persist the decision and reservation durably.
+        </li>
+        <li><strong>Idempotent reversal:</strong> A duplicate reversal must not
+            release credit twice.
+        </li>
+        <li><strong>Correct lifecycle:</strong> Authorization, clearing,
+            reversal, and settlement must not be confused.
+        </li>
+    </ol>
+    <p>Exception mechanisms such as network stand-in authorization or
+        issuer-approved credit exceptions require separately defined policies.
+        They are not reasons to relax the normal system's invariants
+        accidentally.</p>
+    <p><strong>Design implication:</strong> Database transactions, unique
+        constraints, request identities, controlled ownership, and
+        reconciliation are more important here than choosing a trendy
+        technology.</p>
+    <hr>
+    <h2 id="4-select-the-communication-protocol">4. Select the communication
+        protocol</h2>
+    <p>The issuer normally receives network financial messages, not an HTTP
+        checkout request directly from the customer.</p>
+    <pre><code>Payment Network
      |
      v
 Network Protocol Adapter
@@ -389,13 +895,26 @@ Canonical Authorization Request
      |
      v
 Authorization Service</code></pre>
-<h3 id="choice-a-protocol-adapter-anti-corruption-layer">Choice: A protocol adapter / anti-corruption layer</h3>
-<p>The adapter handles:</p>
-<ul><li>Secure network connectivity and validation.</li><li>Message parsing and required field validation.</li><li>Correlation and transaction identity.</li><li>Duplicate message recognition.</li><li>Conversion to the internal request model.</li><li>Mapping decisions to network response codes and messages.</li></ul>
-<p>Card payment protocols frequently use ISO 8583-based message structures, but the exact interface and field semantics are network-specific. Never assume a generic ISO 8583 message is the complete specification for a particular network.</p>
-<p><strong>Concept — Anti-corruption layer:</strong> An integration boundary that prevents external protocols, identifiers, and conventions from spreading throughout internal business services.</p>
-<p>Example <strong>illustrative internal</strong> request:</p>
-<pre><code>{
+    <h3 id="choice-a-protocol-adapter-anti-corruption-layer">Choice: A protocol
+        adapter / anti-corruption layer</h3>
+    <p>The adapter handles:</p>
+    <ul>
+        <li>Secure network connectivity and validation.</li>
+        <li>Message parsing and required field validation.</li>
+        <li>Correlation and transaction identity.</li>
+        <li>Duplicate message recognition.</li>
+        <li>Conversion to the internal request model.</li>
+        <li>Mapping decisions to network response codes and messages.</li>
+    </ul>
+    <p>Card payment protocols frequently use ISO 8583-based message structures,
+        but the exact interface and field semantics are network-specific. Never
+        assume a generic ISO 8583 message is the complete specification for a
+        particular network.</p>
+    <p><strong>Concept — Anti-corruption layer:</strong> An integration boundary
+        that prevents external protocols, identifiers, and conventions from
+        spreading throughout internal business services.</p>
+    <p>Example <strong>illustrative internal</strong> request:</p>
+    <pre><code>{
   "requestId": "network-transaction-reference",
   "cardReference": "card_tok_123",
   "merchantId": "merchant_456",
@@ -405,11 +924,17 @@ Authorization Service</code></pre>
   "channel": "CARD_PRESENT",
   "timestamp": "2026-11-02T12:30:00Z"
 }</code></pre>
-<p><strong>Alternative:</strong> Make every internal service understand the network's raw message format. This saves mapping but creates hard dependencies and complicates adding a second network or upgrading a protocol.</p>
-<p><strong>Decision:</strong> Use a canonical internal model while preserving all network information needed for response, clearing, investigations, and reconciliation.</p>
-<hr>
-<h2 id="5-begin-with-the-simplest-baseline">5. Begin with the simplest baseline</h2>
-<pre><code>Card Network
+    <p><strong>Alternative:</strong> Make every internal service understand the
+        network's raw message format. This saves mapping but creates hard
+        dependencies and complicates adding a second network or upgrading a
+        protocol.</p>
+    <p><strong>Decision:</strong> Use a canonical internal model while
+        preserving all network information needed for response, clearing,
+        investigations, and reconciliation.</p>
+    <hr>
+    <h2 id="5-begin-with-the-simplest-baseline">5. Begin with the simplest
+        baseline</h2>
+    <pre><code>Card Network
      |
      v
 Network Adapter
@@ -423,18 +948,49 @@ Authorization Service
      |
      v
 Approve / Decline</code></pre>
-<p>The service resolves the card, checks eligibility and risk, checks available credit, records its decision, and sends a response.</p>
-<p>This is a functional starting point. Its first serious weakness is concurrency: what if two purchases reach the issuer at nearly the same time?</p>
-<hr>
-<h2 id="6-solve-concurrent-authorizations">6. Solve concurrent authorizations</h2>
-<p>Assume:</p>
-<table><thead><tr><th>Measure</th><th>Amount</th></tr></thead><tbody><tr><td>Credit limit</td><td>$1,000</td></tr><tr><td>Posted outstanding</td><td>$600</td></tr><tr><td>Existing holds</td><td>$250</td></tr><tr><td>Available credit</td><td><strong>$150</strong></td></tr></tbody></table>
-<p>Simplified revolving-credit formula:</p>
-<pre><code>Available credit = Credit limit - Posted exposure - Active holds</code></pre>
-<p>Real products may also consider payments, adjustments, disputes, over-limit rules, or dynamic spending capacity.</p>
-<p>Now merchant A requests $100 while merchant B independently requests $100.</p>
-<h3 id="broken-read-then-write-design">Broken read-then-write design</h3>
-<pre><code>Thread A                      Thread B
+    <p>The service resolves the card, checks eligibility and risk, checks
+        available credit, records its decision, and sends a response.</p>
+    <p>This is a functional starting point. Its first serious weakness is
+        concurrency: what if two purchases reach the issuer at nearly the same
+        time?</p>
+    <hr>
+    <h2 id="6-solve-concurrent-authorizations">6. Solve concurrent
+        authorizations</h2>
+    <p>Assume:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Measure</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Credit limit</td>
+            <td>$1,000</td>
+        </tr>
+        <tr>
+            <td>Posted outstanding</td>
+            <td>$600</td>
+        </tr>
+        <tr>
+            <td>Existing holds</td>
+            <td>$250</td>
+        </tr>
+        <tr>
+            <td>Available credit</td>
+            <td><strong>$150</strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Simplified revolving-credit formula:</p>
+    <pre><code>Available credit = Credit limit - Posted exposure - Active holds</code></pre>
+    <p>Real products may also consider payments, adjustments, disputes,
+        over-limit rules, or dynamic spending capacity.</p>
+    <p>Now merchant A requests $100 while merchant B independently requests
+        $100.</p>
+    <h3 id="broken-read-then-write-design">Broken read-then-write design</h3>
+    <pre><code>Thread A                      Thread B
    |                             |
 Read available = $150       Read available = $150
    |                             |
@@ -443,39 +999,91 @@ $100 &lt;= $150                $100 &lt;= $150
 Approve                     Approve
    |                             |
 Save $100 hold              Save $100 hold</code></pre>
-<p>Both could approve, consuming $200 of the same $150. This is a <strong>race condition</strong>.</p>
-<h3 id="candidate-concurrency-controls">Candidate concurrency controls</h3>
-<table><thead><tr><th>Option</th><th>Mechanism</th><th>Trade-off</th></tr></thead><tbody><tr><td>Pessimistic lock</td><td>Lock account row while processing</td><td>Simple but can increase contention</td></tr><tr><td>Optimistic concurrency</td><td>Verify version before updating</td><td>Retries if competing updates win</td></tr><tr><td>Atomic conditional update</td><td>Update only if sufficient availability remains</td><td>Short critical section; requires correct counter modeling</td></tr></tbody></table>
-<h3 id="choice-atomic-conditional-reservation">Choice: Atomic conditional reservation</h3>
-<p>Illustrative SQL:</p>
-<pre><code>UPDATE account_credit
+    <p>Both could approve, consuming $200 of the same $150. This is a <strong>race
+        condition</strong>.</p>
+    <h3 id="candidate-concurrency-controls">Candidate concurrency controls</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Option</th>
+            <th>Mechanism</th>
+            <th>Trade-off</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Pessimistic lock</td>
+            <td>Lock account row while processing</td>
+            <td>Simple but can increase contention</td>
+        </tr>
+        <tr>
+            <td>Optimistic concurrency</td>
+            <td>Verify version before updating</td>
+            <td>Retries if competing updates win</td>
+        </tr>
+        <tr>
+            <td>Atomic conditional update</td>
+            <td>Update only if sufficient availability remains</td>
+            <td>Short critical section; requires correct counter modeling</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="choice-atomic-conditional-reservation">Choice: Atomic conditional
+        reservation</h3>
+    <p>Illustrative SQL:</p>
+    <pre><code>UPDATE account_credit
 SET reserved_minor = reserved_minor + :amount
 WHERE account_id = :account_id
   AND credit_limit_minor
       - posted_exposure_minor
       - reserved_minor &gt;= :amount
 RETURNING reserved_minor;</code></pre>
-<p>Interpretation:</p>
-<ul><li>One row updated: reservation succeeded.</li><li>Zero rows updated: insufficient available credit or no matching account; distinguish the specific reason before returning a decision.</li><li>Related authorization and hold records must commit in the <strong>same database transaction</strong>.</li></ul>
-<p>With correct transaction isolation and row-update semantics, concurrent updates on the same account cannot both reserve credit already consumed by the first committed update.</p>
-<p>Result: one of the $100 requests can be approved; the other is declined under the simplified policy. The exact winner is nondeterministic.</p>
-<h3 id="why-not-use-redis-as-the-authoritative-balance">Why not use Redis as the authoritative balance?</h3>
-<p>Redis supports atomic operations, but separating the reservation counter from the durable financial database raises difficult questions:</p>
-<ul><li>What happens if Redis accepts a reservation and database persistence fails?</li><li>What durability guarantees survive Redis failover?</li><li>How are reversals, clearing, and reservations reconciled?</li><li>Which system becomes authoritative during recovery?</li></ul>
-<p><strong>Decision:</strong> Begin with a transactional authoritative database. Use Redis or another low-latency store for eligible risk features and caches, not as an accidentally inconsistent financial truth source.</p>
-<hr>
-<h2 id="7-define-the-data-model">7. Define the data model</h2>
-<p>The design needs account exposure, the authorization decision, the hold, and durable request identity.</p>
-<h3 id="accountcredit"><code>AccountCredit</code></h3>
-<pre><code>account_id              PK
+    <p>Interpretation:</p>
+    <ul>
+        <li>One row updated: reservation succeeded.</li>
+        <li>Zero rows updated: insufficient available credit or no matching
+            account; distinguish the specific reason before returning a
+            decision.
+        </li>
+        <li>Related authorization and hold records must commit in the <strong>same
+            database transaction</strong>.
+        </li>
+    </ul>
+    <p>With correct transaction isolation and row-update semantics, concurrent
+        updates on the same account cannot both reserve credit already consumed
+        by the first committed update.</p>
+    <p>Result: one of the $100 requests can be approved; the other is declined
+        under the simplified policy. The exact winner is nondeterministic.</p>
+    <h3 id="why-not-use-redis-as-the-authoritative-balance">Why not use Redis as
+        the authoritative balance?</h3>
+    <p>Redis supports atomic operations, but separating the reservation counter
+        from the durable financial database raises difficult questions:</p>
+    <ul>
+        <li>What happens if Redis accepts a reservation and database persistence
+            fails?
+        </li>
+        <li>What durability guarantees survive Redis failover?</li>
+        <li>How are reversals, clearing, and reservations reconciled?</li>
+        <li>Which system becomes authoritative during recovery?</li>
+    </ul>
+    <p><strong>Decision:</strong> Begin with a transactional authoritative
+        database. Use Redis or another low-latency store for eligible risk
+        features and caches, not as an accidentally inconsistent financial truth
+        source.</p>
+    <hr>
+    <h2 id="7-define-the-data-model">7. Define the data model</h2>
+    <p>The design needs account exposure, the authorization decision, the hold,
+        and durable request identity.</p>
+    <h3 id="accountcredit"><code>AccountCredit</code></h3>
+    <pre><code>account_id              PK
 credit_limit_minor
 posted_exposure_minor
 reserved_minor
 currency
 version
 updated_at</code></pre>
-<h3 id="authorization"><code>Authorization</code></h3>
-<pre><code>authorization_id        PK
+    <h3 id="authorization"><code>Authorization</code></h3>
+    <pre><code>authorization_id        PK
 request_identity        UNIQUE
 account_id
 merchant_id
@@ -487,8 +1095,8 @@ authorization_code
 created_at
 expires_at
 version</code></pre>
-<h3 id="authorizationhold"><code>AuthorizationHold</code></h3>
-<pre><code>hold_id                 PK
+    <h3 id="authorizationhold"><code>AuthorizationHold</code></h3>
+    <pre><code>hold_id                 PK
 authorization_id        UNIQUE
 account_id
 reserved_amount_minor
@@ -496,22 +1104,33 @@ remaining_amount_minor
 status
 created_at
 expires_at</code></pre>
-<h3 id="processedrequest"><code>ProcessedRequest</code></h3>
-<pre><code>request_identity        PK
+    <h3 id="processedrequest"><code>ProcessedRequest</code></h3>
+    <pre><code>request_identity        PK
 request_fingerprint
 authorization_id
 response_code
 response_reference
 processing_status</code></pre>
-<p><strong>Why SQL initially?</strong> We need unique constraints, atomic conditional updates, transactional writes across related records, and controlled lifecycle changes. A relational database supports these well.</p>
-<p>A distributed transactional NoSQL database could also work if justified by operational and scale needs; SQL is not the only possible correct implementation.</p>
-<h3 id="critical-consistency-rule">Critical consistency rule</h3>
-<p><code>AccountCredit.reserved_minor</code> and the detailed active holds must be maintained consistently. Every hold mutation must update the aggregate credit reservation within the <strong>same local transaction</strong>. Run independent reconciliation jobs to find mismatches.</p>
-<p>Card credentials and sensitive authentication information should remain in protected card-security systems, not general business tables.</p>
-<hr>
-<h2 id="8-make-authorization-approval-atomic">8. Make authorization approval atomic</h2>
-<p>Our central write path:</p>
-<pre><code>BEGIN TRANSACTION
+    <p><strong>Why SQL initially?</strong> We need unique constraints, atomic
+        conditional updates, transactional writes across related records, and
+        controlled lifecycle changes. A relational database supports these well.
+    </p>
+    <p>A distributed transactional NoSQL database could also work if justified
+        by operational and scale needs; SQL is not the only possible correct
+        implementation.</p>
+    <h3 id="critical-consistency-rule">Critical consistency rule</h3>
+    <p><code>AccountCredit.reserved_minor</code> and the detailed active holds
+        must be maintained consistently. Every hold mutation must update the
+        aggregate credit reservation within the <strong>same local
+            transaction</strong>. Run independent reconciliation jobs to find
+        mismatches.</p>
+    <p>Card credentials and sensitive authentication information should remain
+        in protected card-security systems, not general business tables.</p>
+    <hr>
+    <h2 id="8-make-authorization-approval-atomic">8. Make authorization approval
+        atomic</h2>
+    <p>Our central write path:</p>
+    <pre><code>BEGIN TRANSACTION
 
   1. Claim unique request identity.
   2. If the request exists, recover its decision.
@@ -524,25 +1143,43 @@ processing_status</code></pre>
 COMMIT
 
 Return the committed decision.</code></pre>
-<p>When a request identity already exists, compare the canonical request fingerprint. A repeated key with different logical details is a conflict, not proof that the new request is a legitimate retry.</p>
-<p>Concurrent duplicates are coordinated through the unique constraint and appropriate transaction handling; the second may wait or receive a retryable processing outcome.</p>
-<h3 id="why-one-transaction">Why one transaction?</h3>
-<p>Without atomicity:</p>
-<pre><code>Reserve $100             SUCCESS
+    <p>When a request identity already exists, compare the canonical request
+        fingerprint. A repeated key with different logical details is a
+        conflict, not proof that the new request is a legitimate retry.</p>
+    <p>Concurrent duplicates are coordinated through the unique constraint and
+        appropriate transaction handling; the second may wait or receive a
+        retryable processing outcome.</p>
+    <h3 id="why-one-transaction">Why one transaction?</h3>
+    <p>Without atomicity:</p>
+    <pre><code>Reserve $100             SUCCESS
 Insert authorization     FAILURE
 
 Result: orphan reservation.</code></pre>
-<p>With atomicity, failure of a required insert rolls back the reservation.</p>
-<p><strong>Concept — ACID atomicity:</strong> All operations in one database transaction commit, or none do.</p>
-<h3 id="keep-the-critical-section-short">Keep the critical section short</h3>
-<p>Do not hold database locks while waiting for an external risk service. Prefer:</p>
-<ol start="1"><li>Validate request and card status.</li><li>Perform credential and required fraud/risk checks.</li><li>Enter a short database transaction.</li><li>Recheck critical current state and hard limits.</li><li>Reserve credit, persist decision, and commit.</li></ol>
-<p><strong>Concept — Critical section:</strong> A region of execution that must be coordinated to protect shared state. Shorter lock duration reduces contention.</p>
-<p>A strict rule that can change between fraud evaluation and commit must be versioned, rechecked, or coordinated in the final decision path.</p>
-<hr>
-<h2 id="9-handle-duplicate-requests-idempotency">9. Handle duplicate requests: idempotency</h2>
-<p>A response can be lost after a successful commit:</p>
-<pre><code>Network                         Issuer
+    <p>With atomicity, failure of a required insert rolls back the
+        reservation.</p>
+    <p><strong>Concept — ACID atomicity:</strong> All operations in one database
+        transaction commit, or none do.</p>
+    <h3 id="keep-the-critical-section-short">Keep the critical section
+        short</h3>
+    <p>Do not hold database locks while waiting for an external risk service.
+        Prefer:</p>
+    <ol start="1">
+        <li>Validate request and card status.</li>
+        <li>Perform credential and required fraud/risk checks.</li>
+        <li>Enter a short database transaction.</li>
+        <li>Recheck critical current state and hard limits.</li>
+        <li>Reserve credit, persist decision, and commit.</li>
+    </ol>
+    <p><strong>Concept — Critical section:</strong> A region of execution that
+        must be coordinated to protect shared state. Shorter lock duration
+        reduces contention.</p>
+    <p>A strict rule that can change between fraud evaluation and commit must be
+        versioned, rechecked, or coordinated in the final decision path.</p>
+    <hr>
+    <h2 id="9-handle-duplicate-requests-idempotency">9. Handle duplicate
+        requests: idempotency</h2>
+    <p>A response can be lost after a successful commit:</p>
+    <pre><code>Network                         Issuer
    |                               |
    |----- Authorize $100 ---------&gt;|
    |                               |
@@ -551,11 +1188,16 @@ Result: orphan reservation.</code></pre>
    |&lt;----- Response lost ----------X
    |
    |----- Retry same request -----&gt;|</code></pre>
-<p>Naively processing the retry would reserve $200 for the same logical transaction.</p>
-<p><strong>Concept — Idempotency:</strong> Repeating the same logical operation does not produce another business effect.</p>
-<h3 id="choose-a-durable-request-identity">Choose a durable request identity</h3>
-<p>Issuer authorization identity should use the appropriate network-defined transaction references and scoped identifying fields. Amount, timestamp, or one trace number alone may not be globally unique.</p>
-<pre><code>Incoming Request
+    <p>Naively processing the retry would reserve $200 for the same logical
+        transaction.</p>
+    <p><strong>Concept — Idempotency:</strong> Repeating the same logical
+        operation does not produce another business effect.</p>
+    <h3 id="choose-a-durable-request-identity">Choose a durable request
+        identity</h3>
+    <p>Issuer authorization identity should use the appropriate network-defined
+        transaction references and scoped identifying fields. Amount, timestamp,
+        or one trace number alone may not be globally unique.</p>
+    <pre><code>Incoming Request
        |
        v
 Derive Request Identity
@@ -568,14 +1210,27 @@ Find Previous Decision
        +-- Existing, different ----&gt; Identity conflict
        |
        +-- New --------------------&gt; Process once and persist</code></pre>
-<p>Use a durable unique constraint as the <strong>correctness mechanism</strong>. An optional Redis duplicate lookup can be an optimization.</p>
-<p><strong>Important:</strong> An incremental authorization, a reversal, and a clearing message are separate logical operations. They must not accidentally share the authorization request's idempotency scope.</p>
-<hr>
-<h2 id="10-verify-card-credentials-and-evaluate-fraud">10. Verify card credentials and evaluate fraud</h2>
-<p>Three questions are distinct:</p>
-<ol start="1"><li><strong>Card/credential authentication:</strong> Is the payment credential valid in its transaction context?</li><li><strong>Fraud risk:</strong> Is this purchase suspicious?</li><li><strong>Credit authorization:</strong> Does account policy permit the amount?</li></ol>
-<h3 id="card-security-service">Card security service</h3>
-<pre><code>Authorization Service
+    <p>Use a durable unique constraint as the <strong>correctness
+        mechanism</strong>. An optional Redis duplicate lookup can be an
+        optimization.</p>
+    <p><strong>Important:</strong> An incremental authorization, a reversal, and
+        a clearing message are separate logical operations. They must not
+        accidentally share the authorization request's idempotency scope.</p>
+    <hr>
+    <h2 id="10-verify-card-credentials-and-evaluate-fraud">10. Verify card
+        credentials and evaluate fraud</h2>
+    <p>Three questions are distinct:</p>
+    <ol start="1">
+        <li><strong>Card/credential authentication:</strong> Is the payment
+            credential valid in its transaction context?
+        </li>
+        <li><strong>Fraud risk:</strong> Is this purchase suspicious?</li>
+        <li><strong>Credit authorization:</strong> Does account policy permit
+            the amount?
+        </li>
+    </ol>
+    <h3 id="card-security-service">Card security service</h3>
+    <pre><code>Authorization Service
           |
           v
 Card Security Service
@@ -583,12 +1238,52 @@ Card Security Service
           +--&gt; Protected Card Data
           |
           +--&gt; HSM</code></pre>
-<p><strong>Concept — HSM:</strong> A hardware security module protects cryptographic keys and performs sensitive cryptographic operations within a controlled boundary.</p>
-<p>Why use a separate security boundary? General application servers should not have broad access to payment keys and sensitive card data.</p>
-<h3 id="risk-decision">Risk decision</h3>
-<p>Possible inputs:</p>
-<table><thead><tr><th>Signal</th><th>Example</th></tr></thead><tbody><tr><td>Amount</td><td>Unusually large purchase</td></tr><tr><td>Merchant</td><td>Elevated merchant risk</td></tr><tr><td>Velocity</td><td>Many attempts recently</td></tr><tr><td>Geography</td><td>Unexpected geographic pattern</td></tr><tr><td>Channel</td><td>Card-present vs. online</td></tr><tr><td>Device / authentication</td><td>Authentication confidence</td></tr><tr><td>History</td><td>Deviation from past spending</td></tr></tbody></table>
-<pre><code>Authorization Request
+    <p><strong>Concept — HSM:</strong> A hardware security module protects
+        cryptographic keys and performs sensitive cryptographic operations
+        within a controlled boundary.</p>
+    <p>Why use a separate security boundary? General application servers should
+        not have broad access to payment keys and sensitive card data.</p>
+    <h3 id="risk-decision">Risk decision</h3>
+    <p>Possible inputs:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Signal</th>
+            <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Amount</td>
+            <td>Unusually large purchase</td>
+        </tr>
+        <tr>
+            <td>Merchant</td>
+            <td>Elevated merchant risk</td>
+        </tr>
+        <tr>
+            <td>Velocity</td>
+            <td>Many attempts recently</td>
+        </tr>
+        <tr>
+            <td>Geography</td>
+            <td>Unexpected geographic pattern</td>
+        </tr>
+        <tr>
+            <td>Channel</td>
+            <td>Card-present vs. online</td>
+        </tr>
+        <tr>
+            <td>Device / authentication</td>
+            <td>Authentication confidence</td>
+        </tr>
+        <tr>
+            <td>History</td>
+            <td>Deviation from past spending</td>
+        </tr>
+        </tbody>
+    </table>
+    <pre><code>Authorization Request
          |
          v
       Risk Engine
@@ -598,11 +1293,16 @@ Card Security Service
       \        /
        v      v
      Risk Decision</code></pre>
-<p><strong>Rules</strong> enforce explicit conditions, while <strong>ML inference</strong> estimates probabilistic risk. Business policy determines what to do with the outputs.</p>
-<h3 id="why-risk-assessment-is-synchronous">Why risk assessment is synchronous</h3>
-<p>If mandatory fraud evaluation runs only after approval through Kafka, the issuer may discover fraud too late. Necessary pre-approval controls belong on the synchronous authorization path.</p>
-<h3 id="online-feature-store">Online feature store</h3>
-<pre><code>Historical Transactions
+    <p><strong>Rules</strong> enforce explicit conditions, while <strong>ML
+        inference</strong> estimates probabilistic risk. Business policy
+        determines what to do with the outputs.</p>
+    <h3 id="why-risk-assessment-is-synchronous">Why risk assessment is
+        synchronous</h3>
+    <p>If mandatory fraud evaluation runs only after approval through Kafka, the
+        issuer may discover fraud too late. Necessary pre-approval controls
+        belong on the synchronous authorization path.</p>
+    <h3 id="online-feature-store">Online feature store</h3>
+    <pre><code>Historical Transactions
           |
           v
     Stream Processor
@@ -612,15 +1312,51 @@ Card Security Service
           ^
           |
        Risk Engine</code></pre>
-<p><strong>Concept — Feature store:</strong> A service storing precomputed signals for online scoring, such as recent counts, merchant patterns, and spend statistics.</p>
-<p>A low-latency key-value store can be useful. But features and <strong>hard policy constraints</strong> are different:</p>
-<ul><li>A statistical trend may tolerate short staleness.</li><li>A strict transaction-count limit needs coordinated, enforceable updates.</li></ul>
-<h3 id="fraud-service-outage">Fraud service outage</h3>
-<table><thead><tr><th>Fallback</th><th>Benefit</th><th>Cost / risk</th></tr></thead><tbody><tr><td>Fail closed</td><td>Avoid required checks being skipped</td><td>Declines legitimate purchases</td></tr><tr><td>Fail open</td><td>Higher acceptance</td><td>Increased risk</td></tr><tr><td>Degraded rules</td><td>Some decisions remain possible</td><td>Less sophisticated assessment</td></tr></tbody></table>
-<p><strong>Decision:</strong> Use explicit risk-approved degradation policies. Mandatory authentication and critical controls cannot be silently bypassed.</p>
-<hr>
-<h2 id="11-end-to-end-authorization-flow">11. End-to-end authorization flow</h2>
-<pre><code>                       CARD NETWORK
+    <p><strong>Concept — Feature store:</strong> A service storing precomputed
+        signals for online scoring, such as recent counts, merchant patterns,
+        and spend statistics.</p>
+    <p>A low-latency key-value store can be useful. But features and <strong>hard
+        policy constraints</strong> are different:</p>
+    <ul>
+        <li>A statistical trend may tolerate short staleness.</li>
+        <li>A strict transaction-count limit needs coordinated, enforceable
+            updates.
+        </li>
+    </ul>
+    <h3 id="fraud-service-outage">Fraud service outage</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Fallback</th>
+            <th>Benefit</th>
+            <th>Cost / risk</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Fail closed</td>
+            <td>Avoid required checks being skipped</td>
+            <td>Declines legitimate purchases</td>
+        </tr>
+        <tr>
+            <td>Fail open</td>
+            <td>Higher acceptance</td>
+            <td>Increased risk</td>
+        </tr>
+        <tr>
+            <td>Degraded rules</td>
+            <td>Some decisions remain possible</td>
+            <td>Less sophisticated assessment</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Decision:</strong> Use explicit risk-approved degradation
+        policies. Mandatory authentication and critical controls cannot be
+        silently bypassed.</p>
+    <hr>
+    <h2 id="11-end-to-end-authorization-flow">11. End-to-end authorization
+        flow</h2>
+    <pre><code>                       CARD NETWORK
                             |
                             v
                      Network Gateway
@@ -661,21 +1397,157 @@ Card Security Service
                             |
                             v
                        CARD NETWORK</code></pre>
-<h3 id="sequence">Sequence</h3>
-<table><thead><tr><th>Step</th><th>Action</th><th>Reason</th></tr></thead><tbody><tr><td>1</td><td>Receive network message</td><td>Start the operation</td></tr><tr><td>2</td><td>Validate message and fields</td><td>Reject malformed input</td></tr><tr><td>3</td><td>Derive request identity</td><td>Enable deduplication</td></tr><tr><td>4</td><td>Find previous decision</td><td>Avoid duplicate holds</td></tr><tr><td>5</td><td>Resolve and validate card</td><td>Establish eligibility</td></tr><tr><td>6</td><td>Validate required credentials</td><td>Prevent unauthorized use</td></tr><tr><td>7</td><td>Evaluate risk</td><td>Enforce fraud policy</td></tr><tr><td>8</td><td>Begin short database transaction</td><td>Create atomic boundary</td></tr><tr><td>9</td><td>Revalidate critical current state</td><td>Avoid stale decisions</td></tr><tr><td>10</td><td>Reserve credit</td><td>Enforce the account invariant</td></tr><tr><td>11</td><td>Save authorization, hold, and outbox</td><td>Persist state and event intent</td></tr><tr><td>12</td><td>Commit</td><td>Make result durable</td></tr><tr><td>13</td><td>Map decision to network response</td><td>Return approval or decline</td></tr><tr><td>14</td><td>Publish outbox events asynchronously</td><td>Decouple secondary workloads</td></tr></tbody></table>
-<p>The diagram represents <strong>logical components</strong>, not a mandatory one-service-per-box microservice deployment.</p>
-<hr>
-<h2 id="12-derive-a-latency-budget">12. Derive a latency budget</h2>
-<p>Hypothetical issuer-side p99 objective: <strong>300 ms</strong>.</p>
-<table><thead><tr><th>Component</th><th>Illustrative allocated time</th></tr></thead><tbody><tr><td>Ingress, routing, parsing</td><td>20 ms</td></tr><tr><td>Credential verification</td><td>40 ms</td></tr><tr><td>Risk decision</td><td>80 ms</td></tr><tr><td>Credit checks and transaction</td><td>70 ms</td></tr><tr><td>Response formatting and egress</td><td>20 ms</td></tr><tr><td>Contingency</td><td>70 ms</td></tr><tr><td><strong>Total budget</strong></td><td><strong>300 ms</strong></td></tr></tbody></table>
-<p>These are planning allocations, not benchmarked latencies. The sum of component p99 measurements is <strong>not</strong> the same thing as end-to-end p99. Measure actual traces and full-path latency distributions.</p>
-<h3 id="reduce-latency-without-compromising-correctness">Reduce latency without compromising correctness</h3>
-<ul><li>Precompute risk features that can be safely cached.</li><li>Parallelize independent reads.</li><li>Reuse connections and avoid repeated network handshakes where appropriate.</li><li>Keep database transactions short.</li><li>Avoid analytics or notification calls on the critical path.</li><li>Place latency-sensitive components where network latency is predictable.</li><li>Maintain a bounded failure and retry policy.</li></ul>
-<p><strong>Rule:</strong> Parallelize independent reads; preserve ordering and atomicity for financial state changes.</p>
-<hr>
-<h2 id="13-model-authorization-and-hold-lifecycles">13. Model authorization and hold lifecycles</h2>
-<p>Simplified logical states:</p>
-<pre><code>                 RECEIVED
+    <h3 id="sequence">Sequence</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Step</th>
+            <th>Action</th>
+            <th>Reason</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>Receive network message</td>
+            <td>Start the operation</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Validate message and fields</td>
+            <td>Reject malformed input</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Derive request identity</td>
+            <td>Enable deduplication</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Find previous decision</td>
+            <td>Avoid duplicate holds</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Resolve and validate card</td>
+            <td>Establish eligibility</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Validate required credentials</td>
+            <td>Prevent unauthorized use</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Evaluate risk</td>
+            <td>Enforce fraud policy</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>Begin short database transaction</td>
+            <td>Create atomic boundary</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>Revalidate critical current state</td>
+            <td>Avoid stale decisions</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>Reserve credit</td>
+            <td>Enforce the account invariant</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>Save authorization, hold, and outbox</td>
+            <td>Persist state and event intent</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>Commit</td>
+            <td>Make result durable</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>Map decision to network response</td>
+            <td>Return approval or decline</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>Publish outbox events asynchronously</td>
+            <td>Decouple secondary workloads</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>The diagram represents <strong>logical components</strong>, not a
+        mandatory one-service-per-box microservice deployment.</p>
+    <hr>
+    <h2 id="12-derive-a-latency-budget">12. Derive a latency budget</h2>
+    <p>Hypothetical issuer-side p99 objective: <strong>300 ms</strong>.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Component</th>
+            <th>Illustrative allocated time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Ingress, routing, parsing</td>
+            <td>20 ms</td>
+        </tr>
+        <tr>
+            <td>Credential verification</td>
+            <td>40 ms</td>
+        </tr>
+        <tr>
+            <td>Risk decision</td>
+            <td>80 ms</td>
+        </tr>
+        <tr>
+            <td>Credit checks and transaction</td>
+            <td>70 ms</td>
+        </tr>
+        <tr>
+            <td>Response formatting and egress</td>
+            <td>20 ms</td>
+        </tr>
+        <tr>
+            <td>Contingency</td>
+            <td>70 ms</td>
+        </tr>
+        <tr>
+            <td><strong>Total budget</strong></td>
+            <td><strong>300 ms</strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <p>These are planning allocations, not benchmarked latencies. The sum of
+        component p99 measurements is <strong>not</strong> the same thing as
+        end-to-end p99. Measure actual traces and full-path latency
+        distributions.</p>
+    <h3 id="reduce-latency-without-compromising-correctness">Reduce latency
+        without compromising correctness</h3>
+    <ul>
+        <li>Precompute risk features that can be safely cached.</li>
+        <li>Parallelize independent reads.</li>
+        <li>Reuse connections and avoid repeated network handshakes where
+            appropriate.
+        </li>
+        <li>Keep database transactions short.</li>
+        <li>Avoid analytics or notification calls on the critical path.</li>
+        <li>Place latency-sensitive components where network latency is
+            predictable.
+        </li>
+        <li>Maintain a bounded failure and retry policy.</li>
+    </ul>
+    <p><strong>Rule:</strong> Parallelize independent reads; preserve ordering
+        and atomicity for financial state changes.</p>
+    <hr>
+    <h2 id="13-model-authorization-and-hold-lifecycles">13. Model authorization
+        and hold lifecycles</h2>
+    <p>Simplified logical states:</p>
+    <pre><code>                 RECEIVED
                     |
                     v
                 EVALUATING
@@ -689,10 +1561,15 @@ Card Security Service
                 |          |          |
                 v          v          v
              REVERSED   EXPIRED     CLEARED</code></pre>
-<p>This is intentionally simplified. Production workflows can involve partial captures, multiple clearing records, incremental authorizations, partial reversals, and other exceptions.</p>
-<p><strong>Important modeling choice:</strong> Keep the historical <em>authorization decision</em> distinct from the <em>current hold state</em>. An originally approved authorization remains historically approved even after its hold is released.</p>
-<h3 id="reversal-flow">Reversal flow</h3>
-<pre><code>Reversal Request
+    <p>This is intentionally simplified. Production workflows can involve
+        partial captures, multiple clearing records, incremental authorizations,
+        partial reversals, and other exceptions.</p>
+    <p><strong>Important modeling choice:</strong> Keep the historical <em>authorization
+        decision</em> distinct from the <em>current hold state</em>. An
+        originally approved authorization remains historically approved even
+        after its hold is released.</p>
+    <h3 id="reversal-flow">Reversal flow</h3>
+    <pre><code>Reversal Request
        |
        v
 Find Original Authorization
@@ -718,25 +1595,89 @@ Commit
        |
        v
 Return response</code></pre>
-<p><strong>Why idempotent?</strong> Two deliveries of the same $100 reversal cannot each release $100.</p>
-<p>For partial reversals, persist reversal identities and amounts so that repeated reversals and genuinely new adjustments are distinguished.</p>
-<hr>
-<h2 id="14-move-from-authorization-to-clearing">14. Move from authorization to clearing</h2>
-<p>Assume the following before clearing:</p>
-<table><thead><tr><th>Before clearing</th><th>Amount</th></tr></thead><tbody><tr><td>Credit limit</td><td>$1,000</td></tr><tr><td>Posted exposure</td><td>$500</td></tr><tr><td>Active holds</td><td>$100</td></tr><tr><td>Available credit</td><td><strong>$400</strong></td></tr></tbody></table>
-<p>The entire $100 authorization then clears and posts:</p>
-<table><thead><tr><th>After clearing</th><th>Amount</th></tr></thead><tbody><tr><td>Credit limit</td><td>$1,000</td></tr><tr><td>Posted exposure</td><td>$600</td></tr><tr><td>Active holds</td><td>$0</td></tr><tr><td>Available credit</td><td><strong>$400</strong></td></tr></tbody></table>
-<p>The exposure moved from <em>reserved</em> to <em>posted</em>. It did not become a second charge.</p>
-<p><strong>Required rule:</strong> Clearing must coordinate the posted exposure and the release of the related reservation, so the same obligation is not counted twice.</p>
-<h3 id="different-clearing-amounts">Different clearing amounts</h3>
-<pre><code>Original authorization:  $100
+    <p><strong>Why idempotent?</strong> Two deliveries of the same $100 reversal
+        cannot each release $100.</p>
+    <p>For partial reversals, persist reversal identities and amounts so that
+        repeated reversals and genuinely new adjustments are distinguished.</p>
+    <hr>
+    <h2 id="14-move-from-authorization-to-clearing">14. Move from authorization
+        to clearing</h2>
+    <p>Assume the following before clearing:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Before clearing</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Credit limit</td>
+            <td>$1,000</td>
+        </tr>
+        <tr>
+            <td>Posted exposure</td>
+            <td>$500</td>
+        </tr>
+        <tr>
+            <td>Active holds</td>
+            <td>$100</td>
+        </tr>
+        <tr>
+            <td>Available credit</td>
+            <td><strong>$400</strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <p>The entire $100 authorization then clears and posts:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>After clearing</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Credit limit</td>
+            <td>$1,000</td>
+        </tr>
+        <tr>
+            <td>Posted exposure</td>
+            <td>$600</td>
+        </tr>
+        <tr>
+            <td>Active holds</td>
+            <td>$0</td>
+        </tr>
+        <tr>
+            <td>Available credit</td>
+            <td><strong>$400</strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <p>The exposure moved from <em>reserved</em> to <em>posted</em>. It did not
+        become a second charge.</p>
+    <p><strong>Required rule:</strong> Clearing must coordinate the posted
+        exposure and the release of the related reservation, so the same
+        obligation is not counted twice.</p>
+    <h3 id="different-clearing-amounts">Different clearing amounts</h3>
+    <pre><code>Original authorization:  $100
 Final cleared amount:     $95</code></pre>
-<p>The system must post the actual applicable amount and handle the remaining hold according to its rules. This includes partial capture, multiple presentments, late clearing, and missing authorization matches.</p>
-<p><strong>Ledger distinction:</strong> An authorization hold is not automatically a double-entry financial journal entry. The financial ledger records accounting events. The hold system manages available-credit reservation. They must be reconciled but should not be conflated.</p>
-<hr>
-<h2 id="15-handle-failures-explicitly">15. Handle failures explicitly</h2>
-<h3 id="failure-a-crash-before-database-commit">Failure A: Crash before database commit</h3>
-<pre><code>Receive request
+    <p>The system must post the actual applicable amount and handle the
+        remaining hold according to its rules. This includes partial capture,
+        multiple presentments, late clearing, and missing authorization
+        matches.</p>
+    <p><strong>Ledger distinction:</strong> An authorization hold is not
+        automatically a double-entry financial journal entry. The financial
+        ledger records accounting events. The hold system manages
+        available-credit reservation. They must be reconciled but should not be
+        conflated.</p>
+    <hr>
+    <h2 id="15-handle-failures-explicitly">15. Handle failures explicitly</h2>
+    <h3 id="failure-a-crash-before-database-commit">Failure A: Crash before
+        database commit</h3>
+    <pre><code>Receive request
       |
       v
 Evaluate risk
@@ -745,9 +1686,11 @@ Evaluate risk
 Attempt reservation
       |
       X  Crash before commit</code></pre>
-<p>Transaction rolls back. No normal approval should have been returned. Retry can safely attempt the logical operation again.</p>
-<h3 id="failure-b-commit-succeeds-but-response-is-lost">Failure B: Commit succeeds but response is lost</h3>
-<pre><code>Receive request
+    <p>Transaction rolls back. No normal approval should have been returned.
+        Retry can safely attempt the logical operation again.</p>
+    <h3 id="failure-b-commit-succeeds-but-response-is-lost">Failure B: Commit
+        succeeds but response is lost</h3>
+    <pre><code>Receive request
       |
       v
 Commit $100 hold
@@ -756,14 +1699,27 @@ Commit $100 hold
 Prepare approval
       |
       X  Network failure</code></pre>
-<p>The financial effect exists, but the merchant may not have received the response. This is an <strong>uncertain outcome</strong>, not a failed transaction. Preserve the original decision; recognize retries and handle subsequent network advice, reversal, or expiry according to applicable rules.</p>
-<p><strong>Never reverse automatically merely because a response timed out.</strong> The network and merchant may have observed a different outcome.</p>
-<h3 id="failure-c-fraud-service-timeout">Failure C: Fraud service timeout</h3>
-<p>Apply the explicit risk-approved degraded policy. Do not default to approving every transaction. Use bounded retries and circuit-breaker behavior where suitable.</p>
-<h3 id="failure-d-authoritative-database-unavailable">Failure D: Authoritative database unavailable</h3>
-<p>The proposed normal online path cannot safely approve without durably recording the reservation. Return the defined failure response or invoke a separately governed network-supported contingency arrangement.</p>
-<h3 id="failure-e-event-broker-unavailable">Failure E: Event broker unavailable</h3>
-<pre><code>Authorization DB
+    <p>The financial effect exists, but the merchant may not have received the
+        response. This is an <strong>uncertain outcome</strong>, not a failed
+        transaction. Preserve the original decision; recognize retries and
+        handle subsequent network advice, reversal, or expiry according to
+        applicable rules.</p>
+    <p><strong>Never reverse automatically merely because a response timed
+        out.</strong> The network and merchant may have observed a different
+        outcome.</p>
+    <h3 id="failure-c-fraud-service-timeout">Failure C: Fraud service
+        timeout</h3>
+    <p>Apply the explicit risk-approved degraded policy. Do not default to
+        approving every transaction. Use bounded retries and circuit-breaker
+        behavior where suitable.</p>
+    <h3 id="failure-d-authoritative-database-unavailable">Failure D:
+        Authoritative database unavailable</h3>
+    <p>The proposed normal online path cannot safely approve without durably
+        recording the reservation. Return the defined failure response or invoke
+        a separately governed network-supported contingency arrangement.</p>
+    <h3 id="failure-e-event-broker-unavailable">Failure E: Event broker
+        unavailable</h3>
+    <pre><code>Authorization DB
       |
       v
 Durable Outbox
@@ -771,14 +1727,68 @@ Durable Outbox
       X  Broker unavailable
 
 Outbox event remains for retry.</code></pre>
-<p>The committed financial decision remains valid. The event publisher retries later, and consumers must handle duplicates.</p>
-<h3 id="summary">Summary</h3>
-<table><thead><tr><th>Failure</th><th>Correct response</th></tr></thead><tbody><tr><td>Duplicate authorization</td><td>Recover previous decision</td></tr><tr><td>Crash before commit</td><td>Roll back; permit safe retry</td></tr><tr><td>Commit then lost response</td><td>Keep original decision; reconcile uncertain outcome</td></tr><tr><td>Fraud timeout</td><td>Apply defined risk degradation</td></tr><tr><td>Database unavailable</td><td>Avoid unsupported approval</td></tr><tr><td>Broker unavailable</td><td>Retain event in durable outbox</td></tr><tr><td>Duplicate reversal</td><td>Release only once</td></tr><tr><td>Late clearing</td><td>Match and apply lifecycle rules</td></tr><tr><td>Stale account state</td><td>Revalidate before reservation</td></tr><tr><td>Replayed event</td><td>Idempotent downstream processing</td></tr></tbody></table>
-<hr>
-<h2 id="16-where-kafka-or-a-message-broker-belongs">16. Where Kafka or a message broker belongs</h2>
-<p>Do not insert an asynchronous event broker into the synchronous decision path without a business and protocol reason. The card network needs an immediate authorization response.</p>
-<p>Use an event stream <strong>after the durable decision</strong> for downstream workloads:</p>
-<pre><code>                    Authorization Service
+    <p>The committed financial decision remains valid. The event publisher
+        retries later, and consumers must handle duplicates.</p>
+    <h3 id="summary">Summary</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Failure</th>
+            <th>Correct response</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Duplicate authorization</td>
+            <td>Recover previous decision</td>
+        </tr>
+        <tr>
+            <td>Crash before commit</td>
+            <td>Roll back; permit safe retry</td>
+        </tr>
+        <tr>
+            <td>Commit then lost response</td>
+            <td>Keep original decision; reconcile uncertain outcome</td>
+        </tr>
+        <tr>
+            <td>Fraud timeout</td>
+            <td>Apply defined risk degradation</td>
+        </tr>
+        <tr>
+            <td>Database unavailable</td>
+            <td>Avoid unsupported approval</td>
+        </tr>
+        <tr>
+            <td>Broker unavailable</td>
+            <td>Retain event in durable outbox</td>
+        </tr>
+        <tr>
+            <td>Duplicate reversal</td>
+            <td>Release only once</td>
+        </tr>
+        <tr>
+            <td>Late clearing</td>
+            <td>Match and apply lifecycle rules</td>
+        </tr>
+        <tr>
+            <td>Stale account state</td>
+            <td>Revalidate before reservation</td>
+        </tr>
+        <tr>
+            <td>Replayed event</td>
+            <td>Idempotent downstream processing</td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h2 id="16-where-kafka-or-a-message-broker-belongs">16. Where Kafka or a
+        message broker belongs</h2>
+    <p>Do not insert an asynchronous event broker into the synchronous decision
+        path without a business and protocol reason. The card network needs an
+        immediate authorization response.</p>
+    <p>Use an event stream <strong>after the durable decision</strong> for
+        downstream workloads:</p>
+    <pre><code>                    Authorization Service
                              |
                              v
                        Transaction DB
@@ -793,18 +1803,89 @@ Outbox event remains for retry.</code></pre>
               |              |               |
               v              v               v
         Notifications    Analytics      Fraud Features</code></pre>
-<p>Benefits: independent consumers, reduced coupling, replay when supported, and protection of critical response latency.</p>
-<h3 id="queue-vs-stream">Queue vs. stream</h3>
-<table><thead><tr><th>Requirement</th><th>Traditional queue</th><th>Kafka-style event stream</th></tr></thead><tbody><tr><td>Background jobs</td><td>Strong fit</td><td>Possible</td></tr><tr><td>Multiple independent subscribers</td><td>Requires suitable pub/sub</td><td>Consumer groups fit naturally</td></tr><tr><td>Historical replay</td><td>Depends on queue design</td><td>Strong fit</td></tr><tr><td>Per-key ordering</td><td>Product-specific</td><td>Per-partition ordering</td></tr><tr><td>Simple work dispatch</td><td>Often easier</td><td>Often more infrastructure</td></tr></tbody></table>
-<p>For downstream account-level processing, partition events by a stable account key when per-account ordering is required. Add sequence numbers or versions so old/repeated events cannot corrupt projections.</p>
-<p><strong>Do not</strong> mistake Kafka for an authoritative credit ledger or reservation database.</p>
-<p><strong>Concept — Transactional outbox:</strong> Write business state and an event record in one local database transaction, then asynchronously publish the event. See <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html" target="_blank" rel="noopener">AWS Prescriptive Guidance</a>.</p>
-<hr>
-<h2 id="17-high-availability-and-multi-region-design">17. High availability and multi-region design</h2>
-<p>Separate stateless services from authoritative state:</p>
-<table><thead><tr><th>Easier to replicate</th><th>Requires stricter coordination</th></tr></thead><tbody><tr><td>Authorization workers</td><td>Account credit state</td></tr><tr><td>Protocol workers (subject to network session rules)</td><td>Authorization decisions and holds</td></tr><tr><td>Routing and some policy evaluation</td><td>Durable request identity</td></tr><tr><td>Risk inference instances</td><td>Key-management services and outbox</td></tr></tbody></table>
-<h3 id="step-1-multiple-availability-zones">Step 1: Multiple availability zones</h3>
-<pre><code>                 Network Gateway
+    <p>Benefits: independent consumers, reduced coupling, replay when supported,
+        and protection of critical response latency.</p>
+    <h3 id="queue-vs-stream">Queue vs. stream</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>Traditional queue</th>
+            <th>Kafka-style event stream</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Background jobs</td>
+            <td>Strong fit</td>
+            <td>Possible</td>
+        </tr>
+        <tr>
+            <td>Multiple independent subscribers</td>
+            <td>Requires suitable pub/sub</td>
+            <td>Consumer groups fit naturally</td>
+        </tr>
+        <tr>
+            <td>Historical replay</td>
+            <td>Depends on queue design</td>
+            <td>Strong fit</td>
+        </tr>
+        <tr>
+            <td>Per-key ordering</td>
+            <td>Product-specific</td>
+            <td>Per-partition ordering</td>
+        </tr>
+        <tr>
+            <td>Simple work dispatch</td>
+            <td>Often easier</td>
+            <td>Often more infrastructure</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>For downstream account-level processing, partition events by a stable
+        account key when per-account ordering is required. Add sequence numbers
+        or versions so old/repeated events cannot corrupt projections.</p>
+    <p><strong>Do not</strong> mistake Kafka for an authoritative credit ledger
+        or reservation database.</p>
+    <p><strong>Concept — Transactional outbox:</strong> Write business state and
+        an event record in one local database transaction, then asynchronously
+        publish the event. See <a
+                href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html"
+                target="_blank" rel="noopener">AWS Prescriptive Guidance</a>.
+    </p>
+    <hr>
+    <h2 id="17-high-availability-and-multi-region-design">17. High availability
+        and multi-region design</h2>
+    <p>Separate stateless services from authoritative state:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Easier to replicate</th>
+            <th>Requires stricter coordination</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Authorization workers</td>
+            <td>Account credit state</td>
+        </tr>
+        <tr>
+            <td>Protocol workers (subject to network session rules)</td>
+            <td>Authorization decisions and holds</td>
+        </tr>
+        <tr>
+            <td>Routing and some policy evaluation</td>
+            <td>Durable request identity</td>
+        </tr>
+        <tr>
+            <td>Risk inference instances</td>
+            <td>Key-management services and outbox</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="step-1-multiple-availability-zones">Step 1: Multiple availability
+        zones</h3>
+    <pre><code>                 Network Gateway
                         |
                   Load Balancer
                         |
@@ -818,19 +1899,44 @@ Outbox event remains for retry.</code></pre>
                         v
                Authoritative Database
                   HA Replication</code></pre>
-<p>A highly available API alone is insufficient; its authoritative database must also survive expected component failures.</p>
-<h3 id="replication-trade-offs">Replication trade-offs</h3>
-<table><thead><tr><th>Strategy</th><th>Advantage</th><th>Risk / cost</th></tr></thead><tbody><tr><td>Synchronous durable replication</td><td>Stronger durability before acknowledgement</td><td>Higher latency/coordination cost</td></tr><tr><td>Asynchronous replication</td><td>Faster acknowledgment</td><td>Recently committed writes may be missing after failover</td></tr></tbody></table>
-<p>Choose based on tested durability, acknowledgement, quorum, failover, and recovery-point guarantees—not the marketing label of the database.</p>
-<h3 id="why-active-active-financial-writes-are-difficult">Why active-active financial writes are difficult</h3>
-<pre><code>Region A                   Region B
+    <p>A highly available API alone is insufficient; its authoritative database
+        must also survive expected component failures.</p>
+    <h3 id="replication-trade-offs">Replication trade-offs</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Strategy</th>
+            <th>Advantage</th>
+            <th>Risk / cost</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Synchronous durable replication</td>
+            <td>Stronger durability before acknowledgement</td>
+            <td>Higher latency/coordination cost</td>
+        </tr>
+        <tr>
+            <td>Asynchronous replication</td>
+            <td>Faster acknowledgment</td>
+            <td>Recently committed writes may be missing after failover</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Choose based on tested durability, acknowledgement, quorum, failover, and
+        recovery-point guarantees—not the marketing label of the database.</p>
+    <h3 id="why-active-active-financial-writes-are-difficult">Why active-active
+        financial writes are difficult</h3>
+    <pre><code>Region A                   Region B
    |                          |
 Read available $100       Read available $100
    |                          |
 Approve $80               Approve $80</code></pre>
-<p>If both independently write against stale replicas, total approvals can exceed available credit.</p>
-<h3 id="initial-choice-single-authoritative-writer-per-account">Initial choice: Single authoritative writer per account</h3>
-<pre><code>              Global Routing
+    <p>If both independently write against stale replicas, total approvals can
+        exceed available credit.</p>
+    <h3 id="initial-choice-single-authoritative-writer-per-account">Initial
+        choice: Single authoritative writer per account</h3>
+    <pre><code>              Global Routing
                     |
            +--------+--------+
            |                 |
@@ -843,19 +1949,80 @@ Approve $80               Approve $80</code></pre>
                     |
           Controlled Replication
              and Failover</code></pre>
-<p><strong>Concept — Fencing:</strong> Ownership epochs or comparable mechanisms prevent an old primary from writing after ownership has moved to a new primary.</p>
-<p>A global strongly consistent database is an alternative, but may increase cross-region latency and coordination complexity. Use it if requirements justify the cost.</p>
-<h3 id="disaster-recovery-targets">Disaster recovery targets</h3>
-<ul><li><strong>RPO:</strong> Maximum acceptable data loss.</li><li><strong>RTO:</strong> Maximum acceptable recovery duration.</li></ul>
-<p>Recovery must verify not only that the database is reachable but also that previously acknowledged authorization decisions, holds, and idempotency records remain correct.</p>
-<p>Prevent <strong>split brain</strong>, where two regions simultaneously believe they own the same account's writes.</p>
-<hr>
-<h2 id="18-scale-authorization-capacity">18. Scale authorization capacity</h2>
-<p>Using the hypothetical ~5,800 TPS peak, possible bottlenecks include protocol connections, HSM capacity, feature lookups, inference, database transactions, account-row contention, and network hops.</p>
-<table><thead><tr><th>Component</th><th>Scaling approach</th><th>Why</th></tr></thead><tbody><tr><td>Network gateways</td><td>Multiple approved endpoints / connections</td><td>Ingress and resilience</td></tr><tr><td>Authorization workers</td><td>Horizontal scaling</td><td>Largely stateless</td></tr><tr><td>Risk inference</td><td>Multiple serving instances</td><td>Parallel model evaluation</td></tr><tr><td>Fraud feature store</td><td>Distributed key-based access</td><td>Low-latency lookups</td></tr><tr><td>Authoritative database</td><td>Tune, partition, then shard as required</td><td>Transactional capacity</td></tr><tr><td>HSM services</td><td>Approved redundant capacity</td><td>Cryptographic availability</td></tr><tr><td>Event consumers</td><td>Partition-aware consumer scaling</td><td>Downstream throughput</td></tr></tbody></table>
-<h3 id="shard-by-the-correct-business-identity">Shard by the correct business identity</h3>
-<p><strong>Why <code>account_id</code>?</strong> Multiple cards may share the same credit account. Sharding by card could split the authoritative spending capacity across nodes.</p>
-<pre><code>               Authorization Router
+    <p><strong>Concept — Fencing:</strong> Ownership epochs or comparable
+        mechanisms prevent an old primary from writing after ownership has moved
+        to a new primary.</p>
+    <p>A global strongly consistent database is an alternative, but may increase
+        cross-region latency and coordination complexity. Use it if requirements
+        justify the cost.</p>
+    <h3 id="disaster-recovery-targets">Disaster recovery targets</h3>
+    <ul>
+        <li><strong>RPO:</strong> Maximum acceptable data loss.</li>
+        <li><strong>RTO:</strong> Maximum acceptable recovery duration.</li>
+    </ul>
+    <p>Recovery must verify not only that the database is reachable but also
+        that previously acknowledged authorization decisions, holds, and
+        idempotency records remain correct.</p>
+    <p>Prevent <strong>split brain</strong>, where two regions simultaneously
+        believe they own the same account's writes.</p>
+    <hr>
+    <h2 id="18-scale-authorization-capacity">18. Scale authorization
+        capacity</h2>
+    <p>Using the hypothetical ~5,800 TPS peak, possible bottlenecks include
+        protocol connections, HSM capacity, feature lookups, inference, database
+        transactions, account-row contention, and network hops.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Component</th>
+            <th>Scaling approach</th>
+            <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Network gateways</td>
+            <td>Multiple approved endpoints / connections</td>
+            <td>Ingress and resilience</td>
+        </tr>
+        <tr>
+            <td>Authorization workers</td>
+            <td>Horizontal scaling</td>
+            <td>Largely stateless</td>
+        </tr>
+        <tr>
+            <td>Risk inference</td>
+            <td>Multiple serving instances</td>
+            <td>Parallel model evaluation</td>
+        </tr>
+        <tr>
+            <td>Fraud feature store</td>
+            <td>Distributed key-based access</td>
+            <td>Low-latency lookups</td>
+        </tr>
+        <tr>
+            <td>Authoritative database</td>
+            <td>Tune, partition, then shard as required</td>
+            <td>Transactional capacity</td>
+        </tr>
+        <tr>
+            <td>HSM services</td>
+            <td>Approved redundant capacity</td>
+            <td>Cryptographic availability</td>
+        </tr>
+        <tr>
+            <td>Event consumers</td>
+            <td>Partition-aware consumer scaling</td>
+            <td>Downstream throughput</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="shard-by-the-correct-business-identity">Shard by the correct
+        business identity</h3>
+    <p><strong>Why <code>account_id</code>?</strong> Multiple cards may share
+        the same credit account. Sharding by card could split the authoritative
+        spending capacity across nodes.</p>
+    <pre><code>               Authorization Router
                         |
             +-----------+-----------+
             |           |           |
@@ -863,11 +2030,14 @@ Approve $80               Approve $80</code></pre>
          Shard 1     Shard 2     Shard 3
         Account       Account     Account
         Group A       Group B     Group C</code></pre>
-<p>A real shard map would use a managed mapping, partitioning, hashing, or ranges—rather than literal alphabetical slices.</p>
-<p>Trade-offs: routing, rebalancing, hotspot handling, difficult cross-account queries, and safe migration. Start with a simpler database until a measured limit justifies sharding.</p>
-<hr>
-<h2 id="19-security-architecture">19. Security architecture</h2>
-<pre><code>                    Payment Network
+    <p>A real shard map would use a managed mapping, partitioning, hashing, or
+        ranges—rather than literal alphabetical slices.</p>
+    <p>Trade-offs: routing, rebalancing, hotspot handling, difficult
+        cross-account queries, and safe migration. Start with a simpler database
+        until a measured limit justifies sharding.</p>
+    <hr>
+    <h2 id="19-security-architecture">19. Security architecture</h2>
+    <pre><code>                    Payment Network
                            |
                            v
                   Protected Network Edge
@@ -881,19 +2051,129 @@ Approve $80               Approve $80</code></pre>
                       |              |
                       v              v
                      HSM         Protected Data</code></pre>
-<table><thead><tr><th>Concern</th><th>Architectural response</th></tr></thead><tbody><tr><td>Network identity</td><td>Authenticated/protected connections</td></tr><tr><td>Card credentials</td><td>Isolation from general business services</td></tr><tr><td>Cryptographic keys</td><td>HSM-backed operations and controls</td></tr><tr><td>Data at rest</td><td>Classification, encryption, minimization</td></tr><tr><td>Service access</td><td>Least privilege and workload identities</td></tr><tr><td>Internal links</td><td>Protected service-to-service communication</td></tr><tr><td>Access records</td><td>Tamper-resistant audit trails</td></tr><tr><td>Operations</td><td>Privileged access controls and separation of duties</td></tr><tr><td>Logs</td><td>Redaction of credentials and sensitive auth data</td></tr></tbody></table>
-<h3 id="pci-dss">PCI DSS</h3>
-<p>PCI DSS governs protection of payment account data for in-scope entities and systems. See the <a href="https://www.pcisecuritystandards.org/document<em>library/" target="</em>blank" rel="noopener">PCI SSC official document library</a> for PCI DSS v4.0.1.</p>
-<p>Sensitive authentication data has special post-authorization retention restrictions. Issuer-specific exceptions must not be mistaken for general permission to store sensitive data.</p>
-<h3 id="tokenization">Tokenization</h3>
-<p><strong>Tokenization:</strong> Replacing a sensitive payment identifier with a substitute identifier to reduce exposure. A generic internal reference token and an EMV payment token serve different purposes and have different controls.</p>
-<p>Business services should use internal card/account references when feasible instead of handling raw primary account numbers.</p>
-<hr>
-<h2 id="20-observability-and-operations">20. Observability and operations</h2>
-<table><thead><tr><th>Metric</th><th>Detects</th></tr></thead><tbody><tr><td>p50/p95/p99 response latency</td><td>Slow critical-path behavior</td></tr><tr><td>Technical error rate</td><td>Processing reliability</td></tr><tr><td>Approval/decline reason distribution</td><td>Unusual policy or business changes</td></tr><tr><td>Database commit time</td><td>Persistence bottlenecks</td></tr><tr><td>Row-lock contention</td><td>Hot accounts or long transactions</td></tr><tr><td>HSM errors and latency</td><td>Cryptographic bottlenecks</td></tr><tr><td>Fraud service timeouts</td><td>Dependency failure</td></tr><tr><td>Duplicate request rate</td><td>Network retry behavior</td></tr><tr><td>Outbox backlog</td><td>Downstream delivery problems</td></tr><tr><td>Reversal match failures</td><td>Lifecycle errors</td></tr><tr><td>Reconciliation mismatches</td><td>Divergence of financial state</td></tr></tbody></table>
-<p>A high <strong>business decline rate</strong> is not necessarily a <strong>technical error rate</strong>. Report them separately.</p>
-<h3 id="tracing">Tracing</h3>
-<pre><code>Network Request
+    <table>
+        <thead>
+        <tr>
+            <th>Concern</th>
+            <th>Architectural response</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Network identity</td>
+            <td>Authenticated/protected connections</td>
+        </tr>
+        <tr>
+            <td>Card credentials</td>
+            <td>Isolation from general business services</td>
+        </tr>
+        <tr>
+            <td>Cryptographic keys</td>
+            <td>HSM-backed operations and controls</td>
+        </tr>
+        <tr>
+            <td>Data at rest</td>
+            <td>Classification, encryption, minimization</td>
+        </tr>
+        <tr>
+            <td>Service access</td>
+            <td>Least privilege and workload identities</td>
+        </tr>
+        <tr>
+            <td>Internal links</td>
+            <td>Protected service-to-service communication</td>
+        </tr>
+        <tr>
+            <td>Access records</td>
+            <td>Tamper-resistant audit trails</td>
+        </tr>
+        <tr>
+            <td>Operations</td>
+            <td>Privileged access controls and separation of duties</td>
+        </tr>
+        <tr>
+            <td>Logs</td>
+            <td>Redaction of credentials and sensitive auth data</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="pci-dss">PCI DSS</h3>
+    <p>PCI DSS governs protection of payment account data for in-scope entities
+        and systems. See the <a
+                href="https://www.pcisecuritystandards.org/document<em>library/"
+                target="</em>blank" rel="noopener">PCI SSC official document
+            library</a> for PCI DSS v4.0.1.</p>
+    <p>Sensitive authentication data has special post-authorization retention
+        restrictions. Issuer-specific exceptions must not be mistaken for
+        general permission to store sensitive data.</p>
+    <h3 id="tokenization">Tokenization</h3>
+    <p><strong>Tokenization:</strong> Replacing a sensitive payment identifier
+        with a substitute identifier to reduce exposure. A generic internal
+        reference token and an EMV payment token serve different purposes and
+        have different controls.</p>
+    <p>Business services should use internal card/account references when
+        feasible instead of handling raw primary account numbers.</p>
+    <hr>
+    <h2 id="20-observability-and-operations">20. Observability and
+        operations</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Detects</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>p50/p95/p99 response latency</td>
+            <td>Slow critical-path behavior</td>
+        </tr>
+        <tr>
+            <td>Technical error rate</td>
+            <td>Processing reliability</td>
+        </tr>
+        <tr>
+            <td>Approval/decline reason distribution</td>
+            <td>Unusual policy or business changes</td>
+        </tr>
+        <tr>
+            <td>Database commit time</td>
+            <td>Persistence bottlenecks</td>
+        </tr>
+        <tr>
+            <td>Row-lock contention</td>
+            <td>Hot accounts or long transactions</td>
+        </tr>
+        <tr>
+            <td>HSM errors and latency</td>
+            <td>Cryptographic bottlenecks</td>
+        </tr>
+        <tr>
+            <td>Fraud service timeouts</td>
+            <td>Dependency failure</td>
+        </tr>
+        <tr>
+            <td>Duplicate request rate</td>
+            <td>Network retry behavior</td>
+        </tr>
+        <tr>
+            <td>Outbox backlog</td>
+            <td>Downstream delivery problems</td>
+        </tr>
+        <tr>
+            <td>Reversal match failures</td>
+            <td>Lifecycle errors</td>
+        </tr>
+        <tr>
+            <td>Reconciliation mismatches</td>
+            <td>Divergence of financial state</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>A high <strong>business decline rate</strong> is not necessarily a
+        <strong>technical error rate</strong>. Report them separately.</p>
+    <h3 id="tracing">Tracing</h3>
+    <pre><code>Network Request
       |
       v
 Correlation ID
@@ -902,12 +2182,17 @@ Correlation ID
       +--&gt; Risk decision
       +--&gt; Credit reservation
       +--&gt; Response</code></pre>
-<p>Propagate a correlation identity without logging protected payment credentials.</p>
-<h3 id="operational-readiness">Operational readiness</h3>
-<p>Define deployment and rollback processes, load testing, capacity planning, backups, restore verification, failure injection, recovery exercises, incident management, security response, runbooks, and service ownership.</p>
-<hr>
-<h2 id="21-final-reference-architecture">21. Final reference architecture</h2>
-<pre><code>                         CARD NETWORK
+    <p>Propagate a correlation identity without logging protected payment
+        credentials.</p>
+    <h3 id="operational-readiness">Operational readiness</h3>
+    <p>Define deployment and rollback processes, load testing, capacity
+        planning, backups, restore verification, failure injection, recovery
+        exercises, incident management, security response, runbooks, and service
+        ownership.</p>
+    <hr>
+    <h2 id="21-final-reference-architecture">21. Final reference
+        architecture</h2>
+    <pre><code>                         CARD NETWORK
                               |
                               v
                    +---------------------+
@@ -968,33 +2253,227 @@ Correlation ID
                         |
                         v
                    CARD NETWORK</code></pre>
-<p>Clearing, posting, ledger, and settlement are separate components and processes. They share stable authorization references and reconcile exposure correctly.</p>
-<hr>
-<h2 id="22-decisions-and-rejected-alternatives">22. Decisions and rejected alternatives</h2>
-<table><thead><tr><th>Decision</th><th>Rationale</th><th>Alternative / when to reconsider</th></tr></thead><tbody><tr><td>Protocol adapter</td><td>Isolates network-specific formats</td><td>Direct protocol model in services</td></tr><tr><td>Synchronous authorization</td><td>Network requires prompt decision</td><td>Async processing for noncritical work</td></tr><tr><td>Transactional authoritative DB</td><td>Atomic reservations and unique constraints</td><td>Distributed transactional stores</td></tr><tr><td>Atomic conditional reservation</td><td>Prevents double-use of credit</td><td>Explicit locking or optimistic versioning</td></tr><tr><td>Durable request identity</td><td>Prevents duplicate holds</td><td>Cache only as optimization</td></tr><tr><td>Mandatory synchronous risk checks</td><td>Prevents inappropriate pre-approval</td><td>Async risk for post-decision analytics</td></tr><tr><td>Online fraud features</td><td>Fast inference data</td><td>Analytical query store for offline use</td></tr><tr><td>Transactional outbox</td><td>Avoids DB/broker dual-write gap</td><td>Direct publish is unsafe without equivalent guarantees</td></tr><tr><td>Asynchronous analytics and alerts</td><td>Protects approval latency</td><td>Synchronous calls only when required</td></tr><tr><td>Account-level partitioning</td><td>Keeps shared credit state together</td><td>Card-based sharding risks splitting shared line</td></tr><tr><td>Single-writer account ownership</td><td>Prevents conflicting cross-region writes</td><td>Globally coordinated multi-writer storage</td></tr><tr><td>Card-security isolation</td><td>Limits exposure of credentials and keys</td><td>Broad application access is inappropriate</td></tr></tbody></table>
-<hr>
-<h2 id="23-variations-that-change-the-architecture">23. Variations that change the architecture</h2>
-<h3 id="a-much-higher-transaction-volume">A. Much higher transaction volume</h3>
-<p>Scale stateless services and model inference; then measure database saturation and contention. Partition and shard when there is a proven bottleneck.</p>
-<h3 id="b-multi-region-active-active">B. Multi-region active-active</h3>
-<p>Use explicit account ownership and safe failover, globally coordinated writes, or a carefully bounded/reconciled allocation strategy. Eventual replica synchronization alone does not enforce a global spending limit.</p>
-<h3 id="c-real-time-velocity-limits">C. Real-time velocity limits</h3>
-<p>Use stream-derived features for probabilistic risk. Enforce hard transaction-count limits atomically or with correctly coordinated state.</p>
-<h3 id="d-hotel-rental-preauthorization">D. Hotel / rental preauthorization</h3>
-<p>Handle estimated amounts, incremental authorization, partial reversal, and amounts that differ at clearing.</p>
-<h3 id="e-network-outage">E. Network outage</h3>
-<p>The issuer cannot perform normal online authorization without the relevant messages. Any stand-in or offline authorization requires a separately governed network-supported mechanism.</p>
-<h3 id="f-multi-currency">F. Multi-currency</h3>
-<p>Define reserve currency, rate source, rounding, FX adjustments, and the relationship between authorization and later clearing amounts.</p>
-<h3 id="g-charge-cards-dynamic-spending-power">G. Charge cards / dynamic spending power</h3>
-<p>A simple fixed credit-limit formula may not apply. Replace it with the product-specific spending-capacity policy while preserving durable, auditable decisions and controlled concurrency.</p>
-<hr>
-<h2 id="24-summary-key-concepts-demonstrated">24. Summary: Key concepts demonstrated</h2>
-<table><thead><tr><th>Concept</th><th>Principle</th></tr></thead><tbody><tr><td>Payment lifecycle</td><td>Authorization is not clearing or settlement</td></tr><tr><td>Atomic transactions</td><td>Related financial changes commit together</td></tr><tr><td>Concurrency</td><td>Prevent simultaneous requests from spending the same available credit</td></tr><tr><td>Idempotency</td><td>Retry the same logical operation without repeating the financial effect</td></tr><tr><td>Uncertain outcomes</td><td>A timeout is not proof of non-commit</td></tr><tr><td>Fraud architecture</td><td>Mandatory checks belong before approval</td></tr><tr><td>Authoritative state vs. projections</td><td>Financial decisions require the correct source of truth</td></tr><tr><td>Transactional outbox</td><td>Couple business commit with durable intent to publish</td></tr><tr><td>Partitioning</td><td>Choose keys based on shared business invariants</td></tr><tr><td>Multi-region consistency</td><td>Availability cannot rely on uncontrolled conflicting writes</td></tr><tr><td>Security</td><td>Protect credentials, keys, and access boundaries</td></tr><tr><td>Reliability</td><td>Define behavior under dependency failures</td></tr></tbody></table>
-<h3 id="interview-ready-explanation">Interview-ready explanation</h3>
-<p>A credit card authorization system receives financial messages from a payment network and returns a low-latency decision using card validity, risk, account policy, and available spending capacity. The core design uses a transactional source of truth for both authorization decisions and credit reservations. Atomic updates prevent concurrent authorizations from incorrectly consuming the same available credit. Durable idempotency prevents duplicate network requests from creating duplicate holds.</p>
-<p>Required credential and risk decisions occur before approval, while analytics, notifications, and other noncritical work are decoupled through durable asynchronous events. The system handles reversals, expiry, clearing reconciliation, and uncertain network outcomes. Multi-AZ infrastructure, carefully controlled regional ownership, secure cryptographic boundaries, and tested recovery procedures increase resilience without weakening financial invariants.</p>
-<p><strong>Next design:</strong> Double-Entry Financial Ledger — immutable journal entries, debit/credit rules, balance derivation, posting, reconciliation, concurrency, and recovery.</p>
-<hr>
-<h2 id="official-references">Official references</h2>
-<ol start="1"><li><a href="https://www.americanexpress.com/content/dam/amex/us/merchant/new-merchant-regulations/Reference-Guide<em>EN</em>US.pdf" target="_blank" rel="noopener">American Express — U.S. Merchant Reference Guide</a> — authorization, reversals, submission, and settlement.</li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html" target="_blank" rel="noopener">AWS Prescriptive Guidance — Transactional outbox pattern</a> — database/event dual-write risk, duplicate delivery, and recovery.</li><li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/" target="_blank" rel="noopener">AWS Prescriptive Guidance — Cloud design patterns</a> — anti-corruption layers, retries, circuit breakers, and workflows.</li><li><a href="https://www.pcisecuritystandards.org/document<em>library/" target="</em>blank" rel="noopener">PCI Security Standards Council — Document library</a> — PCI DSS v4.0.1 and account-data protection requirements.</li></ol></main></body></html>
+    <p>Clearing, posting, ledger, and settlement are separate components and
+        processes. They share stable authorization references and reconcile
+        exposure correctly.</p>
+    <hr>
+    <h2 id="22-decisions-and-rejected-alternatives">22. Decisions and rejected
+        alternatives</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Decision</th>
+            <th>Rationale</th>
+            <th>Alternative / when to reconsider</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Protocol adapter</td>
+            <td>Isolates network-specific formats</td>
+            <td>Direct protocol model in services</td>
+        </tr>
+        <tr>
+            <td>Synchronous authorization</td>
+            <td>Network requires prompt decision</td>
+            <td>Async processing for noncritical work</td>
+        </tr>
+        <tr>
+            <td>Transactional authoritative DB</td>
+            <td>Atomic reservations and unique constraints</td>
+            <td>Distributed transactional stores</td>
+        </tr>
+        <tr>
+            <td>Atomic conditional reservation</td>
+            <td>Prevents double-use of credit</td>
+            <td>Explicit locking or optimistic versioning</td>
+        </tr>
+        <tr>
+            <td>Durable request identity</td>
+            <td>Prevents duplicate holds</td>
+            <td>Cache only as optimization</td>
+        </tr>
+        <tr>
+            <td>Mandatory synchronous risk checks</td>
+            <td>Prevents inappropriate pre-approval</td>
+            <td>Async risk for post-decision analytics</td>
+        </tr>
+        <tr>
+            <td>Online fraud features</td>
+            <td>Fast inference data</td>
+            <td>Analytical query store for offline use</td>
+        </tr>
+        <tr>
+            <td>Transactional outbox</td>
+            <td>Avoids DB/broker dual-write gap</td>
+            <td>Direct publish is unsafe without equivalent guarantees</td>
+        </tr>
+        <tr>
+            <td>Asynchronous analytics and alerts</td>
+            <td>Protects approval latency</td>
+            <td>Synchronous calls only when required</td>
+        </tr>
+        <tr>
+            <td>Account-level partitioning</td>
+            <td>Keeps shared credit state together</td>
+            <td>Card-based sharding risks splitting shared line</td>
+        </tr>
+        <tr>
+            <td>Single-writer account ownership</td>
+            <td>Prevents conflicting cross-region writes</td>
+            <td>Globally coordinated multi-writer storage</td>
+        </tr>
+        <tr>
+            <td>Card-security isolation</td>
+            <td>Limits exposure of credentials and keys</td>
+            <td>Broad application access is inappropriate</td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h2 id="23-variations-that-change-the-architecture">23. Variations that
+        change the architecture</h2>
+    <h3 id="a-much-higher-transaction-volume">A. Much higher transaction
+        volume</h3>
+    <p>Scale stateless services and model inference; then measure database
+        saturation and contention. Partition and shard when there is a proven
+        bottleneck.</p>
+    <h3 id="b-multi-region-active-active">B. Multi-region active-active</h3>
+    <p>Use explicit account ownership and safe failover, globally coordinated
+        writes, or a carefully bounded/reconciled allocation strategy. Eventual
+        replica synchronization alone does not enforce a global spending
+        limit.</p>
+    <h3 id="c-real-time-velocity-limits">C. Real-time velocity limits</h3>
+    <p>Use stream-derived features for probabilistic risk. Enforce hard
+        transaction-count limits atomically or with correctly coordinated
+        state.</p>
+    <h3 id="d-hotel-rental-preauthorization">D. Hotel / rental
+        preauthorization</h3>
+    <p>Handle estimated amounts, incremental authorization, partial reversal,
+        and amounts that differ at clearing.</p>
+    <h3 id="e-network-outage">E. Network outage</h3>
+    <p>The issuer cannot perform normal online authorization without the
+        relevant messages. Any stand-in or offline authorization requires a
+        separately governed network-supported mechanism.</p>
+    <h3 id="f-multi-currency">F. Multi-currency</h3>
+    <p>Define reserve currency, rate source, rounding, FX adjustments, and the
+        relationship between authorization and later clearing amounts.</p>
+    <h3 id="g-charge-cards-dynamic-spending-power">G. Charge cards / dynamic
+        spending power</h3>
+    <p>A simple fixed credit-limit formula may not apply. Replace it with the
+        product-specific spending-capacity policy while preserving durable,
+        auditable decisions and controlled concurrency.</p>
+    <hr>
+    <h2 id="24-summary-key-concepts-demonstrated">24. Summary: Key concepts
+        demonstrated</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Concept</th>
+            <th>Principle</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Payment lifecycle</td>
+            <td>Authorization is not clearing or settlement</td>
+        </tr>
+        <tr>
+            <td>Atomic transactions</td>
+            <td>Related financial changes commit together</td>
+        </tr>
+        <tr>
+            <td>Concurrency</td>
+            <td>Prevent simultaneous requests from spending the same available
+                credit
+            </td>
+        </tr>
+        <tr>
+            <td>Idempotency</td>
+            <td>Retry the same logical operation without repeating the financial
+                effect
+            </td>
+        </tr>
+        <tr>
+            <td>Uncertain outcomes</td>
+            <td>A timeout is not proof of non-commit</td>
+        </tr>
+        <tr>
+            <td>Fraud architecture</td>
+            <td>Mandatory checks belong before approval</td>
+        </tr>
+        <tr>
+            <td>Authoritative state vs. projections</td>
+            <td>Financial decisions require the correct source of truth</td>
+        </tr>
+        <tr>
+            <td>Transactional outbox</td>
+            <td>Couple business commit with durable intent to publish</td>
+        </tr>
+        <tr>
+            <td>Partitioning</td>
+            <td>Choose keys based on shared business invariants</td>
+        </tr>
+        <tr>
+            <td>Multi-region consistency</td>
+            <td>Availability cannot rely on uncontrolled conflicting writes</td>
+        </tr>
+        <tr>
+            <td>Security</td>
+            <td>Protect credentials, keys, and access boundaries</td>
+        </tr>
+        <tr>
+            <td>Reliability</td>
+            <td>Define behavior under dependency failures</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="interview-ready-explanation">Interview-ready explanation</h3>
+    <p>A credit card authorization system receives financial messages from a
+        payment network and returns a low-latency decision using card validity,
+        risk, account policy, and available spending capacity. The core design
+        uses a transactional source of truth for both authorization decisions
+        and credit reservations. Atomic updates prevent concurrent
+        authorizations from incorrectly consuming the same available credit.
+        Durable idempotency prevents duplicate network requests from creating
+        duplicate holds.</p>
+    <p>Required credential and risk decisions occur before approval, while
+        analytics, notifications, and other noncritical work are decoupled
+        through durable asynchronous events. The system handles reversals,
+        expiry, clearing reconciliation, and uncertain network outcomes.
+        Multi-AZ infrastructure, carefully controlled regional ownership, secure
+        cryptographic boundaries, and tested recovery procedures increase
+        resilience without weakening financial invariants.</p>
+    <p><strong>Next design:</strong> Double-Entry Financial Ledger — immutable
+        journal entries, debit/credit rules, balance derivation, posting,
+        reconciliation, concurrency, and recovery.</p>
+    <hr>
+    <h2 id="official-references">Official references</h2>
+    <ol start="1">
+        <li>
+            <a href="https://www.americanexpress.com/content/dam/amex/us/merchant/new-merchant-regulations/Reference-Guide<em>EN</em>US.pdf"
+               target="_blank" rel="noopener">American Express — U.S. Merchant
+                Reference Guide</a> — authorization, reversals, submission, and
+            settlement.
+        </li>
+        <li>
+            <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html"
+               target="_blank" rel="noopener">AWS Prescriptive Guidance —
+                Transactional outbox pattern</a> — database/event dual-write
+            risk, duplicate delivery, and recovery.
+        </li>
+        <li>
+            <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/"
+               target="_blank" rel="noopener">AWS Prescriptive Guidance — Cloud
+                design patterns</a> — anti-corruption layers, retries, circuit
+            breakers, and workflows.
+        </li>
+        <li><a href="https://www.pcisecuritystandards.org/document<em>library/"
+               target="</em>blank" rel="noopener">PCI Security Standards Council
+            — Document library</a> — PCI DSS v4.0.1 and account-data protection
+            requirements.
+        </li>
+    </ol>
+</main>
+</body>
+</html>

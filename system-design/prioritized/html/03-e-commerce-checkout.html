@@ -1,344 +1,775 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>System Design #3 — E-Commerce Checkout</title><style>
-/* The original PDF skill style sheet is embedded below. */
-/* Architect's Field Notes — original study-guide design recreation.
-   Standalone builder embeds this file into its generated HTML. */
-:root {
-  --navy: #112c3a;
-  --header: #193a4b;
-  --ink: #273944;
-  --heading: #17313e;
-  --muted: #75838d;
-  --line: #d9e2e7;
-  --zebra: #f6f8f9;
-  --accent: #64c8e6;
-  --accent-soft: #eaf8fc;
-}
-@page {
-  size: A4;
-  margin: 19mm 19mm 19mm;
-  @top-left {
-    content: "INTERVIEW / FIELD GUIDE";
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .05em;
-    vertical-align: middle;
-  }
-  @top-right {
-    content: string(running-topic);
-    color: #75838d;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 7pt;
-    letter-spacing: .02em;
-    vertical-align: middle;
-  }
-  @bottom-left {
-    content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
-    color: #9aa5ae;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-size: 6.3pt;
-    letter-spacing: .03em;
-    vertical-align: middle;
-  }
-  @bottom-right {
-    content: counter(page, decimal-leading-zero);
-    color: #394b56;
-    font-family: "Inter", "DejaVu Sans", sans-serif;
-    font-weight: 700;
-    font-size: 7pt;
-    vertical-align: middle;
-  }
-}
-@page cover {
-  size: A4;
-  margin: 0;
-  @top-left { content: none; }
-  @top-right { content: none; }
-  @bottom-left { content: none; }
-  @bottom-right { content: none; }
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  font-family: "Inter", "DejaVu Sans", sans-serif;
-  font-size: 9.4pt;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--ink);
-  background: #fff;
-  overflow-wrap: break-word;
-}
-.cover {
-  page: cover;
-  break-after: page;
-  height: 297mm;
-  width: 210mm;
-  overflow: hidden;
-  position: relative;
-  background: var(--navy);
-  color: #fff;
-  padding: 29.6mm 26mm;
-}
-.cover::before, .cover::after {
-  content: "";
-  position: absolute;
-  border: .55pt solid rgba(255,255,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.cover::before { width: 158mm; height: 158mm; right: -84mm; top: -61mm; }
-.cover::after { width: 108mm; height: 108mm; right: -28mm; bottom: -75mm; }
-.cover-brand {
-  font-size: 9.5pt;
-  font-weight: 800;
-  letter-spacing: .31em;
-  text-transform: uppercase;
-  color: #dceaf0;
-}
-.cover-series {
-  font-size: 8pt;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #98b3c1;
-  margin-top: 7mm;
-}
-.cover-accent-bar {
-  position: absolute;
-  left: 26mm; top: 80mm;
-  height: 3.5mm; width: 21mm;
-  background: var(--accent);
-}
-.cover-title {
-  position: absolute;
-  left: 25.5mm; right: 25mm; top: 97mm;
-  font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
-  font-size: 42pt;
-  font-weight: 800;
-  letter-spacing: -.043em;
-  line-height: 1.08;
-  color: #fff;
-}
-.cover-title .second { display: block; color: var(--accent); }
-.cover-title.long { font-size: 37pt; }
-.cover-sub {
-  position: absolute;
-  left: 26mm; right: 31mm; top: 173.5mm;
-  color: #bdcdd5;
-  font-size: 11.5pt;
-  line-height: 1.7;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.cover-note {
-  color: #91aab7;
-  text-transform: none;
-  font-size: 9pt;
-  letter-spacing: .01em;
-  margin-top: 7mm;
-  line-height: 1.6;
-}
-.cover-bottom {
-  position: absolute;
-  bottom: 31mm; left: 26mm;
-  font-size: 7.8pt;
-  line-height: 1.9;
-  letter-spacing: .065em;
-  color: #cfdae0;
-}
-.cover-rule {
-  position: absolute;
-  bottom: 62mm; height: .35pt;
-  left: 26mm; right: 26mm;
-  background: rgba(255,255,255,.15);
-}
-.cover-number {
-  position: absolute;
-  bottom: 29mm; right: 26mm;
-  color: var(--accent);
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 39pt;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-/* Introduction + automatically generated navigable contents. */
-.preface { break-after: page; }
-.preface-label, .toc-overline {
-  color: var(--accent);
-  font-size: 7.6pt;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-top: 0;
-}
-.preface h1 { display: none; }
-.preface h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 14pt;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.02em;
-  color: var(--heading);
-  margin: 5mm 0 5mm;
-  border-bottom: .5pt solid var(--line);
-  padding-bottom: 2.5mm;
-}
-.preface p { font-size: 9.5pt; line-height: 1.6; }
-.toc { border-top: .5pt solid var(--line); margin-top: 8mm; padding-top: 6.5mm; }
-.toc h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 21pt;
-  letter-spacing: -.03em;
-  margin: 2mm 0 5mm;
-  border: 0;
-  padding: 0;
-}
-.toc ol { list-style: none; margin: 0; padding: 0; }
-.toc li {
-  display: flex;
-  align-items: baseline;
-  gap: 5mm;
-  font-size: 9.1pt;
-  padding: 2.7mm 1mm;
-  border-top: .5pt solid #e7ecef;
-  break-inside: avoid;
-}
-.toc li:last-child { border-bottom: .5pt solid #e7ecef; }
-.toc .toc-num { width: 8mm; flex: 0 0 8mm; font-size: 7.5pt; font-weight: 800; color: var(--accent); }
-.toc a { color: var(--ink); text-decoration: none; }
-/* Continuous editorial body: sections can flow across pages. */
-.content { padding: 0; }
-.content h2 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 17.2pt;
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1.28;
-  letter-spacing: -.024em;
-  margin: 11mm 0 5mm;
-  padding-top: 5.5mm;
-  border-top: .6pt solid var(--line);
-  break-after: avoid;
-}
-.content h2::before {
-  content: "CHAPTER";
-  display: block;
-  color: var(--accent);
-  font-size: 7pt;
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-bottom: 2.2mm;
-}
-.content h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
-.content h3 {
-  font-family: "Inter Display", "Inter", sans-serif;
-  font-size: 11.6pt;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -.012em;
-  color: var(--heading);
-  margin: 7mm 0 2.5mm;
-  break-after: avoid;
-}
-.content h4, .preface h3 { font-size: 10pt; color: var(--heading); margin: 5mm 0 2mm; break-after: avoid; }
-p { margin: 0 0 3.15mm; orphans: 2; widows: 2; }
-strong, b { font-weight: 700; color: #1a3341; }
-a { color: #23778e; text-decoration: none; }
-hr { height: 0; border: none; border-top: .55pt solid #d9e2e7; margin: 7mm 0; }
-ul, ol { margin: 2.5mm 0 4mm; padding-left: 6mm; }
-li { padding-left: .5mm; margin: 1.5mm 0; }
-li::marker { color: var(--accent); }
-li p { margin: 0; }
-blockquote {
-  background: var(--accent-soft);
-  border-left: 2.5pt solid var(--accent);
-  margin: 4mm 0 6mm;
-  padding: 4mm 5.2mm;
-  color: #2b4654;
-  font-size: 9.4pt;
-  line-height: 1.56;
-}
-blockquote p { margin-bottom: 2.3mm; }
-blockquote p:last-child { margin-bottom: 0; }
-blockquote strong { color: #143743; }
-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  font-size: 8pt;
-  line-height: 1.42;
-  color: var(--ink);
-  margin: 3.6mm 0 4.8mm;
-  overflow-wrap: anywhere;
-}
-thead { display: table-header-group; }
-thead th {
-  background: var(--header);
-  color: #fff;
-  text-align: left;
-  font-weight: 700;
-  padding: 2.2mm 2.4mm;
-  vertical-align: top;
-  border-right: 1pt solid rgba(255,255,255,.04);
-}
-thead th strong { color: #fff; }
-tbody td { border-bottom: .35pt solid #e3e9ed; padding: 2.3mm 2.4mm; vertical-align: top; }
-tbody tr:nth-child(even) { background: var(--zebra); }
-tr { break-inside: avoid; }
-table.wide { font-size: 7.15pt; }
-table.wide th, table.wide td { padding: 1.8mm; }
-code {
-  font-family: "DejaVu Sans Mono", monospace;
-  font-size: .91em;
-  color: #22445a;
-}
-pre {
-  color: #dce9f0;
-  background: #173746;
-  padding: 4mm 5mm;
-  font-size: 8.3pt;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin: 4mm 0;
-}
-pre code { color: inherit; }
-.task-list-item { list-style: none; margin-left: -5mm; }
-.task-box {
-  display: inline-block;
-  border: .85pt solid #7b8b93;
-  width: 2.6mm; height: 2.6mm;
-  margin-right: 3mm;
-  vertical-align: baseline;
-}
-.task-box.checked { background: var(--accent); border-color: var(--accent); }
-img { max-width: 100%; height: auto; }
-.caption { color: var(--muted); font-size: 7.8pt; }
-@media screen { body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 25px #ddd; } }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>System Design #3 — E-Commerce Checkout</title>
+    <style>
+        /* The original PDF skill style sheet is embedded below. */
+        /* Architect's Field Notes — original study-guide design recreation.
+           Standalone builder embeds this file into its generated HTML. */
+        :root {
+            --navy: #112c3a;
+            --header: #193a4b;
+            --ink: #273944;
+            --heading: #17313e;
+            --muted: #75838d;
+            --line: #d9e2e7;
+            --zebra: #f6f8f9;
+            --accent: #64c8e6;
+            --accent-soft: #eaf8fc;
+        }
+
+        @page {
+            size: A4;
+            margin: 19mm 19mm 19mm;
+            @top-left {
+                content: "INTERVIEW / FIELD GUIDE";
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .05em;
+                vertical-align: middle;
+            }
+            @top-right {
+                content: string(running-topic);
+                color: #75838d;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 7pt;
+                letter-spacing: .02em;
+                vertical-align: middle;
+            }
+            @bottom-left {
+                content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+                color: #9aa5ae;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-size: 6.3pt;
+                letter-spacing: .03em;
+                vertical-align: middle;
+            }
+            @bottom-right {
+                content: counter(page, decimal-leading-zero);
+                color: #394b56;
+                font-family: "Inter", "DejaVu Sans", sans-serif;
+                font-weight: 700;
+                font-size: 7pt;
+                vertical-align: middle;
+            }
+        }
+
+        @page cover {
+            size: A4;
+            margin: 0;
+            @top-left {
+                content: none;
+            }
+            @top-right {
+                content: none;
+            }
+            @bottom-left {
+                content: none;
+            }
+            @bottom-right {
+                content: none;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", "DejaVu Sans", sans-serif;
+            font-size: 9.4pt;
+            font-weight: 400;
+            line-height: 1.55;
+            color: var(--ink);
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        .cover {
+            page: cover;
+            break-after: page;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy);
+            color: #fff;
+            padding: 29.6mm 26mm;
+        }
+
+        .cover::before, .cover::after {
+            content: "";
+            position: absolute;
+            border: .55pt solid rgba(255, 255, 255, .08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cover::before {
+            width: 158mm;
+            height: 158mm;
+            right: -84mm;
+            top: -61mm;
+        }
+
+        .cover::after {
+            width: 108mm;
+            height: 108mm;
+            right: -28mm;
+            bottom: -75mm;
+        }
+
+        .cover-brand {
+            font-size: 9.5pt;
+            font-weight: 800;
+            letter-spacing: .31em;
+            text-transform: uppercase;
+            color: #dceaf0;
+        }
+
+        .cover-series {
+            font-size: 8pt;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #98b3c1;
+            margin-top: 7mm;
+        }
+
+        .cover-accent-bar {
+            position: absolute;
+            left: 26mm;
+            top: 80mm;
+            height: 3.5mm;
+            width: 21mm;
+            background: var(--accent);
+        }
+
+        .cover-title {
+            position: absolute;
+            left: 25.5mm;
+            right: 25mm;
+            top: 97mm;
+            font-family: "Inter Display", "Inter", "DejaVu Sans", sans-serif;
+            font-size: 42pt;
+            font-weight: 800;
+            letter-spacing: -.043em;
+            line-height: 1.08;
+            color: #fff;
+        }
+
+        .cover-title .second {
+            display: block;
+            color: var(--accent);
+        }
+
+        .cover-title.long {
+            font-size: 37pt;
+        }
+
+        .cover-sub {
+            position: absolute;
+            left: 26mm;
+            right: 31mm;
+            top: 173.5mm;
+            color: #bdcdd5;
+            font-size: 11.5pt;
+            line-height: 1.7;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+
+        .cover-note {
+            color: #91aab7;
+            text-transform: none;
+            font-size: 9pt;
+            letter-spacing: .01em;
+            margin-top: 7mm;
+            line-height: 1.6;
+        }
+
+        .cover-bottom {
+            position: absolute;
+            bottom: 31mm;
+            left: 26mm;
+            font-size: 7.8pt;
+            line-height: 1.9;
+            letter-spacing: .065em;
+            color: #cfdae0;
+        }
+
+        .cover-rule {
+            position: absolute;
+            bottom: 62mm;
+            height: .35pt;
+            left: 26mm;
+            right: 26mm;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .cover-number {
+            position: absolute;
+            bottom: 29mm;
+            right: 26mm;
+            color: var(--accent);
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 39pt;
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        /* Introduction + automatically generated navigable contents. */
+        .preface {
+            break-after: page;
+        }
+
+        .preface-label, .toc-overline {
+            color: var(--accent);
+            font-size: 7.6pt;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .preface h1 {
+            display: none;
+        }
+
+        .preface h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 14pt;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -.02em;
+            color: var(--heading);
+            margin: 5mm 0 5mm;
+            border-bottom: .5pt solid var(--line);
+            padding-bottom: 2.5mm;
+        }
+
+        .preface p {
+            font-size: 9.5pt;
+            line-height: 1.6;
+        }
+
+        .toc {
+            border-top: .5pt solid var(--line);
+            margin-top: 8mm;
+            padding-top: 6.5mm;
+        }
+
+        .toc h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 21pt;
+            letter-spacing: -.03em;
+            margin: 2mm 0 5mm;
+            border: 0;
+            padding: 0;
+        }
+
+        .toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc li {
+            display: flex;
+            align-items: baseline;
+            gap: 5mm;
+            font-size: 9.1pt;
+            padding: 2.7mm 1mm;
+            border-top: .5pt solid #e7ecef;
+            break-inside: avoid;
+        }
+
+        .toc li:last-child {
+            border-bottom: .5pt solid #e7ecef;
+        }
+
+        .toc .toc-num {
+            width: 8mm;
+            flex: 0 0 8mm;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .toc a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        /* Continuous editorial body: sections can flow across pages. */
+        .content {
+            padding: 0;
+        }
+
+        .content h2 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 17.2pt;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.28;
+            letter-spacing: -.024em;
+            margin: 11mm 0 5mm;
+            padding-top: 5.5mm;
+            border-top: .6pt solid var(--line);
+            break-after: avoid;
+        }
+
+        .content h2::before {
+            content: "CHAPTER";
+            display: block;
+            color: var(--accent);
+            font-size: 7pt;
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .19em;
+            margin-bottom: 2.2mm;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-family: "Inter Display", "Inter", sans-serif;
+            font-size: 11.6pt;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -.012em;
+            color: var(--heading);
+            margin: 7mm 0 2.5mm;
+            break-after: avoid;
+        }
+
+        .content h4, .preface h3 {
+            font-size: 10pt;
+            color: var(--heading);
+            margin: 5mm 0 2mm;
+            break-after: avoid;
+        }
+
+        p {
+            margin: 0 0 3.15mm;
+            orphans: 2;
+            widows: 2;
+        }
+
+        strong, b {
+            font-weight: 700;
+            color: #1a3341;
+        }
+
+        a {
+            color: #23778e;
+            text-decoration: none;
+        }
+
+        hr {
+            height: 0;
+            border: none;
+            border-top: .55pt solid #d9e2e7;
+            margin: 7mm 0;
+        }
+
+        ul, ol {
+            margin: 2.5mm 0 4mm;
+            padding-left: 6mm;
+        }
+
+        li {
+            padding-left: .5mm;
+            margin: 1.5mm 0;
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        li p {
+            margin: 0;
+        }
+
+        blockquote {
+            background: var(--accent-soft);
+            border-left: 2.5pt solid var(--accent);
+            margin: 4mm 0 6mm;
+            padding: 4mm 5.2mm;
+            color: #2b4654;
+            font-size: 9.4pt;
+            line-height: 1.56;
+        }
+
+        blockquote p {
+            margin-bottom: 2.3mm;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        blockquote strong {
+            color: #143743;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            font-size: 8pt;
+            line-height: 1.42;
+            color: var(--ink);
+            margin: 3.6mm 0 4.8mm;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        thead th {
+            background: var(--header);
+            color: #fff;
+            text-align: left;
+            font-weight: 700;
+            padding: 2.2mm 2.4mm;
+            vertical-align: top;
+            border-right: 1pt solid rgba(255, 255, 255, .04);
+        }
+
+        thead th strong {
+            color: #fff;
+        }
+
+        tbody td {
+            border-bottom: .35pt solid #e3e9ed;
+            padding: 2.3mm 2.4mm;
+            vertical-align: top;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--zebra);
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+
+        table.wide {
+            font-size: 7.15pt;
+        }
+
+        table.wide th, table.wide td {
+            padding: 1.8mm;
+        }
+
+        code {
+            font-family: "DejaVu Sans Mono", monospace;
+            font-size: .91em;
+            color: #22445a;
+        }
+
+        pre {
+            color: #dce9f0;
+            background: #173746;
+            padding: 4mm 5mm;
+            font-size: 8.3pt;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 4mm 0;
+        }
+
+        pre code {
+            color: inherit;
+        }
+
+        .task-list-item {
+            list-style: none;
+            margin-left: -5mm;
+        }
+
+        .task-box {
+            display: inline-block;
+            border: .85pt solid #7b8b93;
+            width: 2.6mm;
+            height: 2.6mm;
+            margin-right: 3mm;
+            vertical-align: baseline;
+        }
+
+        .task-box.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 7.8pt;
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 25px #ddd;
+            }
+        }
 
 
-:root{--accent:#64C8E6;--accent-soft:#EAF8FC;}@page{@top-right{content:"SYSTEM DESIGN #3 — E-COMMERCE CHECKOUT";}@bottom-left{content:"SENIOR / PRINCIPAL SOLUTION ARCHITECT";}}
-@media screen{body{max-width:210mm;margin:0 auto;box-shadow:0 0 20px #dce2e6;}}</style></head><body><section class="cover"><div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div><div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 06 OF 07</div><div class="cover-accent-bar"></div><div class="cover-title">System Design #3 —<span class="second">E-Commerce Checkout</span></div><div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH CONFIDENCE.<div class="cover-note">Evidence-based STAR answers, senior-level judgment, and focused interview rehearsal.</div></div><div class="cover-rule"></div><div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE</div><div class="cover-number">06</div></section><section class="preface"><div class="preface-label">YOUR STUDY COMPANION</div><p><strong>Priority:</strong> High — Distributed transactions <strong>Interview target:</strong> Solution Architect <strong>Format:</strong> Deep design, with decisions, alternatives, and failure recovery</p>
-<blockquote><p><strong>Core problem:</strong> A customer purchases multiple products. We must create the order, reserve inventory, process payment, and start fulfillment without charging twice or selling stock we do not have.</p>
-<p>The challenge is not connecting four services. It is ensuring they reach a correct business outcome when one or more services fail.</p></blockquote><nav class="toc"><div class="toc-overline">NAVIGATION</div><h2>Inside this guide</h2><ol><li><span class="toc-num">01</span><a href="#1-understand-the-problem">1. Understand the problem</a></li><li><span class="toc-num">02</span><a href="#2-first-derive-the-simplest-architecture">2. First derive the simplest architecture</a></li><li><span class="toc-num">03</span><a href="#3-saga-orchestration-versus-choreography">3. Saga orchestration versus choreography</a></li><li><span class="toc-num">04</span><a href="#4-high-level-system-architecture">4. High-level system architecture</a></li><li><span class="toc-num">05</span><a href="#5-api-contracts">5. API contracts</a></li><li><span class="toc-num">06</span><a href="#6-data-model">6. Data model</a></li><li><span class="toc-num">07</span><a href="#7-successful-checkout-flow-and-why-each-step-exists">7. Successful checkout flow and why each step exists</a></li><li><span class="toc-num">08</span><a href="#8-prevent-inventory-overselling">8. Prevent inventory overselling</a></li><li><span class="toc-num">09</span><a href="#9-saga-failure-recovery">9. Saga failure recovery</a></li><li><span class="toc-num">10</span><a href="#10-transactional-outbox-and-the-dual-write-problem">10. Transactional Outbox and the dual-write problem</a></li><li><span class="toc-num">11</span><a href="#11-handle-payment-webhooks">11. Handle payment webhooks</a></li><li><span class="toc-num">12</span><a href="#12-scaling-and-performance">12. Scaling and performance</a></li><li><span class="toc-num">13</span><a href="#13-security-and-compliance">13. Security and compliance</a></li><li><span class="toc-num">14</span><a href="#14-reliability-and-operations">14. Reliability and operations</a></li><li><span class="toc-num">15</span><a href="#15-final-decision-summary">15. Final decision summary</a></li><li><span class="toc-num">16</span><a href="#16-concise-interview-walkthrough">16. Concise interview walkthrough</a></li><li><span class="toc-num">17</span><a href="#official-references-for-further-verification">Official references for further verification</a></li></ol></nav></section><main class="content"><h2 id="1-understand-the-problem">1. Understand the problem</h2>
-<h3 id="functional-requirements">Functional requirements</h3>
-<ol start="1"><li>Customer checks out with multiple products.</li><li>System validates product availability and calculates the final price.</li><li>System reserves inventory to prevent overselling.</li><li>System authorizes payment through an external payment provider.</li><li>System confirms the order after the required checks succeed.</li><li>System starts fulfillment and sends confirmation.</li><li>System handles failed payments, expired reservations, duplicate requests, and partial failures.</li><li>Customer can check the order's current status.</li></ol>
-<p><strong>Assumption:</strong> A physical-goods retailer using card payments.</p>
-<p><strong>Out of scope:</strong> Product search, recommendations, catalog browsing, detailed shipping optimization, and chargebacks.</p>
-<h3 id="non-functional-requirements">Non-functional requirements</h3>
-<table><thead><tr><th>Requirement</th><th>Why it matters</th><th>Design implication</th></tr></thead><tbody><tr><td>No duplicate orders or charges</td><td>Financial correctness</td><td>Idempotency</td></tr><tr><td>No overselling</td><td>Inventory correctness</td><td>Atomic reservation</td></tr><tr><td>High availability</td><td>Checkout generates revenue</td><td>Redundancy and recovery</td></tr><tr><td>Responsive checkout</td><td>Customer experience</td><td>Short critical path</td></tr><tr><td>Fault tolerance</td><td>External systems fail</td><td>Retries, Saga, compensation</td></tr><tr><td>Recoverable operations</td><td>Failures can occur midway</td><td>Durable workflow state</td></tr><tr><td>Security</td><td>Payments and personal information</td><td>Authentication, tokenization, encryption</td></tr><tr><td>Observability</td><td>Investigate stuck or failed orders</td><td>Correlation IDs, metrics, audit trail</td></tr></tbody></table>
-<p><strong>Design priority:</strong> Correctness &gt; availability during uncertainty &gt; performance optimization.</p>
-<p>A temporary <code>PROCESSING</code> status is preferable to telling the customer payment failed when the actual outcome is unknown.</p>
-<h3 id="illustrative-capacity-assumptions">Illustrative capacity assumptions</h3>
-<p>These are design assumptions, not measured company requirements.</p>
-<table><thead><tr><th>Metric</th><th>Assumption</th></tr></thead><tbody><tr><td>Orders per day</td><td>10 million</td></tr><tr><td>Average checkout rate</td><td>~116 requests/second</td></tr><tr><td>Peak multiplier</td><td>10×</td></tr><tr><td>Peak checkout rate</td><td>~1,160 requests/second</td></tr><tr><td>Average items per order</td><td>3</td></tr><tr><td>Order record and related metadata</td><td>~2 KB</td></tr></tbody></table>
-<p>At this scale, a properly designed relational database can be a reasonable starting point. Do not automatically introduce database sharding or dozens of microservices.</p>
-<p>The harder problem is <strong>transaction coordination</strong>, not just requests per second.</p>
-<hr>
-<h2 id="2-first-derive-the-simplest-architecture">2. First derive the simplest architecture</h2>
-<p>Imagine everything runs inside one application and one relational database:</p>
-<pre><code>Customer
+        :root {
+            --accent: #64C8E6;
+            --accent-soft: #EAF8FC;
+        }
+
+        @page {
+            @top-right {
+                content: "SYSTEM DESIGN #3 — E-COMMERCE CHECKOUT";
+            }@bottom-left {
+            content: "SENIOR / PRINCIPAL SOLUTION ARCHITECT";
+        }
+        }
+
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                box-shadow: 0 0 20px #dce2e6;
+            }
+        }</style>
+</head>
+<body>
+<section class="cover">
+    <div class="cover-brand">THE ARCHITECT&#39;S FIELD NOTES</div>
+    <div class="cover-series">BEHAVIORAL INTERVIEW STUDY GUIDE &nbsp;/&nbsp; 06
+        OF 07
+    </div>
+    <div class="cover-accent-bar"></div>
+    <div class="cover-title">System Design #3 —<span class="second">E-Commerce Checkout</span>
+    </div>
+    <div class="cover-sub">THINK CLEARLY. DECIDE WITH EVIDENCE. DELIVER WITH
+        CONFIDENCE.
+        <div class="cover-note">Evidence-based STAR answers, senior-level
+            judgment, and focused interview rehearsal.
+        </div>
+    </div>
+    <div class="cover-rule"></div>
+    <div class="cover-bottom">PREPARED FOR SENIOR / PRINCIPAL SOLUTION ARCHITECT
+        INTERVIEWS<br>READ &nbsp; · &nbsp; REFLECT &nbsp; · &nbsp; PRACTICE
+    </div>
+    <div class="cover-number">06</div>
+</section>
+<section class="preface">
+    <div class="preface-label">YOUR STUDY COMPANION</div>
+    <p><strong>Priority:</strong> High — Distributed transactions <strong>Interview
+        target:</strong> Solution Architect <strong>Format:</strong> Deep
+        design, with decisions, alternatives, and failure recovery</p>
+    <blockquote><p><strong>Core problem:</strong> A customer purchases multiple
+        products. We must create the order, reserve inventory, process payment,
+        and start fulfillment without charging twice or selling stock we do not
+        have.</p>
+        <p>The challenge is not connecting four services. It is ensuring they
+            reach a correct business outcome when one or more services fail.</p>
+    </blockquote>
+    <nav class="toc">
+        <div class="toc-overline">NAVIGATION</div>
+        <h2>Inside this guide</h2>
+        <ol>
+            <li><span class="toc-num">01</span><a
+                    href="#1-understand-the-problem">1. Understand the
+                problem</a></li>
+            <li><span class="toc-num">02</span><a
+                    href="#2-first-derive-the-simplest-architecture">2. First
+                derive the simplest architecture</a></li>
+            <li><span class="toc-num">03</span><a
+                    href="#3-saga-orchestration-versus-choreography">3. Saga
+                orchestration versus choreography</a></li>
+            <li><span class="toc-num">04</span><a
+                    href="#4-high-level-system-architecture">4. High-level
+                system architecture</a></li>
+            <li><span class="toc-num">05</span><a href="#5-api-contracts">5. API
+                contracts</a></li>
+            <li><span class="toc-num">06</span><a href="#6-data-model">6. Data
+                model</a></li>
+            <li><span class="toc-num">07</span><a
+                    href="#7-successful-checkout-flow-and-why-each-step-exists">7.
+                Successful checkout flow and why each step exists</a></li>
+            <li><span class="toc-num">08</span><a
+                    href="#8-prevent-inventory-overselling">8. Prevent inventory
+                overselling</a></li>
+            <li><span class="toc-num">09</span><a
+                    href="#9-saga-failure-recovery">9. Saga failure recovery</a>
+            </li>
+            <li><span class="toc-num">10</span><a
+                    href="#10-transactional-outbox-and-the-dual-write-problem">10.
+                Transactional Outbox and the dual-write problem</a></li>
+            <li><span class="toc-num">11</span><a
+                    href="#11-handle-payment-webhooks">11. Handle payment
+                webhooks</a></li>
+            <li><span class="toc-num">12</span><a
+                    href="#12-scaling-and-performance">12. Scaling and
+                performance</a></li>
+            <li><span class="toc-num">13</span><a
+                    href="#13-security-and-compliance">13. Security and
+                compliance</a></li>
+            <li><span class="toc-num">14</span><a
+                    href="#14-reliability-and-operations">14. Reliability and
+                operations</a></li>
+            <li><span class="toc-num">15</span><a
+                    href="#15-final-decision-summary">15. Final decision
+                summary</a></li>
+            <li><span class="toc-num">16</span><a
+                    href="#16-concise-interview-walkthrough">16. Concise
+                interview walkthrough</a></li>
+            <li><span class="toc-num">17</span><a
+                    href="#official-references-for-further-verification">Official
+                references for further verification</a></li>
+        </ol>
+    </nav>
+</section>
+<main class="content"><h2 id="1-understand-the-problem">1. Understand the
+    problem</h2>
+    <h3 id="functional-requirements">Functional requirements</h3>
+    <ol start="1">
+        <li>Customer checks out with multiple products.</li>
+        <li>System validates product availability and calculates the final
+            price.
+        </li>
+        <li>System reserves inventory to prevent overselling.</li>
+        <li>System authorizes payment through an external payment provider.</li>
+        <li>System confirms the order after the required checks succeed.</li>
+        <li>System starts fulfillment and sends confirmation.</li>
+        <li>System handles failed payments, expired reservations, duplicate
+            requests, and partial failures.
+        </li>
+        <li>Customer can check the order's current status.</li>
+    </ol>
+    <p><strong>Assumption:</strong> A physical-goods retailer using card
+        payments.</p>
+    <p><strong>Out of scope:</strong> Product search, recommendations, catalog
+        browsing, detailed shipping optimization, and chargebacks.</p>
+    <h3 id="non-functional-requirements">Non-functional requirements</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>Why it matters</th>
+            <th>Design implication</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>No duplicate orders or charges</td>
+            <td>Financial correctness</td>
+            <td>Idempotency</td>
+        </tr>
+        <tr>
+            <td>No overselling</td>
+            <td>Inventory correctness</td>
+            <td>Atomic reservation</td>
+        </tr>
+        <tr>
+            <td>High availability</td>
+            <td>Checkout generates revenue</td>
+            <td>Redundancy and recovery</td>
+        </tr>
+        <tr>
+            <td>Responsive checkout</td>
+            <td>Customer experience</td>
+            <td>Short critical path</td>
+        </tr>
+        <tr>
+            <td>Fault tolerance</td>
+            <td>External systems fail</td>
+            <td>Retries, Saga, compensation</td>
+        </tr>
+        <tr>
+            <td>Recoverable operations</td>
+            <td>Failures can occur midway</td>
+            <td>Durable workflow state</td>
+        </tr>
+        <tr>
+            <td>Security</td>
+            <td>Payments and personal information</td>
+            <td>Authentication, tokenization, encryption</td>
+        </tr>
+        <tr>
+            <td>Observability</td>
+            <td>Investigate stuck or failed orders</td>
+            <td>Correlation IDs, metrics, audit trail</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Design priority:</strong> Correctness &gt; availability during
+        uncertainty &gt; performance optimization.</p>
+    <p>A temporary <code>PROCESSING</code> status is preferable to telling the
+        customer payment failed when the actual outcome is unknown.</p>
+    <h3 id="illustrative-capacity-assumptions">Illustrative capacity
+        assumptions</h3>
+    <p>These are design assumptions, not measured company requirements.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Assumption</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Orders per day</td>
+            <td>10 million</td>
+        </tr>
+        <tr>
+            <td>Average checkout rate</td>
+            <td>~116 requests/second</td>
+        </tr>
+        <tr>
+            <td>Peak multiplier</td>
+            <td>10×</td>
+        </tr>
+        <tr>
+            <td>Peak checkout rate</td>
+            <td>~1,160 requests/second</td>
+        </tr>
+        <tr>
+            <td>Average items per order</td>
+            <td>3</td>
+        </tr>
+        <tr>
+            <td>Order record and related metadata</td>
+            <td>~2 KB</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>At this scale, a properly designed relational database can be a
+        reasonable starting point. Do not automatically introduce database
+        sharding or dozens of microservices.</p>
+    <p>The harder problem is <strong>transaction coordination</strong>, not just
+        requests per second.</p>
+    <hr>
+    <h2 id="2-first-derive-the-simplest-architecture">2. First derive the
+        simplest architecture</h2>
+    <p>Imagine everything runs inside one application and one relational
+        database:</p>
+    <pre><code>Customer
    |
    v
 Checkout Application
@@ -355,14 +786,29 @@ Checkout Application
    |
    v
 Database</code></pre>
-<p>Now consider:</p>
-<ol start="1"><li>Save the order successfully.</li><li>Reduce inventory successfully.</li><li>Call the external payment processor.</li><li>Payment succeeds.</li><li>The application crashes before saving payment success.</li></ol>
-<p>We now have inconsistent information:</p>
-<ul><li>Order database may say payment is pending.</li><li>Inventory may already be reduced.</li><li>Payment provider has authorized or charged the customer.</li><li>Customer does not know the outcome.</li></ul>
-<p><strong>A single SQL transaction does not solve this.</strong> It can atomically commit changes within its transaction boundary but generally cannot include an external payment provider.</p>
-<h3 id="decision-use-a-saga">Decision: use a Saga</h3>
-<p>A <strong>Saga</strong> coordinates a distributed business workflow as a series of local transactions, using recovery or compensating actions when needed.</p>
-<pre><code>Create Order
+    <p>Now consider:</p>
+    <ol start="1">
+        <li>Save the order successfully.</li>
+        <li>Reduce inventory successfully.</li>
+        <li>Call the external payment processor.</li>
+        <li>Payment succeeds.</li>
+        <li>The application crashes before saving payment success.</li>
+    </ol>
+    <p>We now have inconsistent information:</p>
+    <ul>
+        <li>Order database may say payment is pending.</li>
+        <li>Inventory may already be reduced.</li>
+        <li>Payment provider has authorized or charged the customer.</li>
+        <li>Customer does not know the outcome.</li>
+    </ul>
+    <p><strong>A single SQL transaction does not solve this.</strong> It can
+        atomically commit changes within its transaction boundary but generally
+        cannot include an external payment provider.</p>
+    <h3 id="decision-use-a-saga">Decision: use a Saga</h3>
+    <p>A <strong>Saga</strong> coordinates a distributed business workflow as a
+        series of local transactions, using recovery or compensating actions
+        when needed.</p>
+    <pre><code>Create Order
      |
      v
 Reserve Inventory
@@ -375,18 +821,22 @@ Confirm Order
      |
      v
 Start Fulfillment</code></pre>
-<p>On a declined payment:</p>
-<pre><code>Payment Declined
+    <p>On a declined payment:</p>
+    <pre><code>Payment Declined
       |
       v
 Release Inventory
       |
       v
 Cancel Order</code></pre>
-<p><strong>Important:</strong> Compensation is not an automatic rollback. Releasing inventory is a new business action. Voiding an authorization or issuing a refund may require a separate external financial operation.</p>
-<h2 id="3-saga-orchestration-versus-choreography">3. Saga orchestration versus choreography</h2>
-<h3 id="choreography">Choreography</h3>
-<pre><code>Order
+    <p><strong>Important:</strong> Compensation is not an automatic rollback.
+        Releasing inventory is a new business action. Voiding an authorization
+        or issuing a refund may require a separate external financial operation.
+    </p>
+    <h2 id="3-saga-orchestration-versus-choreography">3. Saga orchestration
+        versus choreography</h2>
+    <h3 id="choreography">Choreography</h3>
+    <pre><code>Order
   |
 Event
   v
@@ -395,21 +845,62 @@ Inventory
 Event
   v
 Payment</code></pre>
-<p>Services react to events and trigger subsequent steps.</p>
-<h3 id="orchestration">Orchestration</h3>
-<pre><code>      Checkout Saga
+    <p>Services react to events and trigger subsequent steps.</p>
+    <h3 id="orchestration">Orchestration</h3>
+    <pre><code>      Checkout Saga
        /    |    \
       v     v     v
     Order Inventory Payment</code></pre>
-<p>A central durable workflow coordinates participants.</p>
-<table><thead><tr><th>Aspect</th><th>Choreography</th><th>Orchestration</th></tr></thead><tbody><tr><td>Control</td><td>Distributed</td><td>Central coordinator</td></tr><tr><td>Workflow visibility</td><td>Harder</td><td>Easier</td></tr><tr><td>Service coupling</td><td>Event contracts</td><td>Orchestrator contracts</td></tr><tr><td>Complex branching</td><td>Harder to follow</td><td>Easier to manage</td></tr><tr><td>Recovery</td><td>Spread across services</td><td>Explicit workflow decisions</td></tr></tbody></table>
-<h3 id="choice-saga-orchestration">Choice: Saga orchestration</h3>
-<p><strong>Why:</strong> Checkout has a defined sequence, important compensation steps, and multiple failure cases. The coordinator tracks which steps succeeded, which failed, whether payment outcome is known, and what recovery is safe.</p>
-<p><strong>Critical requirement:</strong> Persist workflow state. An in-memory-only orchestrator loses progress on crashes.</p>
-<p><strong>When choreography can work:</strong> Simpler event-driven processes with few participants and uncomplicated recovery.</p>
-<hr>
-<h2 id="4-high-level-system-architecture">4. High-level system architecture</h2>
-<pre><code>                  CUSTOMER
+    <p>A central durable workflow coordinates participants.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Aspect</th>
+            <th>Choreography</th>
+            <th>Orchestration</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Control</td>
+            <td>Distributed</td>
+            <td>Central coordinator</td>
+        </tr>
+        <tr>
+            <td>Workflow visibility</td>
+            <td>Harder</td>
+            <td>Easier</td>
+        </tr>
+        <tr>
+            <td>Service coupling</td>
+            <td>Event contracts</td>
+            <td>Orchestrator contracts</td>
+        </tr>
+        <tr>
+            <td>Complex branching</td>
+            <td>Harder to follow</td>
+            <td>Easier to manage</td>
+        </tr>
+        <tr>
+            <td>Recovery</td>
+            <td>Spread across services</td>
+            <td>Explicit workflow decisions</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="choice-saga-orchestration">Choice: Saga orchestration</h3>
+    <p><strong>Why:</strong> Checkout has a defined sequence, important
+        compensation steps, and multiple failure cases. The coordinator tracks
+        which steps succeeded, which failed, whether payment outcome is known,
+        and what recovery is safe.</p>
+    <p><strong>Critical requirement:</strong> Persist workflow state. An
+        in-memory-only orchestrator loses progress on crashes.</p>
+    <p><strong>When choreography can work:</strong> Simpler event-driven
+        processes with few participants and uncomplicated recovery.</p>
+    <hr>
+    <h2 id="4-high-level-system-architecture">4. High-level system
+        architecture</h2>
+    <pre><code>                  CUSTOMER
                      |
                      v
               CDN / WAF / LB
@@ -449,42 +940,116 @@ Payment</code></pre>
               |                          |
               v                          v
        Fulfillment Service       Notification Service</code></pre>
-<p><em>PSP = Payment Service Provider; CDC = Change Data Capture. Each publishing service owns an outbox in its own transactional database.</em></p>
-<table><thead><tr><th>Component</th><th>Responsibility</th><th>Why separate it logically?</th></tr></thead><tbody><tr><td>API Gateway</td><td>Routing, authentication, limits</td><td>Common entry controls</td></tr><tr><td>Checkout API</td><td>Validate request, start checkout</td><td>Customer-facing interface</td></tr><tr><td>Pricing Service</td><td>Final price, tax, discounts</td><td>Do not trust browser-supplied totals</td></tr><tr><td>Saga Orchestrator</td><td>Manage checkout steps</td><td>Central recovery decisions</td></tr><tr><td>Order Service</td><td>Own order lifecycle</td><td>Clear data ownership</td></tr><tr><td>Inventory Service</td><td>Reserve and release items</td><td>Prevent overselling</td></tr><tr><td>Payment Service</td><td>Integrate with PSP</td><td>Isolate payment rules/failures</td></tr><tr><td>Outbox/Event Relay</td><td>Publish durable events</td><td>Avoid lost events</td></tr><tr><td>Message Broker</td><td>Deliver asynchronous work</td><td>Decouple downstream services</td></tr><tr><td>Fulfillment Service</td><td>Arrange delivery</td><td>Independent later workflow</td></tr><tr><td>Notification Service</td><td>Send email/SMS</td><td>Not critical-path financial logic</td></tr></tbody></table>
-<p><strong>Architecture boundary:</strong> Separate deployable services and databases are justified by ownership, scaling, or reliability needs. Otherwise, a <strong>modular monolith</strong> with a durable workflow and relational database may be a better starting implementation. The correctness rules apply in either case.</p>
-<hr>
-<h2 id="5-api-contracts">5. API contracts</h2>
-<h3 id="start-checkout">Start checkout</h3>
-<pre><code>POST /v1/checkouts
+    <p><em>PSP = Payment Service Provider; CDC = Change Data Capture. Each
+        publishing service owns an outbox in its own transactional
+        database.</em></p>
+    <table>
+        <thead>
+        <tr>
+            <th>Component</th>
+            <th>Responsibility</th>
+            <th>Why separate it logically?</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>API Gateway</td>
+            <td>Routing, authentication, limits</td>
+            <td>Common entry controls</td>
+        </tr>
+        <tr>
+            <td>Checkout API</td>
+            <td>Validate request, start checkout</td>
+            <td>Customer-facing interface</td>
+        </tr>
+        <tr>
+            <td>Pricing Service</td>
+            <td>Final price, tax, discounts</td>
+            <td>Do not trust browser-supplied totals</td>
+        </tr>
+        <tr>
+            <td>Saga Orchestrator</td>
+            <td>Manage checkout steps</td>
+            <td>Central recovery decisions</td>
+        </tr>
+        <tr>
+            <td>Order Service</td>
+            <td>Own order lifecycle</td>
+            <td>Clear data ownership</td>
+        </tr>
+        <tr>
+            <td>Inventory Service</td>
+            <td>Reserve and release items</td>
+            <td>Prevent overselling</td>
+        </tr>
+        <tr>
+            <td>Payment Service</td>
+            <td>Integrate with PSP</td>
+            <td>Isolate payment rules/failures</td>
+        </tr>
+        <tr>
+            <td>Outbox/Event Relay</td>
+            <td>Publish durable events</td>
+            <td>Avoid lost events</td>
+        </tr>
+        <tr>
+            <td>Message Broker</td>
+            <td>Deliver asynchronous work</td>
+            <td>Decouple downstream services</td>
+        </tr>
+        <tr>
+            <td>Fulfillment Service</td>
+            <td>Arrange delivery</td>
+            <td>Independent later workflow</td>
+        </tr>
+        <tr>
+            <td>Notification Service</td>
+            <td>Send email/SMS</td>
+            <td>Not critical-path financial logic</td>
+        </tr>
+        </tbody>
+    </table>
+    <p><strong>Architecture boundary:</strong> Separate deployable services and
+        databases are justified by ownership, scaling, or reliability needs.
+        Otherwise, a <strong>modular monolith</strong> with a durable workflow
+        and relational database may be a better starting implementation. The
+        correctness rules apply in either case.</p>
+    <hr>
+    <h2 id="5-api-contracts">5. API contracts</h2>
+    <h3 id="start-checkout">Start checkout</h3>
+    <pre><code>POST /v1/checkouts
 Authorization: Bearer &lt;access_token&gt;
 Idempotency-Key: checkout-attempt-123
 Content-Type: application/json</code></pre>
-<pre><code>{
+    <pre><code>{
   "cart_id": "cart_101",
   "cart_version": 4,
   "shipping_address_id": "addr_50",
   "payment_method_token": "pm_token_123"
 }</code></pre>
-<p>The server derives the authenticated customer and calculates the final amount; it must not trust browser prices.</p>
-<h3 id="asynchronous-response">Asynchronous response</h3>
-<pre><code>{
+    <p>The server derives the authenticated customer and calculates the final
+        amount; it must not trust browser prices.</p>
+    <h3 id="asynchronous-response">Asynchronous response</h3>
+    <pre><code>{
   "checkout_id": "chk_123",
   "order_id": "ord_456",
   "status": "PROCESSING",
   "amount_minor": 12500,
   "currency": "USD"
 }</code></pre>
-<p>Return <strong>HTTP 202 Accepted</strong> when processing continues asynchronously.</p>
-<pre><code>GET /v1/checkouts/chk_123</code></pre>
-<p>Example states:</p>
-<pre><code>PROCESSING
+    <p>Return <strong>HTTP 202 Accepted</strong> when processing continues
+        asynchronously.</p>
+    <pre><code>GET /v1/checkouts/chk_123</code></pre>
+    <p>Example states:</p>
+    <pre><code>PROCESSING
 REQUIRES_ACTION
 CONFIRMED
 FAILED
 CANCELLED</code></pre>
-<p><code>REQUIRES_ACTION</code> may cover additional payment authentication, such as 3-D Secure.</p>
-<h3 id="why-idempotency">Why idempotency?</h3>
-<pre><code>Customer clicks Pay
+    <p><code>REQUIRES_ACTION</code> may cover additional payment authentication,
+        such as 3-D Secure.</p>
+    <h3 id="why-idempotency">Why idempotency?</h3>
+    <pre><code>Customer clicks Pay
        |
        v
 Server processes request
@@ -494,30 +1059,167 @@ Network loses response
        |
        v
 Customer retries</code></pre>
-<p>Without idempotency, retries could create another order.</p>
-<p><strong>Implementation:</strong> Store authenticated customer, idempotency key, request fingerprint, and checkout attempt ID. Enforce a unique constraint so concurrent retries do not start duplicate workflows. Reject reuse of the same key with different parameters.</p>
-<p><strong>Important:</strong> Checkout-level and PSP-level idempotency are separate safeguards. Use both.</p>
-<hr>
-<h2 id="6-data-model">6. Data model</h2>
-<h3 id="choice-relational-database-for-transactions">Choice: relational database for transactions</h3>
-<p>Why SQL is a sensible default:</p>
-<ul><li>Orders have related items and payments.</li><li>Inventory reservation needs conditional atomic updates.</li><li>Payment state needs constraints and safe transitions.</li><li>Local transactions enforce consistency within a service boundary.</li></ul>
-<p>A Saga coordinates across separately committed service transactions.</p>
-<table><thead><tr><th>Table</th><th>Important fields</th></tr></thead><tbody><tr><td><code>checkout_attempts</code></td><td>attempt<em>id, customer</em>id, idempotency<em>key, request</em>hash, status</td></tr><tr><td><code>orders</code></td><td>order<em>id, customer</em>id, total_minor, currency, status, version</td></tr><tr><td><code>order_items</code></td><td>order<em>id, product</em>id, quantity, unit<em>price</em>minor</td></tr><tr><td><code>inventory</code></td><td>sku, warehouse<em>id, on</em>hand, reserved</td></tr><tr><td><code>reservations</code></td><td>reservation<em>id, order</em>id, sku, quantity, expires_at, status</td></tr><tr><td><code>payments</code></td><td>payment<em>id, order</em>id, provider<em>reference, amount</em>minor, status</td></tr><tr><td><code>saga_instances</code></td><td>saga<em>id, order</em>id, current_step, status, version</td></tr><tr><td><code>outbox_events</code></td><td>event<em>id, aggregate</em>id, event<em>type, payload, publish</em>status</td></tr><tr><td><code>processed_events</code></td><td>consumer<em>id, event</em>id, processed_at</td></tr></tbody></table>
-<p>In a service-owned design, place each table in the appropriate service database, not in one shared cross-service schema.</p>
-<p><strong>Money:</strong> Store integer minor units (for example, 12500 cents for USD 125.00) or a properly defined decimal type, never binary floating point for financial arithmetic. Record currency and rounding rules.</p>
-<p><strong>Historical truth:</strong> Snapshot product prices and purchase details into the order so catalog changes do not rewrite order history.</p>
-<hr>
-<h2 id="7-successful-checkout-flow-and-why-each-step-exists">7. Successful checkout flow and why each step exists</h2>
-<ol start="1"><li><strong>Validate checkout and calculate price.</strong> Check identity, cart version, shipping, availability, discounts, taxes, and currency. Have the user accept the final server-calculated total. <em>Why first?</em> Avoid resource reservations and payments for an invalid cart.</li><li><strong>Persist checkout attempt and pending order.</strong> Record the operation identity and Saga state durably. <em>Why?</em> The workflow must survive a crash before side effects.</li><li><strong>Reserve inventory.</strong> Inventory Service checks and reserves all requested quantities atomically within its transactional boundary. <em>Why before payment?</em> Do not authorize a payment for unavailable stock.</li><li><strong>Authorize payment.</strong> Payment Service creates/reuses a stable PSP operation. <em>Why authorization?</em> For suitable card/payment flows, funds can be held before capture under fulfillment policy.</li><li><strong>Commit inventory allocation.</strong> Convert temporary reservations to allocated inventory idempotently. <em>Why?</em> A confirmed order must not rely on an expiring temporary hold.</li><li><strong>Confirm order.</strong> Change order to <code>CONFIRMED</code>, writing <code>OrderConfirmed</code> to the outbox in the same local transaction. <em>Why?</em> The order now reflects completed prerequisites.</li><li><strong>Start fulfillment and notifications.</strong> Relay events; consumers act independently. <em>Why asynchronously?</em> Email or shipping-service problems must not invalidate a confirmed purchase.</li></ol>
-<h3 id="authorization-versus-capture">Authorization versus capture</h3>
-<table><thead><tr><th>Operation</th><th>Meaning</th></tr></thead><tbody><tr><td>Authorization</td><td>Request approval to hold available funds</td></tr><tr><td>Capture</td><td>Request collection of previously authorized funds</td></tr><tr><td>Void/cancel authorization</td><td>Release an authorization no longer needed</td></tr><tr><td>Refund</td><td>Return funds after a completed payment</td></tr></tbody></table>
-<p>For this example, assume capture happens at an appropriate fulfillment/shipping stage. Real provider rules, payment methods, authorization expiry, and merchant policy determine exact timing.</p>
-<p><strong><code>CONFIRMED</code> is not the same as settled.</strong> Here it means inventory allocated and payment authorized.</p>
-<hr>
-<h2 id="8-prevent-inventory-overselling">8. Prevent inventory overselling</h2>
-<p>Two customers attempt to buy the last item:</p>
-<pre><code>Inventory = 1
+    <p>Without idempotency, retries could create another order.</p>
+    <p><strong>Implementation:</strong> Store authenticated customer,
+        idempotency key, request fingerprint, and checkout attempt ID. Enforce a
+        unique constraint so concurrent retries do not start duplicate
+        workflows. Reject reuse of the same key with different parameters.</p>
+    <p><strong>Important:</strong> Checkout-level and PSP-level idempotency are
+        separate safeguards. Use both.</p>
+    <hr>
+    <h2 id="6-data-model">6. Data model</h2>
+    <h3 id="choice-relational-database-for-transactions">Choice: relational
+        database for transactions</h3>
+    <p>Why SQL is a sensible default:</p>
+    <ul>
+        <li>Orders have related items and payments.</li>
+        <li>Inventory reservation needs conditional atomic updates.</li>
+        <li>Payment state needs constraints and safe transitions.</li>
+        <li>Local transactions enforce consistency within a service boundary.
+        </li>
+    </ul>
+    <p>A Saga coordinates across separately committed service transactions.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Table</th>
+            <th>Important fields</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>checkout_attempts</code></td>
+            <td>attempt<em>id, customer</em>id, idempotency<em>key, request</em>hash,
+                status
+            </td>
+        </tr>
+        <tr>
+            <td><code>orders</code></td>
+            <td>order<em>id, customer</em>id, total_minor, currency, status,
+                version
+            </td>
+        </tr>
+        <tr>
+            <td><code>order_items</code></td>
+            <td>order<em>id, product</em>id, quantity, unit<em>price</em>minor
+            </td>
+        </tr>
+        <tr>
+            <td><code>inventory</code></td>
+            <td>sku, warehouse<em>id, on</em>hand, reserved</td>
+        </tr>
+        <tr>
+            <td><code>reservations</code></td>
+            <td>reservation<em>id, order</em>id, sku, quantity, expires_at,
+                status
+            </td>
+        </tr>
+        <tr>
+            <td><code>payments</code></td>
+            <td>payment<em>id, order</em>id, provider<em>reference, amount</em>minor,
+                status
+            </td>
+        </tr>
+        <tr>
+            <td><code>saga_instances</code></td>
+            <td>saga<em>id, order</em>id, current_step, status, version</td>
+        </tr>
+        <tr>
+            <td><code>outbox_events</code></td>
+            <td>event<em>id, aggregate</em>id, event<em>type, payload,
+                publish</em>status
+            </td>
+        </tr>
+        <tr>
+            <td><code>processed_events</code></td>
+            <td>consumer<em>id, event</em>id, processed_at</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>In a service-owned design, place each table in the appropriate service
+        database, not in one shared cross-service schema.</p>
+    <p><strong>Money:</strong> Store integer minor units (for example, 12500
+        cents for USD 125.00) or a properly defined decimal type, never binary
+        floating point for financial arithmetic. Record currency and rounding
+        rules.</p>
+    <p><strong>Historical truth:</strong> Snapshot product prices and purchase
+        details into the order so catalog changes do not rewrite order history.
+    </p>
+    <hr>
+    <h2 id="7-successful-checkout-flow-and-why-each-step-exists">7. Successful
+        checkout flow and why each step exists</h2>
+    <ol start="1">
+        <li><strong>Validate checkout and calculate price.</strong> Check
+            identity, cart version, shipping, availability, discounts, taxes,
+            and currency. Have the user accept the final server-calculated
+            total. <em>Why first?</em> Avoid resource reservations and payments
+            for an invalid cart.
+        </li>
+        <li><strong>Persist checkout attempt and pending order.</strong> Record
+            the operation identity and Saga state durably. <em>Why?</em> The
+            workflow must survive a crash before side effects.
+        </li>
+        <li><strong>Reserve inventory.</strong> Inventory Service checks and
+            reserves all requested quantities atomically within its
+            transactional boundary. <em>Why before payment?</em> Do not
+            authorize a payment for unavailable stock.
+        </li>
+        <li><strong>Authorize payment.</strong> Payment Service creates/reuses a
+            stable PSP operation. <em>Why authorization?</em> For suitable
+            card/payment flows, funds can be held before capture under
+            fulfillment policy.
+        </li>
+        <li><strong>Commit inventory allocation.</strong> Convert temporary
+            reservations to allocated inventory idempotently. <em>Why?</em> A
+            confirmed order must not rely on an expiring temporary hold.
+        </li>
+        <li><strong>Confirm order.</strong> Change order to
+            <code>CONFIRMED</code>, writing <code>OrderConfirmed</code> to the
+            outbox in the same local transaction. <em>Why?</em> The order now
+            reflects completed prerequisites.
+        </li>
+        <li><strong>Start fulfillment and notifications.</strong> Relay events;
+            consumers act independently. <em>Why asynchronously?</em> Email or
+            shipping-service problems must not invalidate a confirmed purchase.
+        </li>
+    </ol>
+    <h3 id="authorization-versus-capture">Authorization versus capture</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Operation</th>
+            <th>Meaning</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Authorization</td>
+            <td>Request approval to hold available funds</td>
+        </tr>
+        <tr>
+            <td>Capture</td>
+            <td>Request collection of previously authorized funds</td>
+        </tr>
+        <tr>
+            <td>Void/cancel authorization</td>
+            <td>Release an authorization no longer needed</td>
+        </tr>
+        <tr>
+            <td>Refund</td>
+            <td>Return funds after a completed payment</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>For this example, assume capture happens at an appropriate
+        fulfillment/shipping stage. Real provider rules, payment methods,
+        authorization expiry, and merchant policy determine exact timing.</p>
+    <p><strong><code>CONFIRMED</code> is not the same as settled.</strong> Here
+        it means inventory allocated and payment authorized.</p>
+    <hr>
+    <h2 id="8-prevent-inventory-overselling">8. Prevent inventory
+        overselling</h2>
+    <p>Two customers attempt to buy the last item:</p>
+    <pre><code>Inventory = 1
 
 Customer A checks stock --&gt; 1 available
 Customer B checks stock --&gt; 1 available
@@ -526,25 +1228,37 @@ Customer A reserves 1
 Customer B reserves 1
 
 Incorrect result: 2 orders for 1 item</code></pre>
-<h3 id="wrong-pattern-read-then-update">Wrong pattern: read then update</h3>
-<pre><code>SELECT available FROM inventory WHERE sku = 'ABC';
+    <h3 id="wrong-pattern-read-then-update">Wrong pattern: read then update</h3>
+    <pre><code>SELECT available FROM inventory WHERE sku = 'ABC';
 -- Application sees 1 available.
 UPDATE inventory
 SET reserved = reserved + 1
 WHERE sku = 'ABC';</code></pre>
-<p>Concurrent readers can both observe the same stock.</p>
-<h3 id="better-conditional-atomic-update">Better: conditional atomic update</h3>
-<pre><code>UPDATE inventory
+    <p>Concurrent readers can both observe the same stock.</p>
+    <h3 id="better-conditional-atomic-update">Better: conditional atomic
+        update</h3>
+    <pre><code>UPDATE inventory
 SET reserved = reserved + 1
 WHERE sku = 'ABC'
   AND on_hand - reserved &gt;= 1;</code></pre>
-<p>If the affected row count is zero, the reservation fails. The condition and update occur atomically according to the database's concurrency semantics.</p>
-<p>For an order with multiple SKUs, try to reserve all relevant rows in <strong>one local Inventory Service transaction</strong>, with a consistent lock order to reduce deadlocks. If stock spans independent databases, separate reservations require compensation for partial success.</p>
-<h3 id="why-not-redis-as-the-source-of-truth">Why not Redis as the source of truth?</h3>
-<p>Redis is useful for fast <strong>approximate product availability</strong>. Cache expiry, replication delays, and failover can make it unsuitable as the final authority for scarce inventory.</p>
-<p><strong>Choice:</strong> Final stock allocation uses durable, transactional inventory records. Cache read-only availability displays.</p>
-<h3 id="reservation-lifecycle">Reservation lifecycle</h3>
-<pre><code>AVAILABLE
+    <p>If the affected row count is zero, the reservation fails. The condition
+        and update occur atomically according to the database's concurrency
+        semantics.</p>
+    <p>For an order with multiple SKUs, try to reserve all relevant rows in
+        <strong>one local Inventory Service transaction</strong>, with a
+        consistent lock order to reduce deadlocks. If stock spans independent
+        databases, separate reservations require compensation for partial
+        success.</p>
+    <h3 id="why-not-redis-as-the-source-of-truth">Why not Redis as the source of
+        truth?</h3>
+    <p>Redis is useful for fast <strong>approximate product
+        availability</strong>. Cache expiry, replication delays, and failover
+        can make it unsuitable as the final authority for scarce inventory.</p>
+    <p><strong>Choice:</strong> Final stock allocation uses durable,
+        transactional inventory records. Cache read-only availability displays.
+    </p>
+    <h3 id="reservation-lifecycle">Reservation lifecycle</h3>
+    <pre><code>AVAILABLE
     |
     v
  RESERVED
@@ -554,12 +1268,76 @@ WHERE sku = 'ABC'
     |
     v
  COMMITTED</code></pre>
-<p>An expiry worker releases reservations only after an atomic state check. If payment authorization arrives after stock expiry, attempt safe compensation (for example, void authorization) rather than confirming nonexistent inventory.</p>
-<hr>
-<h2 id="9-saga-failure-recovery">9. Saga failure recovery</h2>
-<table><thead><tr><th>Failure</th><th>What can go wrong?</th><th>Correct recovery</th></tr></thead><tbody><tr><td>Inventory unavailable</td><td>Charge for unavailable goods</td><td>Stop before payment; fail order</td></tr><tr><td>Partial reservation</td><td>Some stock held; other items unavailable</td><td>Release completed reservations</td></tr><tr><td>Payment declined</td><td>Stock remains held</td><td>Release stock and cancel order</td></tr><tr><td>Payment timeout</td><td>Payment may have succeeded</td><td>Mark unknown; query/reconcile PSP</td></tr><tr><td>Payment authorized, order DB unavailable</td><td>Order unconfirmed though funds held</td><td>Retry confirmation from durable Saga state</td></tr><tr><td>Inventory expires during payment</td><td>Late authorization without stock</td><td>Void authorization and cancel safely</td></tr><tr><td>Notification fails</td><td>Confirmation email not delivered</td><td>Retry; order stays confirmed</td></tr><tr><td>Orchestrator crashes</td><td>Workflow stops midway</td><td>Resume from persisted state</td></tr><tr><td>Event delivered twice</td><td>Duplicate downstream action</td><td>Idempotent consumers</td></tr><tr><td>Webhook arrives late</td><td>Local state is outdated</td><td>Reconcile with provider state</td></tr></tbody></table>
-<h3 id="critical-scenario-payment-authorized-order-update-fails">Critical scenario: payment authorized, order update fails</h3>
-<pre><code>Inventory reserved
+    <p>An expiry worker releases reservations only after an atomic state check.
+        If payment authorization arrives after stock expiry, attempt safe
+        compensation (for example, void authorization) rather than confirming
+        nonexistent inventory.</p>
+    <hr>
+    <h2 id="9-saga-failure-recovery">9. Saga failure recovery</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Failure</th>
+            <th>What can go wrong?</th>
+            <th>Correct recovery</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Inventory unavailable</td>
+            <td>Charge for unavailable goods</td>
+            <td>Stop before payment; fail order</td>
+        </tr>
+        <tr>
+            <td>Partial reservation</td>
+            <td>Some stock held; other items unavailable</td>
+            <td>Release completed reservations</td>
+        </tr>
+        <tr>
+            <td>Payment declined</td>
+            <td>Stock remains held</td>
+            <td>Release stock and cancel order</td>
+        </tr>
+        <tr>
+            <td>Payment timeout</td>
+            <td>Payment may have succeeded</td>
+            <td>Mark unknown; query/reconcile PSP</td>
+        </tr>
+        <tr>
+            <td>Payment authorized, order DB unavailable</td>
+            <td>Order unconfirmed though funds held</td>
+            <td>Retry confirmation from durable Saga state</td>
+        </tr>
+        <tr>
+            <td>Inventory expires during payment</td>
+            <td>Late authorization without stock</td>
+            <td>Void authorization and cancel safely</td>
+        </tr>
+        <tr>
+            <td>Notification fails</td>
+            <td>Confirmation email not delivered</td>
+            <td>Retry; order stays confirmed</td>
+        </tr>
+        <tr>
+            <td>Orchestrator crashes</td>
+            <td>Workflow stops midway</td>
+            <td>Resume from persisted state</td>
+        </tr>
+        <tr>
+            <td>Event delivered twice</td>
+            <td>Duplicate downstream action</td>
+            <td>Idempotent consumers</td>
+        </tr>
+        <tr>
+            <td>Webhook arrives late</td>
+            <td>Local state is outdated</td>
+            <td>Reconcile with provider state</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="critical-scenario-payment-authorized-order-update-fails">Critical
+        scenario: payment authorized, order update fails</h3>
+    <pre><code>Inventory reserved
        |
        v
 Payment authorized
@@ -569,20 +1347,38 @@ Order DB unavailable
        |
        v
 Payment and order outcomes diverge</code></pre>
-<p>Do not tell the customer payment failed just because the order database update failed.</p>
-<ol start="1"><li>Recover the PSP state and provider transaction reference.</li><li>Keep a recoverable Saga state.</li><li>Retry order confirmation when safe.</li><li>Verify inventory allocation remains valid.</li><li>If completion is impossible, void the authorization or refund as appropriate.</li><li>Reconcile unresolved records.</li></ol>
-<p><strong>Key distinction:</strong> Retry recoverable technical failures. Compensate if the business workflow cannot complete.</p>
-<h3 id="why-blindly-retrying-a-psp-call-is-dangerous">Why blindly retrying a PSP call is dangerous</h3>
-<p>A timeout does not prove the initial PSP operation failed. Another fresh request may create an additional authorization. Reuse a stable provider idempotency key or operation reference and determine the existing result first.</p>
-<p><strong>Never treat a payment timeout as proof of failure.</strong></p>
-<hr>
-<h2 id="10-transactional-outbox-and-the-dual-write-problem">10. Transactional Outbox and the dual-write problem</h2>
-<p>Unsafe sequence:</p>
-<pre><code>1. UPDATE orders SET status = 'CONFIRMED'
+    <p>Do not tell the customer payment failed just because the order database
+        update failed.</p>
+    <ol start="1">
+        <li>Recover the PSP state and provider transaction reference.</li>
+        <li>Keep a recoverable Saga state.</li>
+        <li>Retry order confirmation when safe.</li>
+        <li>Verify inventory allocation remains valid.</li>
+        <li>If completion is impossible, void the authorization or refund as
+            appropriate.
+        </li>
+        <li>Reconcile unresolved records.</li>
+    </ol>
+    <p><strong>Key distinction:</strong> Retry recoverable technical failures.
+        Compensate if the business workflow cannot complete.</p>
+    <h3 id="why-blindly-retrying-a-psp-call-is-dangerous">Why blindly retrying a
+        PSP call is dangerous</h3>
+    <p>A timeout does not prove the initial PSP operation failed. Another fresh
+        request may create an additional authorization. Reuse a stable provider
+        idempotency key or operation reference and determine the existing result
+        first.</p>
+    <p><strong>Never treat a payment timeout as proof of failure.</strong></p>
+    <hr>
+    <h2 id="10-transactional-outbox-and-the-dual-write-problem">10.
+        Transactional Outbox and the dual-write problem</h2>
+    <p>Unsafe sequence:</p>
+    <pre><code>1. UPDATE orders SET status = 'CONFIRMED'
 2. Publish OrderConfirmed to message broker</code></pre>
-<p>If the DB update succeeds and publishing fails, the order is confirmed but fulfillment never receives the event. Publishing first can create the reverse inconsistency.</p>
-<h3 id="choice-transactional-outbox">Choice: Transactional Outbox</h3>
-<pre><code>          Order Service
+    <p>If the DB update succeeds and publishing fails, the order is confirmed
+        but fulfillment never receives the event. Publishing first can create
+        the reverse inconsistency.</p>
+    <h3 id="choice-transactional-outbox">Choice: Transactional Outbox</h3>
+    <pre><code>          Order Service
                 |
                 v
        ONE DB TRANSACTION
@@ -601,25 +1397,69 @@ Payment and order outcomes diverge</code></pre>
                 |
                 v
         Fulfillment Service</code></pre>
-<p>The order update and outbox insertion commit together. A relay publishes committed outbox records and retries if necessary.</p>
-<h3 id="does-outbox-guarantee-exactly-once-delivery">Does outbox guarantee exactly-once delivery?</h3>
-<p><strong>No.</strong> For example, the relay might publish successfully and crash before recording that fact. On restart, it publishes again.</p>
-<pre><code>Reliable Outbox
+    <p>The order update and outbox insertion commit together. A relay publishes
+        committed outbox records and retries if necessary.</p>
+    <h3 id="does-outbox-guarantee-exactly-once-delivery">Does outbox guarantee
+        exactly-once delivery?</h3>
+    <p><strong>No.</strong> For example, the relay might publish successfully
+        and crash before recording that fact. On restart, it publishes again.
+    </p>
+    <pre><code>Reliable Outbox
       +
 At-least-once Delivery
       +
 Idempotent Consumer
       =
 Reliable Business Processing</code></pre>
-<p>The consumer stores an event ID or business operation ID under a uniqueness constraint. Its deduplication record and business update must commit atomically.</p>
-<h3 id="kafka-versus-queue">Kafka versus queue</h3>
-<table><thead><tr><th>Requirement</th><th>Better initial fit</th></tr></thead><tbody><tr><td>Independent jobs distributed to workers</td><td>Durable work queue</td></tr><tr><td>Replay event history</td><td>Kafka-style stream</td></tr><tr><td>Multiple independent consumers</td><td>Pub/sub or stream</td></tr><tr><td>Per-aggregate ordering</td><td>Partition/key by aggregate ID</td></tr><tr><td>Simple notification delivery</td><td>Queue</td></tr><tr><td>Large-scale analytical streaming</td><td>Kafka-style stream</td></tr></tbody></table>
-<p>Brokers do not automatically provide global ordering or exactly-once business effects.</p>
-<p><strong>Choice:</strong> Start with a durable queue or event bus for checkout. Use a log/stream platform where replay, retention, and high-throughput event processing are real requirements.</p>
-<hr>
-<h2 id="11-handle-payment-webhooks">11. Handle payment webhooks</h2>
-<p>PSP webhooks may arrive more than once, out of order, or after local timeouts. Do not assume the last received event is the current truth.</p>
-<pre><code>Payment Provider
+    <p>The consumer stores an event ID or business operation ID under a
+        uniqueness constraint. Its deduplication record and business update must
+        commit atomically.</p>
+    <h3 id="kafka-versus-queue">Kafka versus queue</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Requirement</th>
+            <th>Better initial fit</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Independent jobs distributed to workers</td>
+            <td>Durable work queue</td>
+        </tr>
+        <tr>
+            <td>Replay event history</td>
+            <td>Kafka-style stream</td>
+        </tr>
+        <tr>
+            <td>Multiple independent consumers</td>
+            <td>Pub/sub or stream</td>
+        </tr>
+        <tr>
+            <td>Per-aggregate ordering</td>
+            <td>Partition/key by aggregate ID</td>
+        </tr>
+        <tr>
+            <td>Simple notification delivery</td>
+            <td>Queue</td>
+        </tr>
+        <tr>
+            <td>Large-scale analytical streaming</td>
+            <td>Kafka-style stream</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Brokers do not automatically provide global ordering or exactly-once
+        business effects.</p>
+    <p><strong>Choice:</strong> Start with a durable queue or event bus for
+        checkout. Use a log/stream platform where replay, retention, and
+        high-throughput event processing are real requirements.</p>
+    <hr>
+    <h2 id="11-handle-payment-webhooks">11. Handle payment webhooks</h2>
+    <p>PSP webhooks may arrive more than once, out of order, or after local
+        timeouts. Do not assume the last received event is the current
+        truth.</p>
+    <pre><code>Payment Provider
        |
        v
 Webhook Endpoint
@@ -641,14 +1481,64 @@ Update Payment State
        |
        v
 Resume Saga</code></pre>
-<p><strong>Why:</strong> Separate reliable acceptance of a notification from slower processing. Verify signatures, persist the event, deduplicate, and apply valid payment state transitions. If there is uncertainty, reconcile against the PSP's authoritative state.</p>
-<p>For extra cardholder authentication, the workflow may enter <code>REQUIRES_ACTION</code> and resume after the customer completes the step.</p>
-<hr>
-<h2 id="12-scaling-and-performance">12. Scaling and performance</h2>
-<table><thead><tr><th>Concern</th><th>Design decision</th><th>Why</th></tr></thead><tbody><tr><td>Growing API traffic</td><td>Stateless replicas behind a load balancer</td><td>Horizontal scaling</td></tr><tr><td>Repeated catalog reads</td><td>Redis/cache/CDN</td><td>Reduce read demand</td></tr><tr><td>Hot products</td><td>Atomic inventory updates; partition appropriately</td><td>Stock correctness and contention control</td></tr><tr><td>Large order-history reads</td><td>Read replicas or projections</td><td>Separate reads from writes</td></tr><tr><td>Increasing event volume</td><td>Partitioned broker and worker consumers</td><td>Parallelism</td></tr><tr><td>Slow PSP</td><td>Timeouts, bounded retries, limited concurrency</td><td>Avoid resource exhaustion</td></tr><tr><td>Large historical tables</td><td>Archiving/partitioning when needed</td><td>Maintenance and query efficiency</td></tr></tbody></table>
-<h3 id="should-we-shard-immediately">Should we shard immediately?</h3>
-<p>No. Measure database CPU, storage, contention, latency, and throughput first.</p>
-<pre><code>Single SQL Primary
+    <p><strong>Why:</strong> Separate reliable acceptance of a notification from
+        slower processing. Verify signatures, persist the event, deduplicate,
+        and apply valid payment state transitions. If there is uncertainty,
+        reconcile against the PSP's authoritative state.</p>
+    <p>For extra cardholder authentication, the workflow may enter <code>REQUIRES_ACTION</code>
+        and resume after the customer completes the step.</p>
+    <hr>
+    <h2 id="12-scaling-and-performance">12. Scaling and performance</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Concern</th>
+            <th>Design decision</th>
+            <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Growing API traffic</td>
+            <td>Stateless replicas behind a load balancer</td>
+            <td>Horizontal scaling</td>
+        </tr>
+        <tr>
+            <td>Repeated catalog reads</td>
+            <td>Redis/cache/CDN</td>
+            <td>Reduce read demand</td>
+        </tr>
+        <tr>
+            <td>Hot products</td>
+            <td>Atomic inventory updates; partition appropriately</td>
+            <td>Stock correctness and contention control</td>
+        </tr>
+        <tr>
+            <td>Large order-history reads</td>
+            <td>Read replicas or projections</td>
+            <td>Separate reads from writes</td>
+        </tr>
+        <tr>
+            <td>Increasing event volume</td>
+            <td>Partitioned broker and worker consumers</td>
+            <td>Parallelism</td>
+        </tr>
+        <tr>
+            <td>Slow PSP</td>
+            <td>Timeouts, bounded retries, limited concurrency</td>
+            <td>Avoid resource exhaustion</td>
+        </tr>
+        <tr>
+            <td>Large historical tables</td>
+            <td>Archiving/partitioning when needed</td>
+            <td>Maintenance and query efficiency</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="should-we-shard-immediately">Should we shard immediately?</h3>
+    <p>No. Measure database CPU, storage, contention, latency, and throughput
+        first.</p>
+    <pre><code>Single SQL Primary
        |
        v
 Primary + Read Replicas
@@ -658,33 +1548,261 @@ Partitioned Large Tables
        |
        v
 Sharding by suitable ownership key</code></pre>
-<p>Sharding creates cross-shard transaction and operational complexity. Inventory and orders may need different partition keys: inventory by SKU and warehouse, orders by customer or order ID.</p>
-<h3 id="multi-region-correctness">Multi-region correctness</h3>
-<p>Two active regions independently selling the last shared unit can oversell.</p>
-<p>A safer first design gives each inventory allocation domain a single authoritative write owner, with well-defined regional failover or separate regional stock ownership. Active-active writable inventory requires explicit coordination/conflict strategy.</p>
-<hr>
-<h2 id="13-security-and-compliance">13. Security and compliance</h2>
-<ul><li><strong>Authentication:</strong> Validate account or guest checkout session.</li><li><strong>Authorization:</strong> Users can access only their own carts, orders, and payment operations.</li><li><strong>Server validation:</strong> Never trust browser-supplied amounts or discounts.</li><li><strong>Tokenization:</strong> Prefer hosted provider payment collection/SDKs that avoid direct card handling.</li><li><strong>TLS:</strong> Protect external and sensitive internal traffic.</li><li><strong>Secrets management:</strong> Store PSP API keys securely, rotate, least privilege.</li><li><strong>Webhook verification:</strong> Verify signatures and handle replay.</li><li><strong>Data protection:</strong> Encrypt sensitive data and remove credentials from logs.</li><li><strong>PCI DSS:</strong> Determine actual cardholder-data scope and relevant controls.</li></ul>
-<p>Using a third-party payment provider does <strong>not</strong> automatically eliminate a merchant's PCI DSS responsibilities.</p>
-<p>For APIs, enforce object-level authorization: modifying <code>order_id</code> must never expose another customer's purchase.</p>
-<hr>
-<h2 id="14-reliability-and-operations">14. Reliability and operations</h2>
-<h3 id="important-metrics">Important metrics</h3>
-<table><thead><tr><th>Metric</th><th>What it reveals</th></tr></thead><tbody><tr><td>Checkout completion rate</td><td>Business success</td></tr><tr><td>Checkout p95/p99 latency</td><td>Customer experience</td></tr><tr><td>Payment authorization failures</td><td>PSP/payment problems</td></tr><tr><td>Unknown payment outcomes</td><td>Reconciliation risk</td></tr><tr><td>Inventory reservation failures</td><td>Stock contention</td></tr><tr><td>Stuck Saga count and age</td><td>Workflow recovery problems</td></tr><tr><td>Outbox publication lag</td><td>Event delivery health</td></tr><tr><td>Consumer retries/DLQ count</td><td>Downstream failures</td></tr><tr><td>Authorization/capture mismatches</td><td>Financial reconciliation risk</td></tr></tbody></table>
-<h3 id="resilience-measures">Resilience measures</h3>
-<ul><li>Deploy stateless components across availability zones where supported.</li><li>Use durable state, health checks, bounded retries, circuit breakers, and controlled concurrency.</li><li><strong>Circuit breaker:</strong> Temporarily stop calls to a failing dependency to limit cascading failures; do not falsely classify uncertain payments as failed.</li><li>Propagate correlation IDs through APIs, Saga actions, PSP references, and events.</li><li>Reconcile local payment/order state with PSP records periodically, not only after errors.</li><li>Test PSP timeouts, duplicate webhooks, broker redelivery, DB failures, and reservation expiry.</li></ul>
-<hr>
-<h2 id="15-final-decision-summary">15. Final decision summary</h2>
-<table><thead><tr><th>Decision</th><th>Chosen approach</th><th>Main reason</th></tr></thead><tbody><tr><td>Transaction coordination</td><td>Orchestrated Saga</td><td>Explicit workflow and compensation ownership</td></tr><tr><td>Transactional data</td><td>Relational SQL</td><td>Local ACID and constraints</td></tr><tr><td>Inventory</td><td>Atomic reservations</td><td>Avoid overselling</td></tr><tr><td>Payments</td><td>Stable PSP operation and idempotency</td><td>Safe retries</td></tr><tr><td>Capture</td><td>Separate from authorization when appropriate</td><td>Align collection with fulfillment</td></tr><tr><td>Communication</td><td>Sync for needed decisions; async downstream</td><td>Performance and resilience</td></tr><tr><td>Event publication</td><td>Transactional Outbox</td><td>Avoid lost events</td></tr><tr><td>Event delivery</td><td>At-least-once + idempotent consumers</td><td>Safe redelivery</td></tr><tr><td>Failure recovery</td><td>Bounded retries + reconciliation</td><td>Manage uncertain outcomes</td></tr><tr><td>Caching</td><td>Read optimization, not inventory authority</td><td>Preserve correctness</td></tr><tr><td>Deployment</td><td>Start simple; scale measured bottlenecks</td><td>Avoid unnecessary complexity</td></tr></tbody></table>
-<hr>
-<h2 id="16-concise-interview-walkthrough">16. Concise interview walkthrough</h2>
-<blockquote><p>We start with a checkout API that validates the cart, calculates the final server-side price, and creates a durable checkout attempt identified by an idempotency key.</p>
-<p>Because orders, inventory, and payments are separate transactional boundaries, we coordinate them through an orchestrated Saga. The Saga creates a pending order, reserves stock atomically, and requests payment authorization from an external provider. Once the stock is committed and the payment is authorized, the order is confirmed.</p>
-<p>We use a Transactional Outbox to publish the confirmation event reliably. Fulfillment and notifications process it asynchronously. Consumers are idempotent because events can be delivered more than once.</p>
-<p>For recovery, we distinguish technical failures from business failures. Declines release inventory. Timeouts with uncertain payment outcomes trigger reconciliation rather than blind retries. We track durable workflow progress, scale stateless APIs, protect authoritative stock updates, and monitor stuck workflows and payment mismatches.</p></blockquote>
-<h3 id="five-concepts-to-remember">Five concepts to remember</h3>
-<ol start="1"><li><strong>Saga:</strong> Coordinates a business workflow across independent transactions.</li><li><strong>Compensation:</strong> Performs a new action to reverse a previously completed business step.</li><li><strong>Idempotency:</strong> Prevents duplicate effects on retries of the same logical operation.</li><li><strong>Transactional Outbox:</strong> Reliably connects a database change to event publication.</li><li><strong>Atomic reservation:</strong> Prevents multiple buyers from using the same stock.</li></ol>
-<p><strong>Central lesson:</strong> Distributed checkout cannot assume all services succeed together. Design explicitly for partial success, retries, uncertain external outcomes, compensation, and eventual business completion.</p>
-<hr>
-<h2 id="official-references-for-further-verification">Official references for further verification</h2>
-<ul><li>AWS Prescriptive Guidance — Saga orchestration pattern: https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-orchestration.html</li><li>AWS Prescriptive Guidance — Transactional Outbox pattern: https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html</li><li>Stripe — Idempotent requests: https://docs.stripe.com/api/idempotent_requests</li><li>Stripe — Webhook handling: https://docs.stripe.com/webhooks</li><li>Stripe — Separate authorization and capture: https://docs.stripe.com/payments/place-a-hold-on-a-payment-method</li><li>AWS SQS — At-least-once delivery: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues-at-least-once-delivery.html</li><li>PCI Security Standards Council: https://www.pcisecuritystandards.org/</li><li>OWASP API Security Top 10: https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/</li></ul></main></body></html>
+    <p>Sharding creates cross-shard transaction and operational complexity.
+        Inventory and orders may need different partition keys: inventory by SKU
+        and warehouse, orders by customer or order ID.</p>
+    <h3 id="multi-region-correctness">Multi-region correctness</h3>
+    <p>Two active regions independently selling the last shared unit can
+        oversell.</p>
+    <p>A safer first design gives each inventory allocation domain a single
+        authoritative write owner, with well-defined regional failover or
+        separate regional stock ownership. Active-active writable inventory
+        requires explicit coordination/conflict strategy.</p>
+    <hr>
+    <h2 id="13-security-and-compliance">13. Security and compliance</h2>
+    <ul>
+        <li><strong>Authentication:</strong> Validate account or guest checkout
+            session.
+        </li>
+        <li><strong>Authorization:</strong> Users can access only their own
+            carts, orders, and payment operations.
+        </li>
+        <li><strong>Server validation:</strong> Never trust browser-supplied
+            amounts or discounts.
+        </li>
+        <li><strong>Tokenization:</strong> Prefer hosted provider payment
+            collection/SDKs that avoid direct card handling.
+        </li>
+        <li><strong>TLS:</strong> Protect external and sensitive internal
+            traffic.
+        </li>
+        <li><strong>Secrets management:</strong> Store PSP API keys securely,
+            rotate, least privilege.
+        </li>
+        <li><strong>Webhook verification:</strong> Verify signatures and handle
+            replay.
+        </li>
+        <li><strong>Data protection:</strong> Encrypt sensitive data and remove
+            credentials from logs.
+        </li>
+        <li><strong>PCI DSS:</strong> Determine actual cardholder-data scope and
+            relevant controls.
+        </li>
+    </ul>
+    <p>Using a third-party payment provider does <strong>not</strong>
+        automatically eliminate a merchant's PCI DSS responsibilities.</p>
+    <p>For APIs, enforce object-level authorization: modifying
+        <code>order_id</code> must never expose another customer's purchase.</p>
+    <hr>
+    <h2 id="14-reliability-and-operations">14. Reliability and operations</h2>
+    <h3 id="important-metrics">Important metrics</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Metric</th>
+            <th>What it reveals</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Checkout completion rate</td>
+            <td>Business success</td>
+        </tr>
+        <tr>
+            <td>Checkout p95/p99 latency</td>
+            <td>Customer experience</td>
+        </tr>
+        <tr>
+            <td>Payment authorization failures</td>
+            <td>PSP/payment problems</td>
+        </tr>
+        <tr>
+            <td>Unknown payment outcomes</td>
+            <td>Reconciliation risk</td>
+        </tr>
+        <tr>
+            <td>Inventory reservation failures</td>
+            <td>Stock contention</td>
+        </tr>
+        <tr>
+            <td>Stuck Saga count and age</td>
+            <td>Workflow recovery problems</td>
+        </tr>
+        <tr>
+            <td>Outbox publication lag</td>
+            <td>Event delivery health</td>
+        </tr>
+        <tr>
+            <td>Consumer retries/DLQ count</td>
+            <td>Downstream failures</td>
+        </tr>
+        <tr>
+            <td>Authorization/capture mismatches</td>
+            <td>Financial reconciliation risk</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3 id="resilience-measures">Resilience measures</h3>
+    <ul>
+        <li>Deploy stateless components across availability zones where
+            supported.
+        </li>
+        <li>Use durable state, health checks, bounded retries, circuit breakers,
+            and controlled concurrency.
+        </li>
+        <li><strong>Circuit breaker:</strong> Temporarily stop calls to a
+            failing dependency to limit cascading failures; do not falsely
+            classify uncertain payments as failed.
+        </li>
+        <li>Propagate correlation IDs through APIs, Saga actions, PSP
+            references, and events.
+        </li>
+        <li>Reconcile local payment/order state with PSP records periodically,
+            not only after errors.
+        </li>
+        <li>Test PSP timeouts, duplicate webhooks, broker redelivery, DB
+            failures, and reservation expiry.
+        </li>
+    </ul>
+    <hr>
+    <h2 id="15-final-decision-summary">15. Final decision summary</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Decision</th>
+            <th>Chosen approach</th>
+            <th>Main reason</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Transaction coordination</td>
+            <td>Orchestrated Saga</td>
+            <td>Explicit workflow and compensation ownership</td>
+        </tr>
+        <tr>
+            <td>Transactional data</td>
+            <td>Relational SQL</td>
+            <td>Local ACID and constraints</td>
+        </tr>
+        <tr>
+            <td>Inventory</td>
+            <td>Atomic reservations</td>
+            <td>Avoid overselling</td>
+        </tr>
+        <tr>
+            <td>Payments</td>
+            <td>Stable PSP operation and idempotency</td>
+            <td>Safe retries</td>
+        </tr>
+        <tr>
+            <td>Capture</td>
+            <td>Separate from authorization when appropriate</td>
+            <td>Align collection with fulfillment</td>
+        </tr>
+        <tr>
+            <td>Communication</td>
+            <td>Sync for needed decisions; async downstream</td>
+            <td>Performance and resilience</td>
+        </tr>
+        <tr>
+            <td>Event publication</td>
+            <td>Transactional Outbox</td>
+            <td>Avoid lost events</td>
+        </tr>
+        <tr>
+            <td>Event delivery</td>
+            <td>At-least-once + idempotent consumers</td>
+            <td>Safe redelivery</td>
+        </tr>
+        <tr>
+            <td>Failure recovery</td>
+            <td>Bounded retries + reconciliation</td>
+            <td>Manage uncertain outcomes</td>
+        </tr>
+        <tr>
+            <td>Caching</td>
+            <td>Read optimization, not inventory authority</td>
+            <td>Preserve correctness</td>
+        </tr>
+        <tr>
+            <td>Deployment</td>
+            <td>Start simple; scale measured bottlenecks</td>
+            <td>Avoid unnecessary complexity</td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h2 id="16-concise-interview-walkthrough">16. Concise interview
+        walkthrough</h2>
+    <blockquote><p>We start with a checkout API that validates the cart,
+        calculates the final server-side price, and creates a durable checkout
+        attempt identified by an idempotency key.</p>
+        <p>Because orders, inventory, and payments are separate transactional
+            boundaries, we coordinate them through an orchestrated Saga. The
+            Saga creates a pending order, reserves stock atomically, and
+            requests payment authorization from an external provider. Once the
+            stock is committed and the payment is authorized, the order is
+            confirmed.</p>
+        <p>We use a Transactional Outbox to publish the confirmation event
+            reliably. Fulfillment and notifications process it asynchronously.
+            Consumers are idempotent because events can be delivered more than
+            once.</p>
+        <p>For recovery, we distinguish technical failures from business
+            failures. Declines release inventory. Timeouts with uncertain
+            payment outcomes trigger reconciliation rather than blind retries.
+            We track durable workflow progress, scale stateless APIs, protect
+            authoritative stock updates, and monitor stuck workflows and payment
+            mismatches.</p></blockquote>
+    <h3 id="five-concepts-to-remember">Five concepts to remember</h3>
+    <ol start="1">
+        <li><strong>Saga:</strong> Coordinates a business workflow across
+            independent transactions.
+        </li>
+        <li><strong>Compensation:</strong> Performs a new action to reverse a
+            previously completed business step.
+        </li>
+        <li><strong>Idempotency:</strong> Prevents duplicate effects on retries
+            of the same logical operation.
+        </li>
+        <li><strong>Transactional Outbox:</strong> Reliably connects a database
+            change to event publication.
+        </li>
+        <li><strong>Atomic reservation:</strong> Prevents multiple buyers from
+            using the same stock.
+        </li>
+    </ol>
+    <p><strong>Central lesson:</strong> Distributed checkout cannot assume all
+        services succeed together. Design explicitly for partial success,
+        retries, uncertain external outcomes, compensation, and eventual
+        business completion.</p>
+    <hr>
+    <h2 id="official-references-for-further-verification">Official references
+        for further verification</h2>
+    <ul>
+        <li>AWS Prescriptive Guidance — Saga orchestration pattern:
+            https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-orchestration.html
+        </li>
+        <li>AWS Prescriptive Guidance — Transactional Outbox pattern:
+            https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html
+        </li>
+        <li>Stripe — Idempotent requests:
+            https://docs.stripe.com/api/idempotent_requests
+        </li>
+        <li>Stripe — Webhook handling: https://docs.stripe.com/webhooks</li>
+        <li>Stripe — Separate authorization and capture:
+            https://docs.stripe.com/payments/place-a-hold-on-a-payment-method
+        </li>
+        <li>AWS SQS — At-least-once delivery:
+            https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues-at-least-once-delivery.html
+        </li>
+        <li>PCI Security Standards Council:
+            https://www.pcisecuritystandards.org/
+        </li>
+        <li>OWASP API Security Top 10:
+            https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
+        </li>
+    </ul>
+</main>
+</body>
+</html>

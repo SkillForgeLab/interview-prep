@@ -8,7 +8,8 @@ failed-payment recovery, distributed state management, and financial
 reconciliation.
 
 > **Scope:** Illustrative architecture, not American Express's internal
-> implementation. Payment and financial requirements depend on provider, network,
+> implementation. Payment and financial requirements depend on provider,
+> network,
 > jurisdiction, and product rules.
 
 ## 1. Problem & Requirements
@@ -380,11 +381,14 @@ reconciliation mismatches, and DLQ depth.
 
 > I would design recurring billing around a durable subscription database,
 > distributed scheduler, invoice service, and idempotent payment orchestration.
-> Scheduler jobs may execute more than once, but each billing period must produce
+> Scheduler jobs may execute more than once, but each billing period must
+> produce
 > only its intended invoice and payment obligations. SQL transactions and unique
-> constraints provide local correctness, while a durable Saga coordinates payment
+> constraints provide local correctness, while a durable Saga coordinates
+> payment
 > and ledger services. A transactional outbox publishes reliable downstream
-> events. Payment failures require bounded retries, dunning, and explicit handling
+> events. Payment failures require bounded retries, dunning, and explicit
+> handling
 > of unknown outcomes. I would maintain separate lifecycle states, enforce
 > cancellation and consent rules, and reconcile invoices, provider charges, and
 > ledger postings to ensure financial accuracy.
