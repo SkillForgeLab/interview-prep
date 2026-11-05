@@ -35,6 +35,11 @@ skills in `.agents/`:
   it, and load `tech-stack-curriculum` when implementing examples in Python or
   another workspace-stack technology. Load only the topic references needed
   for the current lesson.
+- Additionally, load **`system-design-tutor`** when the user requests system
+  design teaching, a worked architecture, a case comparison, a distributed-
+  systems pattern, or a solution-architect review. Use
+  `first-principles-learning` alongside it for learning requests, and load only
+  the relevant module and references for the requested case.
 
 When the user asks for documentation, a guide, or learning material in HTML
 format, load **`html-documentation`**. It requires a single self-contained,
